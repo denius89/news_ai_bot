@@ -1,6 +1,8 @@
-# parsers/rss_parser.py
-
 import feedparser
+import json
+from datetime import datetime
+import dateutil.parser
+
 
 def fetch_rss(urls: list[str]) -> list[dict]:
     """
@@ -8,19 +10,38 @@ def fetch_rss(urls: list[str]) -> list[dict]:
     Возвращает список словарей с ключами: title, link, published.
     """
     news_items = []
+    seen_links = set()
+
     for url in urls:
         feed = feedparser.parse(url)
+
+        if feed.bozo:
+            print(f"[WARN] Ошибка при парсинге {url}")
+            continue
+
         for entry in feed.entries:
+            link = entry.get("link", "").strip()
+            if not link or link in seen_links:
+                continue
+            seen_links.add(link)
+
+            # Нормализация даты
+            published_raw = entry.get("published") or entry.get("updated")
+            try:
+                published = dateutil.parser.parse(published_raw) if published_raw else None
+            except Exception:
+                published = None
+
             news_items.append({
                 "title": entry.get("title", "").strip(),
-                "link": entry.get("link", "").strip(),
-                "published": entry.get("published", "") or entry.get("updated", "") or ""
+                "link": link,
+                "published": published
             })
+
     return news_items
 
 
 if __name__ == "__main__":
-    # Пример источников (крипто + экономика)
     test_urls = [
         "https://www.coindesk.com/arc/outboundfeeds/rss/",
         "https://cointelegraph.com/rss",
@@ -28,5 +49,4 @@ if __name__ == "__main__":
     ]
     items = fetch_rss(test_urls)
     print(f"Найдено новостей: {len(items)}")
-    for i, it in enumerate(items[:5], start=1):
-        print(f"{i}. {it['title']}  ({it['link']})")
+    print(json.dumps(items[:5], ensure_ascii=False, indent=2, default=str))
