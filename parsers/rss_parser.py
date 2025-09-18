@@ -7,7 +7,7 @@ import dateutil.parser
 def fetch_rss(urls: list[str]) -> list[dict]:
     """
     Загружает новости из списка RSS-источников.
-    Возвращает список словарей с ключами: title, link, published.
+    Возвращает список словарей с ключами: title, link, published, content.
     """
     news_items = []
     seen_links = set()
@@ -25,17 +25,25 @@ def fetch_rss(urls: list[str]) -> list[dict]:
                 continue
             seen_links.add(link)
 
-            # Нормализация даты
+            # Нормализация даты публикации
             published_raw = entry.get("published") or entry.get("updated")
             try:
                 published = dateutil.parser.parse(published_raw) if published_raw else None
             except Exception:
                 published = None
 
+            # Берём content или summary (если есть)
+            content = entry.get("content", [{}])
+            if isinstance(content, list) and content:
+                content = content[0].get("value", "")
+            else:
+                content = entry.get("summary", "")
+
             news_items.append({
                 "title": entry.get("title", "").strip(),
                 "link": link,
-                "published": published
+                "published": published,
+                "content": content.strip() if content else None,
             })
 
     return news_items

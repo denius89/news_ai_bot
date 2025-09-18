@@ -3,7 +3,7 @@ main.py — минимальный ETL:
 RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
 Запуск:
   python main.py --limit 30       # взять до 30 новостей
-  python main.py --sources crypto # выбрать предустановленные источники
+  python main.py --source crypto  # выбрать предустановленные источники
 """
 
 import argparse
@@ -50,7 +50,8 @@ def main():
         logging.info(f"Ограничение: берём только {args.limit} новостей")
 
     logging.info(f"Получено {len(items)} новостей. Записываем в базу...")
-    upsert_news(items)
+    for item in items:
+        upsert_news(item)
     logging.info("Готово ✅")
 
 if __name__ == "__main__":
