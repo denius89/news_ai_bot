@@ -1,10 +1,12 @@
 import os
+import argparse
 from supabase import create_client
 from dotenv import load_dotenv
 
-def show_latest_news(limit: int = 5):
+def show_latest_news(limit: int = 5, source: str = None):
     """
     Выводит последние N новостей из базы Supabase.
+    Можно фильтровать по source (crypto, economy, all).
     """
     load_dotenv()
     url = os.getenv("SUPABASE_URL")
@@ -16,13 +18,18 @@ def show_latest_news(limit: int = 5):
 
     client = create_client(url, key)
 
-    response = client.table("news").select("*").order("id", desc=True).limit(limit).execute()
+    query = client.table("news").select("*").order("id", desc=True).limit(limit)
+
+    if source and source != "all":
+        query = query.eq("source", source)
+
+    response = query.execute()
 
     if not response.data:
         print("⚠️ Новости не найдены")
         return
 
-    print(f"📰 Последние {len(response.data)} новостей:\n")
+    print(f"📰 Последние {len(response.data)} новостей{' для ' + source if source else ''}:\n")
     for item in response.data:
         print(f"- {item.get('title')}")
         print(f"  📅 {item.get('published_at')}")
@@ -30,4 +37,9 @@ def show_latest_news(limit: int = 5):
         print(f"  🔗 {item.get('link')}\n")
 
 if __name__ == "__main__":
-    show_latest_news(limit=5)
+    parser = argparse.ArgumentParser(description="Показать последние новости из базы Supabase")
+    parser.add_argument("--limit", type=int, default=5, help="Сколько новостей показать")
+    parser.add_argument("--source", type=str, default="all", choices=["all", "crypto", "economy"], help="Источник новостей")
+    args = parser.parse_args()
+
+    show_latest_news(limit=args.limit, source=args.source)
