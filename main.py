@@ -1,9 +1,10 @@
 """
 main.py — минимальный ETL:
 RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
+
 Запуск:
-  python main.py --limit 30       # взять до 30 новостей
-  python main.py --source crypto  # выбрать предустановленные источники
+  python main.py --limit 30        # взять до 30 новостей
+  python main.py --source crypto   # выбрать предустановленные источники
 """
 
 import argparse
@@ -13,27 +14,28 @@ import os
 from parsers.rss_parser import fetch_rss
 from database.db_models import upsert_news
 
-# --- Логирование ---
+# --- ЛОГИРОВАНИЕ ---
 os.makedirs("logs", exist_ok=True)
 
 logger = logging.getLogger("news_ai_bot")
 logger.setLevel(logging.INFO)
 
-# формат
 formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-# в файл
+# лог в файл
 file_handler = RotatingFileHandler("logs/app.log", maxBytes=1_000_000, backupCount=3)
 file_handler.setFormatter(formatter)
 
-# в консоль
+# лог в консоль
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 
-# подключаем обработчики
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
+# подключаем обработчики (не дублируем, если уже есть)
+if not logger.handlers:
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
 
+# --- ИСТОЧНИКИ ---
 SOURCES = {
     "crypto": [
         "https://www.coindesk.com/arc/outboundfeeds/rss/",
@@ -45,16 +47,16 @@ SOURCES = {
     ]
 }
 
+
 def main():
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument("--source", choices=["crypto", "economy", "all"], default="all")
     parser.add_argument("--limit", type=int, default=None)
     args = parser.parse_args()
 
-    urls = []
+    # формируем список URL
     if args.source == "all":
-        for v in SOURCES.values():
-            urls.extend(v)
+        urls = [u for group in SOURCES.values() for u in group]
     else:
         urls = SOURCES[args.source]
 
@@ -67,8 +69,12 @@ def main():
 
     logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
     for item in items:
+        # добавляем поле source для фильтрации
+        item["source"] = args.source
         upsert_news(item)
+
     logger.info("Готово ✅")
+
 
 if __name__ == "__main__":
     main()

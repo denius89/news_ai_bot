@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
 
-# Логирование
+# --- ЛОГИРОВАНИЕ ---
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-# Загружаем переменные окружения
+# --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
 load_dotenv()
 
 url = os.getenv("SUPABASE_URL")
@@ -30,17 +30,17 @@ def upsert_news(item: dict):
         logging.warning("Пропущена новость без ссылки")
         return
 
-    # Дата публикации: если нет — ставим текущую
+    # --- ДАТА ---
     published = item.get("published")
     if isinstance(published, datetime):
         published = published.isoformat()
     if not published:
         published = datetime.now(timezone.utc).isoformat()
 
-    # Контент: если пусто — fallback на title
+    # --- КОНТЕНТ ---
     content = item.get("content") or item.get("title") or ""
 
-    # Оценки AI: если нет — ставим 0.5
+    # --- AI ОЦЕНКИ ---
     credibility = evaluate_credibility(item)
     if credibility is None:
         credibility = 0.5
@@ -49,6 +49,7 @@ def upsert_news(item: dict):
     if importance is None:
         importance = 0.5
 
+    # --- ДАННЫЕ ДЛЯ БАЗЫ ---
     data = {
         "title": item.get("title") or "",
         "link": link,
@@ -56,6 +57,7 @@ def upsert_news(item: dict):
         "content": content,
         "credibility": credibility,
         "importance": importance,
+        "source": item.get("source") or "all",  # 👈 сохраняем источник
     }
 
     try:
