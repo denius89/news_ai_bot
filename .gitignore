@@ -3,3 +3,19 @@ __pycache__/
 *.sqlite3
 .DS_Store
 
+# виртуальное окружение
+venv/
+
+# кеши Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# env
+.env
+
+# IDE/Editor
+.vscode/
+.idea/
+
