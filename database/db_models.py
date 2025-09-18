@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import List, Dict, Any
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
@@ -12,10 +13,14 @@ load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("❌ Не найдены SUPABASE_URL или SUPABASE_KEY в .env")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
-def upsert_news(items: list[dict]):
+def upsert_news(items: List[Dict[str, Any]]) -> None:
     """
     Добавляет новости в таблицу news, избегая дублей по ссылке.
     Дополнительно сохраняет AI-оценки: credibility и importance.
@@ -34,10 +39,15 @@ def upsert_news(items: list[dict]):
         if isinstance(published, datetime):
             published = published.isoformat()
 
-        supabase.table("news").upsert({
+        data = {
             "title": item.get("title", ""),
             "link": link,
             "published_at": published,
             "credibility": credibility,
             "importance": importance
-        }, on_conflict=["link"]).execute()
+        }
+
+        try:
+            supabase.table("news").upsert(data, on_conflict=["link"]).execute()
+        except Exception as e:
+            print(f"⚠️ Ошибка при вставке новости: {e}")
