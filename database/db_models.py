@@ -44,6 +44,7 @@ def upsert_news(items: List[Dict[str, Any]]) -> None:
             "title": item.get("title", ""),
             "link": link,
             "published_at": published,
+            "content": item.get("content") or item.get("title"),
             "credibility": credibility,
             "importance": importance
         }
