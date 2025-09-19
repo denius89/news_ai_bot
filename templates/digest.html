@@ -1,17 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>News Digest</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1 { color: #2c3e50; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
+        .meta { color: #555; font-size: 0.9em; }
+        .importance { font-weight: bold; color: #e67e22; }
+    </style>
 </head>
 <body>
-    <h1>Latest News Digest</h1>
+    <h1>Latest Digest</h1>
     <ul>
         {% for item in news %}
-        <li>{{ item.title }} — <a href="{{ item.link }}" target="_blank">link</a></li>
+        <li>
+            <strong>{{ item.title }}</strong><br>
+            {{ item.content or "Нет текста" }}<br>
+            <div class="meta">
+                📅 {{ item.published_at_fmt }}  
+                🔥 Важность: <span class="importance">{{ item.importance or "-" }}</span>
+            </div>
+            <a href="{{ item.link }}" target="_blank">Источник</a>
+        </li>
+        {% else %}
+        <li>Нет новостей</li>
         {% endfor %}
     </ul>
-    <p><a href="/">Back to Home</a></p>
 </body>
 </html>
