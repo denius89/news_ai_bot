@@ -53,13 +53,23 @@ def main():
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument("--source", choices=["crypto", "economy", "all"], default="all")
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--digest", type=int, nargs="?", const=5, help="Сформировать дайджест (по умолчанию 5 новостей)")
+    parser.add_argument(
+        "--digest", type=int, nargs="?", const=5,
+        help="Сформировать дайджест (по умолчанию 5 новостей)"
+    )
+    parser.add_argument(
+        "--ai", action="store_true",
+        help="Использовать AI для генерации дайджеста"
+    )
     args = parser.parse_args()
 
     # если указан дайджест — формируем его и выходим
     if args.digest is not None:
-        logger.info(f"Генерация дайджеста (последние {args.digest} новостей)...")
-        digest = generate_digest(limit=args.digest)
+        logger.info(
+            f"Генерация {'AI-' if args.ai else ''}дайджеста "
+            f"(последние {args.digest} новостей)..."
+        )
+        digest = generate_digest(limit=args.digest, ai=args.ai)
         print("\n" + digest + "\n")
         return
 
