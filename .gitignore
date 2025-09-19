@@ -1,4 +1,27 @@
+# Операционная система
+.DS_Store
+
+# Виртуальное окружение
+venv/
+
+# Python кэш
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Базы данных
+*.sqlite3
+
+# Конфигурация окружения
+.env
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Логи
+logs/__pycache__/
 .env
 *.sqlite3
 .DS_Store
