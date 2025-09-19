@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-19 14:57:22 UTC_
+_Generated on 2025-09-19 15:22:36 UTC_
 
 ```
 ├── .github/
@@ -23,6 +23,13 @@ _Generated on 2025-09-19 14:57:22 UTC_
 ├── parsers/
 │   ├── __init__.py
 │   └── rss_parser.py
+├── routes/
+│   └── news_routes.py
+├── static/
+│   └── style.css
+├── templates/
+│   ├── digest.html
+│   └── index.html
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
