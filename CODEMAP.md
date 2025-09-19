@@ -1,8 +1,11 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-19 13:44:31 UTC_
+_Generated on 2025-09-19 13:49:19 UTC_
 
 ```
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── ai_modules/
 │   ├── __init__.py
 │   ├── credibility.py
