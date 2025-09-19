@@ -1,10 +1,13 @@
 """
-main.py — минимальный ETL:
+main.py — минимальный ETL + генерация дайджеста.
 RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
 
-Запуск:
+Запуск ETL:
   python main.py --limit 30        # взять до 30 новостей
   python main.py --source crypto   # выбрать предустановленные источники
+
+Запуск дайджеста:
+  python main.py --digest 5        # дайджест из 5 новостей
 """
 
 import argparse
@@ -13,6 +16,7 @@ from logging.handlers import RotatingFileHandler
 import os
 from parsers.rss_parser import fetch_rss
 from database.db_models import upsert_news
+from digests.generator import generate_digest
 
 # --- ЛОГИРОВАНИЕ ---
 os.makedirs("logs", exist_ok=True)
@@ -22,15 +26,12 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 
-# лог в файл
 file_handler = RotatingFileHandler("logs/app.log", maxBytes=1_000_000, backupCount=3)
 file_handler.setFormatter(formatter)
 
-# лог в консоль
 console_handler = logging.StreamHandler()
 console_handler.setFormatter(formatter)
 
-# подключаем обработчики (не дублируем, если уже есть)
 if not logger.handlers:
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
@@ -52,9 +53,17 @@ def main():
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument("--source", choices=["crypto", "economy", "all"], default="all")
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--digest", type=int, nargs="?", const=5, help="Сформировать дайджест (по умолчанию 5 новостей)")
     args = parser.parse_args()
 
-    # формируем список URL
+    # если указан дайджест — формируем его и выходим
+    if args.digest is not None:
+        logger.info(f"Генерация дайджеста (последние {args.digest} новостей)...")
+        digest = generate_digest(limit=args.digest)
+        print("\n" + digest + "\n")
+        return
+
+    # иначе — обычный ETL
     if args.source == "all":
         urls = [u for group in SOURCES.values() for u in group]
     else:
@@ -69,7 +78,6 @@ def main():
 
     logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
     for item in items:
-        # добавляем поле source для фильтрации
         item["source"] = args.source
         upsert_news(item)
 
