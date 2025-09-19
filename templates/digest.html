@@ -1,32 +1,30 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <title>News Digest</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
-        h1 { color: #2c3e50; }
-        ul { list-style-type: none; padding: 0; }
-        li { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
-        .meta { color: #555; font-size: 0.9em; }
-        .importance { font-weight: bold; color: #e67e22; }
-    </style>
+    <meta charset="UTF-8">
+    <title>AI Digest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Latest Digest</h1>
-    <ul>
+    <h1>📰 AI Digest</h1>
+
+    <div class="container">
         {% for item in news %}
-        <li>
-            <strong>{{ item.title }}</strong><br>
-            {{ item.content or "Нет текста" }}<br>
-            <div class="meta">
-                📅 {{ item.published_at_fmt }}  
-                🔥 Важность: <span class="importance">{{ item.importance or "-" }}</span>
+            <div class="card">
+                <h2><a href="{{ item.link }}" target="_blank">{{ item.title }}</a></h2>
+                <p>{{ item.content or "Нет текста" }}</p>
+                <div class="meta">
+                    <span>📅 {{ item.published_at_fmt }}</span>
+                    {% if item.importance >= 8 %}
+                        <span class="badge high">🔥 {{ item.importance }}</span>
+                    {% elif item.importance >= 5 %}
+                        <span class="badge medium">⚡ {{ item.importance }}</span>
+                    {% else %}
+                        <span class="badge low">💤 {{ item.importance }}</span>
+                    {% endif %}
+                </div>
             </div>
-            <a href="{{ item.link }}" target="_blank">Источник</a>
-        </li>
-        {% else %}
-        <li>Нет новостей</li>
         {% endfor %}
-    </ul>
+    </div>
 </body>
 </html>
