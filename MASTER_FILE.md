@@ -13,26 +13,50 @@
 ## 📂 Структура проекта
 
 > ℹ️ Актуальная структура проекта автоматически поддерживается в `CODEMAP.md`.  
-> Здесь зафиксирован снимок на 2025-09-18.
+> Здесь зафиксирован снимок на 2025-09-19.
 ```
-├── CODEMAP.md
-├── MASTER_FILE.md
-├── README.md
-├── requirements.txt
-├── TASKS.md
-├── main.py
-├── database/
-│   └── db_models.py
-├── parsers/
-│   └── rss_parser.py
-├── tools/
-│   └── repo_map.py
-├── tests/
-│   ├── test_ai_modules.py
-│   └── test_supabase.py
-└── logs/
+    ├── CODEMAP.md
+    ├── MASTER_FILE.md
+    ├── README.md
+    ├── TASKS.md
+    ├── config.py
+    ├── main.py
+    ├── requirements.txt
+    ├── webapp.py
+    ├── .gitignore
+    │
+    ├── ai_modules/
+    │   ├── __init__.py
+    │   ├── credibility.py
+    │   └── importance.py
+    │
+    ├── database/
+    │   ├── __init__.py
+    │   ├── db_models.py
+    │   ├── init_tables.sql
+    │   └── seed_data.sql
+    │
+    ├── parsers/
+    │   ├── __init__.py
+    │   └── rss_parser.py
+    │
+    ├── tests/
+    │   ├── __init__.py
+    │   ├── test_ai_modules.py
+    │   ├── test_db_content.py
+    │   ├── test_db_insert.py
+    │   ├── test_deepl.py
+    │   ├── test_main.py
+    │   ├── test_openai.py
+    │   └── test_supabase.py
+    │
+    ├── tools/
+    │   ├── fix_old_news.py
+    │   ├── repo_map.py
+    │   └── show_news.py
+    │
+    └── logs/
 ```
-
 ## 🗄️ База данных
 
 Проект использует **Supabase (PostgreSQL)** вместо локальной SQLite.  
