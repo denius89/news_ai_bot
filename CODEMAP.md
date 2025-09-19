@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-19 13:59:45 UTC_
+_Generated on 2025-09-19 14:18:32 UTC_
 
 ```
 ├── .github/
@@ -14,6 +14,8 @@ _Generated on 2025-09-19 13:59:45 UTC_
 │   ├── init_tables.sql
 │   └── seed_data.sql
 ├── digests/
+│   ├── __init__.py
+│   ├── ai_summary.py
 │   └── generator.py
 ├── logs/
 ├── parsers/
@@ -21,7 +23,9 @@ _Generated on 2025-09-19 13:59:45 UTC_
 │   └── rss_parser.py
 ├── tests/
 │   ├── __init__.py
+│   ├── conftest.py
 │   ├── test_ai_modules.py
+│   ├── test_ai_summary.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_deepl.py
