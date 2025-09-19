@@ -1,7 +1,22 @@
 import feedparser
 import json
+import re
 from datetime import datetime
 import dateutil.parser
+from bs4 import BeautifulSoup
+
+
+def clean_text(text: str) -> str:
+    """
+    Удаляет HTML-теги и нормализует пробелы.
+    """
+    if not text:
+        return ""
+    # Убираем HTML
+    text = BeautifulSoup(text, "html.parser").get_text()
+    # Нормализуем пробелы
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
 
 
 def fetch_rss(urls: list[str]) -> list[dict]:
@@ -40,10 +55,10 @@ def fetch_rss(urls: list[str]) -> list[dict]:
                 content = entry.get("summary", "")
 
             news_items.append({
-                "title": entry.get("title", "").strip(),
+                "title": clean_text(entry.get("title", "")),
                 "link": link,
                 "published": published,
-                "content": content.strip() if content else None,
+                "content": clean_text(content),
             })
 
     return news_items
