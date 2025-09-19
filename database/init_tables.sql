@@ -1,23 +1,30 @@
 -- Новости
-create table if not exists news (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
+CREATE TABLE IF NOT EXISTS news (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  title text NOT NULL,
   content text,
-  source text,
-  published_at timestamp with time zone default now()
+  source text NOT NULL,
+  published_at timestamp with time zone NOT NULL,
+  credibility numeric CHECK (credibility >= 0 AND credibility <= 1),
+  importance numeric CHECK (importance >= 0 AND importance <= 1),
+  created_at timestamp with time zone DEFAULT now()
 );
 
+-- Индексы для новостей
+CREATE INDEX IF NOT EXISTS idx_news_published_at ON news(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_news_source ON news(source);
+
 -- Пользователи
-create table if not exists users (
-  id uuid primary key default gen_random_uuid(),
-  telegram_id text unique,
-  created_at timestamp with time zone default now()
+CREATE TABLE IF NOT EXISTS users (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  telegram_id bigint UNIQUE NOT NULL,
+  created_at timestamp with time zone DEFAULT now()
 );
 
 -- Дайджесты
-create table if not exists digests (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references users(id) on delete cascade,
-  created_at timestamp with time zone default now(),
-  summary text
+CREATE TABLE IF NOT EXISTS digests (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
+  summary text,
+  created_at timestamp with time zone DEFAULT now()
 );
