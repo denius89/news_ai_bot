@@ -1,0 +1,59 @@
+crypto:
+  - name: CoinDesk
+    url: https://www.coindesk.com/arc/outboundfeeds/rss/
+  - name: Bitcoin News
+    url: https://news.bitcoin.com/feed/
+  - name: Cointelegraph
+    url: https://cointelegraph.com/rss
+  - name: CryptoSlate
+    url: https://cryptoslate.com/feed/
+  - name: The Block
+    url: https://www.theblock.co/rss
+
+economy:
+  - name: Yahoo Finance
+    url: https://news.yahoo.com/rss/
+  - name: Financial Times
+    url: https://www.ft.com/?format=rss
+  - name: Bloomberg
+    url: https://www.bloomberg.com/feed/podcast/etf-report.xml
+  - name: CNBC
+    url: https://www.cnbc.com/id/100003114/device/rss/rss.html
+  - name: MarketWatch
+    url: https://www.marketwatch.com/rss/topstories
+
+world:
+  - name: BBC World
+    url: http://feeds.bbci.co.uk/news/world/rss.xml
+  - name: Reuters
+    url: http://feeds.reuters.com/Reuters/worldNews
+  - name: Al Jazeera
+    url: https://www.aljazeera.com/xml/rss/all.xml
+  - name: CNN World
+    url: http://rss.cnn.com/rss/edition_world.rss
+  - name: DW News
+    url: https://rss.dw.com/xml/rss-en-all
+
+technology:
+  - name: TechCrunch
+    url: http://feeds.feedburner.com/TechCrunch/
+  - name: Wired
+    url: https://www.wired.com/feed/rss
+  - name: The Verge
+    url: https://www.theverge.com/rss/index.xml
+  - name: Engadget
+    url: https://www.engadget.com/rss.xml
+  - name: Ars Technica
+    url: http://feeds.arstechnica.com/arstechnica/index
+
+politics:
+  - name: Politico
+    url: https://www.politico.com/rss/politics08.xml
+  - name: CNN Politics
+    url: http://rss.cnn.com/rss/cnn_allpolitics.rss
+  - name: The Guardian Politics
+    url: https://www.theguardian.com/politics/rss
+  - name: BBC Politics
+    url: http://feeds.bbci.co.uk/news/politics/rss.xml
+  - name: Reuters Politics
+    url: http://feeds.reuters.com/Reuters/PoliticsNews

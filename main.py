@@ -17,6 +17,11 @@ import os
 from parsers.rss_parser import fetch_rss
 from database.db_models import upsert_news
 from digests.generator import generate_digest
+import yaml
+
+# --- Загрузка источников ---
+with open("config/sources.yaml", "r", encoding="utf-8") as f:
+    SOURCES = yaml.safe_load(f)
 
 # --- ЛОГИРОВАНИЕ ---
 os.makedirs("logs", exist_ok=True)
@@ -36,22 +41,12 @@ if not logger.handlers:
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
 
-# --- ИСТОЧНИКИ ---
-SOURCES = {
-    "crypto": [
-        "https://www.coindesk.com/arc/outboundfeeds/rss/",
-        "https://news.bitcoin.com/feed/"
-    ],
-    "economy": [
-        "https://news.yahoo.com/rss/",
-        "https://www.ft.com/?format=rss"
-    ]
-}
-
 
 def main():
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
-    parser.add_argument("--source", choices=["crypto", "economy", "all"], default="all")
+    parser.add_argument(
+        "--source", choices=list(SOURCES.keys()) + ["all"], default="all"
+    )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--digest", type=int, nargs="?", const=5,
@@ -63,7 +58,7 @@ def main():
     )
     args = parser.parse_args()
 
-    # если указан дайджест — формируем его и выходим
+    # --- Дайджест ---
     if args.digest is not None:
         logger.info(
             f"Генерация {'AI-' if args.ai else ''}дайджеста "
@@ -73,13 +68,18 @@ def main():
         print("\n" + digest + "\n")
         return
 
-    # иначе — обычный ETL
+    # --- ETL ---
     if args.source == "all":
-        urls = [u for group in SOURCES.values() for u in group]
+        urls = [u["url"] for group in SOURCES.values() for u in group]
     else:
-        urls = SOURCES[args.source]
+        urls = [u["url"] for u in SOURCES[args.source]]
 
     logger.info(f"Загружаем новости из {len(urls)} источников ({args.source})...")
+    logger.info("Используемые URL:")
+    for group in (SOURCES.values() if args.source == "all" else [SOURCES[args.source]]):
+        for src in group:
+            logger.info(f"  {src['name']}: {src['url']}")
+
     items = fetch_rss(urls)
 
     if args.limit and len(items) > args.limit:

@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-19 14:36:46 UTC_
+_Generated on 2025-09-19 14:57:22 UTC_
 
 ```
 ├── .github/
@@ -8,6 +8,8 @@ _Generated on 2025-09-19 14:36:46 UTC_
 │   ├── __init__.py
 │   ├── credibility.py
 │   └── importance.py
+├── config/
+│   └── sources.yaml
 ├── database/
 │   ├── __init__.py
 │   ├── db_models.py
@@ -42,7 +44,9 @@ _Generated on 2025-09-19 14:36:46 UTC_
 ├── config.py
 ├── main.py
 ├── MASTER_FILE.md
+├── MASTER_FILE — копия.md
 ├── README.md
+├── README — копия.md
 ├── requirements.txt
 ├── TASKS.md
 └── webapp.py
