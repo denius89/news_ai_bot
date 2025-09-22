@@ -3,12 +3,12 @@ main.py — минимальный ETL + генерация дайджеста.
 RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
 
 Запуск ETL:
-  python main.py --limit 30        # взять до 30 новостей
-  python main.py --source crypto   # выбрать предустановленные источники
-  python main.py --source all --limit 50  # все источники, но только 50 новостей
+  python main.py --limit 30                 # взять до 30 новостей (срез сверху после сбора)
+  python main.py --source crypto            # выбрать предустановленные источники
+  python main.py --source all --limit 50    # все источники, но только 50 новостей
 
 Запуск дайджеста:
-  python main.py --digest 5        # дайджест из 5 новостей
+  python main.py --digest 5                 # дайджест из 5 новостей
 """
 
 import argparse
@@ -44,7 +44,8 @@ def main():
         "--source", type=str, default="all",
         help="Категория из sources.yaml или 'all'"
     )
-    parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--limit", type=int, default=None,
+                        help="Общий лимит после сбора (срез сверху)")
     parser.add_argument(
         "--digest", type=int, nargs="?", const=5,
         help="Сформировать дайджест (по умолчанию 5 новостей)"
@@ -52,6 +53,10 @@ def main():
     parser.add_argument(
         "--ai", action="store_true",
         help="Использовать AI для генерации дайджеста"
+    )
+    parser.add_argument(
+        "--per-source-limit", type=int, default=20,
+        help="Сколько новостей брать с каждого источника (по умолчанию 20)"
     )
     args = parser.parse_args()
 
@@ -73,10 +78,10 @@ def main():
 
     logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
     logger.info("Используемые источники:")
-    for url, meta in sources.items():
-        logger.info(f"  {meta['name']} ({meta['category']}): {url}")
+    for src in sources:
+        logger.info(f"  {src['name']} ({src['category']}): {src['url']}")
 
-    items = fetch_rss(sources)
+    items = fetch_rss(sources, per_source_limit=args.per_source_limit)
 
     if args.limit and len(items) > args.limit:
         items = items[:args.limit]

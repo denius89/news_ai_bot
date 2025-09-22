@@ -7,14 +7,15 @@ crypto:
     url: https://cointelegraph.com/rss
   - name: CryptoSlate
     url: https://cryptoslate.com/feed/
-  # The Block отключил публичный RSS → убрал (можно оставить только если будет платный API)
+  - name: Decrypt
+    url: https://decrypt.co/feed
 
 economy:
   - name: Yahoo Finance
     url: https://news.yahoo.com/rss/
   - name: Financial Times
     url: https://www.ft.com/?format=rss
-  - name: Bloomberg
+  - name: Bloomberg Markets
     url: https://feeds.bloomberg.com/markets/news.rss
   - name: CNBC
     url: https://www.cnbc.com/id/100003114/device/rss/rss.html
@@ -24,10 +25,10 @@ economy:
 world:
   - name: BBC World
     url: http://feeds.bbci.co.uk/news/world/rss.xml
-  - name: Reuters
-    url: https://feeds.reuters.com/reuters/worldNews
-  - name: Al Jazeera
-    url: https://www.aljazeera.com/xml/rss/all.xml
+  - name: Guardian World
+    url: https://www.theguardian.com/world/rss
+  - name: Guardian Politics
+    url: https://www.theguardian.com/politics/rss
   - name: CNN World
     url: http://rss.cnn.com/rss/edition_world.rss
   - name: DW News
@@ -40,14 +41,14 @@ technology:
     url: https://www.wired.com/feed/rss
   - name: The Verge
     url: https://www.theverge.com/rss/index.xml
-  - name: Engadget
-    url: http://www.engadget.com/rss.xml
+  - name: CNET News
+    url: https://www.cnet.com/rss/news/
   - name: Ars Technica
     url: http://feeds.arstechnica.com/arstechnica/index
 
 politics:
-  - name: Politico
-    url: https://www.politico.com/rss/politics.xml
+  - name: Axios Politics
+    url: https://www.axios.com/feeds/politics.xml
   - name: CNN Politics
     url: http://rss.cnn.com/rss/cnn_allpolitics.rss
   - name: The Guardian Politics
