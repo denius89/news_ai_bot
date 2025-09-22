@@ -62,7 +62,7 @@ def events():
     category = request.args.get("category")
 
     query = supabase.table("events").select(
-        "event_time, country, currency, title, importance, fact, forecast, previous, source"
+        "event_time, country, country_code, currency, title, importance, fact, forecast, previous, source"
     )
 
     if category:

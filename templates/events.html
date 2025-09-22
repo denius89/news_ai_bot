@@ -31,7 +31,7 @@
                 </td>
                 <td>
                     {% if ev.country %}
-                        <span class="fi fi-{{ ev.country|lower }}"></span>
+                    <span class="fi fi-{{ ev.country_code|lower }}"></span>
                     {% endif %}
                     {{ ev.currency or "" }}
                 </td>
@@ -65,7 +65,7 @@
 
         <div class="event-country">
             {% if ev.country %}
-                <span class="fi fi-{{ ev.country|lower }}"></span>
+                <span class="fi fi-{{ ev.country_code|lower }}"></span>
             {% endif %}
             {{ ev.currency or "" }}
         </div>
