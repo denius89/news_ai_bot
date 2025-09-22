@@ -3,12 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Digest</title>
-    <!-- добавили ?v=2 для обновления стилей -->
-    <link rel="stylesheet"href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
 </head>
 <body>
     <h1>📰 AI Digest</h1>
 
+    <!-- Filter Chips -->
+    <div class="categories-chips">
+        {% for cat in all_categories %}
+            {% set is_active = cat in active_categories %}
+            {% set new_categories = active_categories.copy() %}
+            {% if is_active %}
+                {% set _ = new_categories.remove(cat) %}
+            {% else %}
+                {% set _ = new_categories.append(cat) %}
+            {% endif %}
+
+            <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
+               class="chip-filter chip-{{ cat }} {% if is_active %}active{% endif %}">
+                <span class="chip-icon">
+                    {% if cat == "crypto" %}📊
+                    {% elif cat == "economy" %}💰
+                    {% elif cat == "world" %}🌍
+                    {% elif cat == "technology" %}⚙️
+                    {% elif cat == "politics" %}🏛️
+                    {% else %}📌
+                    {% endif %}
+                </span>
+                <span>{{ cat.capitalize() }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Cards -->
     <div class="container">
         {% for item in news %}
             <div class="card">
@@ -21,12 +48,17 @@
                 <p class="card-summary">{{ item.content or "Нет текста" }}</p>
 
                 <div class="card-footer">
-                    <div class="footer-date">
-                        📅 {{ item.published_at_fmt }}
+                    <div class="footer-top">
+                        <span class="chip chip-date">
+                            📅 {{ item.published_at_fmt }}
+                        </span>
                     </div>
                     <div class="footer-bottom">
-                        <span class="tag">🌐 {{ item.source or "—" }}</span>
-                        <span class="badge 
+                        <span class="chip chip-tag">🌐 {{ item.source or "—" }}</span>
+                        <span class="chip chip-category {{ item.category }}">
+                            🏷️ {{ item.category or "—" }}
+                        </span>
+                        <span class="chip 
                             {% if item.importance > 0.7 %}
                                 high
                             {% elif item.importance > 0.4 %}
