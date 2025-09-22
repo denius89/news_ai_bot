@@ -9,7 +9,7 @@ def digest():
     # Загружаем последние 10 новостей, сортировка: важность → дата
     response = (
         supabase.table("news")
-        .select("title, content, link, published_at, importance")
+        .select("title, content, link, published_at, importance, source")
         .order("importance", desc=True)
         .order("published_at", desc=True)
         .limit(10)
@@ -18,8 +18,8 @@ def digest():
 
     news_items = response.data if response.data else []
 
-    # Форматируем дату для отображения
     for item in news_items:
+        # Форматируем дату
         if item.get("published_at"):
             try:
                 dt = datetime.fromisoformat(item["published_at"].replace("Z", "+00:00"))
@@ -28,5 +28,14 @@ def digest():
                 item["published_at_fmt"] = item["published_at"]
         else:
             item["published_at_fmt"] = "—"
+
+        # importance → float (иначе может быть строкой)
+        try:
+            item["importance"] = float(item.get("importance") or 0.0)
+        except Exception:
+            item["importance"] = 0.0
+
+        # источник
+        item["source"] = item.get("source") or "—"
 
     return render_template("digest.html", news=news_items)

@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-19 15:41:29 UTC_
+_Generated on 2025-09-22 07:55:06 UTC_
 
 ```
 ├── .github/
@@ -52,9 +52,7 @@ _Generated on 2025-09-19 15:41:29 UTC_
 ├── config.py
 ├── main.py
 ├── MASTER_FILE.md
-├── MASTER_FILE — копия.md
 ├── README.md
-├── README — копия.md
 ├── requirements.txt
 ├── TASKS.md
 └── webapp.py
