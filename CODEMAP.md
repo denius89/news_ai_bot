@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-22 10:39:38 UTC_
+_Generated on 2025-09-22 13:17:28 UTC_
 
 ```
 ├── .github/
@@ -29,7 +29,9 @@ _Generated on 2025-09-22 10:39:38 UTC_
 ├── static/
 │   └── style.css
 ├── templates/
+│   ├── base.html
 │   ├── digest.html
+│   ├── events.html
 │   └── index.html
 ├── tests/
 │   ├── __init__.py

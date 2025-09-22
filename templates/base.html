@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "AI Digest" }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+</head>
+<body>
+    <!-- Верхнее меню -->
+    <nav class="top-nav">
+        <a href="/digest" class="{% if active_page == 'digest' %}active{% endif %}">📰 Digest</a>
+        <a href="/events" class="{% if active_page == 'events' %}active{% endif %}">🗓️ Events</a>
+    </nav>
+
+    <!-- Контент страницы -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

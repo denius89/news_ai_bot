@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>🗓️ Economic & Crypto Calendar</h1>
+
+<!-- Счётчик событий сегодня -->
+<div id="today-counter" class="today-counter">
+    ⚡ Сегодня: <span id="today-count">0</span> событий
+</div>
+
+<!-- Таблица для десктопа -->
+<div class="events-table">
+    <table>
+        <thead>
+            <tr>
+                <th>⏰ Время</th>
+                <th>🌍 Страна</th>
+                <th>📌 Событие</th>
+                <th>⭐ Важность</th>
+                <th>📊</th>
+                <th>📈</th>
+                <th>📉</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ev in events %}
+            <tr class="event-row" data-time="{{ ev.event_time }}">
+                <td>
+                    <span class="event-time-main">{{ ev.event_time_fmt }}</span>
+                    <span class="event-time-remaining time-remaining" data-time="{{ ev.event_time }}"></span>
+                </td>
+                <td>
+                    {% if ev.country %}
+                        <span class="fi fi-{{ ev.country|lower }}"></span>
+                    {% endif %}
+                    {{ ev.currency or "" }}
+                </td>
+                <td>{{ ev.title or "—" }}</td>
+                <td>
+                    {% if ev.importance == 1 %}
+                        ⭐ <span class="importance-low">Low</span>
+                    {% elif ev.importance == 2 %}
+                        ⭐⭐ <span class="importance-medium">Medium</span>
+                    {% elif ev.importance == 3 %}
+                        ⭐⭐⭐ <span class="importance-high">High</span>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>{{ ev.fact or "—" }}</td>
+                <td>{{ ev.forecast or "—" }}</td>
+                <td>{{ ev.previous or "—" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Карточки для мобильной версии -->
+<div class="events-cards">
+    {% for ev in events %}
+    <div class="event-card" data-time="{{ ev.event_time }}">
+        <span class="event-time-main">{{ ev.event_time_fmt }}</span>
+        <span class="event-time-remaining time-remaining" data-time="{{ ev.event_time }}"></span>
+
+        <div class="event-country">
+            {% if ev.country %}
+                <span class="fi fi-{{ ev.country|lower }}"></span>
+            {% endif %}
+            {{ ev.currency or "" }}
+        </div>
+
+        <div class="event-title">{{ ev.title or "—" }}</div>
+
+        <div class="event-meta">
+            {% if ev.importance == 1 %}
+                ⭐ <span class="importance-low">Low</span>
+            {% elif ev.importance == 2 %}
+                ⭐⭐ <span class="importance-medium">Medium</span>
+            {% elif ev.importance == 3 %}
+                ⭐⭐⭐ <span class="importance-high">High</span>
+            {% else %}
+                —
+            {% endif %}
+        </div>
+
+        <div class="event-stats">
+            <span>📊 {{ ev.fact or "—" }}</span>
+            <span>📈 {{ ev.forecast or "—" }}</span>
+            <span>📉 {{ ev.previous or "—" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- JS для обновления времени -->
+<script>
+function updateTimeRemaining() {
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10);
+    let todayCount = 0;
+
+    document.querySelectorAll(".time-remaining").forEach(el => {
+        const targetTime = new Date(el.dataset.time);
+        if (isNaN(targetTime)) return;
+
+        const diffMs = targetTime - now;
+        if (diffMs <= 0) {
+            el.textContent = "⏳ Уже прошло";
+            return;
+        }
+
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffDays > 0) {
+            el.textContent = `через ${diffDays} дн. ${diffHours % 24} ч.`;
+        } else if (diffHours > 0) {
+            el.textContent = `через ${diffHours} ч. ${diffMins % 60} мин.`;
+        } else {
+            el.textContent = `через ${diffMins} мин.`;
+        }
+    });
+
+    document.querySelectorAll(".event-row, .event-card").forEach(row => {
+        const targetTime = new Date(row.dataset.time);
+        if (!isNaN(targetTime)) {
+            const targetStr = targetTime.toISOString().slice(0, 10);
+            if (targetStr === todayStr) {
+                row.classList.add("event-today");
+                todayCount++;
+            }
+        }
+    });
+
+    document.getElementById("today-count").textContent = todayCount;
+}
+
+updateTimeRemaining();
+setInterval(updateTimeRemaining, 60000);
+</script>
+{% endblock %}
