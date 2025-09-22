@@ -58,6 +58,7 @@ def upsert_news(item: dict):
         "credibility": credibility,
         "importance": importance,
         "source": item.get("source") or "all",  # 👈 сохраняем источник
+        "category": item["category"]
     }
 
     try:

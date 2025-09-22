@@ -2,21 +2,43 @@ import argparse
 import logging
 from database.db_models import supabase
 from digests.ai_summary import generate_summary  # модуль AI-саммари
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
 
 def fetch_recent_news(limit: int = 5):
     """
     Загружает последние N новостей из базы (сортировка по importance и дате).
+    Добавляет поле published_at_fmt для отображения.
     """
-    response = supabase.table("news") \
-        .select("id, title, content, link, importance, published_at") \
-        .order("importance", desc=True) \
-        .order("published_at", desc=True) \
-        .limit(limit) \
+    response = (
+        supabase.table("news")
+        .select("id, title, content, link, importance, published_at, source, category")
+        .order("importance", desc=True)
+        .order("published_at", desc=True)
+        .limit(limit)
         .execute()
+    )
 
-    return response.data or []
+    rows = response.data or []
+    news = []
+
+    for row in rows:
+        # форматируем дату
+        published_at_fmt = "—"
+        if row.get("published_at"):
+            try:
+                dt = datetime.fromisoformat(row["published_at"].replace("Z", "+00:00"))
+                published_at_fmt = dt.strftime("%d %b %Y, %H:%M")
+            except Exception:
+                pass
+
+        row["published_at_fmt"] = published_at_fmt
+        news.append(row)
+
+    return news
+
 
 def generate_digest(limit: int = 5, ai: bool = False) -> str:
     """
@@ -36,7 +58,8 @@ def generate_digest(limit: int = 5, ai: bool = False) -> str:
     for i, item in enumerate(news_items, 1):
         title = item.get("title", "Без заголовка")
         link = item.get("link", "")
-        lines.append(f"{i}. {title} ({link})")
+        date = item.get("published_at_fmt", "—")
+        lines.append(f"{i}. {title} [{date}] ({link})")
 
     digest_text = "📰 Дайджест новостей:\n\n" + "\n".join(lines)
     return digest_text

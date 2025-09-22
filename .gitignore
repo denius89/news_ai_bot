@@ -43,3 +43,4 @@ __pycache__/
 .idea/
 
 logs/app.log
+logs/*.log

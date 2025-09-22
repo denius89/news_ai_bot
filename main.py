@@ -5,6 +5,7 @@ RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
 Запуск ETL:
   python main.py --limit 30        # взять до 30 новостей
   python main.py --source crypto   # выбрать предустановленные источники
+  python main.py --source all --limit 50  # все источники, но только 50 новостей
 
 Запуск дайджеста:
   python main.py --digest 5        # дайджест из 5 новостей
@@ -14,14 +15,9 @@ import argparse
 import logging
 from logging.handlers import RotatingFileHandler
 import os
-from parsers.rss_parser import fetch_rss
+from parsers.rss_parser import load_sources, fetch_rss
 from database.db_models import upsert_news
 from digests.generator import generate_digest
-import yaml
-
-# --- Загрузка источников ---
-with open("config/sources.yaml", "r", encoding="utf-8") as f:
-    SOURCES = yaml.safe_load(f)
 
 # --- ЛОГИРОВАНИЕ ---
 os.makedirs("logs", exist_ok=True)
@@ -45,7 +41,8 @@ if not logger.handlers:
 def main():
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument(
-        "--source", choices=list(SOURCES.keys()) + ["all"], default="all"
+        "--source", type=str, default="all",
+        help="Категория из sources.yaml или 'all'"
     )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
@@ -70,17 +67,16 @@ def main():
 
     # --- ETL ---
     if args.source == "all":
-        urls = [u["url"] for group in SOURCES.values() for u in group]
+        sources = load_sources()
     else:
-        urls = [u["url"] for u in SOURCES[args.source]]
+        sources = load_sources(args.source)
 
-    logger.info(f"Загружаем новости из {len(urls)} источников ({args.source})...")
-    logger.info("Используемые URL:")
-    for group in (SOURCES.values() if args.source == "all" else [SOURCES[args.source]]):
-        for src in group:
-            logger.info(f"  {src['name']}: {src['url']}")
+    logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
+    logger.info("Используемые источники:")
+    for url, meta in sources.items():
+        logger.info(f"  {meta['name']} ({meta['category']}): {url}")
 
-    items = fetch_rss(urls)
+    items = fetch_rss(sources)
 
     if args.limit and len(items) > args.limit:
         items = items[:args.limit]
@@ -88,7 +84,6 @@ def main():
 
     logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
     for item in items:
-        item["source"] = args.source
         upsert_news(item)
 
     logger.info("Готово ✅")
