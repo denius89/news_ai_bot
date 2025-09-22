@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-22 13:47:09 UTC_
+_Generated on 2025-09-22 18:50:26 UTC_
 
 ```
 ├── .github/
@@ -22,6 +22,7 @@ _Generated on 2025-09-22 13:47:09 UTC_
 ├── logs/
 ├── parsers/
 │   ├── __init__.py
+│   ├── events_parser.py
 │   └── rss_parser.py
 ├── routes/
 │   ├── __init__.py
