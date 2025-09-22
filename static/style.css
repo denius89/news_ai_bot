@@ -1,8 +1,9 @@
-h1 { margin: 6px 0 18px; font-weight: 700; }
-.meta span { display: inline-flex; align-items: center; gap: 6px; }
-.badge { min-width: 52px; text-align: center; }
+h1 {
+    margin: 6px 0 18px;
+    font-weight: 700;
+    text-align: center;
+}
 
-/* === Базовая тема === */
 body {
     font-family: 'Inter', 'Roboto', sans-serif;
     background: #121212;
@@ -14,78 +15,117 @@ body {
 /* === Сетка карточек === */
 .container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
 /* === Карточки === */
 .card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(10px);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 260px; /* фиксированная высота */
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
 }
 
 /* === Заголовки === */
-.card h2 {
+.card-title {
     font-size: 20px;
-    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #82b1ff;
+    text-decoration: none;
+    transition: color 0.2s, border-bottom 0.2s;
+    cursor: pointer;
+}
+
+.card-title:hover {
     color: #ffffff;
+    border-bottom: 1px solid #ffffff;
 }
 
-.card p {
+/* === Контент (ровно 4 строки с …) === */
+.card-summary {
     font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 12px;
+    line-height: 1.4; /* фиксируем высоту строки */
+    margin: 12px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;   /* ровно 4 строки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    color: #d0d0d0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding-bottom: 3px;
 }
 
-/* === Метаданные (дата, важность, источник) === */
-.meta {
+/* === Футер карточки (две строки) === */
+.card-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: #b0b0b0;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+.footer-date {
+    font-size: 13px;
+    color: #ccc;
+}
+
+.footer-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
-    margin-top: 10px;
-    color: #b0b0b0;
 }
 
-/* === Бейджи важности === */
+/* === Бейджи важности (шире, прямоугольные) === */
 .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    height: 24px;
+    border-radius: 4px; /* прямоугольные */
     font-size: 12px;
     font-weight: 600;
     color: #fff;
+    min-width: 60px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 6px rgba(255,255,255,0.3);
 }
 
 .badge.high {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b); /* красный */
+    background: linear-gradient(135deg, #e84b5f, #d93745);
 }
 
 .badge.medium {
-    background: linear-gradient(135deg, #ff9966, #ff5e62); /* оранжевый */
+    background: linear-gradient(135deg, #f27c4c, #e85a3f);
 }
 
 .badge.low {
-    background: linear-gradient(135deg, #667eea, #764ba2); /* синий/фиолет */
+    background: linear-gradient(135deg, #5c7bdc, #6a4ea2);
 }
 
 /* === Ссылки === */
 a {
-    color: #82b1ff;
     text-decoration: none;
     transition: color 0.2s ease;
-}
-
-a:hover {
-    color: #ffffff;
 }

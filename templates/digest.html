@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Digest</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- добавили ?v=2 для обновления стилей -->
+    <link rel="stylesheet"href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
 </head>
 <body>
     <h1>📰 AI Digest</h1>
@@ -11,14 +12,32 @@
     <div class="container">
         {% for item in news %}
             <div class="card">
-                <h2><a href="{{ item.link }}" target="_blank">{{ item.title }}</a></h2>
-                <p>{{ item.content or "Нет текста" }}</p>
-                <div class="meta">
-                    <span>📅 {{ item.published_at_fmt }}</span>
-                    <span>🌐 {{ item.source or "—" }}</span>
-                    <span class="badge">
-                        {{ item.importance|importance_icon }} {{ "%.2f"|format(item.importance) }}
-                    </span>
+                <h2>
+                    <a href="{{ item.link }}" target="_blank" class="card-title">
+                        {{ item.title }}
+                    </a>
+                </h2>
+
+                <p class="card-summary">{{ item.content or "Нет текста" }}</p>
+
+                <div class="card-footer">
+                    <div class="footer-date">
+                        📅 {{ item.published_at_fmt }}
+                    </div>
+                    <div class="footer-bottom">
+                        <span class="tag">🌐 {{ item.source or "—" }}</span>
+                        <span class="badge 
+                            {% if item.importance > 0.7 %}
+                                high
+                            {% elif item.importance > 0.4 %}
+                                medium
+                            {% else %}
+                                low
+                            {% endif %}">
+                            {{ item.importance|importance_icon }}
+                            {{ "%.2f"|format(item.importance) }}
+                        </span>
+                    </div>
                 </div>
             </div>
         {% endfor %}
