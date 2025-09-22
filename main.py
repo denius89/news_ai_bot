@@ -1,14 +1,18 @@
 """
-main.py — минимальный ETL + генерация дайджеста.
+main.py — минимальный ETL + генерация дайджеста + загрузка событий.
 RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
+Events -> парсинг (Investing.com / API) -> Supabase.
 
 Запуск ETL:
-  python main.py --limit 30                 # взять до 30 новостей (срез сверху после сбора)
-  python main.py --source crypto            # выбрать предустановленные источники
-  python main.py --source all --limit 50    # все источники, но только 50 новостей
+  python main.py --limit 30        # взять до 30 новостей
+  python main.py --source crypto   # выбрать предустановленные источники
+  python main.py --source all --limit 50  # все источники, но только 50 новостей
 
 Запуск дайджеста:
-  python main.py --digest 5                 # дайджест из 5 новостей
+  python main.py --digest 5        # дайджест из 5 новостей
+
+Загрузка событий:
+  python main.py --events          # загрузить экономические события
 """
 
 import argparse
@@ -16,7 +20,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 from parsers.rss_parser import load_sources, fetch_rss
-from database.db_models import upsert_news
+from parsers.events_parser import fetch_investing_events
+from database.db_models import upsert_news, upsert_event
 from digests.generator import generate_digest
 
 # --- ЛОГИРОВАНИЕ ---
@@ -44,8 +49,7 @@ def main():
         "--source", type=str, default="all",
         help="Категория из sources.yaml или 'all'"
     )
-    parser.add_argument("--limit", type=int, default=None,
-                        help="Общий лимит после сбора (срез сверху)")
+    parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--digest", type=int, nargs="?", const=5,
         help="Сформировать дайджест (по умолчанию 5 новостей)"
@@ -55,8 +59,8 @@ def main():
         help="Использовать AI для генерации дайджеста"
     )
     parser.add_argument(
-        "--per-source-limit", type=int, default=20,
-        help="Сколько новостей брать с каждого источника (по умолчанию 20)"
+        "--events", action="store_true",
+        help="Загрузить экономические события"
     )
     args = parser.parse_args()
 
@@ -70,7 +74,19 @@ def main():
         print("\n" + digest + "\n")
         return
 
-    # --- ETL ---
+    # --- События ---
+    if args.events:
+        logger.info("Загружаем экономические события с Investing.com...")
+        events = fetch_investing_events(limit_days=2)
+        logger.info(f"Получено {len(events)} событий")
+
+        for ev in events:
+            upsert_event(ev)
+
+        logger.info("✅ События сохранены")
+        return
+
+    # --- Новости (ETL) ---
     if args.source == "all":
         sources = load_sources()
     else:
@@ -78,10 +94,10 @@ def main():
 
     logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
     logger.info("Используемые источники:")
-    for src in sources:
+    for src in sources.values():
         logger.info(f"  {src['name']} ({src['category']}): {src['url']}")
 
-    items = fetch_rss(sources, per_source_limit=args.per_source_limit)
+    items = fetch_rss(sources)
 
     if args.limit and len(items) > args.limit:
         items = items[:args.limit]
