@@ -22,6 +22,9 @@ if not url or not key:
 supabase = create_client(url, key)
 
 
+# =======================
+# Новости
+# =======================
 def upsert_news(item: dict):
     """Добавляет или обновляет новость в базе."""
 
@@ -57,8 +60,8 @@ def upsert_news(item: dict):
         "content": content,
         "credibility": credibility,
         "importance": importance,
-        "source": item.get("source") or "all",  # 👈 сохраняем источник
-        "category": item["category"]
+        "source": item.get("source") or "all",  # сохраняем источник
+        "category": item.get("category") or "general"
     }
 
     try:
@@ -66,3 +69,41 @@ def upsert_news(item: dict):
         logging.info(f"✅ Добавлена/обновлена новость: {data['title'][:60]}...")
     except Exception as e:
         logging.error(f"❌ Ошибка при вставке новости: {e}")
+
+
+# =======================
+# События
+# =======================
+def upsert_event(event: dict):
+    """
+    Добавляет или обновляет событие в таблице events
+    по уникальному сочетанию (title + event_time).
+    """
+    if not event.get("title") or not event.get("event_time"):
+        logging.warning("Пропущено событие без названия или времени")
+        return
+
+    event_time = event.get("event_time")
+    if isinstance(event_time, datetime):
+        event_time = event_time.isoformat()
+
+    data = {
+        "event_time": event_time,
+        "country": event.get("country"),
+        "currency": event.get("currency"),
+        "title": event.get("title"),
+        "importance": event.get("importance"),
+        "fact": event.get("fact"),
+        "forecast": event.get("forecast"),
+        "previous": event.get("previous"),
+        "source": event.get("source") or "manual",
+    }
+
+    try:
+        supabase.table("events").upsert(
+            data,
+            on_conflict=["title", "event_time"]
+        ).execute()
+        logging.info(f"✅ Добавлено/обновлено событие: {data['title'][:60]}...")
+    except Exception as e:
+        logging.error(f"❌ Ошибка при вставке события: {e}")
