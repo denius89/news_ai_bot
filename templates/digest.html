@@ -1,78 +1,58 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>AI Digest</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
-</head>
-<body>
-    <h1>📰 AI Digest</h1>
+{% extends "base.html" %}
 
-    <!-- Filter Chips -->
-    <div class="categories-chips">
-        {% for cat in all_categories %}
-            {% set is_active = cat in active_categories %}
-            {% set new_categories = active_categories.copy() %}
-            {% if is_active %}
-                {% set _ = new_categories.remove(cat) %}
-            {% else %}
-                {% set _ = new_categories.append(cat) %}
-            {% endif %}
+{% block content %}
+<h1>📰 AI Digest</h1>
 
-            <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
-               class="chip-filter chip-{{ cat }} {% if is_active %}active{% endif %}">
-                <span class="chip-icon">
-                    {% if cat == "crypto" %}📊
-                    {% elif cat == "economy" %}💰
-                    {% elif cat == "world" %}🌍
-                    {% elif cat == "technology" %}⚙️
-                    {% elif cat == "politics" %}🏛️
-                    {% else %}📌
-                    {% endif %}
+<!-- Filter Chips -->
+<div class="categories-chips">
+    {% for cat in all_categories %}
+        {% set is_active = cat in active_categories %}
+        {% set new_categories = active_categories.copy() %}
+        {% if is_active %}
+            {% set _ = new_categories.remove(cat) %}
+        {% else %}
+            {% set _ = new_categories.append(cat) %}
+        {% endif %}
+
+        <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
+           class="chip-filter chip-{{ cat }} {% if is_active %}active{% endif %}">
+            <span class="chip-icon">
+                {% if cat == "crypto" %}📊
+                {% elif cat == "economy" %}💰
+                {% elif cat == "world" %}🌍
+                {% elif cat == "technology" %}⚙️
+                {% elif cat == "politics" %}🏛️
+                {% else %}📌
+                {% endif %}
+            </span>
+            <span>{{ cat.capitalize() }}</span>
+        </a>
+    {% endfor %}
+</div>
+
+<!-- Cards -->
+<div class="container">
+    {% for item in news %}
+        <div class="card">
+            <h2>
+                <a href="{{ item.link }}" target="_blank" class="card-title">
+                    {{ item.title }}
+                </a>
+            </h2>
+
+            <p class="card-summary">{{ item.content or "Нет текста" }}</p>
+
+            <div class="footer-bottom">
+                <span class="chip chip-tag">🌐 {{ item.source or "—" }}</span>
+                <span class="chip chip-category {{ item.category }}">
+                    🏷️ {{ item.category or "—" }}
                 </span>
-                <span>{{ cat.capitalize() }}</span>
-            </a>
-        {% endfor %}
-    </div>
-
-    <!-- Cards -->
-    <div class="container">
-        {% for item in news %}
-            <div class="card">
-                <h2>
-                    <a href="{{ item.link }}" target="_blank" class="card-title">
-                        {{ item.title }}
-                    </a>
-                </h2>
-
-                <p class="card-summary">{{ item.content or "Нет текста" }}</p>
-
-                <div class="card-footer">
-                    <div class="footer-top">
-                        <span class="chip chip-date">
-                            📅 {{ item.published_at_fmt }}
-                        </span>
-                    </div>
-                    <div class="footer-bottom">
-                        <span class="chip chip-tag">🌐 {{ item.source or "—" }}</span>
-                        <span class="chip chip-category {{ item.category }}">
-                            🏷️ {{ item.category or "—" }}
-                        </span>
-                        <span class="chip 
-                            {% if item.importance > 0.7 %}
-                                high
-                            {% elif item.importance > 0.4 %}
-                                medium
-                            {% else %}
-                                low
-                            {% endif %}">
-                            {{ item.importance|importance_icon }}
-                            {{ "%.2f"|format(item.importance) }}
-                        </span>
-                    </div>
-                </div>
+                <span class="chip {% if item.importance > 0.7 %}high{% elif item.importance > 0.4 %}medium{% else %}low{% endif %}">
+                    {{ item.importance|importance_icon }}
+                    {{ "%.2f"|format(item.importance) }}
+                </span>
             </div>
-        {% endfor %}
-    </div>
-</body>
-</html>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
