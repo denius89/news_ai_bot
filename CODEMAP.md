@@ -1,10 +1,11 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-23 13:14:47 UTC_
+_Generated on 2025-09-23 13:18:58 UTC_
 
 ```
 ├── .github/
 │   └── workflows/
+│       ├── integration.yml
 │       └── tests.yml
 ├── ai_modules/
 │   ├── __init__.py
