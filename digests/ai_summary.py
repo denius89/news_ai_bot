@@ -6,7 +6,14 @@ digests/ai_summary.py
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def get_client() -> OpenAI:
+    """Ленивое создание клиента OpenAI"""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("❌ Нет OPENAI_API_KEY, установите ключ в .env или пропустите интеграционный тест")
+    return OpenAI(api_key=api_key)
+
 
 def generate_summary(news_list, max_tokens=300) -> str:
     """
@@ -30,6 +37,7 @@ def generate_summary(news_list, max_tokens=300) -> str:
 Формат: связный текст, а не список пунктов.
     """
 
+    client = get_client()
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}],
