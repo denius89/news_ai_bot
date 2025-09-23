@@ -2,6 +2,7 @@ import pytest
 from parsers.rss_parser import fetch_rss
 from database.db_models import upsert_news
 
+
 @pytest.mark.integration
 def test_insert_news():
     sources = {
@@ -10,9 +11,11 @@ def test_insert_news():
     }
 
     items = fetch_rss(sources, per_source_limit=2)
+    assert isinstance(items, list)
     assert len(items) > 0
 
-    upsert_news(items[:1])
+    # фикс: передаём одну новость, а не список
+    upsert_news(items[0])
     print("✅ Новости добавлены в базу (интеграционный тест)")
 
 
