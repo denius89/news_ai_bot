@@ -51,3 +51,42 @@ values
     ('2025-09-26 08:00:00+00', 'EU', 'EUR', 'ECB Interest Rate Decision', 3, null, '4.25%', '4.25%', 'TradingEconomics'),
     ('2025-09-27 10:00:00+00', 'CN', 'CNY', 'Manufacturing PMI', 2, '50.1', '49.8', '49.5', 'TradingEconomics'),
     ('2025-09-28 14:00:00+00', 'US', 'BTC', 'Ethereum Hard Fork', 2, null, null, null, 'Cointelegraph');
+
+-- database/init_tables.sql (добавь в конец файла)
+
+-- 1) Таблица событий (если ещё не создана)
+CREATE TABLE IF NOT EXISTS events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_time TIMESTAMPTZ NOT NULL,         -- UTC
+    country TEXT,                             -- код страны (пример: us, gb, eu)
+    currency TEXT,                            -- USD, EUR и т.п.
+    title TEXT NOT NULL,
+    importance INT,                           -- 1=Low, 2=Medium, 3=High
+    fact TEXT,
+    forecast TEXT,
+    previous TEXT,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- 2) Уникальный ключ для дедупликации
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_indexes
+        WHERE schemaname = 'public'
+          AND indexname = 'uniq_events_time_title_country'
+    ) THEN
+        CREATE UNIQUE INDEX uniq_events_time_title_country
+        ON events (event_time, title, COALESCE(country, ''));
+    END IF;
+END $$;
+
+-- Добавляем колонку для ISO-кода страны (для флагов)
+ALTER TABLE events
+ADD COLUMN IF NOT EXISTS country_code TEXT;
+
+-- Можно сразу ограничить длину кода (2 символа для ISO или 2–3, если EU и т.п.)
+ALTER TABLE events
+ADD CONSTRAINT events_country_code_check CHECK (
+    country_code IS NULL OR char_length(country_code) BETWEEN 2 AND 3
+);
