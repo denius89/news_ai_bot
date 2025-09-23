@@ -1,9 +1,11 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-23 08:15:43 UTC_
+_Generated on 2025-09-23 09:30:41 UTC_
 
 ```
 ├── .github/
+│   └── workflows/
+│       └── tests.yml
 ├── ai_modules/
 │   ├── __init__.py
 │   ├── credibility.py
@@ -60,6 +62,7 @@ _Generated on 2025-09-23 08:15:43 UTC_
 ├── config.py
 ├── main.py
 ├── MASTER_FILE.md
+├── pytest.ini
 ├── README.md
 ├── requirements.txt
 ├── TASKS.md
