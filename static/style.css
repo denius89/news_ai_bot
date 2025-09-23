@@ -1,79 +1,176 @@
 /* === Базовые стили === */
-h1 {
-    margin: 6px 0 18px;
-    font-weight: 700;
-    text-align: center;
-    color: #FFFFFF;
-}
-
 body {
-    font-family: 'Roboto', 'Inter', sans-serif;
-    background: #121212; /* Surface */
-    color: #E0E0E0;      /* On-surface */
+    font-family: 'SF Pro', 'Roboto', 'Inter', sans-serif;
+    background: #F7F7F7;
+    color: #212121;
     margin: 0;
     padding: 0;
+    line-height: 1.6;
 }
 
-/* === Верхнее меню === */
-.top-nav {
-    display: flex;
-    gap: 20px;
-    padding: 12px 20px;
-    background: #1E1E1E;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+/* === Layout container === */
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 20px;
+}
+
+/* === Site header (brand + nav) === */
+.site-header {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 200;
+    background: #FFFFFF;
+    border-bottom: 1px solid #EAEAEA;
+    backdrop-filter: saturate(180%) blur(8px);
+    transition: box-shadow .2s ease, border-color .2s ease, transform .2s ease;
 }
-.top-nav a {
-    color: #E0E0E0;
+.header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.site-header.is-scrolled {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    border-color: transparent;
+    transform: translateZ(0);
+}
+
+/* Brand */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+}
+.brand-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007AFF, #5E5CE6);
+    color: #FFF;
+    font-weight: 800;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,122,255,0.25);
+}
+.brand-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+}
+.brand-subtitle {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+/* Навигация как табы */
+.site-header .top-nav {
+    display: flex;
+    gap: 8px;
+}
+.site-header .top-nav a {
+    padding: 6px 14px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    color: #212121;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s ease;
+    transition: background .2s, color .2s;
 }
-.top-nav a:hover {
-    color: #BB86FC;
+.site-header .top-nav a:hover {
+    background: rgba(0,122,255,0.06);
+    color: #007AFF;
 }
-.top-nav a.active {
-    color: #BB86FC;
-    border-bottom: 2px solid #BB86FC;
-    padding-bottom: 2px;
-}
-
-.page-content {
-    padding: 20px;
+.site-header .top-nav a.active {
+    background: rgba(0,122,255,0.1);
+    color: #007AFF;
+    font-weight: 600;
 }
 
-/* === Filter Chips === */
+/* === Subnav (категории) === */
+.subnav {
+    border-top: 1px solid #F1F1F1;
+    border-bottom: 1px solid #F1F1F1;
+    background: #FFF;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.subnav .categories-chips {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+/* === Фильтры (Chips) === */
 .categories-chips {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin: 16px 0 24px;
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 .chip-filter {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    border-radius: 20px;
+    border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    color: #212121;
+    transition: all 0.2s ease;
+    cursor: pointer;
     text-decoration: none;
-    background: rgba(255,255,255,0.08);
-    color: #E0E0E0;
-    transition: all 0.25s ease;
 }
-.chip-filter:hover {
-    opacity: 0.9;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+.chip-filter:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,122,255,0.25);
 }
-.chip-crypto.active     { background: #BB86FC; color: #fff; }
-.chip-economy.active    { background: #03DAC6; color: #000; }
-.chip-world.active      { background: #82B1FF; color: #000; }
-.chip-technology.active { background: #FFB74D; color: #000; }
-.chip-politics.active   { background: #CF6679; color: #fff; }
+
+/* Цвета фильтров */
+.chip-filter.crypto.active,
+.chip-filter.crypto:hover {
+    background: rgba(0,122,255,0.15);
+    color: #007AFF;
+    border-color: transparent;
+}
+.chip-filter.economy.active,
+.chip-filter.economy:hover {
+    background: rgba(76,217,100,0.15);
+    color: #34C759;
+    border-color: transparent;
+}
+.chip-filter.world.active,
+.chip-filter.world:hover {
+    background: rgba(10,132,255,0.15);
+    color: #0A84FF;
+    border-color: transparent;
+}
+.chip-filter.technology.active,
+.chip-filter.technology:hover {
+    background: rgba(255,149,0,0.15);
+    color: #FF9500;
+    border-color: transparent;
+}
+.chip-filter.politics.active,
+.chip-filter.politics:hover {
+    background: rgba(255,59,48,0.15);
+    color: #FF3B30;
+    border-color: transparent;
+}
 
 /* === Карточки новостей === */
 .container {
@@ -83,154 +180,117 @@ body {
     margin-top: 20px;
 }
 .card {
-    background: #1E1E1E;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    transition: all 0.25s ease;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
+    background: #FFF;
+    border-radius: 16px;
+    padding: 24px 20px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    color: inherit;
+    transition: transform .2s ease, box-shadow .2s ease;
     min-height: 260px;
-    backdrop-filter: blur(6px);
 }
 .card:hover {
     transform: translateY(-4px);
-    background: #242424;
-    box-shadow: 0 6px 16px rgba(187,134,252,0.3);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
-/* === Заголовки === */
+/* Заголовок */
 .card-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #BB86FC;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color .2s ease;
+}
+.card-title--calm { color: #212121; }
+.card-title--calm:hover { color: #007AFF; }
+.card-link {
+    color: inherit;
     text-decoration: none;
-    position: relative;
-    cursor: pointer;
-    transition: color 0.3s ease;
 }
-.card-title::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -3px;
-    width: 0;
-    height: 2px;
-    background: #BB86FC;
-    transition: width 0.3s ease;
-}
-.card-title:hover {
-    color: #FFFFFF;
-}
-.card-title:hover::after {
-    width: 100%;
+.card-link:hover { color: #007AFF; }
+
+/* Дата */
+.card-date {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 12px;
 }
 
-/* === Контент (4 строки с …) === */
+/* Сводка */
 .card-summary {
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 12px 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
+    flex-grow: 1;
+    max-height: 6.5em; /* ~4 строки */
     overflow: hidden;
     text-overflow: ellipsis;
-    word-break: break-word;
-    color: #E0E0E0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding-bottom: 3px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    color: #555;
 }
 
-/* === Футер карточки === */
+/* Футер */
 .card-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 13px;
     margin-top: auto;
-    padding-top: 10px;
-}
-
-/* === Чипы внутри карточек === */
-.chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 12px;
-    height: 26px;
-    border-radius: 16px;
     font-size: 13px;
-    font-weight: 500;
-    background: rgba(255,255,255,0.08);
-    color: #E0E0E0;
-    min-width: 60px;
-    transition: all 0.25s ease;
+    color: #666;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
 }
-.chip:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 8px rgba(187,134,252,0.4);
+.card-footer .importance-value {
+    font-weight: 600;
 }
-.chip-date { background: rgba(255,255,255,0.1); font-size: 12px; }
-.chip-tag  { color: #B0C4FF; background: rgba(187,134,252,0.15); font-size: 12px; }
+.card-footer .importance-value.low { color: #34C759; }
+.card-footer .importance-value.medium { color: #FF9500; }
+.card-footer .importance-value.high { color: #FF3B30; }
 
-/* Категории */
-.chip-category.crypto     { background: rgba(187,134,252,0.2); color: #BB86FC; }
-.chip-category.economy    { background: rgba(3,218,198,0.2);  color: #03DAC6; }
-.chip-category.world      { background: rgba(130,177,255,0.2); color: #82B1FF; }
-.chip-category.technology { background: rgba(255,183,77,0.2);  color: #FFB74D; }
-.chip-category.politics   { background: rgba(207,102,121,0.2); color: #CF6679; }
-
-/* === Таблица событий (desktop) === */
+/* === Таблица событий === */
 .events-table {
     margin-top: 20px;
     overflow-x: auto;
-    display: block; /* показываем по умолчанию */
 }
 .events-table table {
     width: 100%;
     border-collapse: collapse;
-    background: #1E1E1E;
+    background: #FFFFFF;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
 .events-table th,
 .events-table td {
     padding: 12px 16px;
     text-align: left;
     font-size: 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid #E0E0E0;
 }
 .events-table th {
-    background: #242424;
+    background: #F9F9F9;
     font-weight: 600;
-    color: #BB86FC;
+    color: #007AFF;
     position: sticky;
     top: 0;
     z-index: 2;
 }
-.events-table tr:hover {
-    background: rgba(255,255,255,0.05);
-}
-.events-table td {
-    color: #E0E0E0;
-}
+.events-table tr:hover { background: #FAFAFA; }
+.events-table td { color: #212121; }
 
-/* Важность */
-.importance-low    { color: #03DAC6; }
-.importance-medium { color: #FFB74D; }
-.importance-high   { color: #CF6679; }
+/* Важность в таблице */
+.importance-low    { color: #34C759; }
+.importance-medium { color: #FF9500; }
+.importance-high   { color: #FF3B30; }
 
 /* Время события */
 .event-time-main {
     font-weight: 600;
-    color: #BB86FC;
+    color: #007AFF;
     display: block;
 }
 .event-time-remaining {
     font-size: 12px;
-    color: #B0BEC5;
+    color: #666;
     margin-top: 2px;
 }
 
@@ -241,47 +301,36 @@ body {
     gap: 14px;
 }
 .event-card {
-    background: #1E1E1E;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: #FFFFFF;
     border-radius: 12px;
     padding: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-height: 200px;
 }
 .event-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
-
-/* Хедер карточки */
 .event-card-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: 10px;
 }
-.event-time-main {
-    font-weight: 600;
-    color: #BB86FC;
-    margin-bottom: 4px; /* чуть больше */
-}
-.event-time-remaining {
-    font-size: 12px;
-    color: #B0BEC5;
-    margin-bottom: 10px; /* увеличенный отступ снизу */
-}
-
-/* Контент карточки */
 .event-country {
     font-size: 14px;
     margin-bottom: 8px;
-    margin-top: 8px;
-    color: #E0E0E0;
+    color: #212121;
 }
 .event-title {
     font-size: 15px;
     font-weight: 500;
     margin-bottom: 8px;
-    color: #FFFFFF;
+    color: #212121;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -291,47 +340,82 @@ body {
 .event-meta {
     margin-bottom: 8px;
 }
-.event-meta .importance-low    { color: #03DAC6; }
-.event-meta .importance-medium { color: #FFB74D; }
-.event-meta .importance-high   { color: #CF6679; }
-
-/* Метрики */
 .event-stats {
+    margin-top: auto;
     font-size: 13px;
-    color: #E0E0E0;
+    color: #666;
     display: flex;
     justify-content: space-between;
     gap: 6px;
-
-    /* разделитель */
-    margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid #E0E0E0;
 }
 .event-stats span {
     flex: 1;
     text-align: center;
     padding: 6px 8px;
-    background: rgba(255,255,255,0.06);
+    background: #F5F5F5;
     border-radius: 6px;
     line-height: 1.4;
 }
 
 /* === Мобильная адаптация === */
 @media (max-width: 768px) {
+    .page-content {
+        padding: 16px 12px;
+    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .card {
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: none;
+        border: 1px solid #EAEAEA;
+        min-height: unset;
+    }
+    .card-date {
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 6px;
+    }
+    .card-summary {
+        font-size: 13px;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+    .card-footer {
+        font-size: 12px;
+        color: #666;
+        gap: 6px;
+    }
+    .card-footer .importance-value {
+        font-size: 12px;
+    }
+
+    /* Subnav горизонтальный скролл без полосы */
+    .categories-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .categories-chips::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Хедер: скрыть подзаголовок */
+    .brand-subtitle {
+        display: none;
+    }
+
     .events-table { display: none; }
     .events-cards { display: grid; }
-}
-
-/* Флаги */
-.fi {
-    margin-right: 6px;
-    border-radius: 3px;
-    width: 20px;
-    height: 14px;
-}
-.event-country .fi {
-    font-size: 16px;
 }
 
 /* Счётчик событий сегодня */
@@ -339,20 +423,56 @@ body {
     margin: 12px 0 20px;
     font-size: 15px;
     font-weight: 600;
-    color: #BB86FC;
+    color: #007AFF;
     text-align: center;
 }
 
-/* Подсветка событий сегодняшнего дня */
+/* Подсветка событий сегодня */
 .events-table tr.event-today td {
-    background: rgba(187,134,252,0.08);
-    border-left: 3px solid #BB86FC;
+    background: rgba(0,122,255,0.08);
+    border-left: 3px solid #007AFF;
 }
 .event-card.event-today {
-    background: #1f1a26;
-    border-left: 3px solid #BB86FC;
+    background: #F0F8FF;
+    border-left: 3px solid #007AFF;
 }
 
-.chip.high    { background: #CF6679; color: #FFFFFF; }
-.chip.medium  { background: #FFB74D; color: #000000; }
-.chip.low     { background: #03DAC6; color: #000000; }
+/* Accessibility */
+.chip-filter:link,
+.chip-filter:visited { color: inherit; }
+@media (prefers-reduced-motion: reduce) {
+    .site-header, .top-nav a, .card, .chip, .chip-filter, .event-card {
+        transition: none !important;
+    }
+}
+
+/* Логотип */
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px; /* squircle */
+  background: linear-gradient(135deg, #007AFF, #5E5CE6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,122,255,0.25);
+}
+.brand-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.brand-title .brand-ai {
+  color: #5E5CE6;
+}
+.brand-subtitle {
+  font-size: 11px;
+  color: #777;
+  line-height: 1.2;
+  margin-top: 2px;
+}
