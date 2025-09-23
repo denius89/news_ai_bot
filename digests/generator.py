@@ -12,6 +12,10 @@ def fetch_recent_news(limit: int = 5):
     Загружает последние N новостей из базы (сортировка по importance и дате).
     Добавляет поле published_at_fmt для отображения.
     """
+    if not supabase:
+        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список новостей.")
+        return []
+
     response = (
         supabase.table("news")
         .select("id, title, content, link, importance, published_at, source, category")
@@ -48,7 +52,7 @@ def generate_digest(limit: int = 5, ai: bool = False) -> str:
     """
     news_items = fetch_recent_news(limit=limit)
     if not news_items:
-        return "Нет новостей для дайджеста."
+        return "Сегодня новостей нет."
 
     if ai:
         return generate_summary(news_items)
