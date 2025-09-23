@@ -17,33 +17,18 @@ Events -> парсинг (Investing.com / API) -> Supabase.
 
 import argparse
 import logging
-from logging.handlers import RotatingFileHandler
-import os
 from parsers.rss_parser import load_sources, fetch_rss
 from parsers.events_parser import fetch_investing_events
 from database.db_models import upsert_news, upsert_event
 from digests.generator import generate_digest
-
-# --- ЛОГИРОВАНИЕ ---
-os.makedirs("logs", exist_ok=True)
-
-logger = logging.getLogger("news_ai_bot")
-logger.setLevel(logging.INFO)
-
-formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-
-file_handler = RotatingFileHandler("logs/app.log", maxBytes=1_000_000, backupCount=3)
-file_handler.setFormatter(formatter)
-
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(formatter)
-
-if not logger.handlers:
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
+from utils.logging_setup import setup_logging
 
 
 def main():
+    # --- ЛОГИРОВАНИЕ ---
+    setup_logging()
+    logger = logging.getLogger("news_ai_bot")
+
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument(
         "--source", type=str, default="all",

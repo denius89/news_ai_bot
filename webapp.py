@@ -1,11 +1,15 @@
 from flask import Flask
 from routes.news_routes import news_bp
 import config
+import logging
+from utils.logging_setup import setup_logging
+
+# --- ЛОГИРОВАНИЕ ---
+setup_logging()
+logger = logging.getLogger("news_ai_bot")
 
 app = Flask(__name__)
 app.config['VERSION'] = config.VERSION
-
-app = Flask(__name__)
 
 # 🔥 Добавляем фильтр для отображения иконок важности
 def importance_icon(value: float) -> str:
@@ -25,4 +29,5 @@ app.jinja_env.filters['importance_icon'] = importance_icon
 app.register_blueprint(news_bp)
 
 if __name__ == "__main__":
+    logger.info("🚀 Webapp запущен (порт 5000)")
     app.run(debug=True, port=5000)
