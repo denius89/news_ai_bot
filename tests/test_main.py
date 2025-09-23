@@ -1,14 +1,24 @@
 import subprocess
 import os
+import pytest
 from supabase import create_client
 from dotenv import load_dotenv
 
+
+@pytest.mark.integration
 def test_main_etl():
     """
-    E2E тест: запускает main.py и проверяет,
+    Интеграционный E2E тест:
+    запускает main.py и проверяет,
     что в Supabase есть новости с полями credibility и importance.
     """
     load_dotenv()
+
+    # Проверяем ключи Supabase
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
+    if not url or not key:
+        pytest.skip("❌ Нет ключей Supabase в .env")
 
     # Запуск main.py с ограничением 2 новости
     result = subprocess.run(
@@ -18,8 +28,6 @@ def test_main_etl():
     assert result.returncode == 0, f"main.py завершился с ошибкой: {result.stderr}"
 
     # Подключение к Supabase
-    url = os.getenv("SUPABASE_URL")
-    key = os.getenv("SUPABASE_KEY")
     client = create_client(url, key)
 
     # Проверяем наличие новостей
@@ -32,3 +40,5 @@ def test_main_etl():
         for item in response.data
     )
     assert has_ai_fields, "Нет записей с полями credibility и importance"
+
+    print("✅ ETL-процесс прошёл успешно, новости загружены в базу")

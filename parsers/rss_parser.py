@@ -24,43 +24,47 @@ def clean_text(text: str) -> str:
     return text
 
 
-def load_sources(category: str | None = None) -> list[dict]:
+def load_sources(category: str | None = None) -> dict[str, dict]:
     """
     Загружает список RSS-источников из sources.yaml.
     Если категория не указана → берём все источники.
-    Возвращает список словарей: url, name, category.
+    Возвращает словарь: ключ — имя источника, значение — словарь {url, name, category}.
     """
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
         sources = yaml.safe_load(f)
 
-    urls = []
+    urls: dict[str, dict] = {}
     if category:
         if category not in sources:
             raise ValueError(f"Нет категории '{category}' в sources.yaml")
-        urls = [
-            {"url": item["url"], "name": item["name"], "category": category}
-            for item in sources[category]
-        ]
+        for item in sources[category]:
+            urls[item["name"]] = {
+                "url": item["url"],
+                "name": item["name"],
+                "category": category,
+            }
     else:
         for cat, group in sources.items():
-            urls.extend(
-                {"url": item["url"], "name": item["name"], "category": cat}
-                for item in group
-            )
+            for item in group:
+                urls[item["name"]] = {
+                    "url": item["url"],
+                    "name": item["name"],
+                    "category": cat,
+                }
 
     return urls
 
 
-def fetch_rss(urls: list[dict], per_source_limit: int | None = None) -> list[dict]:
+def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> list[dict]:
     """
-    Загружает новости из списка RSS-источников.
+    Загружает новости из словаря RSS-источников.
     Если per_source_limit указан → берём только N новостей с каждого источника.
     Возвращает список словарей: title, link, published, content, source, category.
     """
     news_items = []
     seen_links = set()
 
-    for meta in urls:
+    for meta in urls.values():
         url = meta["url"]
         source_name = meta["name"]
         category = meta.get("category", "general")
@@ -113,7 +117,7 @@ def fetch_rss(urls: list[dict], per_source_limit: int | None = None) -> list[dic
 if __name__ == "__main__":
     from pprint import pprint
 
-    test_urls = load_sources("world")
-    items = fetch_rss(test_urls, per_source_limit=5)
+    test_sources = load_sources("world")
+    items = fetch_rss(test_sources, per_source_limit=5)
     print(f"Найдено новостей: {len(items)}")
     pprint(items[:3])
