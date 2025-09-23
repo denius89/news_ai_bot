@@ -49,10 +49,16 @@ COUNTRY_MAP = {
 }
 
 
-def upsert_news(item: dict):
-    """Добавляет или обновляет новость в базе."""
+def upsert_news(item: dict | list[dict]):
+    """Добавляет или обновляет новость (или список новостей) в базе."""
     if not supabase:
         logging.warning("⚠️ Supabase не инициализирован, новость не сохранена.")
+        return
+
+    # если передан список — рекурсивно обрабатываем каждую новость
+    if isinstance(item, list):
+        for i in item:
+            upsert_news(i)
         return
 
     link = item.get("link")
