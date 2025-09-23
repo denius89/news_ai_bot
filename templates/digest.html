@@ -1,58 +1,60 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1>📰 AI Digest</h1>
+{% block subnav %}
+<div class="subnav">
+    <div class="categories-chips">
+        {% for cat in all_categories %}
+            {% set is_active = cat in active_categories %}
+            {% set new_categories = active_categories.copy() %}
+            {% if is_active %}
+                {% set _ = new_categories.remove(cat) %}
+            {% else %}
+                {% set _ = new_categories.append(cat) %}
+            {% endif %}
 
-<!-- Filter Chips -->
-<div class="categories-chips">
-    {% for cat in all_categories %}
-        {% set is_active = cat in active_categories %}
-        {% set new_categories = active_categories.copy() %}
-        {% if is_active %}
-            {% set _ = new_categories.remove(cat) %}
-        {% else %}
-            {% set _ = new_categories.append(cat) %}
-        {% endif %}
-
-        <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
-           class="chip-filter chip-{{ cat }} {% if is_active %}active{% endif %}">
-            <span class="chip-icon">
-                {% if cat == "crypto" %}📊
-                {% elif cat == "economy" %}💰
-                {% elif cat == "world" %}🌍
-                {% elif cat == "technology" %}⚙️
-                {% elif cat == "politics" %}🏛️
-                {% else %}📌
-                {% endif %}
-            </span>
-            <span>{{ cat.capitalize() }}</span>
-        </a>
-    {% endfor %}
+            <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
+               class="chip-filter {{ cat }} {% if is_active %}active{% endif %}">
+                {% if cat == "crypto" %}📊{% elif cat == "economy" %}💰
+                {% elif cat == "world" %}🌍{% elif cat == "technology" %}⚙️
+                {% elif cat == "politics" %}🏛️{% endif %}
+                <span>{{ cat.capitalize() }}</span>
+            </a>
+        {% endfor %}
+    </div>
 </div>
+{% endblock %}
 
-<!-- Cards -->
+{% block content %}
 <div class="container">
     {% for item in news %}
-        <div class="card">
-            <h2>
-                <a href="{{ item.link }}" target="_blank" class="card-title">
-                    {{ item.title }}
-                </a>
-            </h2>
+    <div class="card">
+        <!-- Заголовок -->
+        <h2 class="card-title card-title--calm">
+            <a href="{{ item.link }}" target="_blank" class="card-link">
+                {{ item.title }}
+            </a>
+        </h2>
 
-            <p class="card-summary">{{ item.content or "Нет текста" }}</p>
+        <!-- Дата -->
+        <div class="card-date">{{ item.published_at_fmt }}</div>
 
-            <div class="footer-bottom">
-                <span class="chip chip-tag">🌐 {{ item.source or "—" }}</span>
-                <span class="chip chip-category {{ item.category }}">
-                    🏷️ {{ item.category or "—" }}
-                </span>
-                <span class="chip {% if item.importance > 0.7 %}high{% elif item.importance > 0.4 %}medium{% else %}low{% endif %}">
-                    {{ item.importance|importance_icon }}
-                    {{ "%.2f"|format(item.importance) }}
-                </span>
-            </div>
+        <!-- Краткое содержание -->
+        <p class="card-summary">{{ item.content or "Нет текста" }}</p>
+
+        <!-- Футер -->
+        <div class="card-footer">
+            <span class="source-link">{{ item.source }}</span>
+            ·
+            <span class="card-category">{{ item.category or "—" }}</span>
+            ·
+            <span class="importance-value
+                {% if item.importance > 0.7 %}high
+                {% elif item.importance > 0.4 %}medium
+                {% else %}low{% endif %}">
+                🔥 {{ "%.2f"|format(item.importance) }}
+            </span>
         </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}

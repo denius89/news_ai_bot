@@ -1,19 +1,42 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title or "AI Digest" }}</title>
+    <title>{{ title or "Pulse AI" }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
 </head>
 <body>
-    <!-- Верхнее меню -->
-    <nav class="top-nav">
-        <a href="/digest" class="{% if active_page == 'digest' %}active{% endif %}">📰 Digest</a>
-        <a href="/events" class="{% if active_page == 'events' %}active{% endif %}">🗓️ Events</a>
-    </nav>
+    <!-- Site Header -->
+    <header class="site-header">
+  <div class="header-inner">
+    <!-- Логотип -->
+    <a href="/" class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="2 12 6 12 10 4 14 20 18 12 22 12"></polyline>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand-title">
+          Pulse<span class="brand-ai">AI</span>
+        </div>
+        <div class="brand-subtitle">AI-Powered News & Events</div>
+      </div>
+    </a>
 
-    <!-- Контент страницы -->
+    <!-- Навигация -->
+    <nav class="top-nav">
+      <a href="/digest" class="{% if active_page == 'digest' %}active{% endif %}">Digest</a>
+      <a href="/events" class="{% if active_page == 'events' %}active{% endif %}">Events</a>
+    </nav>
+  </div>
+</header>
+
+    <!-- Subnav (filters, etc.) -->
+    {% block subnav %}{% endblock %}
+
+    <!-- Page Content -->
     <main class="page-content">
         {% block content %}{% endblock %}
     </main>

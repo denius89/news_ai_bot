@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>🗓️ Economic & Crypto Calendar</h1>
-
 <!-- Счётчик событий сегодня -->
 <div id="today-counter" class="today-counter">
     ⚡ Сегодня: <span id="today-count">0</span> событий
@@ -17,9 +15,9 @@
                 <th>🌍 Страна</th>
                 <th>📌 Событие</th>
                 <th>⭐ Важность</th>
-                <th>📊</th>
-                <th>📈</th>
-                <th>📉</th>
+                <th>📊 Факт</th>
+                <th>📈 Прогноз</th>
+                <th>📉 Предыдущее</th>
             </tr>
         </thead>
         <tbody>
@@ -31,18 +29,18 @@
                 </td>
                 <td>
                     {% if ev.country %}
-                    <span class="fi fi-{{ ev.country_code|lower }}"></span>
+                        <span class="fi fi-{{ ev.country_code|lower }}"></span>
                     {% endif %}
                     {{ ev.currency or "" }}
                 </td>
                 <td>{{ ev.title or "—" }}</td>
                 <td>
                     {% if ev.importance == 1 %}
-                        ⭐ <span class="importance-low">Low</span>
+                        <span class="importance-low">⭐ Low</span>
                     {% elif ev.importance == 2 %}
-                        ⭐⭐ <span class="importance-medium">Medium</span>
+                        <span class="importance-medium">⭐⭐ Medium</span>
                     {% elif ev.importance == 3 %}
-                        ⭐⭐⭐ <span class="importance-high">High</span>
+                        <span class="importance-high">⭐⭐⭐ High</span>
                     {% else %}
                         —
                     {% endif %}
@@ -60,8 +58,10 @@
 <div class="events-cards">
     {% for ev in events %}
     <div class="event-card" data-time="{{ ev.event_time }}">
-        <span class="event-time-main">{{ ev.event_time_fmt }}</span>
-        <span class="event-time-remaining time-remaining" data-time="{{ ev.event_time }}"></span>
+        <div class="event-card-header">
+            <span class="event-time-main">{{ ev.event_time_fmt }}</span>
+            <span class="event-time-remaining time-remaining" data-time="{{ ev.event_time }}"></span>
+        </div>
 
         <div class="event-country">
             {% if ev.country %}
@@ -74,11 +74,11 @@
 
         <div class="event-meta">
             {% if ev.importance == 1 %}
-                ⭐ <span class="importance-low">Low</span>
+                <span class="importance-low">⭐ Low</span>
             {% elif ev.importance == 2 %}
-                ⭐⭐ <span class="importance-medium">Medium</span>
+                <span class="importance-medium">⭐⭐ Medium</span>
             {% elif ev.importance == 3 %}
-                ⭐⭐⭐ <span class="importance-high">High</span>
+                <span class="importance-high">⭐⭐⭐ High</span>
             {% else %}
                 —
             {% endif %}
@@ -110,24 +110,23 @@ function updateTimeRemaining() {
             return;
         }
 
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-        const diffDays = Math.floor(diffHours / 24);
+        const mins = Math.floor(diffMs / 60000);
+        const hrs = Math.floor(mins / 60);
+        const days = Math.floor(hrs / 24);
 
-        if (diffDays > 0) {
-            el.textContent = `через ${diffDays} дн. ${diffHours % 24} ч.`;
-        } else if (diffHours > 0) {
-            el.textContent = `через ${diffHours} ч. ${diffMins % 60} мин.`;
+        if (days > 0) {
+            el.textContent = `через ${days} дн. ${hrs % 24} ч.`;
+        } else if (hrs > 0) {
+            el.textContent = `через ${hrs} ч. ${mins % 60} мин.`;
         } else {
-            el.textContent = `через ${diffMins} мин.`;
+            el.textContent = `через ${mins} мин.`;
         }
     });
 
     document.querySelectorAll(".event-row, .event-card").forEach(row => {
         const targetTime = new Date(row.dataset.time);
         if (!isNaN(targetTime)) {
-            const targetStr = targetTime.toISOString().slice(0, 10);
-            if (targetStr === todayStr) {
+            if (targetTime.toISOString().slice(0, 10) === todayStr) {
                 row.classList.add("event-today");
                 todayCount++;
             }
