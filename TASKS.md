@@ -1,13 +1,15 @@
-# 📝 TASKS (last updated: 2025-09-24 15:44:04)
+# 📝 TASKS (last updated: 2025-09-24 15:55:22)
 
 
 ## Сегодня — Day 01 Sprint Board
-- [ ] Создать/обновить docs: VISION.md, ROADMAP.md, COMMUNICATION.md (🟡)
-- [ ] Обновить MASTER_FILE.md (ссылки на новые docs + правила/решения) (🟡)
-- [ ] Обновить TASKS.md (дни 1–5 из Roadmap) (🟡)
-- [ ] Ревью rss_parser.py и events_parser.py (🔴)
-- [ ] Проверка записи в db_models.py + структурированное логирование (🔴)
-- [ ] Тестовый прогон: загрузить источники → проверить БД (🔴)
+- [x] Создать/обновить docs: VISION.md, ROADMAP.md, COMMUNICATION.md (🟡)
+- [x] Настроить CI (flake8, black, pytest, coverage, isort, mypy) (🔴)
+- [x] Добавить CONTRIBUTING.md и .editorconfig (🟡)
+- [x] Добавить тесты (test_main_import, test_routes, test_webapp) (🟡)
+- [x] Исправить и дописать существующие тесты (supabase, openai, digests, parsers) (🔴)
+- [x] Обновить repo_map.py, перегенерировать CODEMAP.md (🟡)
+- [x] Применить black/isort для форматирования (🟢)
+- [x] Завершить merge day-01-docs-parsers → main (🔴)
 
 ---
 
