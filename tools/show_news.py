@@ -51,8 +51,7 @@ def show_latest_news(limit: int = 5, source: Optional[str] = None, days: Optiona
         print(f"- {item.get('title')}")
         print(f"  📅 {item.get('published_at')}")
         print(
-            f"  ✅ Credibility: {item.get('credibility')}, "
-            f"Importance: {item.get('importance')}"
+            f"  ✅ Credibility: {item.get('credibility')}, " f"Importance: {item.get('importance')}"
         )
         print(f"  🔗 {item.get('link')}\n")
 
