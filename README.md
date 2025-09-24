@@ -1,3 +1,4 @@
+![Tests](https://github.com/denisfedko/news_ai_bot/actions/workflows/tests.yml/badge.svg)
 # News AI Bot
 
 Умный агрегатор крипто- и экономических новостей с AI-анализом.  
