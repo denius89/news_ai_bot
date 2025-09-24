@@ -1,12 +1,13 @@
 import argparse
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from dotenv import load_dotenv
 from supabase import create_client
 
 
-def show_latest_news(limit: int = 5, source: str = None, days: int = None):
+def show_latest_news(limit: int = 5, source: Optional[str] = None, days: Optional[int] = None):
     """
     Выводит последние N новостей из базы Supabase.
     Можно фильтровать по source (crypto, economy, all) и по давности (days).
@@ -21,7 +22,8 @@ def show_latest_news(limit: int = 5, source: str = None, days: int = None):
 
     client = create_client(url, key)
 
-    query = client.table("news").select("*").order("id", desc=True)
+    # Сортируем по дате публикации, а не по id
+    query = client.table("news").select("*").order("published_at", desc=True)
 
     if source and source != "all":
         query = query.eq("source", source)
@@ -48,7 +50,10 @@ def show_latest_news(limit: int = 5, source: str = None, days: int = None):
     for item in response.data:
         print(f"- {item.get('title')}")
         print(f"  📅 {item.get('published_at')}")
-        print(f"  ✅ Credibility: {item.get('credibility')}, Importance: {item.get('importance')}")
+        print(
+            f"  ✅ Credibility: {item.get('credibility')}, "
+            f"Importance: {item.get('importance')}"
+        )
         print(f"  🔗 {item.get('link')}\n")
 
 
