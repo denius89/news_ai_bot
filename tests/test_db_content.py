@@ -2,6 +2,7 @@ import os
 from supabase import create_client
 from dotenv import load_dotenv
 
+
 def show_tables():
     load_dotenv(dotenv_path=".env")
     url = os.getenv("SUPABASE_URL")
@@ -27,6 +28,7 @@ def show_tables():
     digests = supabase.table("digests").select("*").execute()
     for d in digests.data:
         print(d)
+
 
 if __name__ == "__main__":
     show_tables()

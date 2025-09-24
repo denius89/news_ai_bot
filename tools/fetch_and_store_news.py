@@ -4,13 +4,16 @@ from database.db_models import upsert_news, enrich_news_with_ai
 
 logger = logging.getLogger("main")
 
+
 def main():
     # 1. Загружаем список источников
     sources = load_sources()
     logger.info(f"Загружено {len(sources)} источников")
 
     # 2. Парсим RSS
-    items = fetch_rss(sources, per_source_limit=10)  # ограничим, чтобы не тянуть слишком много
+    items = fetch_rss(
+        sources, per_source_limit=10
+    )  # ограничим, чтобы не тянуть слишком много
     logger.info(f"Получено {len(items)} новостей")
 
     if not items:
@@ -23,6 +26,7 @@ def main():
     # 4. Сохраняем в БД
     upsert_news(enriched)
     logger.info("✅ Пайплайн завершён")
+
 
 if __name__ == "__main__":
     main()

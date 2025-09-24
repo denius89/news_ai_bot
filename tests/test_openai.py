@@ -3,6 +3,7 @@ import pytest
 from openai import OpenAI
 from dotenv import load_dotenv
 
+
 @pytest.mark.integration
 def test_openai():
     """Проверка подключения к OpenAI API"""

@@ -13,7 +13,9 @@ def fetch_recent_news(limit: int = 5):
     Добавляет поле published_at_fmt для отображения.
     """
     if not supabase:
-        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список новостей.")
+        logger.warning(
+            "⚠️ Supabase не инициализирован — возвращаем пустой список новостей."
+        )
         return []
 
     response = (
@@ -71,8 +73,12 @@ def generate_digest(limit: int = 5, ai: bool = False) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ai", action="store_true", help="Использовать AI для генерации дайджеста")
-    parser.add_argument("--limit", type=int, default=5, help="Сколько новостей включать")
+    parser.add_argument(
+        "--ai", action="store_true", help="Использовать AI для генерации дайджеста"
+    )
+    parser.add_argument(
+        "--limit", type=int, default=5, help="Сколько новостей включать"
+    )
     args = parser.parse_args()
 
     print(generate_digest(limit=args.limit, ai=args.ai))

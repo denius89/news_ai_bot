@@ -9,6 +9,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("main")
 
+
 def main():
     # 1. Получаем события с Investing (сегодня + 1 день)
     events = fetch_investing_events(limit_days=1)
@@ -19,6 +20,7 @@ def main():
         upsert_event(events)
     else:
         logger.warning("События не получены, ничего не вставлено")
+
 
 if __name__ == "__main__":
     main()

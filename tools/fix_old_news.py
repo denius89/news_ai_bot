@@ -8,7 +8,7 @@ from supabase import create_client
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()]
+    handlers=[logging.StreamHandler()],
 )
 
 # Загружаем .env
@@ -16,6 +16,7 @@ load_dotenv()
 url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 client = create_client(url, key)
+
 
 def fix_news():
     logging.info("🔍 Загружаем все новости из базы...")
@@ -53,6 +54,7 @@ def fix_news():
             fixed += 1
 
     logging.info(f"✅ Обновлено {fixed} новостей")
+
 
 if __name__ == "__main__":
     fix_news()

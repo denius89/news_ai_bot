@@ -22,42 +22,96 @@ if url and key:
     supabase = create_client(url, key)
     logger.info("Supabase client initialized")
 else:
-    logger.warning("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
+    logger.warning(
+        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
+    )
 
 # --- Маппинг стран для флагов ---
 COUNTRY_MAP = {
-    "united states": "us", "us": "us", "u.s.": "us", "usa": "us",
-    "canada": "ca", "ca": "ca",
-    "mexico": "mx", "mx": "mx",
-    "brazil": "br", "br": "br",
-    "argentina": "ar", "ar": "ar",
-    "chile": "cl", "cl": "cl",
-    "united kingdom": "gb", "uk": "gb", "gb": "gb", "england": "gb", "britain": "gb",
-    "euro zone": "eu", "euro area": "eu", "eu": "eu",
-    "germany": "de", "france": "fr", "italy": "it", "spain": "es",
-    "portugal": "pt", "netherlands": "nl", "holland": "nl", "belgium": "be",
-    "switzerland": "ch", "sweden": "se", "norway": "no", "denmark": "dk",
-    "finland": "fi", "austria": "at", "greece": "gr", "ireland": "ie",
-    "poland": "pl", "czech republic": "cz", "czechia": "cz", "hungary": "hu",
-    "romania": "ro", "slovakia": "sk", "slovenia": "si",
-    "china": "cn", "japan": "jp", "india": "in", "hong kong": "hk",
-    "singapore": "sg", "south korea": "kr", "korea": "kr", "republic of korea": "kr",
-    "taiwan": "tw", "indonesia": "id", "malaysia": "my", "thailand": "th", "philippines": "ph",
-    "australia": "au", "new zealand": "nz",
-    "south africa": "za", "egypt": "eg", "nigeria": "ng",
-    "israel": "il", "turkey": "tr", "saudi arabia": "sa",
-    "uae": "ae", "united arab emirates": "ae", "qatar": "qa", "kuwait": "kw",
+    "united states": "us",
+    "us": "us",
+    "u.s.": "us",
+    "usa": "us",
+    "canada": "ca",
+    "ca": "ca",
+    "mexico": "mx",
+    "mx": "mx",
+    "brazil": "br",
+    "br": "br",
+    "argentina": "ar",
+    "ar": "ar",
+    "chile": "cl",
+    "cl": "cl",
+    "united kingdom": "gb",
+    "uk": "gb",
+    "gb": "gb",
+    "england": "gb",
+    "britain": "gb",
+    "euro zone": "eu",
+    "euro area": "eu",
+    "eu": "eu",
+    "germany": "de",
+    "france": "fr",
+    "italy": "it",
+    "spain": "es",
+    "portugal": "pt",
+    "netherlands": "nl",
+    "holland": "nl",
+    "belgium": "be",
+    "switzerland": "ch",
+    "sweden": "se",
+    "norway": "no",
+    "denmark": "dk",
+    "finland": "fi",
+    "austria": "at",
+    "greece": "gr",
+    "ireland": "ie",
+    "poland": "pl",
+    "czech republic": "cz",
+    "czechia": "cz",
+    "hungary": "hu",
+    "romania": "ro",
+    "slovakia": "sk",
+    "slovenia": "si",
+    "china": "cn",
+    "japan": "jp",
+    "india": "in",
+    "hong kong": "hk",
+    "singapore": "sg",
+    "south korea": "kr",
+    "korea": "kr",
+    "republic of korea": "kr",
+    "taiwan": "tw",
+    "indonesia": "id",
+    "malaysia": "my",
+    "thailand": "th",
+    "philippines": "ph",
+    "australia": "au",
+    "new zealand": "nz",
+    "south africa": "za",
+    "egypt": "eg",
+    "nigeria": "ng",
+    "israel": "il",
+    "turkey": "tr",
+    "saudi arabia": "sa",
+    "uae": "ae",
+    "united arab emirates": "ae",
+    "qatar": "qa",
+    "kuwait": "kw",
     "": None,
 }
+
 
 # --- UID для новостей ---
 def make_uid(url: str, title: str) -> str:
     return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
 
+
 # --- Event ID для событий ---
 def make_event_id(title: str, country: str, event_time: str) -> str:
     raw = f"{title}|{country}|{event_time}"
     return hashlib.sha256(raw.encode()).hexdigest()
+
 
 # --- UPSERT новостей ---
 def upsert_news(items: list[dict]):
@@ -70,21 +124,23 @@ def upsert_news(items: list[dict]):
     for item in items:
         try:
             uid = make_uid(item["url"], item["title"])
-            rows.append({
-                "uid": uid,
-                "title": item["title"][:512],
-                "content": item.get("summary", ""),
-                "link": item["url"],
-                "published_at": (
-                    item.get("published_at").isoformat()
-                    if item.get("published_at")
-                    else datetime.now(timezone.utc).isoformat()
-                ),
-                "source": item.get("source"),
-                "category": item.get("category"),
-                "credibility": item.get("credibility"),
-                "importance": item.get("importance"),
-            })
+            rows.append(
+                {
+                    "uid": uid,
+                    "title": item["title"][:512],
+                    "content": item.get("summary", ""),
+                    "link": item["url"],
+                    "published_at": (
+                        item.get("published_at").isoformat()
+                        if item.get("published_at")
+                        else datetime.now(timezone.utc).isoformat()
+                    ),
+                    "source": item.get("source"),
+                    "category": item.get("category"),
+                    "credibility": item.get("credibility"),
+                    "importance": item.get("importance"),
+                }
+            )
         except Exception as e:
             logger.error(f"Ошибка подготовки новости: {e}, item={item}")
 
@@ -97,6 +153,7 @@ def upsert_news(items: list[dict]):
             logger.info("Нет новостей для вставки")
     except Exception as e:
         logger.error(f"Ошибка при вставке новостей в Supabase: {e}")
+
 
 # --- UPSERT событий ---
 def upsert_event(items: list[dict]):
@@ -114,28 +171,34 @@ def upsert_event(items: list[dict]):
             elif not event_time:
                 event_time = datetime.now(timezone.utc).isoformat()
 
-            event_id = make_event_id(item.get("title", ""), item.get("country", ""), event_time)
+            event_id = make_event_id(
+                item.get("title", ""), item.get("country", ""), event_time
+            )
 
-            rows.append({
-                "event_id": event_id,
-                "event_time": event_time,
-                "country": item.get("country"),
-                "currency": item.get("currency"),
-                "title": item.get("title"),
-                "importance": item.get("priority"),   # priority → importance
-                "fact": item.get("fact"),
-                "forecast": item.get("forecast"),
-                "previous": item.get("previous"),
-                "source": item.get("source", "investing"),
-                "country_code": item.get("country_code"),
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            })
+            rows.append(
+                {
+                    "event_id": event_id,
+                    "event_time": event_time,
+                    "country": item.get("country"),
+                    "currency": item.get("currency"),
+                    "title": item.get("title"),
+                    "importance": item.get("priority"),  # priority → importance
+                    "fact": item.get("fact"),
+                    "forecast": item.get("forecast"),
+                    "previous": item.get("previous"),
+                    "source": item.get("source", "investing"),
+                    "country_code": item.get("country_code"),
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
         except Exception as e:
             logger.error(f"Ошибка подготовки события: {e}, item={item}")
 
     try:
         if rows:
-            res = supabase.table("events").upsert(rows, on_conflict="event_id").execute()
+            res = (
+                supabase.table("events").upsert(rows, on_conflict="event_id").execute()
+            )
             logger.info(f"Inserted {len(rows)} events (upsert).")
             return res
         else:
@@ -143,8 +206,10 @@ def upsert_event(items: list[dict]):
     except Exception as e:
         logger.error(f"Ошибка при вставке событий в Supabase: {e}")
 
+
 # 👉 Алиас для совместимости
 upsert_events = upsert_event
+
 
 # --- Обогащение новостей AI ---
 def enrich_news_with_ai(news_item: dict) -> dict:
