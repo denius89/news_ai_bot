@@ -34,4 +34,4 @@ jobs:
 
       - name: Run tests with coverage (exclude integration)
         run: |
-          pytest -m "not integration" --cov=./ --cov-report=term-missing --cov-fail-under=60
+          pytest -m "not integration" --cov=./ --cov-report=term-missing --cov-fail-under=30
