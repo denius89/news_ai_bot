@@ -1,5 +1,7 @@
 import os
+
 import pytest
+
 from digests.ai_summary import generate_summary
 
 

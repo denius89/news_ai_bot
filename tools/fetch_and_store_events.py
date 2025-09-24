@@ -1,25 +1,28 @@
-import logging
-from parsers.events_parser import fetch_investing_events
-from database.db_models import upsert_event
+#!/usr/bin/env python3
 
-# --- Базовое логирование ---
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
-logger = logging.getLogger("main")
+"""
+Скрипт для парсинга экономических событий и сохранения их в Supabase.
+"""
+
+import logging
+
+from parsers.events_parser import fetch_investing_events
+from database.db_models import upsert_events
+
+logger = logging.getLogger("tools.fetch_and_store_events")
 
 
 def main():
-    # 1. Получаем события с Investing (сегодня + 1 день)
-    events = fetch_investing_events(limit_days=1)
-    logger.info(f"Получено {len(events)} событий")
-
-    # 2. Записываем в Supabase
-    if events:
-        upsert_event(events)
-    else:
-        logger.warning("События не получены, ничего не вставлено")
+    logger.info("🔄 Загружаем события с Investing...")
+    try:
+        events = fetch_investing_events()
+        if not events:
+            logger.warning("⚠️ Нет событий для вставки")
+            return
+        upsert_events(events)
+        logger.info(f"✅ Вставлено {len(events)} событий")
+    except Exception as e:
+        logger.error(f"Ошибка при парсинге событий: {e}")
 
 
 if __name__ == "__main__":

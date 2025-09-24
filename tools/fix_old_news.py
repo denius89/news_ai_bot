@@ -1,60 +1,64 @@
+#!/usr/bin/env python3
+
+"""
+Скрипт для фиксации старых новостей в базе Supabase.
+Например: обновление credibility / importance для новостей,
+у которых эти поля отсутствуют.
+"""
+
 import os
-import logging
 from datetime import datetime, timezone
+from typing import Optional
+
 from dotenv import load_dotenv
 from supabase import create_client
 
-# Логирование
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler()],
-)
-
-# Загружаем .env
-load_dotenv()
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-client = create_client(url, key)
+from database.db_models import enrich_news_with_ai
 
 
-def fix_news():
-    logging.info("🔍 Загружаем все новости из базы...")
-    response = client.table("news").select("*").execute()
-    rows = response.data
-    logging.info(f"Найдено {len(rows)} новостей для проверки")
+def get_supabase_client():
+    """Инициализация клиента Supabase."""
+    load_dotenv()
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
 
-    fixed = 0
-    for row in rows:
-        update_needed = False
-        data = {}
+    if not url or not key:
+        raise RuntimeError("SUPABASE_URL и SUPABASE_KEY должны быть заданы в .env")
 
-        # published_at fallback
-        if not row.get("published_at"):
-            data["published_at"] = datetime.now(timezone.utc).isoformat()
-            update_needed = True
+    return create_client(url, key)
 
-        # credibility fallback
-        if row.get("credibility") is None:
-            data["credibility"] = 0.5
-            update_needed = True
 
-        # importance fallback
-        if row.get("importance") is None:
-            data["importance"] = 0.5
-            update_needed = True
+def fix_old_news(limit: Optional[int] = 50):
+    """
+    Находит старые новости без credibility/importance
+    и обновляет их через AI-модули.
+    """
+    client = get_supabase_client()
 
-        # content fallback
-        if not row.get("content"):
-            data["content"] = row.get("title", "")
-            update_needed = True
+    query = client.table("news").select("*").is_("credibility", None).limit(limit)
 
-        if update_needed:
-            client.table("news").update(data).eq("id", row["id"]).execute()
-            fixed += 1
+    response = query.execute()
+    items = response.data or []
 
-    logging.info(f"✅ Обновлено {fixed} новостей")
+    if not items:
+        print("⚠️ Нет новостей для обновления")
+        return
+
+    print(f"🔄 Найдено {len(items)} новостей для обновления...")
+
+    updates = []
+    for item in items:
+        enriched = enrich_news_with_ai(item)
+        enriched["updated_at"] = datetime.now(timezone.utc).isoformat()
+        updates.append(enriched)
+
+    res = client.table("news").upsert(updates, on_conflict="uid").execute()
+    print(f"✅ Обновлено {len(res.data or [])} новостей")
+
+
+def main():
+    fix_old_news(limit=50)
 
 
 if __name__ == "__main__":
-    fix_news()
+    main()

@@ -17,10 +17,11 @@ Events -> парсинг (Investing.com / API) -> Supabase.
 
 import argparse
 import logging
-from parsers.rss_parser import load_sources, fetch_rss
-from parsers.events_parser import fetch_investing_events
-from database.db_models import upsert_news, upsert_event
+
+from database.db_models import upsert_event, upsert_news
 from digests.generator import generate_digest
+from parsers.events_parser import fetch_investing_events
+from parsers.rss_parser import fetch_rss, load_sources
 from utils.logging_setup import setup_logging
 
 
@@ -41,12 +42,8 @@ def main():
         const=5,
         help="Сформировать дайджест (по умолчанию 5 новостей)",
     )
-    parser.add_argument(
-        "--ai", action="store_true", help="Использовать AI для генерации дайджеста"
-    )
-    parser.add_argument(
-        "--events", action="store_true", help="Загрузить экономические события"
-    )
+    parser.add_argument("--ai", action="store_true", help="Использовать AI для генерации дайджеста")
+    parser.add_argument("--events", action="store_true", help="Загрузить экономические события")
     args = parser.parse_args()
 
     # --- Дайджест ---
