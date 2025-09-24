@@ -1,4 +1,9 @@
-# News AI Bot
+# PulseAI
+
+![Tests – main](https://github.com/denisfedko/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests – day-01-docs-parsers](https://github.com/denisfedko/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
+
+AI-платформа для превращения хаотичного потока новостей и событий в персональные дайджесты и умный календарь.
 
 Умный агрегатор крипто- и экономических новостей с AI-анализом.  
 Цель проекта — собрать новости из разных источников, отфильтровать их по важности и достоверности, перевести при необходимости и сформировать удобные дайджесты.

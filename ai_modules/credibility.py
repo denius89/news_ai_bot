@@ -1,5 +1,6 @@
 import random
 
+
 def evaluate_credibility(news_item: dict) -> float:
     """
     Заглушка: возвращает случайное значение достоверности [0, 1].

@@ -22,9 +22,9 @@ def digest():
 
     response = (
         query.order("importance", desc=True)
-             .order("published_at", desc=True)
-             .limit(10)
-             .execute()
+        .order("published_at", desc=True)
+        .limit(10)
+        .execute()
     )
 
     news_items = response.data if response.data else []
@@ -52,7 +52,7 @@ def digest():
         "digest.html",
         news=news_items,
         all_categories=["crypto", "economy", "world", "technology", "politics"],
-        active_categories=categories
+        active_categories=categories,
     )
 
 
@@ -88,8 +88,4 @@ def events():
         except Exception:
             ev["importance"] = 0
 
-    return render_template(
-        "events.html",
-        events=events_list,
-        active_category=category
-    )
+    return render_template("events.html", events=events_list, active_category=category)

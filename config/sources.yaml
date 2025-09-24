@@ -1,59 +1,144 @@
 crypto:
-  - name: CoinDesk
+  - id: coindesk
+    name: CoinDesk
     url: https://www.coindesk.com/arc/outboundfeeds/rss/
-  - name: Bitcoin News
+    enabled: true
+    tags: [crypto, news]
+
+  - id: bitcoin_news
+    name: Bitcoin News
     url: https://news.bitcoin.com/feed/
-  - name: Cointelegraph
+    enabled: true
+    tags: [crypto, news]
+
+  - id: cointelegraph
+    name: Cointelegraph
     url: https://cointelegraph.com/rss
-  - name: CryptoSlate
+    enabled: true
+    tags: [crypto, news]
+
+  - id: cryptoslate
+    name: CryptoSlate
     url: https://cryptoslate.com/feed/
-  - name: Decrypt
+    enabled: true
+    tags: [crypto, news]
+
+  - id: decrypt
+    name: Decrypt
     url: https://decrypt.co/feed
+    enabled: true
+    tags: [crypto, news]
 
 economy:
-  - name: Yahoo Finance
+  - id: yahoo_finance
+    name: Yahoo Finance
     url: https://news.yahoo.com/rss/
-  - name: Financial Times
+    enabled: true
+    tags: [economy]
+
+  - id: ft
+    name: Financial Times
     url: https://www.ft.com/?format=rss
-  - name: Bloomberg Markets
+    enabled: true
+    tags: [economy]
+
+  - id: bloomberg_markets
+    name: Bloomberg Markets
     url: https://feeds.bloomberg.com/markets/news.rss
-  - name: CNBC
+    enabled: true
+    tags: [economy]
+
+  - id: cnbc
+    name: CNBC
     url: https://www.cnbc.com/id/100003114/device/rss/rss.html
-  - name: MarketWatch
+    enabled: true
+    tags: [economy]
+
+  - id: marketwatch
+    name: MarketWatch
     url: https://www.marketwatch.com/rss/topstories
+    enabled: true
+    tags: [economy]
 
 world:
-  - name: BBC World
+  - id: bbc_world
+    name: BBC World
     url: http://feeds.bbci.co.uk/news/world/rss.xml
-  - name: Guardian World
+    enabled: true
+    tags: [world]
+
+  - id: guardian_world
+    name: Guardian World
     url: https://www.theguardian.com/world/rss
-  - name: Guardian Politics
-    url: https://www.theguardian.com/politics/rss
-  - name: CNN World
+    enabled: true
+    tags: [world]
+
+  - id: cnn_world
+    name: CNN World
     url: http://rss.cnn.com/rss/edition_world.rss
-  - name: DW News
+    enabled: true
+    tags: [world]
+
+  - id: dw_news
+    name: DW News
     url: https://rss.dw.com/xml/rss-en-all
+    enabled: true
+    tags: [world]
 
 technology:
-  - name: TechCrunch
+  - id: techcrunch
+    name: TechCrunch
     url: http://feeds.feedburner.com/TechCrunch/
-  - name: Wired
+    enabled: true
+    tags: [tech]
+
+  - id: wired
+    name: Wired
     url: https://www.wired.com/feed/rss
-  - name: The Verge
+    enabled: true
+    tags: [tech]
+
+  - id: theverge
+    name: The Verge
     url: https://www.theverge.com/rss/index.xml
-  - name: CNET News
+    enabled: true
+    tags: [tech]
+
+  - id: cnet
+    name: CNET News
     url: https://www.cnet.com/rss/news/
-  - name: Ars Technica
+    enabled: true
+    tags: [tech]
+
+  - id: ars_technica
+    name: Ars Technica
     url: http://feeds.arstechnica.com/arstechnica/index
+    enabled: true
+    tags: [tech]
 
 politics:
-  - name: Axios Politics
-    url: https://www.axios.com/feeds/politics.xml
-  - name: CNN Politics
+  # Axios убран — у них нет работающего RSS
+  - id: cnn_politics
+    name: CNN Politics
     url: http://rss.cnn.com/rss/cnn_allpolitics.rss
-  - name: The Guardian Politics
+    enabled: true
+    tags: [politics]
+
+  - id: guardian_politics
+    name: The Guardian Politics
     url: https://www.theguardian.com/politics/rss
-  - name: BBC Politics
+    enabled: true
+    tags: [politics]
+
+  - id: bbc_politics
+    name: BBC Politics
     url: http://feeds.bbci.co.uk/news/politics/rss.xml
-  - name: Reuters Politics
-    url: https://feeds.reuters.com/reuters/politicsNews
+    enabled: true
+    tags: [politics]
+
+  # Reuters временно закомментирован из-за DNS проблем
+  # - id: reuters_politics
+  #   name: Reuters Politics
+  #   url: https://feeds.reuters.com/reuters/politicsNews
+  #   enabled: true
+  #   tags: [politics]

@@ -11,7 +11,9 @@ def get_client() -> OpenAI:
     """Ленивое создание клиента OpenAI"""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise RuntimeError("❌ Нет OPENAI_API_KEY, установите ключ в .env или пропустите интеграционный тест")
+        raise RuntimeError(
+            "❌ Нет OPENAI_API_KEY, установите ключ в .env или пропустите интеграционный тест"
+        )
     return OpenAI(api_key=api_key)
 
 

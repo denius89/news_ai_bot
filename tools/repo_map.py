@@ -4,15 +4,21 @@ from datetime import datetime
 
 # Полностью исключаем эти директории
 EXCLUDE_DIRS = {
-    '.git', '.venv', 'venv', '__pycache__', '.pytest_cache',
-    'prompts', 'utils'
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    ".pytest_cache",
+    "prompts",
+    "utils",
 }
 
 # Полностью исключаем эти файлы
-EXCLUDE_FILES = {'.DS_Store', '.env'}
+EXCLUDE_FILES = {".DS_Store", ".env"}
 
 # В эти папки заходим, но внутрь не рекурсируем
-STOP_RECURSE_DIRS = {'logs'}
+STOP_RECURSE_DIRS = {"logs"}
+
 
 def build_tree(root: Path, prefix: str = "") -> list[str]:
     # Сначала каталоги, потом файлы
@@ -32,7 +38,7 @@ def build_tree(root: Path, prefix: str = "") -> list[str]:
     lines: list[str] = []
 
     for idx, p in enumerate(entries):
-        last = (idx == len(entries) - 1)
+        last = idx == len(entries) - 1
         connector = "└── " if last else "├── "
 
         if p.is_dir():
@@ -46,6 +52,7 @@ def build_tree(root: Path, prefix: str = "") -> list[str]:
 
     return lines
 
+
 def main() -> None:
     project_root = Path(__file__).resolve().parents[1]  # корень репо
     lines = build_tree(project_root)
@@ -58,6 +65,7 @@ def main() -> None:
         f.write("\n".join(lines))
         f.write("\n```\n")
     print("✅ CODEMAP.md updated")
+
 
 if __name__ == "__main__":
     main()

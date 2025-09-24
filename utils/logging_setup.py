@@ -5,10 +5,7 @@ import yaml
 from pathlib import Path
 
 
-def setup_logging(
-    config_path: str = "config/logging.yaml",
-    default_level=logging.INFO
-):
+def setup_logging(config_path: str = "config/logging.yaml", default_level=logging.INFO):
     """
     Настройка логирования из YAML-конфига.
     Автоматически создаёт директорию для логов, если она не существует.
@@ -28,7 +25,9 @@ def setup_logging(
                         log_path = Path(filename).parent
                         log_path.mkdir(parents=True, exist_ok=True)
                     except Exception as e:
-                        logging.warning(f"⚠️ Не удалось создать директорию для логов {filename}: {e}")
+                        logging.warning(
+                            f"⚠️ Не удалось создать директорию для логов {filename}: {e}"
+                        )
 
             logging.config.dictConfig(config)
         except Exception as e:

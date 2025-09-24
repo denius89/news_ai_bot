@@ -31,21 +31,21 @@ def main():
 
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
     parser.add_argument(
-        "--source", type=str, default="all",
-        help="Категория из sources.yaml или 'all'"
+        "--source", type=str, default="all", help="Категория из sources.yaml или 'all'"
     )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
-        "--digest", type=int, nargs="?", const=5,
-        help="Сформировать дайджест (по умолчанию 5 новостей)"
+        "--digest",
+        type=int,
+        nargs="?",
+        const=5,
+        help="Сформировать дайджест (по умолчанию 5 новостей)",
     )
     parser.add_argument(
-        "--ai", action="store_true",
-        help="Использовать AI для генерации дайджеста"
+        "--ai", action="store_true", help="Использовать AI для генерации дайджеста"
     )
     parser.add_argument(
-        "--events", action="store_true",
-        help="Загрузить экономические события"
+        "--events", action="store_true", help="Загрузить экономические события"
     )
     args = parser.parse_args()
 
@@ -85,7 +85,7 @@ def main():
     items = fetch_rss(sources)
 
     if args.limit and len(items) > args.limit:
-        items = items[:args.limit]
+        items = items[: args.limit]
         logger.info(f"Ограничение: берём только {args.limit} новостей")
 
     logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
