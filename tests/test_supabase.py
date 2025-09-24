@@ -3,6 +3,7 @@ import pytest
 from supabase import create_client
 from dotenv import load_dotenv
 
+
 @pytest.mark.integration
 def test_supabase():
     load_dotenv(dotenv_path=".env")

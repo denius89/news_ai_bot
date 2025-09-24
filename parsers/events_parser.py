@@ -5,10 +5,7 @@ import hashlib
 import logging
 
 BASE_URL = "https://www.investing.com/economic-calendar/"
-HEADERS = {
-    "User-Agent": "Mozilla/5.0",
-    "Accept-Language": "en-US,en;q=0.9"
-}
+HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en-US,en;q=0.9"}
 
 logger = logging.getLogger("parsers.events")
 
@@ -92,15 +89,17 @@ def fetch_investing_events(limit_days: int = 2):
 
                     event_id = make_event_id(str(day), title or "", country or "")
 
-                    results.append({
-                        "event_id": event_id,
-                        "title": title,
-                        "country": country,
-                        "datetime": dt.isoformat(),
-                        "priority": priority,
-                        "source": "investing",
-                        "category": "macro"
-                    })
+                    results.append(
+                        {
+                            "event_id": event_id,
+                            "title": title,
+                            "country": country,
+                            "datetime": dt.isoformat(),
+                            "priority": priority,
+                            "source": "investing",
+                            "category": "macro",
+                        }
+                    )
                 except Exception as e:
                     logger.error(f"[Investing] Ошибка парсинга строки: {e}")
 

@@ -12,9 +12,8 @@ logger = logging.getLogger("parsers.rss")
 
 CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "sources.yaml"
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (compatible; NewsBot/1.0; +https://example.com)"
-}
+HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; NewsBot/1.0; +https://example.com)"}
+
 
 def clean_text(text: str) -> str:
     """Удаляет HTML-теги и нормализует пробелы."""
@@ -23,6 +22,7 @@ def clean_text(text: str) -> str:
     text = BeautifulSoup(text, "html.parser").get_text()
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
 
 def normalize_date(date_str: str | None):
     """Парсит дату, возвращает UTC datetime или None."""
@@ -36,6 +36,7 @@ def normalize_date(date_str: str | None):
     except Exception as e:
         logger.warning(f"Не удалось распарсить дату: {date_str} ({e})")
         return None
+
 
 def load_sources(category: str | None = None) -> dict[str, dict]:
     """Загружает список RSS-источников из sources.yaml."""
@@ -55,6 +56,7 @@ def load_sources(category: str | None = None) -> dict[str, dict]:
                 urls[item["name"]] = {**item, "category": cat}
 
     return urls
+
 
 def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> list[dict]:
     """Загружает новости из RSS-источников."""
@@ -78,14 +80,16 @@ def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> lis
                 continue
             seen.add(uid)
 
-            news_items.append({
-                "uid": uid,
-                "title": title,
-                "url": url,
-                "summary": summary or title,
-                "published_at": published,
-                "source": meta["name"],
-                "category": meta["category"],
-            })
+            news_items.append(
+                {
+                    "uid": uid,
+                    "title": title,
+                    "url": url,
+                    "summary": summary or title,
+                    "published_at": published,
+                    "source": meta["name"],
+                    "category": meta["category"],
+                }
+            )
 
     return news_items

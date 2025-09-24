@@ -9,7 +9,8 @@ setup_logging()
 logger = logging.getLogger("news_ai_bot")
 
 app = Flask(__name__)
-app.config['VERSION'] = config.VERSION
+app.config["VERSION"] = config.VERSION
+
 
 # 🔥 Добавляем фильтр для отображения иконок важности
 def importance_icon(value: float) -> str:
@@ -22,8 +23,9 @@ def importance_icon(value: float) -> str:
     else:
         return "💤"
 
+
 # Регистрируем фильтр в Jinja
-app.jinja_env.filters['importance_icon'] = importance_icon
+app.jinja_env.filters["importance_icon"] = importance_icon
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)
