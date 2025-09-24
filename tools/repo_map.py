@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 # Полностью исключаем эти директории
-EXCLUDED_DIRS= {
+EXCLUDE_DIRS = {
     ".git",
     ".venv",
     "venv",
