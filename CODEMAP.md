@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-24 08:58:34 UTC_
+_Generated on 2025-09-24 09:17:35 UTC_
 
 ```
 ├── .github/
@@ -55,8 +55,10 @@ _Generated on 2025-09-24 08:58:34 UTC_
 │   ├── test_digests.py
 │   ├── test_main.py
 │   ├── test_openai.py
+│   ├── test_parsers.py
 │   └── test_supabase.py
 ├── tools/
+│   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
 │   ├── repo_map.py
