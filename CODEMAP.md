@@ -1,6 +1,6 @@
 # 📂 Project Structure
+_Generated on 2025-09-24 11:21:49 UTC_
 
-_Generated on 2025-09-24 10:35:09 UTC_
 
 ```
 ├── .github/
@@ -67,6 +67,8 @@ _Generated on 2025-09-24 10:35:09 UTC_
 ├── .gitignore
 ├── CODEMAP.md
 ├── config.py
+├── CONTRIBUTING.md
+├── LICENSE
 ├── main.py
 ├── MASTER_FILE.md
 ├── pytest.ini
