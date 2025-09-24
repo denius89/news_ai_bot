@@ -1,6 +1,6 @@
 # 📂 Project Structure
-_Generated on 2025-09-24 11:21:49 UTC_
 
+_Generated on 2025-09-24 12:06:34 UTC_
 
 ```
 ├── .github/
@@ -63,6 +63,7 @@ _Generated on 2025-09-24 11:21:49 UTC_
 │   ├── fix_old_news.py
 │   ├── repo_map.py
 │   └── show_news.py
+├── .editorconfig
 ├── .env.example
 ├── .gitignore
 ├── CODEMAP.md
@@ -71,6 +72,7 @@ _Generated on 2025-09-24 11:21:49 UTC_
 ├── LICENSE
 ├── main.py
 ├── MASTER_FILE.md
+├── pyproject.toml
 ├── pytest.ini
 ├── README.md
 ├── requirements.txt
