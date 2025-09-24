@@ -39,45 +39,54 @@
 📌 Снимок структуры на момент редактирования (актуальную **всегда** смотри в `CODEMAP.md`):
 
 ```text
+├── .editorconfig
 ├── .gitignore
 ├── CODEMAP.md
+├── CONTRIBUTING.md
 ├── MASTER_FILE.md
 ├── README.md
 ├── TASKS.md
 ├── config.py
 ├── main.py
+├── pyproject.toml
 ├── requirements.txt
 ├── webapp.py
 ├── ai_modules/
-│   ├── __init__.py
+│   ├── init.py
 │   ├── credibility.py
 │   └── importance.py
 ├── config/
+│   ├── logging.yaml
 │   └── sources.yaml
 ├── database/
-│   ├── __init__.py
+│   ├── init.py
 │   ├── db_models.py
 │   ├── init_tables.sql
 │   └── seed_data.sql
 ├── digests/
-│   ├── __init__.py
+│   ├── init.py
 │   ├── ai_summary.py
 │   └── generator.py
+├── docs/
+│   ├── ARCHITECTURE.md
+│   └── DEPLOY.md
 ├── logs/
 ├── parsers/
-│   ├── __init__.py
+│   ├── init.py
+│   ├── events_parser.py
 │   └── rss_parser.py
 ├── routes/
-│   ├── __init__.py
+│   ├── init.py
 │   └── news_routes.py
 ├── static/
 │   └── style.css
 ├── templates/
 │   ├── base.html
 │   ├── digest.html
-│   └── events.html
+│   ├── events.html
+│   └── index.html
 ├── tests/
-│   ├── __init__.py
+│   ├── init.py
 │   ├── conftest.py
 │   ├── test_ai_modules.py
 │   ├── test_ai_summary.py
@@ -86,12 +95,21 @@
 │   ├── test_deepl.py
 │   ├── test_digests.py
 │   ├── test_main.py
+│   ├── test_main_import.py
 │   ├── test_openai.py
-│   └── test_supabase.py
-└── tools/
-    ├── fix_old_news.py
-    ├── repo_map.py
-    └── show_news.py
+│   ├── test_parsers.py
+│   ├── test_routes.py
+│   ├── test_supabase.py
+│   └── test_webapp.py
+├── tools/
+│   ├── fetch_and_store_events.py
+│   ├── fetch_and_store_news.py
+│   ├── fix_old_news.py
+│   ├── repo_map.py
+│   ├── show_latest_news.py
+│   └── show_news.py
+├── utils/
+└── logging_setup.py
 ```
 
 ## 🗄️ База данных
