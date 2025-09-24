@@ -1,9 +1,10 @@
-import os
 import hashlib
 import logging
+import os
 from datetime import datetime, timezone
-from supabase import create_client
+
 from dotenv import load_dotenv
+from supabase import create_client
 
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
@@ -171,9 +172,7 @@ def upsert_event(items: list[dict]):
             elif not event_time:
                 event_time = datetime.now(timezone.utc).isoformat()
 
-            event_id = make_event_id(
-                item.get("title", ""), item.get("country", ""), event_time
-            )
+            event_id = make_event_id(item.get("title", ""), item.get("country", ""), event_time)
 
             rows.append(
                 {
@@ -196,9 +195,7 @@ def upsert_event(items: list[dict]):
 
     try:
         if rows:
-            res = (
-                supabase.table("events").upsert(rows, on_conflict="event_id").execute()
-            )
+            res = supabase.table("events").upsert(rows, on_conflict="event_id").execute()
             logger.info(f"Inserted {len(rows)} events (upsert).")
             return res
         else:

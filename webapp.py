@@ -1,7 +1,9 @@
-from flask import Flask
-from routes.news_routes import news_bp
-import config
 import logging
+
+from flask import Flask
+
+import config
+from routes.news_routes import news_bp
 from utils.logging_setup import setup_logging
 
 # --- ЛОГИРОВАНИЕ ---

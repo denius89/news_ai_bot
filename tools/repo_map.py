@@ -1,6 +1,7 @@
+from datetime import datetime
+
 #!/usr/bin/env python3
 from pathlib import Path
-from datetime import datetime
 
 # Полностью исключаем эти директории
 EXCLUDE_DIRS = {

@@ -1,8 +1,9 @@
-import os
 import argparse
-from supabase import create_client
-from dotenv import load_dotenv
+import os
 from datetime import datetime, timedelta, timezone
+
+from dotenv import load_dotenv
+from supabase import create_client
 
 
 def show_latest_news(limit: int = 5, source: str = None, days: int = None):
@@ -47,19 +48,13 @@ def show_latest_news(limit: int = 5, source: str = None, days: int = None):
     for item in response.data:
         print(f"- {item.get('title')}")
         print(f"  📅 {item.get('published_at')}")
-        print(
-            f"  ✅ Credibility: {item.get('credibility')}, Importance: {item.get('importance')}"
-        )
+        print(f"  ✅ Credibility: {item.get('credibility')}, Importance: {item.get('importance')}")
         print(f"  🔗 {item.get('link')}\n")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Показать последние новости из базы Supabase"
-    )
-    parser.add_argument(
-        "--limit", type=int, default=5, help="Сколько новостей показать"
-    )
+    parser = argparse.ArgumentParser(description="Показать последние новости из базы Supabase")
+    parser.add_argument("--limit", type=int, default=5, help="Сколько новостей показать")
     parser.add_argument(
         "--source",
         type=str,
@@ -67,9 +62,7 @@ if __name__ == "__main__":
         choices=["all", "crypto", "economy"],
         help="Источник новостей",
     )
-    parser.add_argument(
-        "--days", type=int, help="Показать только новости за последние N дней"
-    )
+    parser.add_argument("--days", type=int, help="Показать только новости за последние N дней")
     args = parser.parse_args()
 
     show_latest_news(limit=args.limit, source=args.source, days=args.days)
