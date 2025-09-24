@@ -1,18 +1,22 @@
+"""
+Тесты для AI-модулей credibility и importance.
+"""
+
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
 
 
-def test_credibility_range():
-    item = {"title": "Bitcoin hits new ATH"}
+def test_credibility_basic():
+    """Проверка: функция возвращает float в диапазоне [0, 1]."""
+    item = {"title": "Test news"}
     score = evaluate_credibility(item)
-    assert score is not None, "❌ Credibility вернул None"
-    assert isinstance(score, (int, float)), "❌ Credibility должен быть числом"
-    assert 0 <= score <= 1, f"❌ Credibility вне диапазона [0,1]: {score}"
+    assert isinstance(score, float)
+    assert 0.0 <= score <= 1.0
 
 
-def test_importance_range():
-    item = {"title": "Ethereum Merge complete"}
+def test_importance_basic():
+    """Проверка: функция возвращает float в диапазоне [0, 1]."""
+    item = {"title": "Test news"}
     score = evaluate_importance(item)
-    assert score is not None, "❌ Importance вернул None"
-    assert isinstance(score, (int, float)), "❌ Importance должен быть числом"
-    assert 0 <= score <= 1, f"❌ Importance вне диапазона [0,1]: {score}"
+    assert isinstance(score, float)
+    assert 0.0 <= score <= 1.0
