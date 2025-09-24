@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+Генератор CODEMAP.md — структуры проекта.
+"""
+
 from datetime import datetime
 from pathlib import Path
 
-
-# Полностью исключаем эти директории
-EXCLUDE_DIRS = {
+# Исключённые директории
+EXCLUDED_DIRS = {
     ".git",
     ".venv",
     "venv",
@@ -15,20 +18,20 @@ EXCLUDE_DIRS = {
     "utils",
 }
 
-# Полностью исключаем эти файлы
+# Исключённые файлы
 EXCLUDE_FILES = {".DS_Store", ".env"}
 
-# В эти папки заходим, но внутрь не рекурсируем
+# Директории, куда заходим, но не рекурсируем
 STOP_RECURSE_DIRS = {"logs"}
 
 
 def build_tree(root: Path, prefix: str = "") -> list[str]:
-    # Сначала каталоги, потом файлы
+    """Строит список строк с древовидной структурой проекта."""
     dirs = []
     files = []
     for p in sorted(root.iterdir(), key=lambda x: x.name.lower()):
         if p.is_dir():
-            if p.name in EXCLUDE_DIRS:
+            if p.name in EXCLUDED_DIRS:
                 continue
             dirs.append(p)
         else:
@@ -56,16 +59,18 @@ def build_tree(root: Path, prefix: str = "") -> list[str]:
 
 
 def main() -> None:
-    project_root = Path(__file__).resolve().parents[1]  # корень репо
+    project_root = Path(__file__).resolve().parents[1]
     lines = build_tree(project_root)
     ts = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     out = project_root / "CODEMAP.md"
+
     with out.open("w", encoding="utf-8") as f:
         f.write("# 📂 Project Structure\n\n")
         f.write(f"_Generated on {ts}_\n\n")
         f.write("```\n")
         f.write("\n".join(lines))
         f.write("\n```\n")
+
     print("✅ CODEMAP.md updated")
 
 
