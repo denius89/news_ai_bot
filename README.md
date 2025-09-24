@@ -1,4 +1,4 @@
-# PulseAI v2
+# PulseAI
 
 ![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 ![Tests – day-01-docs-parsers](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
