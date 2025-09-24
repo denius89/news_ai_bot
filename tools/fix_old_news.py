@@ -35,12 +35,7 @@ def fix_old_news(limit: Optional[int] = 50):
     """
     client = get_supabase_client()
 
-    query = (
-        client.table("news")
-        .select("*")
-        .is_("credibility", None)
-        .limit(limit)
-    )
+    query = client.table("news").select("*").is_("credibility", None).limit(limit)
 
     response = query.execute()
     items = response.data or []
