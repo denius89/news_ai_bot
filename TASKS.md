@@ -1,5 +1,6 @@
 # 📝 TASKS (last updated: 2025-09-24 13:21:49)
 
+
 ## Сегодня — Day 01 Sprint Board
 - [ ] Создать/обновить docs: VISION.md, ROADMAP.md, COMMUNICATION.md (🟡)
 - [ ] Обновить MASTER_FILE.md (ссылки на новые docs + правила/решения) (🟡)
