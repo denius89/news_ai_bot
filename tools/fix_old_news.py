@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 from datetime import datetime, timezone
+
 from dotenv import load_dotenv
 from supabase import create_client
 

@@ -1,7 +1,8 @@
 import os
+
 import pytest
-from supabase import create_client
 from dotenv import load_dotenv
+from supabase import create_client
 
 
 @pytest.mark.integration

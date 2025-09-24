@@ -1,8 +1,9 @@
-import subprocess
 import os
+import subprocess
+
 import pytest
-from supabase import create_client
 from dotenv import load_dotenv
+from supabase import create_client
 
 
 @pytest.mark.integration
@@ -39,9 +40,7 @@ def test_main_etl():
     client = create_client(url, key)
 
     # Проверяем наличие новостей
-    response = (
-        client.table("news").select("*").order("id", desc=True).limit(5).execute()
-    )
+    response = client.table("news").select("*").order("id", desc=True).limit(5).execute()
     if not response.data:
         pytest.skip("⚠️ В базе нет новостей для проверки")
 

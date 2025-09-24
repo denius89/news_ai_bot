@@ -1,6 +1,7 @@
 import pytest
-from parsers.rss_parser import fetch_rss
+
 from database.db_models import upsert_news
+from parsers.rss_parser import fetch_rss
 
 
 @pytest.mark.integration

@@ -1,6 +1,7 @@
 import logging
-from parsers.events_parser import fetch_investing_events
+
 from database.db_models import upsert_event
+from parsers.events_parser import fetch_investing_events
 
 # --- Базовое логирование ---
 logging.basicConfig(

@@ -1,6 +1,7 @@
 import os
-import pytest
+
 import deepl
+import pytest
 from dotenv import load_dotenv
 
 
