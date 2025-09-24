@@ -1,7 +1,7 @@
-# PulseAI
+# PulseAI v2
 
-![Tests – main](https://github.com/denisfedko/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
-![Tests – day-01-docs-parsers](https://github.com/denisfedko/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
+![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests – day-01-docs-parsers](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
 
 AI-платформа для превращения хаотичного потока новостей и событий в персональные дайджесты и умный календарь.
 
