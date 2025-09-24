@@ -23,7 +23,8 @@ def test_main_etl():
     # Запуск main.py с ограничением 2 новости
     result = subprocess.run(
         ["python", "main.py", "--source", "crypto", "--limit", "2"],
-        capture_output=True, text=True
+        capture_output=True,
+        text=True,
     )
 
     # Логируем stdout/stderr для отладки
@@ -38,7 +39,9 @@ def test_main_etl():
     client = create_client(url, key)
 
     # Проверяем наличие новостей
-    response = client.table("news").select("*").order("id", desc=True).limit(5).execute()
+    response = (
+        client.table("news").select("*").order("id", desc=True).limit(5).execute()
+    )
     if not response.data:
         pytest.skip("⚠️ В базе нет новостей для проверки")
 

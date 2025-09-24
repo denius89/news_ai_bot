@@ -3,6 +3,7 @@ import pytest
 import deepl
 from dotenv import load_dotenv
 
+
 @pytest.mark.integration
 def test_deepl():
     """Проверка подключения к DeepL API"""

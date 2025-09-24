@@ -1,4 +1,5 @@
 import os
+import hashlib
 import logging
 from datetime import datetime, timezone
 from supabase import create_client
@@ -8,7 +9,7 @@ from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
 
 # --- ЛОГИРОВАНИЕ ---
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("database")
 
 # --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
 load_dotenv()
@@ -19,139 +20,203 @@ key = os.getenv("SUPABASE_KEY")
 supabase = None
 if url and key:
     supabase = create_client(url, key)
+    logger.info("Supabase client initialized")
 else:
-    print("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
+    logger.warning(
+        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
+    )
 
 # --- Маппинг стран для флагов ---
 COUNTRY_MAP = {
-    "united states": "us", "us": "us", "u.s.": "us", "usa": "us",
-    "canada": "ca", "ca": "ca",
-    "mexico": "mx", "mx": "mx",
-    "brazil": "br", "br": "br",
-    "argentina": "ar", "ar": "ar",
-    "chile": "cl", "cl": "cl",
-    "united kingdom": "gb", "uk": "gb", "gb": "gb", "england": "gb", "britain": "gb",
-    "euro zone": "eu", "euro area": "eu", "eu": "eu",
-    "germany": "de", "france": "fr", "italy": "it", "spain": "es",
-    "portugal": "pt", "netherlands": "nl", "holland": "nl", "belgium": "be",
-    "switzerland": "ch", "sweden": "se", "norway": "no", "denmark": "dk",
-    "finland": "fi", "austria": "at", "greece": "gr", "ireland": "ie",
-    "poland": "pl", "czech republic": "cz", "czechia": "cz", "hungary": "hu",
-    "romania": "ro", "slovakia": "sk", "slovenia": "si",
-    "china": "cn", "japan": "jp", "india": "in", "hong kong": "hk",
-    "singapore": "sg", "south korea": "kr", "korea": "kr", "republic of korea": "kr",
-    "taiwan": "tw", "indonesia": "id", "malaysia": "my", "thailand": "th", "philippines": "ph",
-    "australia": "au", "new zealand": "nz",
-    "south africa": "za", "egypt": "eg", "nigeria": "ng",
-    "israel": "il", "turkey": "tr", "saudi arabia": "sa",
-    "uae": "ae", "united arab emirates": "ae", "qatar": "qa", "kuwait": "kw",
+    "united states": "us",
+    "us": "us",
+    "u.s.": "us",
+    "usa": "us",
+    "canada": "ca",
+    "ca": "ca",
+    "mexico": "mx",
+    "mx": "mx",
+    "brazil": "br",
+    "br": "br",
+    "argentina": "ar",
+    "ar": "ar",
+    "chile": "cl",
+    "cl": "cl",
+    "united kingdom": "gb",
+    "uk": "gb",
+    "gb": "gb",
+    "england": "gb",
+    "britain": "gb",
+    "euro zone": "eu",
+    "euro area": "eu",
+    "eu": "eu",
+    "germany": "de",
+    "france": "fr",
+    "italy": "it",
+    "spain": "es",
+    "portugal": "pt",
+    "netherlands": "nl",
+    "holland": "nl",
+    "belgium": "be",
+    "switzerland": "ch",
+    "sweden": "se",
+    "norway": "no",
+    "denmark": "dk",
+    "finland": "fi",
+    "austria": "at",
+    "greece": "gr",
+    "ireland": "ie",
+    "poland": "pl",
+    "czech republic": "cz",
+    "czechia": "cz",
+    "hungary": "hu",
+    "romania": "ro",
+    "slovakia": "sk",
+    "slovenia": "si",
+    "china": "cn",
+    "japan": "jp",
+    "india": "in",
+    "hong kong": "hk",
+    "singapore": "sg",
+    "south korea": "kr",
+    "korea": "kr",
+    "republic of korea": "kr",
+    "taiwan": "tw",
+    "indonesia": "id",
+    "malaysia": "my",
+    "thailand": "th",
+    "philippines": "ph",
+    "australia": "au",
+    "new zealand": "nz",
+    "south africa": "za",
+    "egypt": "eg",
+    "nigeria": "ng",
+    "israel": "il",
+    "turkey": "tr",
+    "saudi arabia": "sa",
+    "uae": "ae",
+    "united arab emirates": "ae",
+    "qatar": "qa",
+    "kuwait": "kw",
     "": None,
 }
 
 
-def upsert_news(item: dict | list[dict]):
-    """Добавляет или обновляет новость (или список новостей) в базе."""
+# --- UID для новостей ---
+def make_uid(url: str, title: str) -> str:
+    return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
+
+
+# --- Event ID для событий ---
+def make_event_id(title: str, country: str, event_time: str) -> str:
+    raw = f"{title}|{country}|{event_time}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+# --- UPSERT новостей ---
+def upsert_news(items: list[dict]):
+    """Вставляет новости в Supabase без дублей (по uid)."""
     if not supabase:
-        logging.warning("⚠️ Supabase не инициализирован, новость не сохранена.")
+        logger.warning("Supabase не подключён, данные не будут сохранены.")
         return
 
-    # если передан список — рекурсивно обрабатываем каждую новость
-    if isinstance(item, list):
-        for i in item:
-            upsert_news(i)
-        return
-
-    link = item.get("link")
-    if not link:
-        logging.warning("Пропущена новость без ссылки")
-        return
-
-    published = item.get("published")
-    if isinstance(published, datetime):
-        published = published.isoformat()
-    if not published:
-        published = datetime.now(timezone.utc).isoformat()
-
-    content = item.get("content") or item.get("title") or ""
-
-    credibility = evaluate_credibility(item) or 0.5
-    importance = evaluate_importance(item) or 0.5
-
-    data = {
-        "title": item.get("title") or "",
-        "link": link,
-        "published_at": published,
-        "content": content,
-        "credibility": credibility,
-        "importance": importance,
-        "source": item.get("source") or "all",
-        "category": item.get("category") or None,
-    }
-
-    try:
-        supabase.table("news").upsert(data, on_conflict=["link"]).execute()
-        logging.info(f"✅ Добавлена/обновлена новость: {data['title'][:60]}...")
-    except Exception as e:
-        logging.error(f"❌ Ошибка при вставке новости: {e}")
-
-
-def upsert_event(ev: dict) -> None:
-    """Добавляет или обновляет событие в базе."""
-    if not supabase:
-        logging.warning("⚠️ Supabase не инициализирован, событие не сохранено.")
-        return
-
-    event_time = ev.get("event_time")
-    if not event_time:
-        logging.warning("Пропущено событие без event_time")
-        return
-
-    # нормализация времени
-    if isinstance(event_time, datetime):
-        if event_time.tzinfo is None:
-            event_time = event_time.replace(tzinfo=timezone.utc)
-        event_time_iso = event_time.astimezone(timezone.utc).isoformat()
-    else:
+    rows = []
+    for item in items:
         try:
-            dt = datetime.fromisoformat(str(event_time).replace("Z", "+00:00"))
-        except Exception:
-            import dateutil.parser
-            dt = dateutil.parser.parse(str(event_time))
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=timezone.utc)
-        event_time_iso = dt.astimezone(timezone.utc).isoformat()
-
-    raw_country = (ev.get("country") or "").strip().lower()
-    raw_currency = (ev.get("currency") or "").strip().lower()
-    code = COUNTRY_MAP.get(raw_country) or COUNTRY_MAP.get(raw_currency)
-
-    payload = {
-        "event_time": event_time_iso,
-        "country": raw_country.title() or None,
-        "country_code": code,
-        "currency": ev.get("currency"),
-        "title": ev.get("title") or "",
-        "importance": ev.get("importance"),
-        "fact": ev.get("fact"),
-        "forecast": ev.get("forecast"),
-        "previous": ev.get("previous"),
-    }
+            uid = make_uid(item["url"], item["title"])
+            rows.append(
+                {
+                    "uid": uid,
+                    "title": item["title"][:512],
+                    "content": item.get("summary", ""),
+                    "link": item["url"],
+                    "published_at": (
+                        item.get("published_at").isoformat()
+                        if item.get("published_at")
+                        else datetime.now(timezone.utc).isoformat()
+                    ),
+                    "source": item.get("source"),
+                    "category": item.get("category"),
+                    "credibility": item.get("credibility"),
+                    "importance": item.get("importance"),
+                }
+            )
+        except Exception as e:
+            logger.error(f"Ошибка подготовки новости: {e}, item={item}")
 
     try:
-        existing = (
-            supabase.table("events")
-            .select("id")
-            .eq("event_time", event_time_iso)
-            .eq("title", payload["title"])
-            .eq("country", payload["country"])
-            .limit(1)
-            .execute()
-        )
-        if existing.data:
-            ev_id = existing.data[0]["id"]
-            supabase.table("events").update(payload).eq("id", ev_id).execute()
+        if rows:
+            res = supabase.table("news").upsert(rows, on_conflict="uid").execute()
+            logger.info(f"Inserted {len(rows)} news items (upsert).")
+            return res
         else:
-            supabase.table("events").insert(payload).execute()
-        logging.info(f"✅ Upsert event: {payload['title'][:80]} @ {event_time_iso}")
+            logger.info("Нет новостей для вставки")
     except Exception as e:
-        logging.error(f"❌ Ошибка upsert_event: {e}")
+        logger.error(f"Ошибка при вставке новостей в Supabase: {e}")
+
+
+# --- UPSERT событий ---
+def upsert_event(items: list[dict]):
+    """Вставляет события в Supabase без дублей (по event_id)."""
+    if not supabase:
+        logger.warning("Supabase не подключён, события не будут сохранены.")
+        return
+
+    rows = []
+    for item in items:
+        try:
+            event_time = item.get("datetime")
+            if isinstance(event_time, datetime):
+                event_time = event_time.isoformat()
+            elif not event_time:
+                event_time = datetime.now(timezone.utc).isoformat()
+
+            event_id = make_event_id(
+                item.get("title", ""), item.get("country", ""), event_time
+            )
+
+            rows.append(
+                {
+                    "event_id": event_id,
+                    "event_time": event_time,
+                    "country": item.get("country"),
+                    "currency": item.get("currency"),
+                    "title": item.get("title"),
+                    "importance": item.get("priority"),  # priority → importance
+                    "fact": item.get("fact"),
+                    "forecast": item.get("forecast"),
+                    "previous": item.get("previous"),
+                    "source": item.get("source", "investing"),
+                    "country_code": item.get("country_code"),
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+        except Exception as e:
+            logger.error(f"Ошибка подготовки события: {e}, item={item}")
+
+    try:
+        if rows:
+            res = (
+                supabase.table("events").upsert(rows, on_conflict="event_id").execute()
+            )
+            logger.info(f"Inserted {len(rows)} events (upsert).")
+            return res
+        else:
+            logger.info("Нет событий для вставки")
+    except Exception as e:
+        logger.error(f"Ошибка при вставке событий в Supabase: {e}")
+
+
+# 👉 Алиас для совместимости
+upsert_events = upsert_event
+
+
+# --- Обогащение новостей AI ---
+def enrich_news_with_ai(news_item: dict) -> dict:
+    """Обновляет credibility и importance для новости через AI-модули."""
+    try:
+        news_item["credibility"] = evaluate_credibility(news_item)
+        news_item["importance"] = evaluate_importance(news_item)
+    except Exception as e:
+        logger.warning(f"Ошибка при AI-аннотации: {e}")
+    return news_item

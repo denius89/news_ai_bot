@@ -1,5 +1,6 @@
 import random
 
+
 def evaluate_importance(news_item: dict) -> float:
     """
     Заглушка: возвращает случайное значение важности [0, 1].
