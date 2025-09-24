@@ -1,6 +1,8 @@
-from flask import Blueprint, render_template, request
-from database.db_models import supabase
 from datetime import datetime
+
+from flask import Blueprint, render_template, request
+
+from database.db_models import supabase
 
 news_bp = Blueprint("news", __name__)
 
@@ -21,10 +23,7 @@ def digest():
         query = query.in_("category", categories)
 
     response = (
-        query.order("importance", desc=True)
-        .order("published_at", desc=True)
-        .limit(10)
-        .execute()
+        query.order("importance", desc=True).order("published_at", desc=True).limit(10).execute()
     )
 
     news_items = response.data if response.data else []

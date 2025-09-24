@@ -1,11 +1,13 @@
-import os
 import argparse
-from supabase import create_client
-from dotenv import load_dotenv
+import os
 from datetime import datetime, timedelta, timezone
+from typing import Optional
+
+from dotenv import load_dotenv
+from supabase import create_client
 
 
-def show_latest_news(limit: int = 5, source: str = None, days: int = None):
+def show_latest_news(limit: int = 5, source: Optional[str] = None, days: Optional[int] = None):
     """
     Выводит последние N новостей из базы Supabase.
     Можно фильтровать по source (crypto, economy, all) и по давности (days).
@@ -20,7 +22,8 @@ def show_latest_news(limit: int = 5, source: str = None, days: int = None):
 
     client = create_client(url, key)
 
-    query = client.table("news").select("*").order("id", desc=True)
+    # Сортируем по дате публикации, а не по id
+    query = client.table("news").select("*").order("published_at", desc=True)
 
     if source and source != "all":
         query = query.eq("source", source)
@@ -48,18 +51,14 @@ def show_latest_news(limit: int = 5, source: str = None, days: int = None):
         print(f"- {item.get('title')}")
         print(f"  📅 {item.get('published_at')}")
         print(
-            f"  ✅ Credibility: {item.get('credibility')}, Importance: {item.get('importance')}"
+            f"  ✅ Credibility: {item.get('credibility')}, " f"Importance: {item.get('importance')}"
         )
         print(f"  🔗 {item.get('link')}\n")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Показать последние новости из базы Supabase"
-    )
-    parser.add_argument(
-        "--limit", type=int, default=5, help="Сколько новостей показать"
-    )
+    parser = argparse.ArgumentParser(description="Показать последние новости из базы Supabase")
+    parser.add_argument("--limit", type=int, default=5, help="Сколько новостей показать")
     parser.add_argument(
         "--source",
         type=str,
@@ -67,9 +66,7 @@ if __name__ == "__main__":
         choices=["all", "crypto", "economy"],
         help="Источник новостей",
     )
-    parser.add_argument(
-        "--days", type=int, help="Показать только новости за последние N дней"
-    )
+    parser.add_argument("--days", type=int, help="Показать только новости за последние N дней")
     args = parser.parse_args()
 
     show_latest_news(limit=args.limit, source=args.source, days=args.days)

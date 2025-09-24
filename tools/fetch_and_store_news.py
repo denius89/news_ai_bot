@@ -1,31 +1,35 @@
+#!/usr/bin/env python3
+
+"""
+Скрипт для парсинга новостей из RSS и сохранения их в базу Supabase.
+"""
+
 import logging
+
 from parsers.rss_parser import load_sources, fetch_rss
-from database.db_models import upsert_news, enrich_news_with_ai
+from database.db_models import upsert_news
 
-logger = logging.getLogger("main")
+logger = logging.getLogger("tools.fetch_and_store_news")
 
 
-def main():
-    # 1. Загружаем список источников
+def main(limit: int = None):
+    logger.info("🔄 Загружаем источники...")
     sources = load_sources()
-    logger.info(f"Загружено {len(sources)} источников")
 
-    # 2. Парсим RSS
-    items = fetch_rss(
-        sources, per_source_limit=10
-    )  # ограничим, чтобы не тянуть слишком много
-    logger.info(f"Получено {len(items)} новостей")
+    all_items = []
+    for src in sources:
+        try:
+            items = fetch_rss(src, limit=limit)
+            all_items.extend(items)
+            logger.info(f"✅ {src['id']}: {len(items)} новостей")
+        except Exception as e:
+            logger.error(f"Ошибка при парсинге {src['id']}: {e}")
 
-    if not items:
-        logger.warning("Новости не получены, завершаем работу")
+    if not all_items:
+        logger.warning("⚠️ Нет новостей для вставки")
         return
 
-    # 3. Дополняем AI-аннотацией
-    enriched = [enrich_news_with_ai(item) for item in items]
-
-    # 4. Сохраняем в БД
-    upsert_news(enriched)
-    logger.info("✅ Пайплайн завершён")
+    upsert_news(all_items)
 
 
 if __name__ == "__main__":

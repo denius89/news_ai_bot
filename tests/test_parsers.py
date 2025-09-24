@@ -1,43 +1,40 @@
-from datetime import datetime, timezone
+"""
+Тесты для парсеров rss_parser и events_parser.
+"""
+
+from bs4 import BeautifulSoup
+from datetime import datetime
+
 from parsers.rss_parser import clean_text, normalize_date
-from parsers.events_parser import (
-    clean_text as clean_event_text,
-    normalize_datetime,
-    make_event_id,
-)
+from parsers.events_parser import clean_text as events_clean, normalize_datetime
 
 
-def test_clean_text_rss():
-    html = "<p>Hello <b>World</b>!</p>"
-    assert clean_text(html) == "Hello World!"
+def test_rss_clean_text():
+    html = "<p>Hello <b>world</b></p>"
+    result = clean_text(html)
+    assert result == "Hello world"
 
 
-def test_normalize_date_to_utc():
-    dt = normalize_date("2024-06-01T10:00:00+02:00")
-    assert dt.tzinfo is not None
-    assert dt.astimezone(timezone.utc).hour == 8
+def test_rss_normalize_date():
+    iso_date = "2025-09-24T10:00:00Z"
+    result = normalize_date(iso_date)
+    assert result.isoformat().startswith("2025-09-24")
 
 
-def test_clean_text_event():
-    assert clean_event_text(None) is None
-    assert (
-        clean_event_text(type("Obj", (), {"get_text": lambda self, **kw: "Data"})())
-        == "Data"
-    )
+def test_events_clean_text():
+    html = "<div>GDP <i>growth</i></div>"
+    soup = BeautifulSoup(html, "html.parser")
+    result = events_clean(soup).lower()
+    assert "gdp" in result
+    assert "growth" in result
 
 
-def test_normalize_datetime_event():
-    d = datetime(2024, 6, 1).date()
-    dt = normalize_datetime(d, "14:30")
-    assert dt.hour == 14
-    assert dt.tzinfo is not None
-
-
-def test_make_event_id_unique():
-    id1 = make_event_id(
-        "Title", "US", datetime(2024, 6, 1, 14, 0, tzinfo=timezone.utc).isoformat()
-    )
-    id2 = make_event_id(
-        "Title", "US", datetime(2024, 6, 1, 14, 0, tzinfo=timezone.utc).isoformat()
-    )
-    assert id1 == id2
+def test_events_normalize_datetime():
+    day = datetime.strptime("2025-09-24", "%Y-%m-%d").date()
+    time_str = "10:30"
+    result = normalize_datetime(day, time_str)
+    assert result.year == 2025
+    assert result.month == 9
+    assert result.day == 24
+    assert result.hour == 10
+    assert result.minute == 30

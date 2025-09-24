@@ -1,8 +1,9 @@
 # utils/logging_setup.py
 import logging
 import logging.config
-import yaml
 from pathlib import Path
+
+import yaml
 
 
 def setup_logging(config_path: str = "config/logging.yaml", default_level=logging.INFO):

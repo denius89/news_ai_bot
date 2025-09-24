@@ -1,0 +1,39 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+skip-string-normalization = true
+
+[tool.isort]
+profile = "black"
+line_length = 100
+combine_as_imports = true
+known_first_party = ["ai_modules","parsers","database","digests","utils","routes","tools"]
+float_to_top = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203","W503"]
+exclude = [".venv","venv",".git","__pycache__","build","dist"]
+select = ["E","F","W","C","B","B9"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+markers = ["integration: tests that require external services (Supabase/OpenAI/DeepL)"]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["venv/*",".venv/*","tests/*","tools/*","*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 30
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+exclude = "(venv|.venv|tests|tools)/"
