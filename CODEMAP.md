@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-23 18:57:12 UTC_
+_Generated on 2025-09-24 07:42:26 UTC_
 
 ```
 ├── .github/
@@ -25,7 +25,10 @@ _Generated on 2025-09-23 18:57:12 UTC_
 │   └── generator.py
 ├── docs/
 │   ├── ARCHITECTURE.md
-│   └── DEPLOY.md
+│   ├── COMMUNICATION.md
+│   ├── DEPLOY.md
+│   ├── ROADMAP.md
+│   └── VISION.md
 ├── logs/
 ├── parsers/
 │   ├── __init__.py
