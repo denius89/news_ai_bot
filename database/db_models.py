@@ -8,99 +8,22 @@ from supabase import create_client
 
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
+from config.constants import COUNTRY_MAP, CATEGORIES, DEFAULT_TAGS
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database")
 
 # --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
 load_dotenv()
-
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 supabase = None
-if url and key:
-    supabase = create_client(url, key)
-    logger.info("Supabase client initialized")
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    logger.info("✅ Supabase client initialized")
 else:
-    logger.warning(
-        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
-    )
-
-# --- Маппинг стран для флагов ---
-COUNTRY_MAP = {
-    "united states": "us",
-    "us": "us",
-    "u.s.": "us",
-    "usa": "us",
-    "canada": "ca",
-    "ca": "ca",
-    "mexico": "mx",
-    "mx": "mx",
-    "brazil": "br",
-    "br": "br",
-    "argentina": "ar",
-    "ar": "ar",
-    "chile": "cl",
-    "cl": "cl",
-    "united kingdom": "gb",
-    "uk": "gb",
-    "gb": "gb",
-    "england": "gb",
-    "britain": "gb",
-    "euro zone": "eu",
-    "euro area": "eu",
-    "eu": "eu",
-    "germany": "de",
-    "france": "fr",
-    "italy": "it",
-    "spain": "es",
-    "portugal": "pt",
-    "netherlands": "nl",
-    "holland": "nl",
-    "belgium": "be",
-    "switzerland": "ch",
-    "sweden": "se",
-    "norway": "no",
-    "denmark": "dk",
-    "finland": "fi",
-    "austria": "at",
-    "greece": "gr",
-    "ireland": "ie",
-    "poland": "pl",
-    "czech republic": "cz",
-    "czechia": "cz",
-    "hungary": "hu",
-    "romania": "ro",
-    "slovakia": "sk",
-    "slovenia": "si",
-    "china": "cn",
-    "japan": "jp",
-    "india": "in",
-    "hong kong": "hk",
-    "singapore": "sg",
-    "south korea": "kr",
-    "korea": "kr",
-    "republic of korea": "kr",
-    "taiwan": "tw",
-    "indonesia": "id",
-    "malaysia": "my",
-    "thailand": "th",
-    "philippines": "ph",
-    "australia": "au",
-    "new zealand": "nz",
-    "south africa": "za",
-    "egypt": "eg",
-    "nigeria": "ng",
-    "israel": "il",
-    "turkey": "tr",
-    "saudi arabia": "sa",
-    "uae": "ae",
-    "united arab emirates": "ae",
-    "qatar": "qa",
-    "kuwait": "kw",
-    "": None,
-}
+    logger.warning("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
 
 
 # --- UID для новостей ---
@@ -118,7 +41,7 @@ def make_event_id(title: str, country: str, event_time: str) -> str:
 def upsert_news(items: list[dict]):
     """Вставляет новости в Supabase без дублей (по uid)."""
     if not supabase:
-        logger.warning("Supabase не подключён, данные не будут сохранены.")
+        logger.warning("⚠️ Supabase не подключён, данные не будут сохранены.")
         return
 
     rows = []
@@ -145,13 +68,14 @@ def upsert_news(items: list[dict]):
         except Exception as e:
             logger.error(f"Ошибка подготовки новости: {e}, item={item}")
 
+    if not rows:
+        logger.info("Нет новостей для вставки")
+        return
+
     try:
-        if rows:
-            res = supabase.table("news").upsert(rows, on_conflict="uid").execute()
-            logger.info(f"Inserted {len(rows)} news items (upsert).")
-            return res
-        else:
-            logger.info("Нет новостей для вставки")
+        res = supabase.table("news").upsert(rows, on_conflict="uid").execute()
+        logger.info(f"✅ Inserted {len(rows)} news items (upsert).")
+        return res
     except Exception as e:
         logger.error(f"Ошибка при вставке новостей в Supabase: {e}")
 
@@ -160,7 +84,7 @@ def upsert_news(items: list[dict]):
 def upsert_event(items: list[dict]):
     """Вставляет события в Supabase без дублей (по event_id)."""
     if not supabase:
-        logger.warning("Supabase не подключён, события не будут сохранены.")
+        logger.warning("⚠️ Supabase не подключён, события не будут сохранены.")
         return
 
     rows = []
@@ -193,13 +117,14 @@ def upsert_event(items: list[dict]):
         except Exception as e:
             logger.error(f"Ошибка подготовки события: {e}, item={item}")
 
+    if not rows:
+        logger.info("Нет событий для вставки")
+        return
+
     try:
-        if rows:
-            res = supabase.table("events").upsert(rows, on_conflict="event_id").execute()
-            logger.info(f"Inserted {len(rows)} events (upsert).")
-            return res
-        else:
-            logger.info("Нет событий для вставки")
+        res = supabase.table("events").upsert(rows, on_conflict="event_id").execute()
+        logger.info(f"✅ Inserted {len(rows)} events (upsert).")
+        return res
     except Exception as e:
         logger.error(f"Ошибка при вставке событий в Supabase: {e}")
 
@@ -217,3 +142,22 @@ def enrich_news_with_ai(news_item: dict) -> dict:
     except Exception as e:
         logger.warning(f"Ошибка при AI-аннотации: {e}")
     return news_item
+
+
+# --- Получение последних новостей ---
+def get_latest_news(source: str | None = None, limit: int = 10):
+    """Возвращает последние новости из БД. Если указан source — фильтруем по источнику."""
+    if not supabase:
+        logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
+        return []
+
+    query = supabase.table("news").select("*").order("published_at", desc=True).limit(limit)
+    if source:
+        query = query.eq("source", source)
+
+    try:
+        data = query.execute().data
+        return data or []
+    except Exception as e:
+        logger.error(f"Ошибка при получении новостей: {e}")
+        return []
