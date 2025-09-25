@@ -63,23 +63,17 @@
 📌 Снимок структуры на момент редактирования (актуальную **всегда** смотри в `CODEMAP.md`):
 
 ```text
-├── .editorconfig
-├── .gitignore
-├── CODEMAP.md
-├── CONTRIBUTING.md
-├── MASTER_FILE.md
-├── README.md
-├── TASKS.md
-├── config.py
-├── main.py
-├── pyproject.toml
-├── requirements.txt
-├── webapp.py
+├── .github/
+│   └── workflows/
+│       ├── integration.yml
+│       └── tests.yml
 ├── ai_modules/
 │   ├── init.py
 │   ├── credibility.py
 │   └── importance.py
 ├── config/
+│   ├── init.py
+│   ├── constants.py
 │   ├── logging.yaml
 │   └── sources.yaml
 ├── database/
@@ -93,7 +87,10 @@
 │   └── generator.py
 ├── docs/
 │   ├── ARCHITECTURE.md
-│   └── DEPLOY.md
+│   ├── COMMUNICATION.md
+│   ├── DEPLOY.md
+│   ├── ROADMAP.md
+│   └── VISION.md
 ├── logs/
 ├── parsers/
 │   ├── init.py
@@ -114,6 +111,7 @@
 │   ├── conftest.py
 │   ├── test_ai_modules.py
 │   ├── test_ai_summary.py
+│   ├── test_clean_text.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_deepl.py
@@ -130,10 +128,23 @@
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
 │   ├── repo_map.py
-│   ├── show_latest_news.py
 │   └── show_news.py
-├── utils/
-└── logging_setup.py
+├── .editorconfig
+├── .env.example
+├── .gitignore
+├── CODEMAP.md
+├── config.py
+├── CONTRIBUTING.md
+├── LICENSE
+├── main.py
+├── MASTER_FILE.md
+├── pyproject.toml
+├── pytest.ini
+├── README.md
+├── requirements.txt
+├── setup.cfg
+├── TASKS.md
+└── webapp.py
 ```
 
 ## 🗄️ База данных
@@ -322,7 +333,7 @@ if not logger.handlers:
 - **PyYAML** — конфигурации источников (`config/sources.yaml`).
 - **Logging (RotatingFileHandler)** — единый сбор логов в консоль и файл.
 - **Jinja2** (через Flask) — шаблонизатор для UI (страницы /digest, /events).
-- **CSS (Material dark style)** — современный UI с адаптацией под мобильные устройства.
+- **Custom CSS (static/style.css)** — собственные стили с адаптацией под светлую/тёмную тему и мобильные устройства.
 - Возможность подключения **новых источников новостей** через `sources.yaml`.
 
 ---
@@ -349,31 +360,50 @@ if not logger.handlers:
 
 ## 🧪 Тесты и отладка
 
-Все тесты хранятся в папке `tests/`.  
-Для запуска используется `pytest`.
+Все тесты хранятся в папке `tests/`. Для запуска используется `pytest`.
 
-### 📌 Текущие тесты
-- `test_ai_modules.py` — проверка AI-заглушек (credibility, importance)  
-- `test_db_content.py` — тестирование наличия/корректности контента новостей в базе  
-- `test_db_insert.py` — проверка:
-  - загрузки новостей из RSS  
-  - генерации AI-оценок (credibility, importance)  
-  - сохранения всех полей в Supabase (включая `published_at` как ISO-строку)  
-- `test_deepl.py` — проверка перевода через DeepL API  
-- `test_main.py` — базовые проверки работы `main.py`  
-- `test_openai.py` — проверка подключения к OpenAI API  
-- `test_supabase.py` — проверка подключения к базе Supabase  
+### 🚀 Быстрый старт
+- Только unit-тесты (CI-профиль):
+  ```bash
+  pytest -m "not integration"
+  ```
+- Unit + покрытие:
+  ```bash
+  pytest -m "not integration" --cov=./ --cov-report=term-missing --cov-fail-under=30
+  ```
+- Только интеграционные (нужен `.env`: `SUPABASE_URL`, `SUPABASE_KEY`, и т.п.):
+  ```bash
+  pytest -m integration
+  ```
+- Запуск одного тест-файла/теста:
+  ```bash
+  pytest tests/test_parsers.py -q
+  pytest -k "fetch_rss_dedup" -q
+  ```
 
-### ▶️ Запуск тестов
-Из корня проекта:
+### 🏷 Маркировка
+- Интеграционные тесты помечаются `@pytest.mark.integration` и **не** запускаются в CI по умолчанию.
 
+### 📌 Наличие тестов (на Day 2)
+- `tests/test_ai_modules.py` — заглушки AI (credibility, importance).  
+- `tests/test_clean_text.py` — тесты для `utils/clean_text` (удаление HTML-тегов, нормализация пробелов, извлечение текста из DOM-элементов). 
+- `tests/test_digests.py` — генерация дайджестов/`ai_summary`.  
+- `tests/test_main_import.py` — импорт/входная точка `main.py`.  
+- `tests/test_parsers.py` — `rss_parser` и `events_parser`: нормализация дат, dedup, MIME-guard.  
+- `tests/test_routes.py` — Flask Blueprints (`news_routes`).  
+- `tests/test_webapp.py` — импорт приложения, Jinja-фильтры.  
+- `tests/test_db_insert.py` — **integration**: `fetch_rss` → upsert → dedup в БД.  
+- `tests/test_supabase.py` — **integration**: подключение к Supabase.
+  
+
+### 🔧 Pre-push (локально)
+Перед пушем рекомендуется запускать:
 ```bash
-pytest
+flake8 .
+black --check .
+pytest -m "not integration" --cov=./ --cov-report=term-missing --cov-fail-under=30
 ```
-С подробным выводом:
-```bash
-pytest -v
-```
+(если настроен git hook — он будет делать это автоматически)
 ---
 
 ### SQL-скрипты (для локальной отладки)
@@ -400,16 +430,26 @@ pytest -v
 
 ## 📌 История решений
 
-- ✅ Day 01 (24.09.2025)
-  • Добавлены CONTRIBUTING.md, .editorconfig, pyproject.toml.  
+- ✅ **Day 01 (24.09.2025)**
+  • Добавлены `CONTRIBUTING.md`, `.editorconfig`, `pyproject.toml`.  
   • Настроен CI: flake8, black, pytest, coverage, isort, mypy.  
-  • Исправлены тесты (ai_modules, supabase, openai, digests, parsers).  
-  • Добавлены вспомогательные тесты (test_main_import, test_routes, test_webapp).  
-  • Добавлены tools/fetch_and_store_events.py и tools/show_latest_news.py.  
-  • repo_map.py исправлен, теперь корректно генерирует CODEMAP.md.  
+  • Исправлены тесты (`ai_modules`, `supabase`, `openai`, `digests`, `parsers`).  
+  • Добавлены вспомогательные тесты (`test_main_import`, `test_routes`, `test_webapp`).  
+  • Добавлены `tools/fetch_and_store_events.py` и `tools/show_latest_news.py`.  
+  • `repo_map.py` исправлен, теперь корректно генерирует `CODEMAP.md`.  
   • Автоформатирование black/isort по всему проекту.  
-  • CI проходит: оба бейджа (main и day-01-docs-parsers) — passing.  
-  • Итог: Day 01 завершён.
+  • CI проходит: оба бейджа (`main` и `day-01-docs-parsers`) — passing.  
+  • Итог: Day 01 завершён.  
+
+- ✅ **Day 02 (25.09.2025)**
+  • Убран Axios (нет стабильного RSS) и временно исключён Reuters.  
+  • Добавлены новые RSS (CoinDesk, Cointelegraph, Bloomberg Markets, TechCrunch и др.).  
+  • Вынесена очистка текста в `utils/clean_text.py`.  
+  • Реализован dedup (`uid = sha256(url|title)`, upsert по `uid`).  
+  • Добавлен `tools/show_news.py` для просмотра новостей.  
+  • `COUNTRY_MAP`, категории и теги вынесены в `config/constants.py`.  
+  • Обновлены `README.md`, `docs/DEPLOY.md`, `docs/ARCHITECTURE.md` (Mermaid-схема).  
+  • Итог: Day 02 завершён.  
 
 ### Шаблон записи решения
 **Дата:** YYYY-MM-DD  
