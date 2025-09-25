@@ -30,11 +30,9 @@ def make_event_id(date_str: str, title: str, country: str) -> str:
 def normalize_datetime(day: datetime.date, time_str: str | None):
     """Преобразует время события в UTC datetime."""
     if not time_str or time_str.lower() in ("all day", "tentative"):
-        # событие без времени → начало дня UTC
         return datetime.combine(day, datetime.min.time()).replace(tzinfo=timezone.utc)
 
     try:
-        # Обычно формат HH:MM
         dt_local = datetime.strptime(time_str.strip(), "%H:%M")
         dt = datetime.combine(day, dt_local.time()).replace(tzinfo=timezone.utc)
         return dt
@@ -54,20 +52,21 @@ def fetch_investing_events(limit_days: int = 2):
     for d in range(limit_days):
         day = today + timedelta(days=d)
         url = f"{BASE_URL}?date={day.strftime('%Y-%m-%d')}"
-        logger.info(f"[Investing] Загружаем {url}")
+        logger.info(f"🔄 [Investing] Загружаем {url}")
 
         try:
             resp = requests.get(url, headers=HEADERS, timeout=20)
             if resp.status_code != 200:
-                logger.warning(f"[Investing] Ошибка {resp.status_code} для {url}")
+                logger.warning(f"⚠️ [Investing] Ошибка {resp.status_code} для {url}")
                 continue
 
             soup = BeautifulSoup(resp.text, "html.parser")
             table = soup.find("table", {"id": "economicCalendarData"})
             if not table:
-                logger.warning(f"[Investing] Таблица не найдена на {url}")
+                logger.warning(f"⚠️ [Investing] Таблица не найдена на {url}")
                 continue
 
+            events_before = len(results)
             for row in table.find_all("tr", class_="js-event-item"):
                 try:
                     time_cell = row.find("td", class_="time")
@@ -96,9 +95,15 @@ def fetch_investing_events(limit_days: int = 2):
                         }
                     )
                 except Exception as e:
-                    logger.error(f"[Investing] Ошибка парсинга строки: {e}")
+                    logger.error(f"❌ [Investing] Ошибка парсинга строки: {e}")
+
+            added = len(results) - events_before
+            if added > 0:
+                logger.info(f"✅ [Investing] {day}: добавлено {added} событий")
+            else:
+                logger.warning(f"⚠️ [Investing] {day}: событий не найдено")
 
         except Exception as e:
-            logger.error(f"[Investing] Ошибка загрузки {url}: {e}")
+            logger.error(f"❌ [Investing] Ошибка загрузки {url}: {e}")
 
     return results

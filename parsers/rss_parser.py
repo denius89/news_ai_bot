@@ -70,13 +70,15 @@ def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> lis
     seen = set()
 
     for meta in urls.values():
+        logger.info(f"🔄 Загружаем источник: {meta['name']} ({meta['url']})")
         feed = fetch_feed(meta["url"])
         if not feed or feed.bozo:
             logger.error(
-                f"Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}"
+                f"❌ Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}"
             )
             continue
 
+        items_before = len(news_items)
         for entry in feed.entries[:per_source_limit]:
             url = entry.get("link") or ""
             title = clean_text(entry.get("title", ""))
@@ -99,5 +101,11 @@ def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> lis
                     "category": meta["category"],
                 }
             )
+
+        items_added = len(news_items) - items_before
+        if items_added > 0:
+            logger.info(f"✅ {meta['name']}: {items_added} новостей добавлено")
+        else:
+            logger.warning(f"⚠️ {meta['name']}: новостей не найдено")
 
     return news_items
