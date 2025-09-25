@@ -135,10 +135,3 @@ politics:
     url: http://feeds.bbci.co.uk/news/politics/rss.xml
     enabled: true
     tags: [politics]
-
-  # Reuters временно закомментирован из-за DNS проблем
-  # - id: reuters_politics
-  #   name: Reuters Politics
-  #   url: https://feeds.reuters.com/reuters/politicsNews
-  #   enabled: true
-  #   tags: [politics]

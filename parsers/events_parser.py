@@ -5,6 +5,8 @@ from datetime import datetime, timedelta, timezone
 import requests
 from bs4 import BeautifulSoup
 
+from utils.clean_text import extract_text as clean_text
+
 BASE_URL = "https://www.investing.com/economic-calendar/"
 HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en-US,en;q=0.9"}
 
