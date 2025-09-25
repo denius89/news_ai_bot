@@ -2,6 +2,7 @@
 import re
 from bs4 import BeautifulSoup
 
+
 def clean_text(text: str) -> str:
     """Удаляет HTML-теги и нормализует пробелы (для строк)."""
     if not text:
@@ -9,6 +10,7 @@ def clean_text(text: str) -> str:
     text = BeautifulSoup(text, "html.parser").get_text()
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
 
 def extract_text(el):
     """Возвращает текст из BeautifulSoup-элемента или None, если пусто (для DOM-элементов)."""
