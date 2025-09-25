@@ -1,28 +1,20 @@
 import hashlib
 import logging
-import re
 from datetime import timezone
 from pathlib import Path
 
+import requests
 import feedparser
 import yaml
-from bs4 import BeautifulSoup
 from dateutil import parser as dtp
+
+from utils.clean_text import clean_text  # вынесено отдельно
 
 logger = logging.getLogger("parsers.rss")
 
 CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "sources.yaml"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; NewsBot/1.0; +https://example.com)"}
-
-
-def clean_text(text: str) -> str:
-    """Удаляет HTML-теги и нормализует пробелы."""
-    if not text:
-        return ""
-    text = BeautifulSoup(text, "html.parser").get_text()
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
 
 
 def normalize_date(date_str: str | None):
@@ -59,17 +51,34 @@ def load_sources(category: str | None = None) -> dict[str, dict]:
     return urls
 
 
+def fetch_feed(url: str):
+    """Запрашивает фид и проверяет MIME-тип (чтобы избежать text/html)."""
+    try:
+        resp = requests.get(url, timeout=10, headers=HEADERS)
+        ctype = resp.headers.get("Content-Type", "")
+        if "xml" not in ctype and "rss" not in ctype:
+            raise ValueError(f"Invalid content-type {ctype} for {url}")
+        return feedparser.parse(resp.content)
+    except Exception as e:
+        logger.error(f"Ошибка при загрузке {url}: {e}")
+        return None
+
+
 def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> list[dict]:
     """Загружает новости из RSS-источников."""
     news_items = []
     seen = set()
 
     for meta in urls.values():
-        feed = feedparser.parse(meta["url"], request_headers=HEADERS)
-        if feed.bozo:
-            logger.error(f"Ошибка при парсинге {meta['url']}: {feed.bozo_exception}")
+        logger.info(f"🔄 Загружаем источник: {meta['name']} ({meta['url']})")
+        feed = fetch_feed(meta["url"])
+        if not feed or feed.bozo:
+            logger.error(
+                f"❌ Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}"
+            )
             continue
 
+        items_before = len(news_items)
         for entry in feed.entries[:per_source_limit]:
             url = entry.get("link") or ""
             title = clean_text(entry.get("title", ""))
@@ -92,5 +101,11 @@ def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> lis
                     "category": meta["category"],
                 }
             )
+
+        items_added = len(news_items) - items_before
+        if items_added > 0:
+            logger.info(f"✅ {meta['name']}: {items_added} новостей добавлено")
+        else:
+            logger.warning(f"⚠️ {meta['name']}: новостей не найдено")
 
     return news_items
