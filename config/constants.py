@@ -82,3 +82,6 @@ COUNTRY_MAP = {
     "kuwait": "kw",
     "": None,
 }
+
+# Версия проекта
+VERSION = "0.1.0"
