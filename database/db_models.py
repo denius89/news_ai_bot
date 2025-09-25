@@ -8,7 +8,7 @@ from supabase import create_client
 
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
-from config.constants import COUNTRY_MAP, CATEGORIES, DEFAULT_TAGS
+from config.constants import COUNTRY_MAP
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database")
@@ -23,7 +23,9 @@ if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
     logger.info("✅ Supabase client initialized")
 else:
-    logger.warning("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
+    logger.warning(
+        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
+    )
 
 
 # --- UID для новостей ---
@@ -96,6 +98,10 @@ def upsert_event(items: list[dict]):
             elif not event_time:
                 event_time = datetime.now(timezone.utc).isoformat()
 
+            # нормализуем country_code через COUNTRY_MAP
+            country_raw = (item.get("country") or "").lower()
+            country_code = COUNTRY_MAP.get(country_raw)
+
             event_id = make_event_id(item.get("title", ""), item.get("country", ""), event_time)
 
             rows.append(
@@ -110,7 +116,7 @@ def upsert_event(items: list[dict]):
                     "forecast": item.get("forecast"),
                     "previous": item.get("previous"),
                     "source": item.get("source", "investing"),
-                    "country_code": item.get("country_code"),
+                    "country_code": country_code,
                     "created_at": datetime.now(timezone.utc).isoformat(),
                 }
             )
