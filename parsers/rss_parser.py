@@ -72,7 +72,9 @@ def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> lis
     for meta in urls.values():
         feed = fetch_feed(meta["url"])
         if not feed or feed.bozo:
-            logger.error(f"Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}")
+            logger.error(
+                f"Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}"
+            )
             continue
 
         for entry in feed.entries[:per_source_limit]:
