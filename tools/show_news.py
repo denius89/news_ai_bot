@@ -78,6 +78,4 @@ if __name__ == "__main__":
     parser.add_argument("--days", type=int, help="Показать только новости за последние N дней")
     args = parser.parse_args()
 
-    show_latest_news(
-        limit=args.limit, source=args.source, category=args.category, days=args.days
-    )
+    show_latest_news(limit=args.limit, source=args.source, category=args.category, days=args.days)
