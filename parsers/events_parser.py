@@ -22,14 +22,6 @@ def parse_importance(cell):
     return min(max(count, 1), 3)
 
 
-def clean_text(el):
-    """Возвращает текст или None, если пусто."""
-    if not el:
-        return None
-    text = el.get_text(strip=True)
-    return text if text else None
-
-
 def make_event_id(date_str: str, title: str, country: str) -> str:
     raw = f"{date_str}|{title}|{country}"
     return hashlib.sha256(raw.encode()).hexdigest()

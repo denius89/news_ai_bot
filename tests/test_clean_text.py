@@ -1,4 +1,3 @@
-import pytest
 from bs4 import BeautifulSoup
 from utils.clean_text import clean_text, extract_text
 
