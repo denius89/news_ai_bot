@@ -43,15 +43,29 @@
 
         <!-- Футер -->
         <div class="card-footer">
-            <span class="source-link">{{ item.source }}</span>
-            ·
-            <span class="card-category">{{ item.category or "—" }}</span>
-            ·
-            <span class="importance-value
-                {% if item.importance > 0.7 %}high
-                {% elif item.importance > 0.4 %}medium
+            <span class="source-link">{{ item.source }}</span> ·
+            <span class="card-category">{{ item.category or "—" }}</span> ·
+
+            {% set cred = item.get('credibility', 0) %}
+            <span class="credibility-value
+                {% if cred > 0.7 %}high
+                {% elif cred > 0.4 %}medium
                 {% else %}low{% endif %}">
-                🔥 {{ "%.2f"|format(item.importance) }}
+                {% if cred > 0.7 %}
+                    ✅ {{ "%.2f"|format(cred) }}
+                {% elif cred > 0.4 %}
+                    ⚠️ {{ "%.2f"|format(cred) }}
+                {% else %}
+                    ❌ {{ "%.2f"|format(cred) }}
+                {% endif %}
+            </span> ·
+
+            {% set imp = item.get('importance', 0) %}
+            <span class="importance-value
+                {% if imp > 0.7 %}high
+                {% elif imp > 0.4 %}medium
+                {% else %}low{% endif %}">
+                🔥 {{ "%.2f"|format(imp) }}
             </span>
         </div>
     </div>
