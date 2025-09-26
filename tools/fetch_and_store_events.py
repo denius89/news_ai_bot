@@ -1,73 +1,35 @@
-import pytest
-from bs4 import BeautifulSoup
+#!/usr/bin/env python3
+"""
+Скрипт для парсинга экономических событий (Investing) и сохранения их в Supabase.
+"""
 
-from parsers.events_parser import (
-    fetch_investing_events,
-    parse_importance,
-    IMPORTANCE_TO_PRIORITY,
-)
+import logging
+import argparse
 
+from parsers.events_parser import fetch_investing_events
+from database.db_models import upsert_events
 
-@pytest.mark.integration
-def test_fetch_investing_events_smoke():
-    """Интеграционный тест: парсер событий Investing.com"""
-    events = fetch_investing_events(limit_days=1)
-
-    # Должен вернуться список
-    assert isinstance(events, list)
-    assert len(events) > 0, "Парсер не вернул ни одного события"
-
-    # Проверяем структуру первого события
-    sample = events[0]
-    required_keys = {
-        "event_id",
-        "title",
-        "country",
-        "datetime",
-        "importance",
-        "priority",
-        "source",
-    }
-    for key in required_keys:
-        assert key in sample, f"Нет обязательного поля {key}"
-
-    # Проверяем согласованность importance/priority
-    importance = sample["importance"]
-    priority = sample["priority"]
-
-    assert importance in IMPORTANCE_TO_PRIORITY
-    assert priority == IMPORTANCE_TO_PRIORITY[importance]
+logger = logging.getLogger("tools.fetch_and_store_events")
 
 
-def test_parse_importance_with_mock_html():
-    """Юнит-тест: определение importance/priority по HTML"""
-    # 3 звезды
-    html = """
-    <td class="sentiment">
-        <i class="icon-gray-full-bullish"></i>
-        <i class="icon-gray-full-bullish"></i>
-        <i class="icon-gray-full-bullish"></i>
-    </td>
-    """
-    cell = BeautifulSoup(html, "html.parser").find("td")
-    importance, priority = parse_importance(cell)
-    assert importance == 3
-    assert priority == "high"
+def main():
+    parser = argparse.ArgumentParser(description="Fetch and store Investing events")
+    parser.add_argument(
+        "--limit-days", type=int, default=2, help="Сколько дней загружать (по умолчанию 2)"
+    )
+    args = parser.parse_args()
 
-    # 1 звезда
-    html = """
-    <td class="sentiment">
-        <i class="icon-gray-full-bullish"></i>
-    </td>
-    """
-    cell = BeautifulSoup(html, "html.parser").find("td")
-    importance, priority = parse_importance(cell)
-    assert importance == 1
-    assert priority == "low"
+    logger.info(f"🔄 Загружаем события с Investing (days={args.limit_days})...")
+    try:
+        events = fetch_investing_events(limit_days=args.limit_days)
+        if not events:
+            logger.warning("⚠️ Нет событий для вставки")
+            return
+        upsert_events(events)
+        logger.info(f"✅ Вставлено {len(events)} событий в БД")
+    except Exception as e:
+        logger.error(f"❌ Ошибка при парсинге событий: {e}", exc_info=True)
 
-    # пустая ячейка → default = 1
-    html = """<td class="sentiment"></td>"""
-    cell = BeautifulSoup(html, "html.parser").find("td")
-    importance, priority = parse_importance(cell)
-    assert importance == 1
-    assert priority == "low"
+
+if __name__ == "__main__":
+    main()

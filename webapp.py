@@ -48,4 +48,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"⚠️ Ошибка при debug-загрузке новостей: {e}")
 
-    app.run(host="127.0.0.1", port=8000, debug=True)
+    app.run(host="127.0.0.1", port=8001, debug=True)

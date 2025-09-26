@@ -3,6 +3,7 @@
 ![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 ![Tests – day-01-docs-parsers](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
 ![Tests – day2-sources-cleaning](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day2-sources-cleaning)
+![Tests – day3-ai-events-telegram](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day3-ai-events-telegram)
 
 AI-платформа для превращения хаотичного потока новостей и событий в персональные дайджесты и умный календарь.
 
@@ -131,6 +132,38 @@ python main.py --digest 5 --ai
 ### Параметры
 - `--digest N` — количество последних новостей для дайджеста  
 - `--ai` — включить генерацию текста с помощью AI 
+
+---
+
+## 📅 Работа с событиями
+
+PulseAI умеет собирать и хранить экономические и крипто-события (например, решения ФРС, релизы CPI, хардфорки блокчейнов).
+
+- Источник: Investing.com (экономический календарь).
+- Поля: `event_time`, `country`, `currency`, `title`, `importance (1–3)`, `fact`, `forecast`, `previous`, `source`.
+- В БД события сохраняются в таблицу `events` с уникальным `event_id`.
+- В UI события отображаются в виде таблицы (desktop) и карточек (mobile), с бейджами важности.
+
+Запуск парсера:
+```bash
+python -m tools.fetch_and_store_events
+```
+
+---
+
+## 🤖 Telegram bot (MVP)
+
+Мы добавили базовый каркас Telegram-бота на `aiogram`:
+
+- `/start` → приветственное сообщение.
+- `/digest` → последние 3 новости из базы.
+
+Запуск:
+```bash
+export TELEGRAM_BOT_TOKEN="your-bot-token"
+python -m telegram_bot.bot
+```
+Требуется переменная окружения `TELEGRAM_BOT_TOKEN` в `.env`.
 
 ---
 

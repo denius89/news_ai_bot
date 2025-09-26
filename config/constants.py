@@ -2,6 +2,12 @@
 Глобальные константы и справочники для проекта.
 """
 
+import os
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения
+load_dotenv()
+
 # --- Категории источников ---
 CATEGORIES = ["crypto", "economy", "world", "technology", "politics"]
 
@@ -83,5 +89,14 @@ COUNTRY_MAP = {
     "": None,
 }
 
-# Версия проекта
+# --- Версия проекта ---
 VERSION = "0.1.0"
+
+# --- API ключи (из .env) ---
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+DEEPL_API_KEY = os.getenv("DEEPL_API_KEY")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+# --- Telegram Bot ---
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")

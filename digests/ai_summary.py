@@ -28,10 +28,13 @@ def generate_summary(news_list: List[Dict], max_tokens: int = 300) -> str:
         return "Сегодня новостей нет."
 
     # Формируем текстовую выборку новостей
-    text_block = "\n".join(
-        f"- {item.get('title')} ({item.get('source')}): {item.get('content', '')[:200]}..."
-        for item in news_list[:10]
-    )
+    text_block = []
+    for item in news_list[:10]:
+        title = item.get("title") or "Без названия"
+        source = item.get("source") or "—"
+        snippet = (item.get("content") or item.get("summary") or item.get("title") or "")[:200]
+        text_block.append(f"- {title} ({source}): {snippet}...")
+    text_block = "\n".join(text_block)
 
     prompt = f"""
 Составь краткий новостной дайджест (3–5 предложений) на основе следующих новостей:
