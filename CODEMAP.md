@@ -1,12 +1,20 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-25 11:27:21 UTC_
+
+_Generated on 2025-09-26 18:45:04 UTC_
+
 
 ```
 ├── .github/
 │   └── workflows/
 │       ├── integration.yml
 │       └── tests.yml
+├── .ruff_cache/
+│   ├── 0.13.2/
+│   │   ├── 11580765189628323361
+│   │   └── 12962173965777229691
+│   ├── .gitignore
+│   └── CACHEDIR.TAG
 ├── ai_modules/
 │   ├── __init__.py
 │   ├── credibility.py
@@ -41,6 +49,17 @@ _Generated on 2025-09-25 11:27:21 UTC_
 │   └── news_routes.py
 ├── static/
 │   └── style.css
+├── telegram_bot/
+│   ├── handlers/
+│   │   ├── __init__.py
+│   │   ├── digest.py
+│   │   ├── digest_ai.py
+│   │   ├── events.py
+│   │   └── start.py
+│   ├── __init__.py
+│   ├── bot.py
+│   ├── config.py
+│   └── keyboards.py
 ├── templates/
 │   ├── base.html
 │   ├── digest.html
@@ -56,6 +75,7 @@ _Generated on 2025-09-25 11:27:21 UTC_
 │   ├── test_db_insert.py
 │   ├── test_deepl.py
 │   ├── test_digests.py
+│   ├── test_events_parser.py
 │   ├── test_main.py
 │   ├── test_main_import.py
 │   ├── test_openai.py

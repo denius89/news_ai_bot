@@ -44,6 +44,16 @@
                     {% else %}
                         —
                     {% endif %}
+
+                    {% if ev.priority %}
+                        <span class="badge
+                          {% if ev.priority == 'high' %} bg-danger
+                          {% elif ev.priority == 'medium' %} bg-warning text-dark
+                          {% else %} bg-secondary
+                          {% endif %}">
+                          {{ ev.priority|capitalize }}
+                        </span>
+                    {% endif %}
                 </td>
                 <td>{{ ev.fact or "—" }}</td>
                 <td>{{ ev.forecast or "—" }}</td>
@@ -81,6 +91,16 @@
                 <span class="importance-high">⭐⭐⭐ High</span>
             {% else %}
                 —
+            {% endif %}
+
+            {% if ev.priority %}
+                <span class="badge
+                  {% if ev.priority == 'high' %} bg-danger
+                  {% elif ev.priority == 'medium' %} bg-warning text-dark
+                  {% else %} bg-secondary
+                  {% endif %}">
+                  {{ ev.priority|capitalize }}
+                </span>
             {% endif %}
         </div>
 
