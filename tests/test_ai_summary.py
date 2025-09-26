@@ -42,13 +42,13 @@ def test_generate_summary_why_important_smoke():
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
 
     item = {
-            "title": "ФРС сохранила ставку",
-            "content": (
-                "Федеральная резервная система США сохранила процентную ставку без изменений, "
-                "но намекнула на возможное снижение в следующем квартале."
-            ),
-            "source": "economy",
-            }
+        "title": "ФРС сохранила ставку",
+        "content": (
+            "Федеральная резервная система США сохранила процентную ставку без изменений, "
+            "но намекнула на возможное снижение в следующем квартале."
+        ),
+        "source": "economy",
+    }
 
     summary = generate_summary_why_important(item, max_tokens=120)
 
