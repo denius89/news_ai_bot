@@ -100,3 +100,5 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 # --- Telegram Bot ---
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# Версия проекта
+VERSION = "0.1.0"

@@ -50,6 +50,15 @@ def normalize_datetime(day: datetime.date, time_str: Optional[str]):
     Если время отсутствует/«all day»/«tentative»/«N/A» → возвращаем начало дня.
     """
     if not time_str or time_str.lower() in ("all day", "tentative", "n/a"):
+      
+def make_event_id(date_str: str, title: str, country: str) -> str:
+    raw = f"{date_str}|{title}|{country}"
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
+def normalize_datetime(day: datetime.date, time_str: str | None):
+    """Преобразует время события в UTC datetime."""
+    if not time_str or time_str.lower() in ("all day", "tentative"):
         return datetime.combine(day, datetime.min.time()).replace(tzinfo=timezone.utc)
 
     try:
@@ -123,6 +132,7 @@ def fetch_investing_events(limit_days: int = 2):
                 except Exception as e:
                     logger.error(f"❌ [Investing] Ошибка парсинга строки: {e}", exc_info=True)
 
+
             added = len(results) - events_before
             if added > 0:
                 logger.info(f"✅ [Investing] {day}: добавлено {added} событий")
@@ -130,6 +140,7 @@ def fetch_investing_events(limit_days: int = 2):
                 logger.warning(f"⚠️ [Investing] {day}: событий не найдено")
 
         except Exception as e:
-            logger.error(f"❌ [Investing] Ошибка загрузки {url}: {e}", exc_info=True)
+          
+            logger.error(f"❌ [Investing] Ошибка загрузки {url}: {e}",
 
     return results

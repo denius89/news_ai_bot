@@ -1,7 +1,9 @@
 import logging
 from flask import Flask
 
+
 from config.constants import VERSION
+
 from routes.news_routes import news_bp
 from utils.logging_setup import setup_logging
 
@@ -10,7 +12,9 @@ setup_logging()
 logger = logging.getLogger("news_ai_bot")
 
 app = Flask(__name__)
+
 app.config["VERSION"] = VERSION
+
 
 
 # 🔥 Фильтр для отображения иконок важности

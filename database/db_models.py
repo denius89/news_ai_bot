@@ -145,6 +145,7 @@ def upsert_event(items: list[dict]):
             elif not event_time:
                 event_time = datetime.now(timezone.utc).isoformat()
 
+            # нормализуем country_code через COUNTRY_MAP
             country_raw = (item.get("country") or "").lower()
             country_code = COUNTRY_MAP.get(country_raw)
 
@@ -250,4 +251,24 @@ def get_latest_events(limit: int = 10):
         return data
     except Exception as e:
         logger.error(f"Ошибка при получении событий: {e}")
+        logger.warning(f"Ошибка при AI-аннотации: {e}")
+    return news_item
+
+
+# --- Получение последних новостей ---
+def get_latest_news(source: str | None = None, limit: int = 10):
+    """Возвращает последние новости из БД. Если указан source — фильтруем по источнику."""
+    if not supabase:
+        logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
+        return []
+
+    query = supabase.table("news").select("*").order("published_at", desc=True).limit(limit)
+    if source:
+        query = query.eq("source", source)
+
+    try:
+        data = query.execute().data
+        return data or []
+    except Exception as e:
+        logger.error(f"Ошибка при получении новостей: {e}")
         return []

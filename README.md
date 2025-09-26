@@ -5,6 +5,7 @@
 ![Tests – day2-sources-cleaning](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day2-sources-cleaning)
 ![Tests – day3-ai-events-telegram](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day3-ai-events-telegram)
 
+
 AI-платформа для превращения хаотичного потока новостей и событий в персональные дайджесты и умный календарь.
 
 ---
@@ -61,6 +62,12 @@ pip install -r requirements.txt
 cp .env.example .env
 # заполните SUPABASE_URL и SUPABASE_KEY
 # (OPENAI_API_KEY, DEEPL_API_KEY — опционально, для будущих функций)
+
+# Запуск сбора новостей (ETL)
+python tools/fetch_and_store_news.py
+
+# Просмотр последних новостей
+python tools/show_news.py --limit 10
 
 # Запуск сбора новостей (ETL)
 python tools/fetch_and_store_news.py
