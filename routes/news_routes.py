@@ -10,15 +10,13 @@ news_bp = Blueprint("news", __name__)
 # --- Дайджест новостей ---
 @news_bp.route("/digest")
 def digest():
-    # Получаем список активных категорий из query params
     categories = request.args.getlist("category")
 
-    # Базовый запрос
+    # Базовый запрос с AI-полями
     query = supabase.table("news").select(
-        "title, content, link, published_at, importance, source, category"
+        "title, content, link, published_at, credibility, importance, source, category"
     )
 
-    # Фильтрация по категориям (если выбраны)
     if categories:
         query = query.in_("category", categories)
 
@@ -26,10 +24,10 @@ def digest():
         query.order("importance", desc=True).order("published_at", desc=True).limit(10).execute()
     )
 
-    news_items = response.data if response.data else []
+    news_items = response.data or []
 
     for item in news_items:
-        # Форматируем дату
+        # форматируем дату
         if item.get("published_at"):
             try:
                 dt = datetime.fromisoformat(item["published_at"].replace("Z", "+00:00"))
@@ -39,12 +37,19 @@ def digest():
         else:
             item["published_at_fmt"] = "—"
 
+        # credibility → float
+        try:
+            item["credibility"] = float(item.get("credibility") or 0.0)
+        except Exception:
+            item["credibility"] = 0.0
+
         # importance → float
         try:
             item["importance"] = float(item.get("importance") or 0.0)
         except Exception:
             item["importance"] = 0.0
 
+        # источник
         item["source"] = item.get("source") or "—"
 
     return render_template(
@@ -68,10 +73,10 @@ def events():
         query = query.eq("category", category)
 
     response = query.order("event_time", desc=False).limit(50).execute()
-    events_list = response.data if response.data else []
+    events_list = response.data or []
 
-    # форматируем время для отображения
     for ev in events_list:
+        # форматируем время
         if ev.get("event_time"):
             try:
                 dt = datetime.fromisoformat(ev["event_time"].replace("Z", "+00:00"))

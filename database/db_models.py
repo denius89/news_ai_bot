@@ -39,9 +39,41 @@ def make_event_id(title: str, country: str, event_time: str) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()
 
 
+# --- Обогащение новостей AI ---
+def enrich_news_with_ai(news_item: dict) -> dict:
+    """Обновляет credibility и importance для новости через AI-модули."""
+    text = news_item.get("content") or news_item.get("summary") or news_item.get("title") or ""
+    source = news_item.get("source")
+    title = news_item.get("title")
+
+    try:
+        cred = None
+        if evaluate_credibility:
+            try:
+                cred = evaluate_credibility(text=text, source=source)
+            except TypeError:
+                cred = evaluate_credibility(text)
+        news_item["credibility"] = cred
+    except Exception as e:
+        logger.warning(f"Ошибка при AI-аннотации credibility: {e}")
+
+    try:
+        imp = None
+        if evaluate_importance:
+            try:
+                imp = evaluate_importance(text=text, title=title)
+            except TypeError:
+                imp = evaluate_importance(text)
+        news_item["importance"] = imp
+    except Exception as e:
+        logger.warning(f"Ошибка при AI-аннотации importance: {e}")
+
+    return news_item
+
+
 # --- UPSERT новостей ---
 def upsert_news(items: list[dict]):
-    """Вставляет новости в Supabase без дублей (по uid)."""
+    """Вставляет новости в Supabase без дублей (по uid) и с обогащением AI."""
     if not supabase:
         logger.warning("⚠️ Supabase не подключён, данные не будут сохранены.")
         return
@@ -49,22 +81,37 @@ def upsert_news(items: list[dict]):
     rows = []
     for item in items:
         try:
-            uid = make_uid(item["url"], item["title"])
+            enriched = enrich_news_with_ai(item)
+
+            # 🔥 гарантируем непустой title
+            title = (enriched.get("title") or "").strip()
+            if not title:
+                title = enriched.get("source") or "Без названия"
+
+            # 🔥 content: сначала content → summary → title
+            content = (
+                (enriched.get("content") or "").strip()
+                or (enriched.get("summary") or "").strip()
+                or title
+            )
+
+            uid = make_uid(enriched.get("url", ""), title)
+
             rows.append(
                 {
                     "uid": uid,
-                    "title": item["title"][:512],
-                    "content": item.get("summary", ""),
-                    "link": item["url"],
+                    "title": title[:512],
+                    "content": content,
+                    "link": enriched.get("url"),
                     "published_at": (
-                        item.get("published_at").isoformat()
-                        if item.get("published_at")
+                        enriched.get("published_at").isoformat()
+                        if enriched.get("published_at")
                         else datetime.now(timezone.utc).isoformat()
                     ),
-                    "source": item.get("source"),
-                    "category": item.get("category"),
-                    "credibility": item.get("credibility"),
-                    "importance": item.get("importance"),
+                    "source": enriched.get("source"),
+                    "category": enriched.get("category"),
+                    "credibility": enriched.get("credibility"),
+                    "importance": enriched.get("importance"),
                 }
             )
         except Exception as e:
@@ -111,7 +158,8 @@ def upsert_event(items: list[dict]):
                     "country": item.get("country"),
                     "currency": item.get("currency"),
                     "title": item.get("title"),
-                    "importance": item.get("priority"),  # priority → importance
+                    "importance": item.get("importance"),  # тут число
+                    "priority": item.get("priority"),  # тут строка (нужно, если колонка есть)
                     "fact": item.get("fact"),
                     "forecast": item.get("forecast"),
                     "previous": item.get("previous"),
@@ -139,13 +187,70 @@ def upsert_event(items: list[dict]):
 upsert_events = upsert_event
 
 
-# --- Обогащение новостей AI ---
-def enrich_news_with_ai(news_item: dict) -> dict:
-    """Обновляет credibility и importance для новости через AI-модули."""
+# --- Получение последних новостей ---
+def get_latest_news(source: str | None = None, limit: int = 10):
+    """Возвращает последние новости из БД. Если указан source — фильтруем по источнику."""
+    if not supabase:
+        logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
+        return []
+
+    query = (
+        supabase.table("news")
+        .select("id, title, content, link, published_at, source, category, credibility, importance")
+        .order("published_at", desc=True)
+        .limit(limit)
+    )
+
+    if source:
+        query = query.eq("source", source)
+
     try:
-        news_item["credibility"] = evaluate_credibility(news_item)
-        news_item["importance"] = evaluate_importance(news_item)
+        data = query.execute().data or []
+        for item in data:
+            title = item.get("title")
+            if not title or not title.strip():
+                item["title"] = item.get("source") or "Без названия"
+        return data
     except Exception as e:
+        logger.error(f"Ошибка при получении новостей: {e}")
+        return []
+
+
+def get_latest_events(limit: int = 10):
+    """Возвращает последние события из БД (таблица events)."""
+    if not supabase:
+        logger.warning("⚠️ Supabase не подключён, get_latest_events не работает.")
+        return []
+
+    query = (
+        supabase.table("events")
+        .select(
+            "event_time, country, country_code, currency, title, importance, fact, forecast, previous, source"
+        )
+        .order("event_time", desc=False)  # ближайшие события вперёд
+        .limit(limit)
+    )
+
+    try:
+        data = query.execute().data or []
+        for ev in data:
+            if ev.get("event_time"):
+                try:
+                    dt = datetime.fromisoformat(ev["event_time"].replace("Z", "+00:00"))
+                    ev["event_time_fmt"] = dt.strftime("%d %b %Y, %H:%M")
+                except Exception:
+                    ev["event_time_fmt"] = ev["event_time"]
+            else:
+                ev["event_time_fmt"] = "—"
+
+            # importance → int
+            try:
+                ev["importance"] = int(ev.get("importance") or 0)
+            except Exception:
+                ev["importance"] = 0
+        return data
+    except Exception as e:
+        logger.error(f"Ошибка при получении событий: {e}")
         logger.warning(f"Ошибка при AI-аннотации: {e}")
     return news_item
 
