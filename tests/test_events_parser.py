@@ -1,11 +1,6 @@
 import pytest
 from bs4 import BeautifulSoup
-
-from parsers.events_parser import (
-    fetch_investing_events,
-    parse_importance,
-    IMPORTANCE_TO_PRIORITY,
-)
+from parsers.events_parser import fetch_investing_events, IMPORTANCE_TO_PRIORITY, parse_importance
 
 
 @pytest.mark.integration
@@ -40,8 +35,7 @@ def test_fetch_investing_events_smoke():
 
 
 def test_parse_importance_with_mock_html():
-    """Юнит-тест: определение importance/priority по HTML"""
-    # 3 звезды
+    """Юнит-тест: парсинг важности из mock HTML"""
     html = """
     <td class="sentiment">
         <i class="icon-gray-full-bullish"></i>
@@ -54,18 +48,12 @@ def test_parse_importance_with_mock_html():
     assert importance == 3
     assert priority == "high"
 
-    # 1 звезда
-    html = """
-    <td class="sentiment">
-        <i class="icon-gray-full-bullish"></i>
-    </td>
-    """
+    html = """<td class="sentiment"><i class="icon-gray-full-bullish"></i></td>"""
     cell = BeautifulSoup(html, "html.parser").find("td")
     importance, priority = parse_importance(cell)
     assert importance == 1
     assert priority == "low"
 
-    # пустая ячейка → default = 1
     html = """<td class="sentiment"></td>"""
     cell = BeautifulSoup(html, "html.parser").find("td")
     importance, priority = parse_importance(cell)

@@ -1,92 +1,113 @@
--- Новости
+-- =============================================================================
+-- database/init_tables.sql  (idempotent, совместимо с Supabase)
+-- =============================================================================
+
+-- В Supabase gen_random_uuid() доступен по умолчанию. На обычном Postgres:
+-- CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- =========================
+-- Таблица новостей
+-- =========================
 CREATE TABLE IF NOT EXISTS news (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  title text NOT NULL,
-  content text,
-  source text NOT NULL,
-  published_at timestamp with time zone NOT NULL,
-  credibility numeric CHECK (credibility >= 0 AND credibility <= 1),
-  importance numeric CHECK (importance >= 0 AND importance <= 1),
-  created_at timestamp with time zone DEFAULT now()
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  uid          text UNIQUE,                                -- уникальный ключ для upsert (url|title hash)
+  title        text NOT NULL,
+  content      text,
+  link         text,                                       -- исходная ссылка
+  source       text NOT NULL,
+  category     text,
+  published_at timestamptz NOT NULL,
+  credibility  numeric CHECK (credibility >= 0 AND credibility <= 1),
+  importance   numeric CHECK (importance  >= 0 AND importance  <= 1),
+  created_at   timestamptz DEFAULT now()
 );
 
--- Индексы для новостей
-CREATE INDEX IF NOT EXISTS idx_news_published_at ON news(published_at DESC);
-CREATE INDEX IF NOT EXISTS idx_news_source ON news(source);
+-- На случай, если таблица news уже существовала без нужных колонок:
+ALTER TABLE news ADD COLUMN IF NOT EXISTS uid        text;
+ALTER TABLE news ADD COLUMN IF NOT EXISTS link       text;
+ALTER TABLE news ADD COLUMN IF NOT EXISTS category   text;
+ALTER TABLE news ADD COLUMN IF NOT EXISTS credibility numeric;
+ALTER TABLE news ADD COLUMN IF NOT EXISTS importance  numeric;
 
+-- Уникальный индекс для upsert по uid
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_news_uid ON news (uid);
+
+-- Индексы для ускорения выборок
+CREATE INDEX IF NOT EXISTS idx_news_published_at ON news (published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_news_source       ON news (source);
+CREATE INDEX IF NOT EXISTS idx_news_link         ON news (link);
+
+-- =========================
 -- Пользователи
+-- =========================
 CREATE TABLE IF NOT EXISTS users (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   telegram_id bigint UNIQUE NOT NULL,
-  created_at timestamp with time zone DEFAULT now()
+  created_at  timestamptz DEFAULT now()
 );
 
+-- =========================
 -- Дайджесты
+-- =========================
 CREATE TABLE IF NOT EXISTS digests (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
-  summary text,
-  created_at timestamp with time zone DEFAULT now()
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    uuid REFERENCES users(id) ON DELETE CASCADE,
+  summary    text,
+  created_at timestamptz DEFAULT now()
 );
 
--- Таблица событий (экономика, крипта, политика и т.д.)
-create table if not exists events (
-    id uuid primary key default gen_random_uuid(),
-    event_time timestamptz not null,              -- время события (UTC)
-    country text,                                 -- страна (ISO-код, напр. US, EU, CN)
-    currency text,                                -- валюта (ISO-код, напр. USD, EUR, BTC)
-    title text not null,                          -- название события
-    importance int check (importance between 1 and 3), -- важность (1-3 звезды)
-    fact text,                                    -- фактическое значение
-    forecast text,                                -- прогноз
-    previous text,                                -- предыдущее значение
-    source text,                                  -- источник (например, TradingEconomics)
-    created_at timestamptz default now()          -- дата добавления
-);
-
--- Примеры событий для отладки
-insert into events (event_time, country, currency, title, importance, fact, forecast, previous, source)
-values
-    ('2025-09-25 12:30:00+00', 'US', 'USD', 'GDP Growth Rate QoQ Final', 3, '3.2%', '3.3%', '3.1%', 'TradingEconomics'),
-    ('2025-09-26 08:00:00+00', 'EU', 'EUR', 'ECB Interest Rate Decision', 3, null, '4.25%', '4.25%', 'TradingEconomics'),
-    ('2025-09-27 10:00:00+00', 'CN', 'CNY', 'Manufacturing PMI', 2, '50.1', '49.8', '49.5', 'TradingEconomics'),
-    ('2025-09-28 14:00:00+00', 'US', 'BTC', 'Ethereum Hard Fork', 2, null, null, null, 'Cointelegraph');
-
--- database/init_tables.sql (добавь в конец файла)
-
--- 1) Таблица событий (если ещё не создана)
+-- =========================
+-- Таблица событий
+-- =========================
+-- Поддерживаем текущую логику: в коде upsert идёт по "event_id",
+-- поэтому добавляем его как уникальное поле. Сохраняем также surrogate PK "id".
 CREATE TABLE IF NOT EXISTS events (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    event_time TIMESTAMPTZ NOT NULL,         -- UTC
-    country TEXT,                             -- код страны (пример: us, gb, eu)
-    currency TEXT,                            -- USD, EUR и т.п.
-    title TEXT NOT NULL,
-    importance INT,                           -- 1=Low, 2=Medium, 3=High
-    fact TEXT,
-    forecast TEXT,
-    previous TEXT,
-    created_at TIMESTAMPTZ DEFAULT now()
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id     text UNIQUE,                                -- уникальный ключ для upsert (hash title|country|time)
+  event_time   timestamptz NOT NULL,                       -- UTC
+  country      text,                                       -- например: US, EU, CN
+  country_code text,                                       -- нормализованный ISO-код (2–3 символа)
+  currency     text,                                       -- USD, EUR, BTC и т.д.
+  title        text NOT NULL,
+  importance   int  CHECK (importance BETWEEN 1 AND 3),    -- 1..3 звезды
+  priority     text,                                       -- low / medium / high (оригинальная градация парсера)
+  fact         text,
+  forecast     text,
+  previous     text,
+  source       text,
+  created_at   timestamptz DEFAULT now()
 );
 
--- 2) Уникальный ключ для дедупликации
+-- На случай, если таблица events уже была создана раньше — дублирующие ADD IF NOT EXISTS
+ALTER TABLE events ADD COLUMN IF NOT EXISTS event_id     text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS country_code text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS priority     text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS importance   int;
+
+-- Уникальный индекс, чтобы upsert по event_id работал
+CREATE UNIQUE INDEX IF NOT EXISTS uniq_events_event_id ON events (event_id);
+
+-- Контроль формата country_code (2–3 символа, допускаем EU и т.п.)
 DO $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes
-        WHERE schemaname = 'public'
-          AND indexname = 'uniq_events_time_title_country'
-    ) THEN
-        CREATE UNIQUE INDEX uniq_events_time_title_country
-        ON events (event_time, title, COALESCE(country, ''));
-    END IF;
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'events_country_code_check'
+  ) THEN
+    ALTER TABLE events
+    ADD CONSTRAINT events_country_code_check
+      CHECK (country_code IS NULL OR char_length(country_code) BETWEEN 2 AND 3);
+  END IF;
 END $$;
 
--- Добавляем колонку для ISO-кода страны (для флагов)
-ALTER TABLE events
-ADD COLUMN IF NOT EXISTS country_code TEXT;
+-- Полезные индексы
+CREATE INDEX IF NOT EXISTS idx_events_time_desc   ON events (event_time DESC);
+CREATE INDEX IF NOT EXISTS idx_events_country     ON events (country);
+CREATE INDEX IF NOT EXISTS idx_events_country_code ON events (country_code);
+CREATE INDEX IF NOT EXISTS idx_events_importance  ON events (importance);
+CREATE INDEX IF NOT EXISTS idx_events_priority    ON events (priority);
 
--- Можно сразу ограничить длину кода (2 символа для ISO или 2–3, если EU и т.п.)
-ALTER TABLE events
-ADD CONSTRAINT events_country_code_check CHECK (
-    country_code IS NULL OR char_length(country_code) BETWEEN 2 AND 3
-);
+-- Доп. индекс для дедупликации/поиска схожих событий (не unique, т.к. есть event_id)
+CREATE INDEX IF NOT EXISTS idx_events_time_title_country
+  ON events (event_time, title, COALESCE(country, ''));
