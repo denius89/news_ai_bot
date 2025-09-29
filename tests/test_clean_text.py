@@ -5,12 +5,14 @@ from utils.clean_text import clean_text, extract_text, clean_for_telegram
 # --- Тесты для clean_text ---
 def test_clean_text_removes_html_tags():
     html = "<p>Hello <b>World</b></p>"
-    assert clean_text(html) == "Hello World"
+    cleaned = clean_text(html)
+    assert cleaned == "Hello World"
 
 
 def test_clean_text_normalizes_spaces():
     html = "<div>  Hello   World  </div>"
-    assert clean_text(html) == "Hello World"
+    cleaned = clean_text(html)
+    assert cleaned == "Hello World"
 
 
 def test_clean_text_empty_input():
@@ -37,7 +39,7 @@ def test_clean_for_telegram_removes_doctype_and_html():
     assert "<!doctype" not in cleaned.lower()
     assert "<html" not in cleaned.lower()
     assert "<body" not in cleaned.lower()
-    assert "<b>Title</b>" in cleaned
+    assert "<b>Title</b>" in cleaned  # <h2> → <b>
     assert "Text" in cleaned
 
 
@@ -46,7 +48,7 @@ def test_clean_for_telegram_paragraphs_and_breaks():
     cleaned = clean_for_telegram(raw)
     assert "First" in cleaned
     assert "Second" in cleaned
-    assert "\n" in cleaned
+    assert "\n" in cleaned  # переносы сохранены
 
 
 def test_clean_for_telegram_lists():
@@ -54,15 +56,20 @@ def test_clean_for_telegram_lists():
     cleaned = clean_for_telegram(raw)
     assert "• Item 1" in cleaned
     assert "• Item 2" in cleaned
-    assert "<li>" not in cleaned
+    assert "<li>" not in cleaned  # теги списка удалены
+    assert "<ul>" not in cleaned
+    assert "<ol>" not in cleaned
 
 
 def test_clean_for_telegram_removes_tables_and_media():
     raw = "<table><tr><td>Cell</td></tr></table><img src='x.png'>Video<iframe></iframe>"
     cleaned = clean_for_telegram(raw)
-    assert "Cell" not in cleaned
+    assert "Cell" not in cleaned  # содержимое таблицы удалено
+    assert "<table>" not in cleaned
+    assert "<td>" not in cleaned
     assert "img" not in cleaned
     assert "iframe" not in cleaned
+    assert "Video" in cleaned  # обычный текст "Video" остаётся
 
 
 def test_clean_for_telegram_keeps_supported_tags():

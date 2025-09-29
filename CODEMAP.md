@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-29 13:16:54 UTC_
+_Generated on 2025-09-29 13:51:54 UTC_
 
 ```
 ├── .github/
@@ -89,6 +89,7 @@ _Generated on 2025-09-29 13:16:54 UTC_
 │   ├── fix_old_news.py
 │   ├── repo_map.py
 │   └── show_news.py
+├── .coverage
 ├── .editorconfig
 ├── .env.example
 ├── .gitignore
