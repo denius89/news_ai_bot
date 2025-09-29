@@ -148,4 +148,6 @@ if __name__ == "__main__":
     start = datetime.fromisoformat(args.start) if args.start else None
     end = datetime.fromisoformat(args.end) if args.end else None
 
-    print(generate_digest(limit=args.limit, ai=args.ai, category=args.category, start=start, end=end))
+    print(
+        generate_digest(limit=args.limit, ai=args.ai, category=args.category, start=start, end=end)
+    )
