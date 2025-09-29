@@ -187,35 +187,6 @@ def upsert_event(items: list[dict]):
 upsert_events = upsert_event
 
 
-# --- Получение последних новостей ---
-def get_latest_news(source: str | None = None, limit: int = 10):
-    """Возвращает последние новости из БД. Если указан source — фильтруем по источнику."""
-    if not supabase:
-        logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
-        return []
-
-    query = (
-        supabase.table("news")
-        .select("id, title, content, link, published_at, source, category, credibility, importance")
-        .order("published_at", desc=True)
-        .limit(limit)
-    )
-
-    if source:
-        query = query.eq("source", source)
-
-    try:
-        data = query.execute().data or []
-        for item in data:
-            title = item.get("title")
-            if not title or not title.strip():
-                item["title"] = item.get("source") or "Без названия"
-        return data
-    except Exception as e:
-        logger.error(f"Ошибка при получении новостей: {e}")
-        return []
-
-
 def get_latest_events(limit: int = 10):
     """Возвращает последние события из БД (таблица events)."""
     if not supabase:
@@ -252,7 +223,7 @@ def get_latest_events(limit: int = 10):
     except Exception as e:
         logger.error(f"Ошибка при получении событий: {e}")
         logger.warning(f"Ошибка при AI-аннотации: {e}")
-    return news_item
+        return []
 
 
 # --- Получение последних новостей ---
