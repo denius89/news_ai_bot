@@ -94,7 +94,7 @@ async def cb_digest_ai(query: types.CallbackQuery):
             return
 
         # 🚨 Telegram ограничение — 4096 символов → режем на куски
-        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
+        chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
                 await query.message.edit_text(
