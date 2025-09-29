@@ -1,7 +1,6 @@
 # telegram_bot/handlers/digest_ai.py
 import logging
 from datetime import datetime, time, timedelta, timezone
-from typing import Optional
 
 import pytz
 from aiogram import types, Router, F
@@ -34,7 +33,13 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
             [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_category:{cat}")]
             for cat, label in CATEGORIES.items()
         ]
-        + [[types.InlineKeyboardButton(text="📚 Все категории", callback_data="digest_ai_category:all")]]
+        + [
+            [
+                types.InlineKeyboardButton(
+                    text="📚 Все категории", callback_data="digest_ai_category:all"
+                )
+            ]
+        ]
         + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")]]
     )
 
@@ -43,9 +48,21 @@ def build_period_keyboard(category: str) -> types.InlineKeyboardMarkup:
     """Клавиатура выбора периода для выбранной категории"""
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text="📅 Сегодня", callback_data=f"digest_ai_period:today:{category}")],
-            [types.InlineKeyboardButton(text="📅 Последние 7 дней", callback_data=f"digest_ai_period:7d:{category}")],
-            [types.InlineKeyboardButton(text="📅 Последние 30 дней", callback_data=f"digest_ai_period:30d:{category}")],
+            [
+                types.InlineKeyboardButton(
+                    text="📅 Сегодня", callback_data=f"digest_ai_period:today:{category}"
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="📅 Последние 7 дней", callback_data=f"digest_ai_period:7d:{category}"
+                )
+            ],
+            [
+                types.InlineKeyboardButton(
+                    text="📅 Последние 30 дней", callback_data=f"digest_ai_period:30d:{category}"
+                )
+            ],
             [types.InlineKeyboardButton(text="⬅️ Назад", callback_data="digest_ai")],
         ]
     )
@@ -126,7 +143,7 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
             return
 
         # 🚨 Telegram ограничение — 4096 символов → режем на куски
-        chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
+        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
                 await query.message.edit_text(
