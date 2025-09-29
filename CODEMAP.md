@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-29 12:00:30 UTC_
+_Generated on 2025-09-29 13:16:54 UTC_
 
 ```
 ├── .github/
@@ -30,7 +30,9 @@ _Generated on 2025-09-29 12:00:30 UTC_
 ├── digests/
 │   ├── __init__.py
 │   ├── ai_summary.py
-│   └── generator.py
+│   ├── configs.py
+│   ├── generator.py
+│   └── prompts.py
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── COMMUNICATION.md
