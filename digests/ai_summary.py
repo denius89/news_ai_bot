@@ -77,7 +77,10 @@ def generate_batch_summary(
 
     # Подготовка данных
     text_block = "\n".join(
-        [f"{i+1}. {item.get('title')}: {(item.get('content') or '')[:400]}" for i, item in enumerate(news_items)]
+        [
+            f"{i+1}. {item.get('title')}: {(item.get('content') or '')[:400]}"
+            for i, item in enumerate(news_items)
+        ]
     )
     links_block = "\n".join(
         [f"- {item.get('title')}: {item.get('link')}" for item in news_items if item.get("link")]

@@ -1,5 +1,5 @@
+# telegram_bot/handlers/digest_ai.py
 import logging
-from datetime import datetime, timedelta, timezone, time
 
 import pytz
 from aiogram import types, Router, F
@@ -7,13 +7,14 @@ from aiogram.filters import Command
 
 from digests.generator import generate_digest
 from telegram_bot.keyboards import back_inline_keyboard
-from digests.configs import CATEGORIES, PERIODS, STYLES
+from digests.configs import CATEGORIES, PERIODS, STYLES  # ✅ берём из configs.py
 from utils.clean_text import clean_for_telegram  # ✅ импортируем хелпер
 
 router = Router()
 logger = logging.getLogger("digest_ai")
 
 LOCAL_TZ = pytz.timezone("Europe/Kyiv")
+
 
 # ---------- Клавиатуры ----------
 def build_category_keyboard() -> types.InlineKeyboardMarkup:
@@ -22,7 +23,13 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
             [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_category:{cat}")]
             for cat, label in CATEGORIES.items()
         ]
-        + [[types.InlineKeyboardButton(text="📚 Все категории", callback_data="digest_ai_category:all")]]
+        + [
+            [
+                types.InlineKeyboardButton(
+                    text="📚 Все категории", callback_data="digest_ai_category:all"
+                )
+            ]
+        ]
         + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")]]
     )
 
@@ -30,7 +37,11 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
 def build_period_keyboard(category: str) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_period:{period}:{category}")]
+            [
+                types.InlineKeyboardButton(
+                    text=label, callback_data=f"digest_ai_period:{period}:{category}"
+                )
+            ]
             for period, label in PERIODS.items()
         ]
         + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data="digest_ai")]]
@@ -40,10 +51,20 @@ def build_period_keyboard(category: str) -> types.InlineKeyboardMarkup:
 def build_style_keyboard(category: str, period: str) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_style:{style}:{category}:{period}")]
+            [
+                types.InlineKeyboardButton(
+                    text=label, callback_data=f"digest_ai_style:{style}:{category}:{period}"
+                )
+            ]
             for style, label in STYLES.items()
         ]
-        + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data=f"digest_ai_period:{period}:{category}")]]
+        + [
+            [
+                types.InlineKeyboardButton(
+                    text="⬅️ Назад", callback_data=f"digest_ai_period:{period}:{category}"
+                )
+            ]
+        ]
     )
 
 
@@ -99,13 +120,13 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
     try:
         text = generate_digest(ai=True, category=category, limit=20, style=style)
-        text = clean_for_telegram(text)  # ✅ теперь берём из utils
+        text = clean_for_telegram(text)  # ✅ чистим перед отправкой
 
         if not text or text.strip() == "":
             await query.message.edit_text("📭 Нет новостей по выбранной категории/периоду.")
             return
 
-        chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
+        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
                 await query.message.edit_text(
