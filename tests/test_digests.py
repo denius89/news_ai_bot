@@ -2,21 +2,42 @@
 Тесты для генерации дайджестов.
 """
 
-from digests.generator import generate_digest
+import pytest
+from digests import generator
 
 
-def test_generate_digest_basic():
-    """Проверка: генерация дайджеста возвращает строку и не пустая."""
-    items = [{"title": "News 1", "content": "Content"}]
-    result = generate_digest(items)
+@pytest.mark.unit
+def test_generate_digest_no_news(monkeypatch):
+    """Если новостей нет → должна вернуться заглушка"""
+    monkeypatch.setattr(generator, "fetch_recent_news", lambda *a, **k: [])
+    result = generator.generate_digest(limit=5, ai=False)
 
-    # Базовые проверки
     assert isinstance(result, str)
-    assert result.strip() != ""
+    assert "Сегодня новостей нет" in result
 
-    # Если новостей нет → должна быть фраза "Сегодня"
-    if "Сегодня" in result:
-        assert "новостей" in result
-    else:
-        # Иначе — в дайджесте должны быть заголовки или тексты из items
-        assert any(val in result for val in ("News", "Content"))
+
+@pytest.mark.unit
+def test_generate_digest_with_news(monkeypatch):
+    """Если есть новости → должны попасть в результат"""
+    fake_news = [
+        {
+            "title": "News 1",
+            "content": "Content 1",
+            "link": "http://example.com/1",
+            "published_at_fmt": "01 Jan 2025, 12:00",
+        },
+        {
+            "title": "News 2",
+            "content": "Content 2",
+            "link": None,
+            "published_at_fmt": "01 Jan 2025, 13:00",
+        },
+    ]
+
+    monkeypatch.setattr(generator, "fetch_recent_news", lambda *a, **k: fake_news)
+    result = generator.generate_digest(limit=2, ai=False)
+
+    assert isinstance(result, str)
+    assert "News 1" in result
+    assert "News 2" in result
+    assert "<b>News 1</b>" in result  # проверка HTML-формата

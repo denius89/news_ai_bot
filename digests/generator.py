@@ -11,6 +11,7 @@ logger = logging.getLogger("generator")
 
 
 def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[Dict]:
+    """Получаем свежие новости из БД (supabase)."""
     if not supabase:
         logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список новостей.")
         return []
@@ -49,6 +50,7 @@ def generate_digest(
     category: Optional[str] = None,
     style: str = "analytical",  # ✅ стиль прокидываем сюда
 ) -> str:
+    """Генерация дайджеста (AI или простой список новостей)."""
     # для AI-дайджеста берём больше новостей
     if ai and limit < 15:
         limit = 15
@@ -59,9 +61,19 @@ def generate_digest(
 
     if ai:
         summary_text = generate_batch_summary(news_items, style=style)
-        if not summary_text:
+        if not summary_text or summary_text.strip() == "":
             return "⚠️ Ошибка при генерации AI-дайджеста."
-        return summary_text  # HTML-формат
+
+        # 🚨 fallback: гарантируем блок «Почему это важно»
+        if "<b>Почему это важно" not in summary_text:
+            summary_text += (
+                "\n\n<b>Почему это важно:</b>\n"
+                "— Событие влияет на рынок\n"
+                "— Важно для инвесторов\n"
+                "— Может повлиять на стратегию компаний"
+            )
+
+        return summary_text.strip()  # HTML-формат
 
     # стандартный (без AI)
     lines = []

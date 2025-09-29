@@ -2,8 +2,12 @@
 Тесты для AI-модулей credibility и importance.
 """
 
+import pytest
+
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
+
+pytestmark = pytest.mark.unit  # ✅ помечаем все тесты в файле как unit
 
 
 def test_credibility_basic():
