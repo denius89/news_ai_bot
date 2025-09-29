@@ -2,10 +2,11 @@
 import os
 import json
 import logging
-from typing import List, Dict
+from typing import List, Dict, Union
 
 from openai import OpenAI
-from digests.prompts import PROMPTS  # ✅ все промты централизованно
+from digests.prompts import PROMPTS
+from utils.formatters import format_digest_output  # ✅ новый универсальный форматтер
 
 logger = logging.getLogger("ai_summary")
 
@@ -26,14 +27,17 @@ def get_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
-def generate_summary_why_important(
+def generate_summary_why_important_json(
     news_item: Dict,
     max_tokens: int = 400,
     style: str = "why_important",
 ) -> Dict:
     """
-    Резюме + «Почему важно» (до 3 пунктов).
-    Работает через PROMPTS["why_important"] или кастомный стиль.
+    Возвращает JSON-аннотацию новости:
+    {
+      "summary": "короткое резюме",
+      "why_important": ["п1", "п2", "п3"]
+    }
     """
     title = news_item.get("title") or "Без названия"
     content = news_item.get("content") or news_item.get("summary") or ""
@@ -60,8 +64,20 @@ def generate_summary_why_important(
             "why_important": data.get("why_important", [])[:3],
         }
     except Exception as e:
-        logger.error(f"Ошибка при AI-аннотации: {e}", exc_info=True)
+        logger.error(f"Ошибка при JSON-аннотации: {e}", exc_info=True)
         return {"summary": title, "why_important": []}
+
+
+def generate_summary_why_important(
+    news_item: Dict,
+    max_tokens: int = 400,
+    style: str = "why_important",
+) -> str:
+    """
+    Формирует текстовый блок для Telegram, используя форматтер.
+    """
+    data = generate_summary_why_important_json(news_item, max_tokens, style)
+    return format_digest_output(data, style="why_important")
 
 
 def generate_batch_summary(
@@ -98,7 +114,8 @@ def generate_batch_summary(
             max_tokens=max_tokens,
             temperature=_TEMPS.get(style, 0.7),
         )
-        return response.choices[0].message.content.strip()
+        raw_text: Union[str, Dict] = response.choices[0].message.content.strip()
+        return format_digest_output(raw_text, style=style)
     except Exception as e:
         logger.error(f"Ошибка при batch-аннотации: {e}", exc_info=True)
         return "⚠️ Ошибка генерации AI-дайджеста."

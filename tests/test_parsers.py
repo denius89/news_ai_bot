@@ -2,6 +2,7 @@
 Тесты для парсеров rss_parser и events_parser.
 """
 
+import pytest
 from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 
@@ -10,18 +11,21 @@ from parsers.rss_parser import normalize_date, fetch_rss
 from parsers.events_parser import normalize_datetime, make_event_id
 
 
+@pytest.mark.unit
 def test_rss_clean_text():
     html = "<p>Hello <b>world</b></p>"
     result = clean_text(html)
     assert result == "Hello world"
 
 
+@pytest.mark.unit
 def test_rss_normalize_date():
     iso_date = "2025-09-24T10:00:00Z"
     result = normalize_date(iso_date)
     assert result.isoformat().startswith("2025-09-24")
 
 
+@pytest.mark.unit
 def test_events_clean_text():
     html = "<div>GDP <i>growth</i></div>"
     soup = BeautifulSoup(html, "html.parser")
@@ -30,6 +34,7 @@ def test_events_clean_text():
     assert "growth" in result
 
 
+@pytest.mark.unit
 def test_events_normalize_datetime():
     day = datetime.strptime("2025-09-24", "%Y-%m-%d").date()
     time_str = "10:30"
@@ -41,6 +46,7 @@ def test_events_normalize_datetime():
     assert result.minute == 30
 
 
+@pytest.mark.unit
 def test_events_normalize_datetime_all_day():
     day = datetime.strptime("2025-09-24", "%Y-%m-%d").date()
     result = normalize_datetime(day, "All day")
@@ -49,6 +55,7 @@ def test_events_normalize_datetime_all_day():
     assert result.tzinfo == timezone.utc
 
 
+@pytest.mark.unit
 def test_events_normalize_datetime_tentative():
     day = datetime.strptime("2025-09-24", "%Y-%m-%d").date()
     result = normalize_datetime(day, "Tentative")
@@ -57,18 +64,21 @@ def test_events_normalize_datetime_tentative():
     assert result.tzinfo == timezone.utc
 
 
+@pytest.mark.unit
 def test_make_event_id_stability():
     id1 = make_event_id("2025-09-24", "GDP Growth", "US")
     id2 = make_event_id("2025-09-24", "GDP Growth", "US")
     assert id1 == id2  # одинаковые данные → одинаковый uid
 
 
+@pytest.mark.unit
 def test_make_event_id_difference():
     id1 = make_event_id("2025-09-24", "GDP Growth", "US")
     id2 = make_event_id("2025-09-24", "Inflation", "US")
     assert id1 != id2  # разные события → разные uid
 
 
+@pytest.mark.unit
 def test_fetch_rss_dedup(monkeypatch):
     """Проверка, что одинаковые новости не дублируются."""
 
@@ -98,6 +108,7 @@ def test_fetch_rss_dedup(monkeypatch):
     assert items[0]["summary"] == "Summary"
 
 
+@pytest.mark.unit
 def test_fetch_rss_two_different(monkeypatch):
     """Проверка, что разные новости сохраняются обе."""
 

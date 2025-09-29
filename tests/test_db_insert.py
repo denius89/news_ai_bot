@@ -6,6 +6,8 @@ from parsers.rss_parser import fetch_rss
 
 @pytest.mark.integration
 def test_insert_news():
+    """Интеграционный тест: загрузка новостей из RSS и вставка в БД"""
+
     sources = {
         "Yahoo": {
             "url": "https://news.yahoo.com/rss/",
@@ -19,14 +21,18 @@ def test_insert_news():
         },
     }
 
+    # берём максимум по 2 новости на источник
     items = fetch_rss(sources, per_source_limit=2)
     assert isinstance(items, list)
     assert len(items) > 0
 
-    # фикс: передаём одну новость, а не список
-    upsert_news(items[0])
-    print("✅ Новости добавлены в базу (интеграционный тест)")
+    # проверяем вставку нескольких новостей
+    for item in items[:3]:  # ограничим до 3, чтобы не перегружать базу
+        upsert_news(item)
+
+    print(f"✅ Добавлено {min(len(items), 3)} новостей в базу (интеграционный тест)")
 
 
 if __name__ == "__main__":
+    # запуск без pytest
     test_insert_news()

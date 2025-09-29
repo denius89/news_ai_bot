@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-29 13:51:54 UTC_
+_Generated on 2025-09-29 15:16:29 UTC_
 
 ```
 ├── .github/
@@ -76,6 +76,7 @@ _Generated on 2025-09-29 13:51:54 UTC_
 │   ├── test_deepl.py
 │   ├── test_digests.py
 │   ├── test_events_parser.py
+│   ├── test_generator.py
 │   ├── test_main.py
 │   ├── test_main_import.py
 │   ├── test_openai.py
