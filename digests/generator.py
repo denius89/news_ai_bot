@@ -1,6 +1,5 @@
 import argparse
 import logging
-from typing import List, Dict
 from datetime import datetime
 
 from database.db_models import supabase
