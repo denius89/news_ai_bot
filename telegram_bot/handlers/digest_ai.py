@@ -10,6 +10,8 @@ from database.db_models import supabase
 from digests.generator import generate_digest
 from telegram_bot.keyboards import back_inline_keyboard
 
+from typing import Optional
+
 router = Router()
 logger = logging.getLogger("digest_ai")
 
@@ -92,7 +94,7 @@ async def cb_digest_ai(query: types.CallbackQuery):
             return
 
         # 🚨 Telegram ограничение — 4096 символов → режем на куски
-        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
+        chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
                 await query.message.edit_text(
@@ -114,7 +116,7 @@ async def cb_digest_ai(query: types.CallbackQuery):
 
 
 # (Опционально — можно оставить для будущей фильтрации по дате)
-def fetch_today_news(category: str | None = None, limit: int = 30) -> list[dict]:
+def fetch_today_news(category: Optional[str] = None, limit: int = 30) -> list[dict]:
     """Достаём все новости за текущий день (с опциональной категорией)."""
     now_local = datetime.now(LOCAL_TZ)
     today_start = LOCAL_TZ.localize(datetime.combine(now_local.date(), time.min)).astimezone(
