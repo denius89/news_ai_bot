@@ -16,7 +16,6 @@ app = Flask(__name__)
 app.config["VERSION"] = VERSION
 
 
-
 # 🔥 Фильтр для отображения иконок важности
 def importance_icon(value: float) -> str:
     if value is None:
