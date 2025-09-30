@@ -1,87 +1,246 @@
-# 🤝 Contributing Guide
+# Contributing to PulseAI
 
-Спасибо, что хотите помочь развивать **PulseAI**!  
-Этот проект открыт для pull requests, предложений и улучшений.
+Thank you for your interest in contributing to **PulseAI**!  
+This project is open to pull requests, suggestions, and improvements.
 
----
+## Table of Contents
 
-## 📌 Как начать
+- [Getting Started](#getting-started)
+- [Development Setup](#development-setup)
+- [Testing](#testing)
+- [Code Style](#code-style)
+- [Git Workflow](#git-workflow)
+- [Pull Request Process](#pull-request-process)
+- [Documentation](#documentation)
+- [Tips](#tips)
+- [License](#license)
 
-1. **Форкните** репозиторий и клонируйте его:
+## Getting Started
+
+1. **Fork and Clone**
    ```bash
-   git clone https://github.com/<ваш-аккаунт>/news_ai_bot.git
+   git clone https://github.com/<your-username>/news_ai_bot.git
    cd news_ai_bot
    ```
 
-2.	**Создайте виртуальное окружение** и установите зависимости:
-	```bash
-	python -m venv venv
-	source venv/bin/activate   # macOS/Linux
-	venv\Scripts\activate      # Windows
-	pip install -r requirements.txt
-	```
+2. **Create Virtual Environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # macOS/Linux
+   venv\Scripts\activate      # Windows
+   pip install -r requirements.txt
+   ```
 
-3.	Настройте переменные окружения:
-- скопируйте .env.example → .env
-- добавьте ключи для **Supabase, OpenAI, DeepL**
+3. **Environment Setup**
+   - Copy `.env.example` → `.env`
+   - Add keys for **Supabase, OpenAI, DeepL**
 
----
+## Development Setup
 
-## 🧪 Тесты
+### Prerequisites
+- Python 3.11+
+- Git
+- Supabase account
+- OpenAI API key (optional)
+- DeepL API key (optional)
 
-Запуск **unit-тестов**:
+### Quick Start
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run tests
+pytest -m "not integration"
+
+# Start web application
+python webapp.py
+
+# Run Telegram bot
+python -m telegram_bot.bot
+```
+
+### Development Commands
+```bash
+# Run all checks
+make check
+
+# Format code
+make format
+
+# Run linter
+make lint
+
+# Run tests
+make test
+```
+
+## Testing
+
+### Unit Tests (Fast)
 ```bash
 pytest -m "not integration"
 ```
-Запуск **интеграционных тестов** (требуют реальных ключей):
+
+### Integration Tests (Requires API Keys)
 ```bash
 pytest -m "integration"
 ```
 
----
-
-## 🧹 Стиль кода
-
-Мы используем **flake8** и **black**:
-
+### Test Coverage
 ```bash
-flake8 .
-black --check .
+pytest --cov --cov-report=term-missing
 ```
-Автоформатирование:
+
+### Writing Tests
+- Place tests in `tests/` directory
+- Use descriptive test names
+- Include both positive and negative test cases
+- Mock external dependencies when possible
+
+## Code Style
+
+### Linting and Formatting
+We use **flake8** and **black**:
+
 ```bash
+# Check code style
+flake8 .
+
+# Check formatting
+black --check .
+
+# Auto-format code
 black .
 ```
 
----
+### Code Standards
+- Follow PEP 8 style guidelines
+- Use type hints where appropriate
+- Write descriptive docstrings
+- Keep functions small and focused
+- Use meaningful variable names
 
-## 🔀 Git flow
+### Import Organization
+```python
+# Standard library imports
+import os
+import sys
 
-- Ветки называем по формату:
+# Third-party imports
+import requests
+from flask import Flask
 
-day-XX-feature-name
-fix/bug-description
-docs/update-readme
+# Local imports
+from models.news import NewsItem
+from services.digest_service import DigestService
+```
 
+## Git Workflow
 
-- Сообщения коммитов:
+### Branch Naming
+- **Feature branches:** `feature/description`
+- **Bug fixes:** `fix/bug-description`
+- **Documentation:** `docs/update-readme`
+- **Daily work:** `day-XX-feature-name`
 
-feat: добавил поддержку фильтров
-fix: исправил баг в rss_parser
-docs: обновил README.md
-chore: обновил CI pipeline
+### Commit Messages
+Use conventional commit format:
 
+```
+feat: add support for topic filters
+fix: resolve bug in rss_parser
+docs: update README.md
+chore: update CI pipeline
+test: add tests for new feature
+refactor: improve code structure
+```
 
-- Перед PR убедитесь, что CI зелёный ✅
+### Pre-commit Checklist
+- [ ] Code follows style guidelines
+- [ ] Tests pass locally
+- [ ] Documentation updated
+- [ ] No breaking changes without notice
+- [ ] Commit message is descriptive
 
-## 💡 Советы
+## Pull Request Process
 
-- Все задачи фиксируйте в `TASKS.md`.  
-- Важные решения заносите в `MASTER_FILE.md`.  
-- Если добавляете новые файлы → автохук обновит `CODEMAP.md`.  
+### Before Submitting
+1. **Ensure CI is green** ✅
+2. **Update documentation** if needed
+3. **Add tests** for new features
+4. **Update TASKS.md** if applicable
 
----
+### PR Template
+```markdown
+## Description
+Brief description of changes
 
-## 📜 Лицензия
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Documentation update
+- [ ] Refactoring
 
-Проект распространяется под лицензией [MIT](LICENSE).
+## Testing
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manual testing completed
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] No breaking changes
+```
+
+### Review Process
+- Maintainers will review within 48 hours
+- Address feedback promptly
+- Keep PRs focused and small
+- Use draft PRs for work in progress
+
+## Documentation
+
+### Document Updates
+- **README.md** — Project overview and quick start
+- **docs/** — Detailed technical documentation
+- **TASKS.md** — Current tasks and backlog
+- **MASTER_FILE.md** — Project rules and decisions
+
+### Documentation Standards
+- Use clear, concise language
+- Include code examples where helpful
+- Keep documentation up to date
+- Use consistent formatting
+
+## Tips
+
+### Project Structure
+- **Tasks** — Document in `TASKS.md`
+- **Decisions** — Record in `MASTER_FILE.md`
+- **New files** — Auto-hook updates `CODEMAP.md`
+
+### Development Workflow
+1. **Check current tasks** in `TASKS.md`
+2. **Review project rules** in `MASTER_FILE.md`
+3. **Create feature branch** from `main`
+4. **Implement changes** with tests
+5. **Update documentation** as needed
+6. **Submit pull request**
+
+### Getting Help
+- Check existing issues and discussions
+- Ask questions in GitHub Discussions
+- Review documentation in `docs/`
+- Look at existing code for examples
+
+### Common Issues
+- **Import errors** — Check virtual environment activation
+- **Test failures** — Verify environment variables
+- **Style issues** — Run `black .` and `flake8 .`
+- **Documentation** — Keep docs in sync with code
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).  
+By contributing, you agree that your contributions will be licensed under the same license.
