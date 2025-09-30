@@ -6,7 +6,9 @@ import logging
 from flask import Blueprint, render_template, request
 
 from services.digest_service import build_daily_digest
-from database.db_models import get_latest_events  # пока оставим здесь (можно позже вынести в EventsService)
+from database.db_models import (
+    get_latest_events,
+)  # пока оставим здесь (можно позже вынести в EventsService)
 
 logger = logging.getLogger(__name__)
 
