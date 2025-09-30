@@ -1,7 +1,6 @@
-# 📝 TASKS (last updated: 2025-10-01 14:42:53)
+# 📝 TASKS (last updated: 2025-10-01 15:30:00)
 
-
-_Last updated: 2025-09-30 16:30:00_
+_Last updated: 2025-10-01 15:30:00_
 
 ## Table of Contents
 
@@ -124,12 +123,42 @@ Complete refactoring to Pydantic models, centralized services, and comprehensive
 
 ---
 
+### Day 07 — Digest System Refactoring + Date Handling + Test Coverage ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Complete refactoring of digest system, proper datetime handling, and comprehensive test coverage with async support.
+
+**Completed:**
+- **Refactor**: вынесена логика в `DigestAIService`, упрощён `generator.py`, 
+  добавлен shim `digest_service.py`
+- **Dates**: `published_at` переведён в `datetime/timestamptz`, добавлен 
+  `utils/formatters.format_date`, обновлены модели и шаблоны
+- **Tests**: переписаны `test_digests.py`, `test_generator.py`, создан `test_ai_service.py`; 
+  покрыты позитивные, негативные и edge cases; async-тесты работают 
+  через `pytest-asyncio`; CI зелёный
+- **Architecture**: создан `digests/ai_service.py` с централизованной AI-логикой
+- **Database**: добавлена миграция для конвертации `published_at` в `timestamptz`
+- **Formatting**: исправлено форматирование дат с ведущими нулями 
+  (`%d` вместо `%-d`)
+- **Documentation**: обновлены `README.md` с Quick Start и `ARCHITECTURE.md` 
+  с диаграммой потоков данных
+
+**Acceptance Criteria:**
+- ✅ Digest system uses centralized `DigestAIService`
+- ✅ All dates properly handled as `datetime` objects
+- ✅ Comprehensive test coverage with async support
+- ✅ All tests pass including edge cases
+- ✅ Documentation updated with architecture diagrams
+
+---
+
 ## Current Tasks
 
 ### Data Model Refinement 🟡
 **Priority:** 🟡  
 **Context:**  
-Уточнить модель данных для NewsItem и EventItem, особенно обработку published_at как datetime.
+Уточнить модель данных для NewsItem и EventItem, особенно обработку 
+published_at как datetime.
 
 **Subtasks:**
 - [ ] Проверить корректность парсинга ISO 8601 дат в Pydantic моделях
@@ -146,7 +175,8 @@ Complete refactoring to Pydantic models, centralized services, and comprehensive
 ### Test Coverage Enhancement 🟡
 **Priority:** 🟡  
 **Context:**  
-Доработать тесты: покрыть кейсы с пустыми данными и ошибками Supabase.
+Доработать тесты: покрыть кейсы с пустыми данными и ошибками 
+Supabase.
 
 **Subtasks:**
 - [ ] Добавить тесты для пустых результатов из Supabase

@@ -11,6 +11,7 @@
 
 - [Features](#features)
 - [Project Structure](#project-structure)
+- [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
@@ -53,6 +54,19 @@
 ├── webapp.py          # Flask-приложение
 └── main.py            # CLI-обработка новостей
 ```
+
+## Quick Start
+
+1. Скопируй `.env.example` в `.env` и заполни токены (OpenAI, Supabase, Telegram).
+2. Установи зависимости: `pip install -r requirements.txt`.
+3. Запусти бота: `make run-bot`.
+
+### Dev
+- Линтер: `make lint`
+- Форматирование: `make format`
+- Тесты: `make test`
+
+Проект тестируется через pytest и поддерживает async (pytest-asyncio).
 
 ## Installation
 

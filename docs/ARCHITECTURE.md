@@ -80,25 +80,78 @@ flowchart TD
 
 ## Data Flow Diagram
 
+**Поток данных:**
+Telegram → Handlers → Services → Repositories → Supabase
+
 ```mermaid
-flowchart LR
-    A["📥 Data Sources<br/>RSS, Websites, Calendars"] --> B["⚙️ Parsers<br/>rss_parser.py<br/>events_parser.py"]
-    B --> C["🧹 Data Cleaning<br/>clean_text.py<br/>deduplication"]
-    C --> D["🗄️ Database<br/>Supabase PostgreSQL<br/>news, events tables"]
-    D --> E["🤖 AI Modules<br/>credibility.py<br/>importance.py<br/>ai_summary.py"]
-    E --> F["📊 Repositories<br/>news_repository.py<br/>events_repository.py"]
-    F --> G["🔧 Services<br/>digest_service.py<br/>digest_ai_service.py"]
-    G --> H["📤 Output<br/>Telegram Bot<br/>Web App<br/>API"]
+flowchart TD
+    subgraph "User Interface"
+        TG["🤖 Telegram Bot<br/>aiogram 3.x"]
+        WEB["🌐 Web App<br/>Flask + Templates"]
+        API["📱 API Endpoints<br/>REST API"]
+    end
     
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style C fill:#e8f5e8
-    style D fill:#fff3e0
-    style E fill:#fce4ec
-    style F fill:#e0f2f1
-    style G fill:#f1f8e9
-    style H fill:#e3f2fd
+    subgraph "Application Layer"
+        HANDLERS["📋 Handlers<br/>routes/<br/>telegram_bot/handlers/"]
+        SERVICES["🔧 Services<br/>digests/ai_service.py<br/>services/digest_service.py"]
+        REPOS["📊 Repositories<br/>repositories/<br/>database/db_models.py"]
+    end
+    
+    subgraph "Data Layer"
+        DB["🗄️ Supabase<br/>PostgreSQL<br/>news, events, users"]
+    end
+    
+    subgraph "AI Layer"
+        AI_MODULES["🤖 AI Modules<br/>ai_modules/<br/>credibility, importance"]
+    end
+    
+    subgraph "Data Sources"
+        RSS["📰 RSS Feeds"]
+        EVENTS["📅 Events Calendars"]
+    end
+    
+    %% User Interface to Handlers
+    TG --> HANDLERS
+    WEB --> HANDLERS
+    API --> HANDLERS
+    
+    %% Handlers to Services
+    HANDLERS --> SERVICES
+    
+    %% Services to Repositories
+    SERVICES --> REPOS
+    
+    %% Repositories to Database
+    REPOS --> DB
+    
+    %% AI Modules integration
+    SERVICES --> AI_MODULES
+    AI_MODULES --> SERVICES
+    
+    %% Data Sources to Repositories
+    RSS --> REPOS
+    EVENTS --> REPOS
+    
+    %% Styling
+    style TG fill:#e3f2fd
+    style WEB fill:#e8f5e8
+    style API fill:#fff3e0
+    style HANDLERS fill:#f3e5f5
+    style SERVICES fill:#fce4ec
+    style REPOS fill:#e0f2f1
+    style DB fill:#ffebee
+    style AI_MODULES fill:#f1f8e9
+    style RSS fill:#e1f5fe
+    style EVENTS fill:#e1f5fe
 ```
+
+### Component Descriptions
+
+- **Handlers**: файлы в `routes/`, обработчики команд Telegram (`telegram_bot/handlers/`)
+- **Services**: бизнес-логика, например `digests/ai_service.py`, `services/digest_service.py`
+- **Repositories**: работа с БД (модели, `database/db_models.py`, `repositories/`)
+- **Supabase**: хранение новостей, пользователей, категорий
+- **AI**: модули в `ai_modules/` для оценки важности и генерации дайджестов
 
 ## Technology Stack
 
