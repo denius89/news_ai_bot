@@ -1,11 +1,13 @@
 import hashlib
 import logging
 import os
+import time
 from datetime import datetime, timezone
 from typing import List, Dict, Optional
 
+import httpx
 from dotenv import load_dotenv
-from supabase import create_client
+from supabase import create_client, Client
 
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
@@ -20,14 +22,33 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-supabase = None
+supabase: Optional[Client] = None
 if SUPABASE_URL and SUPABASE_KEY:
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    logger.info("✅ Supabase client initialized")
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        logger.info("✅ Supabase client initialized")
+    except Exception as e:
+        logger.error("❌ Ошибка инициализации Supabase: %s", e)
 else:
     logger.warning(
         "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
     )
+
+
+# --- SAFE EXECUTE (ретраи) ---
+def safe_execute(query, retries: int = 3, delay: int = 2):
+    """
+    Выполняет запрос с ретраями при сетевых ошибках Supabase/httpx.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            return query.execute()
+        except (httpx.RemoteProtocolError, httpx.ConnectError) as e:
+            logger.warning("⚠️ Попытка %s/%s: ошибка соединения %s", attempt, retries, e)
+            if attempt < retries:
+                time.sleep(delay)
+            else:
+                raise
 
 
 # --- UID для новостей ---
@@ -71,48 +92,44 @@ def upsert_news(items: List[Dict]):
         try:
             enriched = enrich_news_with_ai(item)
 
-            # 🔥 гарантируем непустой title
-            title = (enriched.get("title") or "").strip()
-            if not title:
-                title = enriched.get("source") or "Без названия"
-
-            # 🔥 content: сначала content → summary → title
+            title = (
+                (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
+            )
             content = (
                 (enriched.get("content") or "").strip()
                 or (enriched.get("summary") or "").strip()
                 or title
             )
-
             uid = make_uid(enriched.get("url", ""), title)
 
-            rows.append(
-                {
-                    "uid": uid,
-                    "title": title[:512],
-                    "content": content,
-                    "link": enriched.get("url"),
-                    "published_at": ensure_utc_iso(enriched.get("published_at"))
-                    or datetime.now(timezone.utc).isoformat(),
-                    "source": enriched.get("source"),
-                    "category": enriched.get("category"),
-                    "credibility": enriched.get("credibility"),
-                    "importance": enriched.get("importance"),
-                }
-            )
+            row = {
+                "uid": uid,
+                "title": title[:512],
+                "content": content,
+                "link": enriched.get("url"),
+                "published_at": ensure_utc_iso(enriched.get("published_at"))
+                or datetime.now(timezone.utc).isoformat(),
+                "source": enriched.get("source"),
+                "category": (enriched.get("category") or "").lower() or None,
+                "credibility": enriched.get("credibility"),
+                "importance": enriched.get("importance"),
+            }
+            logger.debug("Prepared news row: %s", row)
+            rows.append(row)
         except Exception as e:
-            logger.error(f"Ошибка подготовки новости: {e}, item={item}")
+            logger.error("Ошибка подготовки новости: %s, item=%s", e, item)
 
     if not rows:
         logger.info("Нет новостей для вставки")
         return
 
     try:
-        res = supabase.table("news").upsert(rows, on_conflict="uid").execute()
+        res = safe_execute(supabase.table("news").upsert(rows, on_conflict="uid"))
         inserted = len(res.data or [])
         logger.info("✅ Upsert news: %s prepared, %s inserted/updated", len(rows), inserted)
         return res
     except Exception as e:
-        logger.error(f"Ошибка при вставке новостей в Supabase: {e}")
+        logger.error("Ошибка при вставке новостей в Supabase: %s", e)
 
 
 # --- UPSERT событий ---
@@ -131,51 +148,49 @@ def upsert_event(items: List[Dict]):
             elif not event_time:
                 event_time = datetime.now(timezone.utc).isoformat()
 
-            # нормализуем country_code через COUNTRY_MAP
             country_raw = (item.get("country") or "").lower()
             country_code = COUNTRY_MAP.get(country_raw)
-
             event_id = make_event_id(item.get("title", ""), item.get("country", ""), event_time)
 
-            rows.append(
-                {
-                    "event_id": event_id,
-                    "event_time": event_time,
-                    "country": item.get("country"),
-                    "currency": item.get("currency"),
-                    "title": item.get("title"),
-                    "importance": item.get("importance"),
-                    "priority": item.get("priority"),
-                    "fact": item.get("fact"),
-                    "forecast": item.get("forecast"),
-                    "previous": item.get("previous"),
-                    "source": item.get("source", "investing"),
-                    "country_code": country_code,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                }
-            )
+            row = {
+                "event_id": event_id,
+                "event_time": event_time,
+                "country": item.get("country"),
+                "currency": item.get("currency"),
+                "title": item.get("title"),
+                "importance": item.get("importance"),
+                "priority": item.get("priority"),
+                "fact": item.get("fact"),
+                "forecast": item.get("forecast"),
+                "previous": item.get("previous"),
+                "source": item.get("source", "investing"),
+                "country_code": country_code,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+            logger.debug("Prepared event row: %s", row)
+            rows.append(row)
         except Exception as e:
-            logger.error(f"Ошибка подготовки события: {e}, item={item}")
+            logger.error("Ошибка подготовки события: %s, item=%s", e, item)
 
     if not rows:
         logger.info("Нет событий для вставки")
         return
 
     try:
-        res = supabase.table("events").upsert(rows, on_conflict="event_id").execute()
+        res = safe_execute(supabase.table("events").upsert(rows, on_conflict="event_id"))
         inserted = len(res.data or [])
         logger.info("✅ Upsert events: %s prepared, %s inserted/updated", len(rows), inserted)
         return res
     except Exception as e:
-        logger.error(f"Ошибка при вставке событий в Supabase: {e}")
+        logger.error("Ошибка при вставке событий в Supabase: %s", e)
 
 
-# 👉 Алиас для совместимости
+# 👉 Алиас
 upsert_events = upsert_event
 
 
+# --- Получение событий ---
 def get_latest_events(limit: int = 10) -> List[Dict]:
-    """Возвращает последние события из БД (таблица events)."""
     if not supabase:
         logger.warning("⚠️ Supabase не подключён, get_latest_events не работает.")
         return []
@@ -190,7 +205,8 @@ def get_latest_events(limit: int = 10) -> List[Dict]:
     )
 
     try:
-        data = query.execute().data or []
+        data = safe_execute(query).data or []
+        logger.debug("get_latest_events: fetched %d rows", len(data))
         for ev in data:
             ev["event_time_fmt"] = format_datetime(ev.get("event_time"))
             try:
@@ -199,23 +215,21 @@ def get_latest_events(limit: int = 10) -> List[Dict]:
                 ev["importance"] = 0
         return data
     except Exception as e:
-        logger.error(f"Ошибка при получении событий: {e}")
+        logger.error("Ошибка при получении событий: %s", e)
         return []
 
 
+# --- Получение новостей ---
 def get_latest_news(
     source: Optional[str] = None,
     categories: Optional[List[str]] = None,
     limit: int = 10,
 ) -> List[Dict]:
-    """
-    Возвращает последние новости из БД.
-    - Если указан source → фильтруем по источнику.
-    - Если указаны categories → фильтруем по списку категорий.
-    """
     if not supabase:
         logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
         return []
+
+    logger.debug("get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
 
     query = (
         supabase.table("news")
@@ -229,13 +243,15 @@ def get_latest_news(
     if source:
         query = query.eq("source", source)
     if categories:
-        query = query.in_("category", categories)
+        cats = [c.lower() for c in categories]
+        query = query.in_("category", cats)
 
     try:
-        data = query.execute().data or []
+        data = safe_execute(query).data or []
+        logger.debug("get_latest_news: fetched %d rows", len(data))
         for row in data:
             row["published_at_fmt"] = format_datetime(row.get("published_at"))
         return data
     except Exception as e:
-        logger.error(f"Ошибка при получении новостей: {e}")
+        logger.error("Ошибка при получении новостей: %s", e)
         return []

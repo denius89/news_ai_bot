@@ -1,14 +1,12 @@
-# telegram_bot/handlers/digest_ai.py
 import logging
-
 import pytz
 from aiogram import types, Router, F
 from aiogram.filters import Command
 
-from services.digest_service import build_ai_digest  # ✅ используем сервис
+from digests.generator import generate_digest
 from telegram_bot.keyboards import back_inline_keyboard
-from digests.configs import CATEGORIES, PERIODS, STYLES  # ✅ категории/периоды/стили централизованы
-from utils.clean_text import clean_for_telegram  # ✅ защита от кривого HTML
+from digests.configs import CATEGORIES, PERIODS, STYLES
+from utils.clean_text import clean_for_telegram  # ✅ чистим текст перед отправкой
 
 router = Router()
 logger = logging.getLogger("digest_ai")
@@ -119,14 +117,14 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
     try:
-        text = build_ai_digest(category=category, period=period, style=style, limit=20)
-        text = clean_for_telegram(text)
+        text = generate_digest(ai=True, category=category, limit=20, style=style)
+        text = clean_for_telegram(text)  # ✅ всегда чистим перед отправкой
 
-        if not text or text.strip() == "":
+        if not text.strip():
             await query.message.edit_text("📭 Нет новостей по выбранной категории/периоду.")
             return
 
-        # Разбиваем на чанки, чтобы уложиться в лимит Telegram (4096 символов)
+        # режем на части, чтобы не превысить лимит Telegram (4096 символов)
         chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:

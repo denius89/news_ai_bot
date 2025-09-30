@@ -13,28 +13,37 @@ logger = logging.getLogger("generator")
 def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[Dict]:
     """Получаем свежие новости из БД (supabase)."""
     if not supabase:
-        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список новостей.")
+        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список.")
         return []
 
-    query = (
-        supabase.table("news")
-        .select("id, title, content, link, importance, published_at, source, category")
-        .order("importance", desc=True)
-        .order("published_at", desc=True)
-        .limit(limit)
-    )
-    if category:
-        query = query.eq("category", category)
+    try:
+        query = (
+            supabase.table("news")
+            .select("id, title, content, link, importance, published_at, source, category")
+            .order("importance", desc=True)
+            .order("published_at", desc=True)
+            .limit(limit)
+        )
 
-    response = query.execute()
-    rows = response.data or []
+        if category:
+            query = query.eq("category", category)
+
+        # ⚠️ Оборачиваем в try/except на случай 414 или разрыва соединения
+        response = query.execute()
+        rows = response.data or []
+        logger.debug("fetch_recent_news: %s rows fetched (category=%s)", len(rows), category)
+
+    except Exception as e:
+        logger.error(f"❌ Ошибка при запросе новостей из Supabase: {e}")
+        return []
+
     news: List[Dict] = []
-
     for row in rows:
+        published_at = row.get("published_at") or ""
         published_at_fmt = "—"
-        if row.get("published_at"):
+        if published_at:
             try:
-                dt = datetime.fromisoformat(row["published_at"].replace("Z", "+00:00"))
+                dt = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
                 published_at_fmt = dt.strftime("%d %b %Y, %H:%M")
             except Exception:
                 pass
@@ -60,7 +69,12 @@ def generate_digest(
         return "Сегодня новостей нет."
 
     if ai:
-        summary_text = generate_batch_summary(news_items, style=style)
+        try:
+            summary_text = generate_batch_summary(news_items, style=style)
+        except Exception as e:
+            logger.error("Ошибка при генерации AI-дайджеста: %s", e, exc_info=True)
+            return "⚠️ Ошибка при генерации AI-дайджеста."
+
         if not summary_text or summary_text.strip() == "":
             return "⚠️ Ошибка при генерации AI-дайджеста."
 

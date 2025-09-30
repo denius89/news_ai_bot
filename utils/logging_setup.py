@@ -3,37 +3,43 @@ import logging
 import logging.config
 from pathlib import Path
 
-import yaml
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 
 def setup_logging(config_path: str = "config/logging.yaml", default_level=logging.INFO):
     """
     Настройка логирования из YAML-конфига.
-    Автоматически создаёт директорию для логов, если она не существует.
+    - Если logging.yaml найден → используем dictConfig.
+    - Если нет → basicConfig (stdout).
+    - Автоматически создаёт директории для файлов логов.
     """
     config_file = Path(config_path)
 
-    if config_file.exists():
+    if yaml and config_file.exists():
         try:
-            with open(config_file, "r") as f:
+            with open(config_file, "r", encoding="utf-8") as f:
                 config = yaml.safe_load(f)
 
-            # --- фикс: создаём папку для всех FileHandler-ов ---
+            # Создаём папки для FileHandler-ов
             for handler in config.get("handlers", {}).values():
                 filename = handler.get("filename")
-                if filename:
+                if isinstance(filename, str):
                     try:
-                        log_path = Path(filename).parent
-                        log_path.mkdir(parents=True, exist_ok=True)
+                        Path(filename).parent.mkdir(parents=True, exist_ok=True)
                     except Exception as e:
-                        logging.warning(
-                            f"⚠️ Не удалось создать директорию для логов {filename}: {e}"
-                        )
+                        logging.basicConfig(level=default_level)
+                        logging.warning(f"⚠️ Не удалось создать директорию для {filename}: {e}")
 
             logging.config.dictConfig(config)
         except Exception as e:
             logging.basicConfig(level=default_level)
-            logging.error(f"❌ Ошибка при загрузке логгинга из {config_path}: {e}")
+            logging.error(f"❌ Ошибка при загрузке конфигурации логов {config_path}: {e}")
     else:
-        logging.basicConfig(level=default_level)
+        logging.basicConfig(
+            level=default_level,
+            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        )
         logging.warning("⚠️ Файл конфигурации логов не найден, используется basicConfig")

@@ -1,21 +1,29 @@
+import os
 import json
 import logging
 from typing import List, Dict, Union
 
+from openai import OpenAI
 from digests.prompts import PROMPTS
 from utils.formatters import format_digest_output
 from utils.clean_text import clean_for_telegram  # ✅ фильтрация HTML для Telegram
-from utils.ai_client import ask  # ✅ централизованный AI-клиент
 
 logger = logging.getLogger("ai_summary")
 
-# Температуры по умолчанию для разных стилей
 _TEMPS = {
     "analytical": 0.7,
     "business": 0.6,
     "meme": 0.9,
     "why_important": 0.5,
 }
+
+
+def get_client() -> OpenAI:
+    """Создание клиента OpenAI (ленивое)."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("❌ Нет OPENAI_API_KEY, установите ключ в .env")
+    return OpenAI(api_key=api_key)
 
 
 def generate_summary_why_important_json(
@@ -41,9 +49,15 @@ def generate_summary_why_important_json(
 Текст: {content}
 """
 
+    client = get_client()
     try:
-        raw = ask(prompt, max_tokens=max_tokens)
-        data = json.loads(raw)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=max_tokens,
+            temperature=_TEMPS.get(style, 0.5),
+        )
+        data = json.loads(response.choices[0].message.content)
         return {
             "summary": data.get("summary") or title,
             "why_important": data.get("why_important", [])[:3],
@@ -58,12 +72,15 @@ def generate_summary_why_important(
     max_tokens: int = 400,
     style: str = "why_important",
 ) -> str:
-    """
-    Формирует текстовый блок для Telegram (с фильтрацией HTML).
-    """
+    """Формирует текстовый блок для Telegram (с фильтрацией HTML)."""
     data = generate_summary_why_important_json(news_item, max_tokens, style)
     formatted = format_digest_output(data, style="why_important")
-    return clean_for_telegram(formatted)  # ✅ защита от кривых тегов
+
+    # ✅ гарантируем закрытый тег <b>
+    if formatted.count("<b>") != formatted.count("</b>"):
+        formatted = formatted.replace("<b>", "<b>", 1) + "</b>"
+
+    return clean_for_telegram(formatted)
 
 
 def generate_batch_summary(
@@ -71,13 +88,10 @@ def generate_batch_summary(
     max_tokens: int = 1500,
     style: str = "analytical",
 ) -> str:
-    """
-    Формирует цельный дайджест в выбранном стиле (PROMPTS[style]).
-    """
+    """Формирует цельный дайджест в выбранном стиле (PROMPTS[style])."""
     if not news_items:
         return "Сегодня новостей нет."
 
-    # Подготовка данных
     text_block = "\n".join(
         [
             f"{i+1}. {item.get('title')}: {(item.get('content') or '')[:400]}"
@@ -88,15 +102,21 @@ def generate_batch_summary(
         [f"- {item.get('title')}: {item.get('link')}" for item in news_items if item.get("link")]
     )
 
-    # Выбор промта и подстановка
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
     prompt = base_prompt.format(text_block=text_block, links_block=links_block)
 
+    client = get_client()
     try:
-        raw_text: Union[str, Dict] = ask(prompt, max_tokens=max_tokens)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=max_tokens,
+            temperature=_TEMPS.get(style, 0.7),
+        )
+        raw_text: Union[str, Dict] = response.choices[0].message.content.strip()
         formatted = format_digest_output(raw_text, style=style)
 
-        # fallback: если модель не вернула блок "Почему это важно"
+        # ✅ fallback с гарантированным закрытым тегом
         if "<b>Почему это важно" not in formatted:
             formatted += (
                 "\n\n<b>Почему это важно:</b>\n"
@@ -104,7 +124,10 @@ def generate_batch_summary(
                 "— Важно для инвесторов"
             )
 
-        return clean_for_telegram(formatted)  # ✅ фильтруем для Telegram
+        if formatted.count("<b>") != formatted.count("</b>"):
+            formatted += "</b>"
+
+        return clean_for_telegram(formatted)
     except Exception as e:
         logger.error(f"Ошибка при batch-аннотации: {e}", exc_info=True)
         return "⚠️ Ошибка генерации AI-дайджеста."
