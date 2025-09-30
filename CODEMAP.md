@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 08:25:49 UTC_
+_Generated on 2025-09-30 10:22:25 UTC_
 
 ```
 ├── .github/
@@ -41,10 +41,16 @@ _Generated on 2025-09-30 08:25:49 UTC_
 │   ├── ROADMAP.md
 │   └── VISION.md
 ├── logs/
+├── models/
+│   ├── event.py
+│   └── news.py
 ├── parsers/
 │   ├── __init__.py
 │   ├── events_parser.py
 │   └── rss_parser.py
+├── repositories/
+│   ├── events_repository.py
+│   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
 │   └── news_routes.py
