@@ -5,17 +5,17 @@ from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
 
 from services.digest_service import build_daily_digest
-from telegram_bot.utils.formatters import format_news
 from digests.configs import CATEGORIES
 from utils.clean_text import clean_for_telegram
+from models.news import NewsItem
 
 router = Router()
 logger = logging.getLogger(__name__)
 
 
-def select_news_by_importance(news_list, limit: int):
+def select_news_by_importance(news_list: list[NewsItem], limit: int) -> list[NewsItem]:
     """Выбирает limit новостей: важные → остальные → fallback."""
-    important = [n for n in news_list if (n.get("importance") or 0) >= 0.4]
+    important = [n for n in news_list if float(n.importance or 0) >= 0.4]
     other = [n for n in news_list if n not in important]
 
     selected = important[:limit]
@@ -49,20 +49,11 @@ async def send_digest(
     cats = None if (category is None or category == "all") else [category]
 
     # ⚡️ переносим в threadpool чтобы не блокировать event loop
-    digest_text, news = await asyncio.to_thread(build_daily_digest, 50, "analytical", cats)
+    # Используем переданный limit вместо фиксированного значения 50
+    digest_text, news = await asyncio.to_thread(build_daily_digest, limit, "analytical", cats)
 
-    if not news:
-        text = (
-            f"📭 Нет свежих новостей в категории «{CATEGORIES.get(category, category)}»"
-            if category and category != "all"
-            else "📭 Нет свежих новостей"
-        )
-    else:
-        selected = select_news_by_importance(news, limit)
-        header = ""
-        if category and category != "all":
-            header = f"<b>{CATEGORIES.get(category, category)}:</b>\n\n"
-        text = header + format_news(selected, limit=limit, min_importance=0.0)
+    # Используем готовый текст из сервиса, чтобы сохранить метрики важности/актуальности
+    text = digest_text
 
     text = clean_for_telegram(text)
     markup = categories_keyboard()
@@ -76,12 +67,16 @@ async def send_digest(
                 reply_markup=markup,
             )
         else:
-            await target.message.edit_text(
-                text,
-                parse_mode="HTML",
-                disable_web_page_preview=True,
-                reply_markup=markup,
-            )
+            # избегаем "message is not modified"
+            if target.message.text and target.message.text.strip() == text.strip():
+                await target.message.edit_reply_markup(reply_markup=markup)
+            else:
+                await target.message.edit_text(
+                    text,
+                    parse_mode="HTML",
+                    disable_web_page_preview=True,
+                    reply_markup=markup,
+                )
             await target.answer(cache_time=0)
     except TelegramBadRequest as e:
         msg = str(e).lower()
@@ -115,4 +110,4 @@ async def cmd_digest(message: types.Message):
 async def cb_digest(query: types.CallbackQuery):
     """Кнопки категорий → всегда обновляют текущее сообщение."""
     category = query.data.split(":", 1)[1] if ":" in query.data else "all"
-    await send_digest(query, category=category)
+    await send_digest(query, limit=5, category=category)

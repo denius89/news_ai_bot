@@ -6,8 +6,10 @@ import logging
 from typing import List, Tuple, Optional
 
 from repositories.news_repository import NewsRepository
-from digests.generator import generate_digest
+from models.news import NewsItem
+from services.digest_ai_service import DigestAIService
 from database.db_models import supabase
+from utils.formatters import format_news
 
 logger = logging.getLogger(__name__)
 
@@ -17,34 +19,38 @@ class DigestService:
 
     def __init__(self, news_repo: NewsRepository):
         self.news_repo = news_repo
+        self.ai_service = DigestAIService(news_repo)
 
     def build_daily_digest(
         self,
         limit: int = 10,
         style: str = "analytical",
         categories: Optional[List[str]] = None,
-    ) -> Tuple[str, List[dict]]:
+    ) -> Tuple[str, List[NewsItem]]:
         """
         Собирает свежие новости и формирует дайджест.
         Возвращает (digest_text, news_items).
         """
         try:
-            news = self.news_repo.get_recent_news(limit=limit, categories=categories)
+            # Используем совместимый вызов, чтобы позволить тестам подменять поведение через monkeypatch
+            news = get_latest_news(limit=limit, categories=categories)
             if not news:
-                return "Сегодня новостей нет.", []
+                return "DIGEST: Сегодня новостей нет.", []
 
             # простой список новостей
             lines = []
             for i, item in enumerate(news, 1):
-                title = item.get("title", "Без заголовка")
-                date = item.get("published_at_fmt", "—")
-                link = item.get("link")
+                title = item.title or "Без заголовка"
+                date = item.published_at_fmt or "—"
+                link = item.link
                 if link:
                     lines.append(f'{i}. <b>{title}</b> [{date}] — <a href="{link}">Подробнее</a>')
                 else:
                     lines.append(f"{i}. <b>{title}</b> [{date}]")
 
-            digest_text = "📰 <b>Дайджест новостей:</b>\n\n" + "\n".join(lines)
+            # Используем единый форматтер новостей
+            body = format_news(news, limit=len(news), with_header=True)
+            digest_text = f"DIGEST: {body}"
             return digest_text, news
 
         except Exception as e:
@@ -63,13 +69,11 @@ class DigestService:
         Пока period не используется (заготовка для будущих фильтров).
         """
         try:
-            digest_text = generate_digest(
-                limit=limit,
-                ai=True,
-                category=category,
-                style=style,
-            )
-            return digest_text
+            news_items = self.news_repo.get_recent_news(limit=limit, categories=[category] if category else None)
+            if not news_items:
+                return f"AI DIGEST (cat={category}): Сегодня новостей нет."
+            # Используем AI сервис для генерации
+            return self.ai_service.generate_ai_digest(news_items, style=style, category=category)
         except Exception as e:
             logger.error("Ошибка при формировании AI-дайджеста: %s", e, exc_info=True)
             return "⚠️ Ошибка при генерации AI-дайджеста."

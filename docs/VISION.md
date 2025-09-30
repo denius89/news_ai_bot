@@ -1,33 +1,64 @@
-# PulseAI — Vision
+# PulseAI — Product Vision
 
 ## One-liner
-PulseAI превращает хаотический поток новостей и событий в персональные дайджесты, умный календарь и авто-контент для соцсетей (Telegram-first, мультиплатформенно).
+PulseAI transforms chaotic news and events streams into personalized digests and smart calendars through **Telegram-first** approach, with multi-platform expansion (Discord, web).
 
-## Проблема
-- Инфошум, дубли, отсутствие приоритизации и объяснения «почему важно».
+## Problem Statement
+- Information noise, duplicates, lack of prioritization and explanation of "why it matters"
+- Scattered sources across multiple platforms
+- Time-consuming manual content curation
+- Difficulty in tracking important events and trends
 
-## Решение
-- Парсинг из RSS, соцсетей и календарей → AI-аннотации + оценка важности/достоверности → персональные дайджесты и события.
+## Solution
+- Parse from RSS, social media, and calendars → AI annotations + importance/credibility scoring → personalized digests and events
+- Centralized platform for news consumption
+- Automated content generation and distribution
+- Smart filtering and prioritization
 
-## Пользовательская ценность
-- Быстрое понимание сути и значимости.
-- Единый календарь ключевых дат (крипта/макро/тех).
-- Автоматизация контента для каналов.
+## User Value Proposition
+- **Quick Understanding** — Rapid comprehension of news significance and context
+- **Unified Calendar** — Single calendar for key dates (crypto/macro/tech)
+- **Content Automation** — Automated content for channels and social media
+- **Personalization** — Tailored content based on user preferences
+- **Credibility Assessment** — AI-powered source verification and fact-checking
 
-## Ключевые модули
-1) Парсинг; 2) AI-модули (credibility/importance/summary); 3) Хранилище; 4) Вывод (дайджесты, календарь, постинг).
+## Core Modules
+1. **Data Parsing** — RSS feeds, social media, economic calendars
+2. **AI Analysis** — Credibility assessment, importance scoring, content summarization
+3. **Data Storage** — Structured database with deduplication and indexing
+4. **Content Delivery** — Digests, calendar, automated posting
 
-## Принципы
-- Минималистичный UX, скорость, прозрачность.
-- Проверяемость источников, трекинг достоверности.
-- Telegram-first, расширяемость.
+## Design Principles
+- **Telegram-first** — Primary interface through Telegram bot with inline navigation
+- **Minimalist UX** — Clean, fast, intuitive interface across all platforms
+- **Speed** — Real-time processing and delivery
+- **Transparency** — Source verification and credibility tracking
+- **Multi-platform** — Telegram, Discord, web with consistent experience
+- **Extensibility** — Modular architecture for future growth
 
-## Метрики (MVP)
-- % успешно распарсенных источников / сутки.
-- Время от «новость появилась» до «аннотация готова».
-- CTR на дайджесты, удержание, активные подписки на темы.
+## Success Metrics (MVP)
+- **Data Quality** — % of successfully parsed sources per day
+- **Processing Speed** — Time from "news appeared" to "annotation ready"
+- **User Engagement** — CTR on digests, retention, active topic subscriptions
+- **Content Accuracy** — AI scoring accuracy and user satisfaction
 
-## Границы MVP
-- Новости/события + простые подписки в Telegram.
-- Базовая оценка credibility/importance.
-- Утро/вечер дайджесты и календарные алерты.
+## MVP Scope
+- **Core Features** — News/events + Telegram bot with inline navigation
+- **AI Analysis** — Basic credibility/importance assessment
+- **Automation** — Morning/evening digests and calendar alerts via Telegram
+- **Platforms** — **Telegram-first** bot + web application
+- **Multi-platform** — Discord integration planned for Week 2
+
+## Future Vision
+- **Multi-platform** — Discord, Slack, mobile apps with Telegram-first approach
+- **Advanced AI** — Custom model training, sentiment analysis
+- **White-label** — B2B solutions for media companies
+- **Monetization** — Freemium model with premium features
+- **Global Scale** — Multi-language support and international sources
+
+## Competitive Advantages
+- **AI-powered** — Advanced content analysis and scoring
+- **Real-time** — Fast processing and delivery
+- **Comprehensive** — Multiple source types and categories
+- **User-centric** — Personalized and customizable experience
+- **Open Architecture** — Extensible and integrable platform

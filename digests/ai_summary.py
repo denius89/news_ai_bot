@@ -10,11 +10,12 @@
 import os
 import json
 import logging
-from typing import List, Dict, Union
+from typing import List, Union
 
 from openai import OpenAI
 from digests.prompts import PROMPTS
 from utils.formatters import format_digest_output
+from models.news import NewsItem
 from utils.clean_text import clean_for_telegram
 
 logger = logging.getLogger("ai_summary")
@@ -36,10 +37,10 @@ def get_client() -> OpenAI:
 
 
 def generate_summary_why_important_json(
-    news_item: Dict,
+    news_item: NewsItem,
     max_tokens: int = 400,
     style: str = "why_important",
-) -> Dict:
+) -> dict:
     """Вернуть JSON с кратким резюме и списком «почему важно».
 
     Возвращаемая структура:
@@ -48,8 +49,8 @@ def generate_summary_why_important_json(
           "why_important": ["п1", "п2", "п3"]
         }
     """
-    title = news_item.get("title") or "Без названия"
-    content = news_item.get("content") or news_item.get("summary") or ""
+    title = news_item.title or "Без названия"
+    content = news_item.content or ""
 
     base_prompt = PROMPTS.get(style, PROMPTS["why_important"])
     prompt = f"""{base_prompt}
@@ -78,7 +79,7 @@ def generate_summary_why_important_json(
 
 
 def generate_summary_why_important(
-    news_item: Dict,
+    news_item: NewsItem,
     max_tokens: int = 400,
     style: str = "why_important",
 ) -> str:
@@ -89,7 +90,7 @@ def generate_summary_why_important(
 
 
 def generate_batch_summary(
-    news_items: List[Dict],
+    news_items: List[NewsItem],
     max_tokens: int = 1500,
     style: str = "analytical",
 ) -> str:
@@ -98,11 +99,10 @@ def generate_batch_summary(
         return "Сегодня новостей нет."
 
     text_block = "\n".join(
-        f"{i+1}. {item.get('title')}: {(item.get('content') or '')[:400]}"
-        for i, item in enumerate(news_items)
+        f"{i+1}. {item.title}: {(item.content or '')[:400]}" for i, item in enumerate(news_items)
     )
     links_block = "\n".join(
-        f"- {item.get('title')}: {item.get('link')}" for item in news_items if item.get("link")
+        f"- {item.title}: {item.link}" for item in news_items if item.link
     )
 
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
