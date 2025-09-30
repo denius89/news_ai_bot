@@ -1,4 +1,3 @@
-# digests/generator.py
 """Генерация дайджестов: обычных и AI.
 
 - fetch_recent_news: загрузка новостей из Supabase.
@@ -21,7 +20,7 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[D
 
     Args:
         limit: максимальное число новостей.
-        category: категория для фильтрации (в БД хранится в lowercase).
+        category: категория или список категорий (через запятую).
 
     Returns:
         Список словарей с новостями.
@@ -37,8 +36,14 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[D
         .order("published_at", desc=True)
         .limit(limit)
     )
+
     if category:
-        query = query.eq("category", category.lower())
+        cats = [c.strip().lower() for c in category.split(",") if c.strip()]
+        if len(cats) == 1:
+            query = query.eq("category", cats[0])
+        elif len(cats) > 1:
+            cond = ",".join([f"category.eq.{c}" for c in cats])
+            query = query.or_(cond)
 
     response = query.execute()
     rows = response.data or []
@@ -67,7 +72,7 @@ def generate_digest(
     Если `ai=True` — вызывается LLM-сводка по списку новостей.
     Иначе возвращается простой HTML-список.
     """
-    # для AI-дайджеста берем больше новостей
+    # для AI-дайджеста берём больше новостей
     if ai and limit < 15:
         limit = 15
 

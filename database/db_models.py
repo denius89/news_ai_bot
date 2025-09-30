@@ -4,7 +4,7 @@ import os
 import time
 from datetime import datetime, timezone
 from typing import List, Dict, Optional
-
+from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 from supabase import create_client, Client
@@ -18,7 +18,7 @@ from utils.dates import format_datetime, ensure_utc_iso
 logger = logging.getLogger("database")
 
 # --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 

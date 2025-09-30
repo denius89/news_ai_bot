@@ -1,7 +1,9 @@
 import logging
 import pytz
+import asyncio
 from aiogram import types, Router, F
 from aiogram.filters import Command
+from aiogram.exceptions import TelegramBadRequest
 
 from digests.generator import generate_digest
 from telegram_bot.keyboards import back_inline_keyboard
@@ -72,7 +74,9 @@ async def show_digest_ai_menu(target: types.Message | types.CallbackQuery):
     if isinstance(target, types.Message):
         await target.answer(text, reply_markup=kb)
     else:
-        await target.message.edit_text(text, reply_markup=kb)
+        # избегаем ошибки "message is not modified"
+        if target.message.text != text:
+            await target.message.edit_text(text, reply_markup=kb)
         await target.answer()
 
 
@@ -97,7 +101,12 @@ async def cb_digest_ai_menu_back(query: types.CallbackQuery):
 async def cb_digest_ai_category(query: types.CallbackQuery):
     raw_category = query.data.split(":", 1)[1]
     kb = build_period_keyboard(raw_category)
-    await query.message.edit_text("📌 Категория выбрана. Теперь укажите период:", reply_markup=kb)
+    try:
+        await query.message.edit_text(
+            "📌 Категория выбрана. Теперь укажите период:", reply_markup=kb
+        )
+    except TelegramBadRequest:
+        pass
     await query.answer()
 
 
@@ -105,7 +114,10 @@ async def cb_digest_ai_category(query: types.CallbackQuery):
 async def cb_digest_ai_period(query: types.CallbackQuery):
     _, period, raw_category = query.data.split(":")
     kb = build_style_keyboard(raw_category, period)
-    await query.message.edit_text("✍️ Выберите стиль дайджеста:", reply_markup=kb)
+    try:
+        await query.message.edit_text("✍️ Выберите стиль дайджеста:", reply_markup=kb)
+    except TelegramBadRequest:
+        pass
     await query.answer()
 
 
@@ -117,8 +129,11 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
     try:
-        text = generate_digest(ai=True, category=category, limit=20, style=style)
-        text = clean_for_telegram(text)  # ✅ всегда чистим перед отправкой
+        # ⚡ Генерация может быть долгой → выносим в отдельный таск
+        text = await asyncio.to_thread(
+            generate_digest, ai=True, category=category, limit=20, style=style
+        )
+        text = clean_for_telegram(text)
 
         if not text.strip():
             await query.message.edit_text("📭 Нет новостей по выбранной категории/периоду.")
@@ -127,19 +142,26 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         # режем на части, чтобы не превысить лимит Telegram (4096 символов)
         chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
-            if idx == 0:
-                await query.message.edit_text(
-                    chunk,
-                    parse_mode="HTML",
-                    disable_web_page_preview=True,
-                    reply_markup=back_inline_keyboard(),
-                )
-            else:
-                await query.message.answer(
-                    chunk,
-                    parse_mode="HTML",
-                    disable_web_page_preview=True,
-                )
+            try:
+                if idx == 0:
+                    await query.message.edit_text(
+                        chunk,
+                        parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=back_inline_keyboard(),
+                    )
+                else:
+                    await query.message.answer(
+                        chunk,
+                        parse_mode="HTML",
+                        disable_web_page_preview=True,
+                    )
+            except TelegramBadRequest as e:
+                logger.warning("⚠️ edit_text пропущен: %s", e)
+                continue
     except Exception as e:
         logger.error(f"Ошибка генерации AI-дайджеста: {e}", exc_info=True)
-        await query.message.edit_text(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+        try:
+            await query.message.edit_text(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+        except TelegramBadRequest:
+            pass
