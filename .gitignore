@@ -1,4 +1,25 @@
-# Операционная система
+# OS
+.DS_Store
+
+# Virtual environment
+venv/
+.env
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Databases
+*.sqlite3
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Logs
+logs/# Операционная система
 .DS_Store
 
 # Виртуальное окружение
