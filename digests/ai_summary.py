@@ -102,9 +102,7 @@ def generate_batch_summary(
         for i, item in enumerate(news_items)
     )
     links_block = "\n".join(
-        f"- {item.get('title')}: {item.get('link')}"
-        for item in news_items
-        if item.get("link")
+        f"- {item.get('title')}: {item.get('link')}" for item in news_items if item.get("link")
     )
 
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
