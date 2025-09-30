@@ -1,7 +1,6 @@
 # tests/test_db_models.py
 import re
 from database import db_models
-from models.news import NewsItem
 
 
 def test_make_uid_and_event_id_are_stable():

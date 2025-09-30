@@ -69,4 +69,3 @@ def test_upcoming_category_filter_list():
     repo = EventsRepository(_FakeClient(data))
     result = repo.upcoming(limit=10, categories=["macro", "corp"])  # smoke: no errors
     assert isinstance(result, list)
-

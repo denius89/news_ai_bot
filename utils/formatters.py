@@ -73,7 +73,9 @@ def format_news_item(item: NewsItem, index: Optional[int] = None) -> str:
     )
 
 
-def format_news(news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True) -> str:
+def format_news(
+    news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True
+) -> str:
     """
     Полный HTML-дайджест: заголовок и нумерованный список новостей.
     """
@@ -131,7 +133,11 @@ def format_news_items(news: List[NewsItem], limit: int = 5, min_importance: floa
             summary = summary[:259] + "…"
         summary = escape(summary)
 
-        title_line = f"<b>{i}. <a href=\"{escape(link)}\">{title}</a></b>" if link else f"<b>{i}. {title}</b>"
+        title_line = (
+            f"<b>{i}. <a href=\"{escape(link)}\">{title}</a></b>"
+            if link
+            else f"<b>{i}. {title}</b>"
+        )
 
         if summary:
             lines.append(
