@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 07:45:08 UTC_
+_Generated on 2025-09-30 08:02:17 UTC_
 
 ```
 ├── .github/
@@ -48,6 +48,9 @@ _Generated on 2025-09-30 07:45:08 UTC_
 ├── routes/
 │   ├── __init__.py
 │   └── news_routes.py
+├── services/
+│   ├── __init__.py
+│   └── digest_service.py
 ├── static/
 │   └── style.css
 ├── telegram_bot/
@@ -90,7 +93,6 @@ _Generated on 2025-09-30 07:45:08 UTC_
 │   ├── fix_old_news.py
 │   ├── repo_map.py
 │   └── show_news.py
-├── .coverage
 ├── .editorconfig
 ├── .env.example
 ├── .gitignore
