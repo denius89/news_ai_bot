@@ -1,11 +1,28 @@
-# telegram_bot/handlers/digestДай об.py
+import logging
 from aiogram import types, Router, F
 from aiogram.filters import Command
 
 from services.digest_service import build_daily_digest
-from digests.configs import CATEGORIES  # ✅ категории централизованно
+from telegram_bot.utils.formatters import format_news
+from digests.configs import CATEGORIES
+from utils.clean_text import clean_for_telegram  # ✅ чтобы Telegram не падал
 
 router = Router()
+logger = logging.getLogger(__name__)
+
+
+def select_news_by_importance(news_list, limit):
+    """Выбирает limit новостей: важные → остальные → fallback."""
+    important = [n for n in news_list if (n.get("importance") or 0) >= 0.4]
+    other = [n for n in news_list if n not in important]
+
+    selected = important[:limit]
+    if len(selected) < limit:
+        selected += other[: limit - len(selected)]
+    if not selected and news_list:
+        selected = news_list[:limit]  # fallback
+
+    return selected
 
 
 def categories_keyboard():
@@ -26,32 +43,37 @@ async def send_digest(
     limit: int = 5,
     category: str | None = None,
 ):
-    """Формирует дайджест для выбранной категории или общий."""
-    categories = None if category == "all" else [category]
-    digest_text, news_items = build_daily_digest(limit=limit, categories=categories)
+    """Формирует дайджест для выбранной категории (или общего потока)."""
+    cats = None if (category is None or category == "all") else [category]
+    _, news = build_daily_digest(limit=50, categories=cats)  # digest_text не используем
 
-    header = ""
-    if category and category != "all":
-        header = f"<b>{CATEGORIES.get(category, category)} news:</b>\n\n"
+    if not news:
+        text = (
+            f"📭 Нет свежих новостей в категории «{CATEGORIES.get(category, category)}»"
+            if category and category != "all"
+            else "📭 Нет свежих новостей"
+        )
+    else:
+        selected = select_news_by_importance(news, limit)
+        header = ""
+        if category and category != "all":
+            header = f"<b>{CATEGORIES.get(category, category)}:</b>\n\n"
+        text = header + format_news(selected, limit=limit, min_importance=0.0)
 
-    text = header + digest_text
+    text = clean_for_telegram(text)  # ✅ защита от кривой разметки
     markup = categories_keyboard()
 
     if isinstance(target, types.Message):
         await target.answer(
-            text,
-            parse_mode="HTML",
-            disable_web_page_preview=True,
-            reply_markup=markup,
+            text, parse_mode="HTML", disable_web_page_preview=True, reply_markup=markup
         )
-    else:  # callback query
+    else:
         await target.message.edit_text(
-            text,
-            parse_mode="HTML",
-            disable_web_page_preview=True,
-            reply_markup=markup,
+            text, parse_mode="HTML", disable_web_page_preview=True, reply_markup=markup
         )
         await target.answer()
+
+    logger.info("✅ Digest sent: category=%s, count=%d", category, len(news))
 
 
 @router.message(Command("digest"))
