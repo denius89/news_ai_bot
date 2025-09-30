@@ -6,7 +6,8 @@ from typing import List, Dict, Union
 
 from openai import OpenAI
 from digests.prompts import PROMPTS
-from utils.formatters import format_digest_output  # ✅ новый универсальный форматтер
+from utils.formatters import format_digest_output
+from utils.clean_text import clean_for_telegram  # ✅ фильтрация HTML для Telegram
 
 logger = logging.getLogger("ai_summary")
 
@@ -20,7 +21,7 @@ _TEMPS = {
 
 
 def get_client() -> OpenAI:
-    """Создание клиента OpenAI (ленивое)"""
+    """Создание клиента OpenAI (ленивое)."""
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("❌ Нет OPENAI_API_KEY, установите ключ в .env")
@@ -74,10 +75,11 @@ def generate_summary_why_important(
     style: str = "why_important",
 ) -> str:
     """
-    Формирует текстовый блок для Telegram, используя форматтер.
+    Формирует текстовый блок для Telegram (с фильтрацией HTML).
     """
     data = generate_summary_why_important_json(news_item, max_tokens, style)
-    return format_digest_output(data, style="why_important")
+    formatted = format_digest_output(data, style="why_important")
+    return clean_for_telegram(formatted)  # ✅ защита от кривых тегов
 
 
 def generate_batch_summary(
@@ -115,7 +117,17 @@ def generate_batch_summary(
             temperature=_TEMPS.get(style, 0.7),
         )
         raw_text: Union[str, Dict] = response.choices[0].message.content.strip()
-        return format_digest_output(raw_text, style=style)
+        formatted = format_digest_output(raw_text, style=style)
+
+        # fallback: если модель не вернула блок "Почему это важно"
+        if "<b>Почему это важно" not in formatted:
+            formatted += (
+                "\n\n<b>Почему это важно:</b>\n"
+                "— Событие влияет на рынок\n"
+                "— Важно для инвесторов"
+            )
+
+        return clean_for_telegram(formatted)  # ✅ фильтруем для Telegram
     except Exception as e:
         logger.error(f"Ошибка при batch-аннотации: {e}", exc_info=True)
         return "⚠️ Ошибка генерации AI-дайджеста."
