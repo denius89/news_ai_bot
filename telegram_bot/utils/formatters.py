@@ -56,16 +56,9 @@ def country_flag(code: str | None) -> str:
 
 
 def format_news(news: list[dict], limit: int = 5, min_importance: float = 0.4) -> str:
-    """
-    Список новостей для Telegram (HTML).
-    - показывает только важные (importance >= min_importance)
-    - заголовок — ссылка
-    - метрики в одну строку (bold)
-    """
     if not news:
         return "⚠️ No fresh news"
 
-    # фильтруем важные
     filtered = [n for n in news if float(n.get("importance") or 0) >= float(min_importance)]
     if not filtered:
         return "⚠️ No important news today"
@@ -85,24 +78,24 @@ def format_news(news: list[dict], limit: int = 5, min_importance: float = 0.4) -
         summary = _short(item.get("content") or item.get("summary") or "", 260)
         summary = escape(summary)
 
-        # Title as link
         title_line = f"<b>{i}. <a href=\"{escape(link)}\">{title}</a></b>"
 
-    if summary:
-        lines.append(
-            f"\n{title_line}\n"
-            f"{source} · {published}\n"
-            f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
-            f"{imp_icon} <b>Importance:</b> {imp:.2f}\n"
-            f"— {summary}"
-        )
-    else:
-        lines.append(
-            f"\n{title_line}\n"
-            f"{source} · {published}\n"
-            f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
-            f"{imp_icon} <b>Importance:</b> {imp:.2f}"
-        )
+        if summary:
+            lines.append(
+                f"\n{title_line}\n"
+                f"{source} · {published}\n"
+                f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
+                f"{imp_icon} <b>Importance:</b> {imp:.2f}\n"
+                f"— {summary}"
+            )
+        else:
+            lines.append(
+                f"\n{title_line}\n"
+                f"{source} · {published}\n"
+                f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
+                f"{imp_icon} <b>Importance:</b> {imp:.2f}"
+            )
+
     return _clamp_tg("\n".join(lines))
 
 

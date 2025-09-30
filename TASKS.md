@@ -1,235 +1,298 @@
-# 📝 TASKS (last updated: 2025-09-29 17:29:30)
+# 📝 TASKS (last updated: 2025-09-30 16:42:19)
 
+_Last updated: 2025-09-30 16:30:00_
 
-## Легенда приоритетов
-- 🔴 Срочно (блокирует работу)  
-- 🟡 Важно (желательно сделать в ближайшие дни)  
-- 🟢 Можно отложить  
+## Table of Contents
 
-## Шаблон задачи
+- [Priority Legend](#priority-legend)
+- [Completed Days](#completed-days)
+- [Current Tasks](#current-tasks)
+- [Backlog](#backlog)
+- [Change History](#change-history)
 
-### [Заголовок задачи]
-**Приоритет:** 🔴/🟡/🟢  
-**Контекст (зачем):**  
-Краткое объяснение, зачем нужна задача.  
+## Priority Legend
 
-**Подзадачи:**
-- [ ] шаг 1
-- [ ] шаг 2
+- 🔴 Urgent (blocks work)
+- 🟡 Important (should be done in coming days)
+- 🟢 Can be postponed
 
-**Критерии приёмки:**
-- Условие 1
-- Условие 2
+## Task Template
 
-**Связанные решения:** (ссылка на Историю решений в MASTER_FILE.md)
+### [Task Title]
+**Priority:** 🔴/🟡/🟢  
+**Context (why):**  
+Brief explanation of why the task is needed.
 
----
+**Subtasks:**
+- [ ] step 1
+- [ ] step 2
 
-## Day 01 — Docs + Parsers + CI ✅ (закрыт)
-**Приоритет:** 🔴  
-**Контекст:**  
-Подготовить базовую документацию, починить парсеры и подключить CI.  
+**Acceptance Criteria:**
+- Condition 1
+- Condition 2
 
-**Сделано:**
-- Написан `README.md`, `VISION.md`, `ARCHITECTURE.md`, `ROADMAP.md`.
-- Добавлен парсер RSS (`rss_parser.py`).
-- Добавлен парсер событий (`events_parser.py`).
-- Настроен CI (pytest).
-
-**Критерии приёмки:**  
-- ✅ Документация есть.  
-- ✅ Парсеры работают.  
-- ✅ Тесты запускаются в CI.  
+**Related Decisions:** (link to Decision History in MASTER_FILE.md)
 
 ---
 
-## Day 02 — Источники и очистка ✅ (закрыт)
-**Приоритет:** 🔴  
-**Контекст:**  
-Расширение источников, чистка данных, борьба с дублями, улучшение утилит.  
+## Completed Days
 
-**Сделано:**
-- Добавлены новые источники (CoinDesk, Cointelegraph, Bloomberg, TechCrunch и др.).
-- Убраны проблемные источники (Axios, Reuters).
-- Вынесена HTML-очистка в `utils/clean_text.py`.
-- Добавлен фильтр дублей (`make_uid`).
-- Добавлены тесты для парсеров.
-- Создан инструмент `tools/show_news.py` для просмотра новостей.
-- Обновлены `README.md`, `DEPLOY.md`, `ARCHITECTURE.md` (Mermaid-схема).
+### Day 01 — Docs + Parsers + CI ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Prepare basic documentation, fix parsers, and connect CI.
 
-**Критерии приёмки:**  
-- ✅ Нет дублей в БД.  
-- ✅ Тесты проходят.  
-- ✅ Документация обновлена.  
+**Completed:**
+- Written `README.md`, `VISION.md`, `ARCHITECTURE.md`, `ROADMAP.md`
+- Added RSS parser (`rss_parser.py`)
+- Added events parser (`events_parser.py`)
+- Set up CI (pytest)
 
-### Мини-саммари (вечер Day 2)
-**✅ Сделано:**  
-- Источники расширены, проблемные удалены (Axios, Reuters).  
-- Очистка вынесена в `utils/clean_text.py`.  
-- Добавлены тесты для парсеров, дублей в БД нет.  
-- Реализован просмотр новостей (`tools/show_news.py`).  
-- Обновлены `README.md`, `DEPLOY.md`, `ARCHITECTURE.md`.    
-
-**🔜 В работе:**  
-— Проверка AI-модулей на реальных данных (Day 3).  
-
-**🚧 Блокеры:**  
-— DNS у Reuters остаётся нестабильным (оставлен выключенным).  
+**Acceptance Criteria:**  
+- ✅ Documentation exists
+- ✅ Parsers work
+- ✅ Tests run in CI
 
 ---
 
-## Day 03 — AI + Events + Telegram ✅ (закрыт)
-**Приоритет:** 🔴
-**Контекст:**
-Добавлен Telegram-бот, AI-дайджест, события Investing.
+### Day 02 — Sources and Data Cleaning ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Expand sources, clean data, fight duplicates, improve utilities.
 
-**Сделано:**
-- Добавлен Telegram-бот (`telegram_bot/`) на aiogram.
-- Хэндлеры `/start`, `/digest`, `/digest_ai`, `/events`.
-- Inline-навигация: главное меню, категории AI-дайджеста, кнопка «Назад».
-- Форматирование новостей и событий (emoji, метрики credibility/importance, summary).
-- AI-дайджест по категориям за текущий день.
-- Интеграция Investing (события) → `tools/fetch_and_store_events.py`.
-- Фиксы `db_models.py` (fallback title, get_latest_events).
-- Доработка `ai_summary.py` (prompt, устранение багов).
-- Обновлён DEPLOY.md (добавлен деплой бота).
+**Completed:**
+- Added new sources (CoinDesk, Cointelegraph, Bloomberg, TechCrunch, etc.)
+- Removed problematic sources (Axios, Reuters)
+- Moved HTML cleaning to `utils/clean_text.py`
+- Added duplicate filter (`make_uid`)
+- Added parser tests
+- Created `tools/show_news.py` for viewing news
+- Updated `README.md`, `DEPLOY.md`, `ARCHITECTURE.md` (Mermaid diagram)
 
-**Критерии приёмки:**
-- ✅ Бот запускается, все команды работают.
-- ✅ Новости, события, AI-дайджест выводятся с кнопками.
-- ✅ Webapp + ETL стабильны.
-
-**Сводка:**
-- ✅ Сделано: добавлен Telegram-бот (/start, /digest, /events, /digest_ai), навигация через inline-кнопки, AI-дайджест по категориям, фикс базы и форматеров, интеграция Investing-парсера.
-- 🔜 В работе: расширение подписок и уведомлений в боте.
-- 🚧 Блокеры: пока нет, нужен следующий этап — персонализация бота.
+**Acceptance Criteria:**  
+- ✅ No duplicates in DB
+- ✅ Tests pass
+- ✅ Documentation updated
 
 ---
 
-## История изменений
-- ✅ 2025-09-23 — Монетизация зафиксирована в README.md  
-- ✅ 2025-09-24 — Day 1 закрыт  
-- ✅ 2025-09-25 — Day 2 закрыт (источники, очистка, тесты, утилиты, документация)
-- ✅ 2025-09-26 — Day 3 (AI + Events + Telegram) — добавлен Telegram-бот, AI-дайджест, события Investing.
+### Day 03 — AI + Events + Telegram ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Added Telegram bot, AI digest, Investing events.
 
-## Основные задачи (backlog)
+**Completed:**
+- Added Telegram bot (`telegram_bot/`) on aiogram
+- Handlers `/start`, `/digest`, `/digest_ai`, `/events`
+- Inline navigation: main menu, AI digest categories, "Back" button
+- News and events formatting (emoji, credibility/importance metrics, summary)
+- AI digest by categories for current day
+- Investing integration (events) → `tools/fetch_and_store_events.py`
+- Fixed `db_models.py` (title fallback, get_latest_events)
+- Enhanced `ai_summary.py` (prompt, bug fixes)
+- Updated DEPLOY.md (added bot deployment)
 
-### Добавить фильтр по темам
-**Приоритет:** 🟡  
-**Контекст (зачем):**  
-Чтобы пользователи могли формировать персональные дайджесты.  
-
-**Подзадачи:**
-- [ ] Расширить модель в БД (таблица тем)  
-- [ ] Добавить выбор тем в config/sources.yaml  
-- [ ] Добавить фильтр в webapp.py  
-
-**Критерии приёмки:**
-- В webapp можно выбрать тему  
-- В дайджест попадают только новости по теме  
-
----
-
-### Ревизия документации ✅ (сделано в Day 2)
-**Приоритет:** 🟡  
-**Контекст:**  
-Документация приведена в актуальное состояние.  
-
-**Итог:**  
-- Обновлены MASTER_FILE.md, README.md, TASKS.md.  
-- Добавлены DEPLOY.md и ARCHITECTURE.md.  
+**Acceptance Criteria:**
+- ✅ Bot starts, all commands work
+- ✅ News, events, AI digest display with buttons
+- ✅ Webapp + ETL stable
 
 ---
 
-### Расширение тестов (частично)
-**Приоритет:** 🟡  
-**Контекст:**  
-Повысить стабильность ETL и AI-модулей.  
+### Day 06 — Architecture Refactoring + Documentation ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Complete refactoring to Pydantic models, centralized services, and comprehensive documentation update.
 
-**Подзадачи (остаток):**
-- [ ] Тесты для ETL: нормализация дат, upsert в БД без дублей  
-- [ ] Тесты для AI-модулей: `importance`, `credibility`  
-- [ ] Маркировка интеграционных тестов и исключение их из CI  
+**Completed:**
+- Refactored to **Pydantic models** (`NewsItem`, `EventItem`) with proper datetime handling
+- Added **repositories layer** (`news_repository.py`, `events_repository.py`) for data access
+- Implemented **services layer** (`digest_service.py`, `digest_ai_service.py`) for business logic
+- Created **DigestAIService** — centralized service for both regular and AI digests
+- Fixed **Telegram bot** callback query timeout errors and "message not modified" issues
+- Updated **tests** to work with new architecture using proper mocking
+- Added **Makefile** with development commands (`run-bot`, `run-web`, `test`, `lint`)
+- **Complete documentation overhaul** — updated all .md files with consistent style and TOC
+- Used **Cursor AI** for automated refactoring and code improvements
 
-**Критерии приёмки:**  
-- Покрытие ключевых модулей выросло (ETL и AI-модули задеты тестами)  
-- Интеграционные тесты можно запустить отдельной меткой  
-
----
-
-### Доработка ETL-пайплайна ✅ (сделано в Day 2)
-**Приоритет:** 🟡  
-**Итог:**  
-- Очистка HTML вынесена в `utils/clean_text.py`.  
-- Добавлен fallback для пустых `content`.  
-- Дедупликация через `make_uid`.  
-- Нормализация дат в UTC.  
-- Логирование ошибок добавлено.  
+**Acceptance Criteria:**
+- ✅ All tests pass with new architecture
+- ✅ Telegram bot works without errors
+- ✅ Documentation is clean and consistent
+- ✅ Architecture is maintainable and scalable
 
 ---
 
-### Логирование и конфиг (частично)
-**Приоритет:** 🟡  
-**Контекст:**  
-Единый формат логов для парсеров/БД и снижение шума.  
+## Current Tasks
 
-**Подзадачи (остаток):**
-- [ ] Централизовать именованные логгеры parsers.rss / parsers.events / database  
-- [ ] Добавить возможность управлять уровнями логов из config/logging.yaml  
+### Data Model Refinement 🟡
+**Priority:** 🟡  
+**Context:**  
+Уточнить модель данных для NewsItem и EventItem, особенно обработку published_at как datetime.
 
----
+**Subtasks:**
+- [ ] Проверить корректность парсинга ISO 8601 дат в Pydantic моделях
+- [ ] Убедиться, что published_at_fmt и event_time_fmt работают правильно
+- [ ] Добавить валидацию для edge cases (некорректные даты, null значения)
 
-### Поддержка календаря событий (частично)
-**Приоритет:** 🟡  
-**Контекст:**  
-События должны иметь приоритеты для аналитики и отображения.  
-
-**Подзадачи (остаток):**
-- [ ] Расширить модель `events` в базе (поле `priority`)  
-- [ ] Отображать бейдж приоритета в webapp  
-
-**Итог на Day 2:**  
-- ✅ Парсинг Investing событий работает.  
-- ⏳ Приоритеты/бейджи ещё не реализованы.  
+**Acceptance Criteria:**
+- Все даты корректно парсятся и форматируются
+- Нет ошибок валидации в тестах
+- Fallback для некорректных дат работает
 
 ---
 
-### Добавление новых источников ✅ (сделано в Day 2)
-**Приоритет:** 🟡  
-**Итог:**  
-- В `config/sources.yaml` добавлены CoinDesk, Cointelegraph, Bloomberg, TechCrunch.  
-- Парсинг протестирован, новости попадают в БД.  
+### Test Coverage Enhancement 🟡
+**Priority:** 🟡  
+**Context:**  
+Доработать тесты: покрыть кейсы с пустыми данными и ошибками Supabase.
+
+**Subtasks:**
+- [ ] Добавить тесты для пустых результатов из Supabase
+- [ ] Покрыть кейсы ошибок подключения к базе данных
+- [ ] Добавить тесты для edge cases в репозиториях
+- [ ] Улучшить моки для интеграционных тестов
+
+**Acceptance Criteria:**
+- Покрытие тестами > 80%
+- Все edge cases покрыты
+- Интеграционные тесты стабильны
 
 ---
 
-### Telegram-бот для уведомлений
-**Приоритет:** 🟢  
-**Контекст:**  
-Доставлять дайджесты и события напрямую в Telegram.  
+### Documentation Final Review 🟢
+**Priority:** 🟢  
+**Context:**  
+Пройтись по всем .md файлам ещё раз для финальной проверки.
 
-**Подзадачи:**
-- [L ] Написать бота на aiogram/pyTelegramBotAPI
-- [ ] Привязать к БД (получение дайджестов)  
-- [ ] Тестовые рассылки  
+**Subtasks:**
+- [ ] Проверить актуальность всех ссылок
+- [ ] Убедиться в консистентности стиля
+- [ ] Проверить корректность TOC во всех файлах
+- [ ] Обновить примеры кода, если нужно
+
+**Acceptance Criteria:**
+- Все ссылки работают
+- Стиль единообразен
+- TOC корректны
+
+### Documentation Cleanup
+**Priority:** 🟡  
+**Context:**  
+Bring all documentation to consistent style and structure.
+
+**Subtasks:**
+- [x] Update README.md with proper structure and TOC
+- [x] Update CODEMAP.md with organized sections
+- [ ] Update MASTER_FILE.md with clean structure
+- [ ] Update docs/ files with consistent formatting
+- [ ] Add TOC to files with more than 3 headings
+
+**Acceptance Criteria:**
+- All .md files follow consistent style
+- TOC present in large files
+- No duplicates or outdated information
 
 ---
 
-### White-label интеграции для медиа
-**Приоритет:** 🟢  
-**Контекст:**  
-Дать медиа готовое решение для встраивания дайджестов.  
+### Test Coverage Expansion
+**Priority:** 🟡  
+**Context:**  
+Increase stability of ETL and AI modules.
 
-**Подзадачи:**
-- [ ] Определить формат API/экспорта  
-- [ ] Сделать шаблон white-label фронтенда  
+**Subtasks:**
+- [ ] Tests for ETL: date normalization, upsert in DB without duplicates
+- [ ] Tests for AI modules: `importance`, `credibility`
+- [ ] Mark integration tests and exclude from CI
+
+**Acceptance Criteria:**  
+- Key modules coverage increased (ETL and AI modules covered by tests)
+- Integration tests can be run with separate marker
 
 ---
 
-### Автоматические дайджесты
-**Приоритет:** 🟢  
-**Контекст:**  
-Дайджесты должны приходить автоматически утром/вечером.  
+### Topic Filter Implementation
+**Priority:** 🟡  
+**Context:**  
+Allow users to form personalized digests.
 
-**Подзадачи:**
-- [ ] Настроить крон (утро и вечер)  
-- [ ] Добавить опцию авто-генерации в webapp  
+**Subtasks:**
+- [ ] Extend DB model (topics table)
+- [ ] Add topic selection in config/sources.yaml
+- [ ] Add filter in webapp.py
+
+**Acceptance Criteria:**
+- Topic selection available in webapp
+- Only topic-related news appear in digest
+
+---
+
+## Backlog
+
+### Events Calendar Enhancement
+**Priority:** 🟡  
+**Context:**  
+Events should have priorities for analytics and display.
+
+**Subtasks:**
+- [ ] Extend `events` model in DB (priority field)
+- [ ] Display priority badge in webapp
+
+**Current Status:**  
+- ✅ Investing events parsing works
+- ⏳ Priorities/badges not yet implemented
+
+---
+
+### Logging and Configuration
+**Priority:** 🟡  
+**Context:**  
+Unified log format for parsers/DB and reduce noise.
+
+**Subtasks:**
+- [ ] Centralize named loggers parsers.rss / parsers.events / database
+- [ ] Add ability to control log levels from config/logging.yaml
+
+---
+
+### Telegram Bot Notifications
+**Priority:** 🟢  
+**Context:**  
+Deliver digests and events directly to Telegram.
+
+**Subtasks:**
+- [x] Write bot on aiogram/pyTelegramBotAPI
+- [x] Connect to DB (digest retrieval)
+- [ ] Test notifications
+
+---
+
+### White-label Integrations for Media
+**Priority:** 🟢  
+**Context:**  
+Give media ready solution for embedding digests.
+
+**Subtasks:**
+- [ ] Define API/export format
+- [ ] Create white-label frontend template
+
+---
+
+### Automatic Digests
+**Priority:** 🟢  
+**Context:**  
+Digests should arrive automatically morning/evening.
+
+**Subtasks:**
+- [ ] Set up cron (morning and evening)
+- [ ] Add auto-generation option in webapp
+
+---
+
+## Change History
+
+- ✅ 2025-09-23 — Monetization documented in README.md
+- ✅ 2025-09-24 — Day 1 closed
+- ✅ 2025-09-25 — Day 2 closed (sources, cleaning, tests, utilities, documentation)
+- ✅ 2025-09-26 — Day 3 (AI + Events + Telegram) — added Telegram bot, AI digest, Investing events
+- ✅ 2025-09-27-30 — Days 4-6 (Architecture Refactoring) — Pydantic models, centralized services, repositories
