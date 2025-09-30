@@ -1,13 +1,11 @@
-# digests/ai_summary.py
-import os
 import json
 import logging
 from typing import List, Dict, Union
 
-from openai import OpenAI
 from digests.prompts import PROMPTS
 from utils.formatters import format_digest_output
 from utils.clean_text import clean_for_telegram  # ✅ фильтрация HTML для Telegram
+from utils.ai_client import ask  # ✅ централизованный AI-клиент
 
 logger = logging.getLogger("ai_summary")
 
@@ -18,14 +16,6 @@ _TEMPS = {
     "meme": 0.9,
     "why_important": 0.5,
 }
-
-
-def get_client() -> OpenAI:
-    """Создание клиента OpenAI (ленивое)."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("❌ Нет OPENAI_API_KEY, установите ключ в .env")
-    return OpenAI(api_key=api_key)
 
 
 def generate_summary_why_important_json(
@@ -51,15 +41,9 @@ def generate_summary_why_important_json(
 Текст: {content}
 """
 
-    client = get_client()
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
-            temperature=_TEMPS.get(style, 0.5),
-        )
-        data = json.loads(response.choices[0].message.content)
+        raw = ask(prompt, max_tokens=max_tokens)
+        data = json.loads(raw)
         return {
             "summary": data.get("summary") or title,
             "why_important": data.get("why_important", [])[:3],
@@ -108,15 +92,8 @@ def generate_batch_summary(
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
     prompt = base_prompt.format(text_block=text_block, links_block=links_block)
 
-    client = get_client()
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=max_tokens,
-            temperature=_TEMPS.get(style, 0.7),
-        )
-        raw_text: Union[str, Dict] = response.choices[0].message.content.strip()
+        raw_text: Union[str, Dict] = ask(prompt, max_tokens=max_tokens)
         formatted = format_digest_output(raw_text, style=style)
 
         # fallback: если модель не вернула блок "Почему это важно"
