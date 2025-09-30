@@ -1,46 +1,79 @@
+"""
+Маршруты для веб-приложения:
+ - /digest  → последние новости
+ - /events  → список событий
+"""
+
 import logging
-from typing import List, Tuple, Optional
+from flask import Blueprint, render_template, request
 
-from database.db_models import get_latest_news
-from digests.generator import generate_digest
+from database.db_models import supabase
+from utils.dates import format_datetime
 
-logger = logging.getLogger("digest_service")
+logger = logging.getLogger(__name__)
 
-
-def build_daily_digest(
-    limit: int = 10,
-    style: str = "why_important",
-    categories: Optional[List[str]] = None,
-) -> Tuple[str, list]:
-    """
-    Собирает свежие новости из БД и формирует дайджест.
-    Возвращает (digest_text, news_items).
-    """
-    try:
-        news = get_latest_news(limit=limit, categories=categories)
-        if not news:
-            return "Сегодня новостей нет.", []
-        digest_text = generate_digest(news, style=style)
-        return digest_text, news
-    except Exception as e:
-        logger.error(f"Ошибка при формировании дайджеста: {e}", exc_info=True)
-        return "⚠️ Ошибка при генерации дайджеста.", []
+# Blueprint для всех новостных маршрутов
+news_bp = Blueprint("news", __name__)
 
 
-def build_ai_digest(
-    category: Optional[str],
-    period: str,
-    style: str,
-    limit: int = 20,
-) -> str:
-    """
-    Формирует AI-дайджест для выбранной категории и периода.
-    Пока period не используется (заготовка для будущих фильтров).
-    """
-    try:
-        categories = None if category is None else [category]
-        digest_text, _ = build_daily_digest(limit=limit, style=style, categories=categories)
-        return digest_text
-    except Exception as e:
-        logger.error(f"Ошибка при формировании AI-дайджеста: {e}", exc_info=True)
-        return "⚠️ Ошибка при генерации AI-дайджеста."
+@news_bp.route("/digest")
+def digest():
+    categories = request.args.getlist("category")
+
+    query = supabase.table("news").select(
+        "title, content, link, published_at, credibility, importance, source, category"
+    )
+    if categories:
+        query = query.in_("category", categories)
+
+    response = (
+        query.order("importance", desc=True).order("published_at", desc=True).limit(10).execute()
+    )
+    news_items = response.data or []
+
+    # форматируем поля
+    for item in news_items:
+        item["published_at_fmt"] = format_datetime(item.get("published_at"))
+        try:
+            item["credibility"] = float(item.get("credibility") or 0.0)
+        except Exception:
+            item["credibility"] = 0.0
+        try:
+            item["importance"] = float(item.get("importance") or 0.0)
+        except Exception:
+            item["importance"] = 0.0
+        item["source"] = item.get("source") or "—"
+
+    return render_template(
+        "digest.html",
+        news=news_items,
+        all_categories=["crypto", "economy", "world", "technology", "politics"],
+        active_categories=categories,
+    )
+
+
+@news_bp.route("/events")
+def events():
+    category = request.args.get("category")
+
+    query = supabase.table("events").select(
+        "event_time, country, country_code, currency, title, importance, fact, forecast, previous, source"
+    )
+    if category:
+        query = query.eq("category", category)
+
+    response = query.order("event_time", desc=False).limit(50).execute()
+    events_list = response.data or []
+
+    for ev in events_list:
+        ev["event_time_fmt"] = format_datetime(ev.get("event_time"))
+        try:
+            ev["importance"] = int(ev.get("importance") or 0)
+        except Exception:
+            ev["importance"] = 0
+
+    return render_template("events.html", events=events_list, active_category=category)
+
+
+# Экспортируем news_bp, чтобы тесты и webapp могли его импортировать
+__all__ = ["news_bp"]

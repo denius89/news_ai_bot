@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 08:02:17 UTC_
+_Generated on 2025-09-30 08:25:49 UTC_
 
 ```
 ├── .github/
@@ -76,7 +76,9 @@ _Generated on 2025-09-30 08:02:17 UTC_
 │   ├── test_clean_text.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
+│   ├── test_db_models.py
 │   ├── test_deepl.py
+│   ├── test_digest_service.py
 │   ├── test_digests.py
 │   ├── test_events_parser.py
 │   ├── test_generator.py
@@ -93,6 +95,7 @@ _Generated on 2025-09-30 08:02:17 UTC_
 │   ├── fix_old_news.py
 │   ├── repo_map.py
 │   └── show_news.py
+├── .coverage
 ├── .editorconfig
 ├── .env.example
 ├── .gitignore
