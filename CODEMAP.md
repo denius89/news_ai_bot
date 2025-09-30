@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 12:17:45 UTC_
+_Generated on 2025-09-30 14:39:07 UTC_
 
 ```
 ├── .github/
@@ -68,6 +68,7 @@ _Generated on 2025-09-30 12:17:45 UTC_
 │   └── news_routes.py
 ├── services/
 │   ├── __init__.py
+│   ├── digest_ai_service.py
 │   └── digest_service.py
 ├── static/
 │   └── style.css
@@ -99,9 +100,11 @@ _Generated on 2025-09-30 12:17:45 UTC_
 │   ├── test_digest_service.py
 │   ├── test_digests.py
 │   ├── test_events_parser.py
+│   ├── test_events_repository.py
 │   ├── test_generator.py
 │   ├── test_main.py
 │   ├── test_main_import.py
+│   ├── test_news_repository.py
 │   ├── test_openai.py
 │   ├── test_parsers.py
 │   ├── test_routes.py
@@ -121,6 +124,7 @@ _Generated on 2025-09-30 12:17:45 UTC_
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── main.py
+├── Makefile
 ├── MASTER_FILE.md
 ├── pyproject.toml
 ├── pytest.ini

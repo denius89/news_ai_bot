@@ -4,10 +4,11 @@ import asyncio
 from aiogram import types, Router, F
 from aiogram.filters import Command
 
-from digests.generator import generate_digest
+from services.digest_ai_service import DigestAIService
 from telegram_bot.keyboards import back_inline_keyboard
 from digests.configs import CATEGORIES, PERIODS, STYLES
 from utils.clean_text import clean_for_telegram
+from models.news import NewsItem
 
 router = Router()
 logger = logging.getLogger("digest_ai")
@@ -110,18 +111,24 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
 
 @router.callback_query(F.data.startswith("digest_ai_style:"))
 async def cb_digest_ai_style(query: types.CallbackQuery):
-    await query.answer("⏳ Формирую дайджест...", cache_time=0)
+    try:
+        await query.answer("⏳ Формирую дайджест...", cache_time=0)
+    except Exception:
+        # Query might already be answered or expired, ignore
+        pass
+    
     _, style, raw_category, period = query.data.split(":")
     category = None if raw_category == "all" else raw_category
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
     try:
-        # ⚡️ переносим в threadpool
+        # Используем новый AI сервис
+        service = DigestAIService()
         text = await asyncio.to_thread(
-            generate_digest,
+            service.generate_digest,
             20,  # limit
-            True,  # ai
             category,
+            True,  # ai
             style,
         )
         text = clean_for_telegram(text)
@@ -133,20 +140,31 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
-                await query.message.edit_text(
-                    chunk,
-                    parse_mode="HTML",
-                    disable_web_page_preview=True,
-                    reply_markup=back_inline_keyboard(),
-                )
+                # Check if content has changed to avoid "message is not modified" error
+                if query.message.text != chunk:
+                    await query.message.edit_text(
+                        chunk,
+                        parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=back_inline_keyboard(),
+                    )
+                else:
+                    # Only update markup if content is the same
+                    await query.message.edit_reply_markup(reply_markup=back_inline_keyboard())
             else:
                 await query.message.answer(
                     chunk,
                     parse_mode="HTML",
                     disable_web_page_preview=True,
                 )
-        await query.answer(cache_time=0)
     except Exception as e:
         logger.error(f"Ошибка генерации AI-дайджеста: {e}", exc_info=True)
-        await query.message.edit_text(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
-        await query.answer(cache_time=0)
+        try:
+            await query.message.edit_text(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+        except Exception:
+            # Message might be too old to edit, try sending a new one
+            try:
+                await query.message.answer(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+            except Exception:
+                # If all else fails, just log the error
+                logger.error("Failed to send error message to user")

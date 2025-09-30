@@ -3,7 +3,7 @@
 """
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
 from supabase import Client
 from datetime import datetime
 from models.event import EventItem
@@ -13,17 +13,34 @@ logger = logging.getLogger(__name__)
 
 class EventsRepository:
     """
-    Репозиторий событий: чтение и вставка в Supabase.
+    Репозиторий событий: чтение и вставка записей в Supabase.
+
+    Выравнен по стилю с `NewsRepository`: использует модульный `logger`,
+    строгие сигнатуры типов и обработку ошибок с логированием.
     """
 
     def __init__(self, client: Client):
+        """
+        Инициализирует репозиторий событий.
+
+        :param client: экземпляр клиента Supabase.
+        """
         self._db = client
 
-    def upcoming(self, limit: int = 50, category: Optional[str] = None) -> List[EventItem]:
+    def upcoming(
+        self,
+        limit: int = 50,
+        categories: Optional[Union[str, List[str]]] = None,
+    ) -> List[EventItem]:
         """
-        Получить ближайшие события.
-        :param limit: количество событий
-        :param category: категория для фильтрации (если есть)
+        Получить ближайшие события в порядке по времени.
+
+        - Возвращает список валидированных моделей `EventItem`.
+        - Поддерживает фильтрацию по категории: можно передать строку или список строк.
+
+        :param limit: максимальное число элементов выборки.
+        :param categories: категория или список категорий для фильтрации; значения нормализуются к lower().
+        :return: список объектов `EventItem`.
         """
         if not self._db:
             logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список событий.")
@@ -39,8 +56,15 @@ class EventsRepository:
                 .order("event_time", desc=False)
                 .limit(limit)
             )
-            if category:
-                q = q.eq("category", category.lower())
+            if categories:
+                if isinstance(categories, str):
+                    q = q.eq("category", categories.lower())
+                elif isinstance(categories, list):
+                    cats = [c.strip().lower() for c in categories if c and c.strip()]
+                    if len(cats) == 1:
+                        q = q.eq("category", cats[0])
+                    elif len(cats) > 1:
+                        q = q.in_("category", cats)
 
             data = q.execute().data or []
             events: List[EventItem] = []
@@ -57,6 +81,12 @@ class EventsRepository:
                     events.append(ev)
                 except Exception as e:
                     logger.warning("Ошибка валидации события: %s (row=%s)", e, d)
+            logger.debug(
+                "EventsRepository.upcoming → %d rows (limit=%s, categories=%s)",
+                len(events),
+                limit,
+                categories,
+            )
             return events
 
         except Exception as e:
@@ -65,8 +95,10 @@ class EventsRepository:
 
     def upsert(self, items: List[EventItem]) -> int:
         """
-        Вставить или обновить список событий (по event_id).
-        :return: количество вставленных строк
+        Вставить или обновить список событий по ключу `event_id`.
+
+        :param items: список валидированных объектов `EventItem` для сохранения.
+        :return: количество вставленных/обновленных строк (по ответу Supabase), либо 0 при ошибке.
         """
         if not self._db:
             logger.warning("⚠️ Supabase не инициализирован — upsert не выполнен.")
@@ -81,3 +113,6 @@ class EventsRepository:
         except Exception as e:
             logger.error("Ошибка при upsert событий: %s", e, exc_info=True)
             return 0
+
+
+__all__ = ["EventsRepository"]
