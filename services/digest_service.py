@@ -33,7 +33,7 @@ class DigestService:
             if not news:
                 return "Сегодня новостей нет.", []
 
-            # ⚠️ generate_digest сам ходит в базу, поэтому тут используем простую сборку вручную
+            # простой список новостей
             lines = []
             for i, item in enumerate(news, 1):
                 title = item.get("title", "Без заголовка")
@@ -95,4 +95,20 @@ def build_ai_digest(*args, **kwargs):
     return _default_service.build_ai_digest(*args, **kwargs)
 
 
-__all__ = ["build_daily_digest", "build_ai_digest", "DigestService"]
+# --- ⚠️ Backward compatibility ---
+def get_latest_news(limit: int = 10, categories: Optional[List[str]] = None):
+    """
+    Совместимость для старых тестов и кода.
+    Используй DigestService.news_repo.get_recent_news вместо этого метода.
+    """
+    if not _default_service:
+        return []
+    return _default_service.news_repo.get_recent_news(limit=limit, categories=categories)
+
+
+__all__ = [
+    "build_daily_digest",
+    "build_ai_digest",
+    "DigestService",
+    "get_latest_news",  # добавлено для обратной совместимости
+]
