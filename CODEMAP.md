@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 07:20:40 UTC_
+_Generated on 2025-09-30 07:38:24 UTC_
 
 ```
 ├── .github/
@@ -21,6 +21,7 @@ _Generated on 2025-09-30 07:20:40 UTC_
 │   ├── __init__.py
 │   ├── constants.py
 │   ├── logging.yaml
+│   ├── settings.py
 │   └── sources.yaml
 ├── database/
 │   ├── __init__.py
@@ -58,7 +59,6 @@ _Generated on 2025-09-30 07:20:40 UTC_
 │   │   └── start.py
 │   ├── __init__.py
 │   ├── bot.py
-│   ├── config.py
 │   └── keyboards.py
 ├── templates/
 │   ├── base.html
@@ -95,7 +95,6 @@ _Generated on 2025-09-30 07:20:40 UTC_
 ├── .env.example
 ├── .gitignore
 ├── CODEMAP.md
-├── config.py
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── main.py

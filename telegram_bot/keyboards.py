@@ -10,10 +10,9 @@ def start_inline_keyboard() -> types.InlineKeyboardMarkup:
 
 
 def main_inline_keyboard() -> types.InlineKeyboardMarkup:
-    """Главное меню"""
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text="📰 Новости", callback_data="digest")],
+            [types.InlineKeyboardButton(text="📰 Новости", callback_data="digest:all")],
             [types.InlineKeyboardButton(text="🤖 AI-дайджест", callback_data="digest_ai")],
             [types.InlineKeyboardButton(text="📅 События", callback_data="events")],
         ]

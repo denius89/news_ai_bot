@@ -227,19 +227,46 @@ def get_latest_events(limit: int = 10):
 
 
 # --- Получение последних новостей ---
-def get_latest_news(source: str | None = None, limit: int = 10):
-    """Возвращает последние новости из БД. Если указан source — фильтруем по источнику."""
+def get_latest_news(
+    source: str | None = None,
+    category: str | None = None,
+    limit: int = 10,
+):
+    """
+    Возвращает последние новости из БД.
+    - Если указан source → фильтруем по источнику.
+    - Если указана category → фильтруем по категории.
+    """
     if not supabase:
         logger.warning("⚠️ Supabase не подключён, get_latest_news не работает.")
         return []
 
-    query = supabase.table("news").select("*").order("published_at", desc=True).limit(limit)
+    query = (
+        supabase.table("news")
+        .select(
+            "id, uid, title, content, link, published_at, source, category, credibility, importance"
+        )
+        .order("published_at", desc=True)
+        .limit(limit)
+    )
+
     if source:
         query = query.eq("source", source)
+    if category:
+        query = query.eq("category", category)
 
     try:
-        data = query.execute().data
-        return data or []
+        data = query.execute().data or []
+        for row in data:
+            if row.get("published_at"):
+                try:
+                    dt = datetime.fromisoformat(row["published_at"].replace("Z", "+00:00"))
+                    row["published_at_fmt"] = dt.strftime("%d %b %Y, %H:%M")
+                except Exception:
+                    row["published_at_fmt"] = row["published_at"]
+            else:
+                row["published_at_fmt"] = "—"
+        return data
     except Exception as e:
         logger.error(f"Ошибка при получении новостей: {e}")
         return []

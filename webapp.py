@@ -1,9 +1,7 @@
 import logging
 from flask import Flask
 
-
-from config.constants import VERSION
-
+from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST
 from routes.news_routes import news_bp
 from utils.logging_setup import setup_logging
 
@@ -12,7 +10,6 @@ setup_logging()
 logger = logging.getLogger("news_ai_bot")
 
 app = Flask(__name__)
-
 app.config["VERSION"] = VERSION
 
 
@@ -24,8 +21,7 @@ def importance_icon(value: float) -> str:
         return "🔥"
     elif value >= 0.5:
         return "⚡"
-    else:
-        return "💤"
+    return "💤"
 
 
 # Регистрируем фильтр в Jinja
@@ -39,16 +35,19 @@ app.register_blueprint(news_bp)
 if __name__ == "__main__":
     from database.db_models import get_latest_news
 
-    logger.info("🚀 Webapp запущен (порт 5000)")
+    logger.info(f"🚀 Webapp запущен (хост {WEBAPP_HOST}, порт {WEBAPP_PORT}, debug={DEBUG})")
 
-    # Debug: последние новости
-    print("🔎 Debug: последние новости из БД")
     try:
         latest = get_latest_news(limit=5)
+        logger.debug("🔎 Последние новости из БД:")
         for n in latest:
-            print(f"- {n['title'][:50]}...")
-            print(f"  credibility={n.get('credibility')}, importance={n.get('importance')}")
-    except Exception as e:
-        print(f"⚠️ Ошибка при debug-загрузке новостей: {e}")
+            logger.debug(
+                "- %s... (credibility=%s, importance=%s)",
+                n["title"][:50],
+                n.get("credibility"),
+                n.get("importance"),
+            )
+    except Exception:
+        logger.exception("⚠️ Ошибка при debug-загрузке новостей")
 
-    app.run(host="127.0.0.1", port=8001, debug=True)
+    app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
