@@ -8,7 +8,6 @@ from services.digest_ai_service import DigestAIService
 from telegram_bot.keyboards import back_inline_keyboard
 from digests.configs import CATEGORIES, PERIODS, STYLES
 from utils.clean_text import clean_for_telegram
-from models.news import NewsItem
 
 router = Router()
 logger = logging.getLogger("digest_ai")
@@ -116,7 +115,7 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
     except Exception:
         # Query might already be answered or expired, ignore
         pass
-    
+
     _, style, raw_category, period = query.data.split(":")
     category = None if raw_category == "all" else raw_category
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
@@ -137,7 +136,7 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
             await query.message.edit_text("📭 Нет новостей по выбранной категории/периоду.")
             return
 
-        chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
+        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
                 # Check if content has changed to avoid "message is not modified" error

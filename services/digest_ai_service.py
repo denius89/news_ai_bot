@@ -3,7 +3,7 @@ AI Digest Service - centralized digest generation for both normal and AI digests
 """
 
 import logging
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from repositories.news_repository import NewsRepository
 from models.news import NewsItem
@@ -29,13 +29,13 @@ class DigestAIService:
     ) -> str:
         """
         Generate digest (normal or AI) based on parameters.
-        
+
         Args:
             limit: maximum number of news items
             category: filter by category (None for all)
             ai: if True, generate AI digest, else normal HTML digest
             style: style for AI generation
-            
+
         Returns:
             Formatted digest text
         """
@@ -43,17 +43,17 @@ class DigestAIService:
             # Get news items
             categories = [category] if category else None
             news_items = self.news_repo.get_recent_news(limit=limit, categories=categories)
-            
+
             if not news_items:
                 if ai:
                     return f"AI DIGEST (cat={category}): Сегодня новостей нет."
                 return format_news([], limit=None, with_header=True)
-            
+
             if ai:
                 return self.generate_ai_digest(news_items, style=style, category=category)
             else:
                 return format_news(news_items, limit=limit, with_header=True)
-                
+
         except Exception as e:
             logger.error("Ошибка при генерации дайджеста: %s", e, exc_info=True)
             if ai:
@@ -68,25 +68,25 @@ class DigestAIService:
     ) -> str:
         """
         Generate AI digest from news items.
-        
+
         Args:
             news_items: list of NewsItem models
             style: AI generation style
             category: category for display
-            
+
         Returns:
             AI digest text with fallback block
         """
         try:
             # Generate AI summary
             ai_text = generate_batch_summary(news_items, style=style) or ""
-            
+
             # Add fallback block if missing
             if "<b>Почему это важно" not in ai_text:
                 ai_text += format_ai_fallback()
-            
+
             return f"AI DIGEST (cat={category}):\n\n{ai_text}".strip()
-            
+
         except Exception as e:
             logger.error("Ошибка при генерации AI-дайджеста: %s", e, exc_info=True)
             return f"AI DIGEST (cat={category}): ⚠️ Ошибка при генерации AI-дайджеста."

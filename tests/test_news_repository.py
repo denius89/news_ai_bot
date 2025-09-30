@@ -70,4 +70,3 @@ def test_get_recent_news_category_filter_list():
     repo = NewsRepository(_FakeClient(data))
     result = repo.get_recent_news(limit=10, categories=["crypto", "economy"])  # smoke: no errors
     assert isinstance(result, list)
-

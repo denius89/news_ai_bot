@@ -12,7 +12,6 @@ from datetime import datetime
 from database.db_models import supabase
 from models.news import NewsItem
 from services.digest_ai_service import DigestAIService
-from digests.ai_summary import generate_batch_summary  # For backward compatibility
 
 logger = logging.getLogger("generator")
 
@@ -85,7 +84,9 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[N
     if not items:
         logger.info("fetch_recent_news: после валидации нет элементов → fallback")
         return [_dummy_news()]
-    logger.debug("fetch_recent_news → %d items (limit=%s, category=%s)", len(items), limit, category)
+    logger.debug(
+        "fetch_recent_news → %d items (limit=%s, category=%s)", len(items), limit, category
+    )
     return items
 
 

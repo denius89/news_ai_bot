@@ -69,7 +69,9 @@ class DigestService:
         Пока period не используется (заготовка для будущих фильтров).
         """
         try:
-            news_items = self.news_repo.get_recent_news(limit=limit, categories=[category] if category else None)
+            news_items = self.news_repo.get_recent_news(
+                limit=limit, categories=[category] if category else None
+            )
             if not news_items:
                 return f"AI DIGEST (cat={category}): Сегодня новостей нет."
             # Используем AI сервис для генерации

@@ -101,9 +101,7 @@ def generate_batch_summary(
     text_block = "\n".join(
         f"{i+1}. {item.title}: {(item.content or '')[:400]}" for i, item in enumerate(news_items)
     )
-    links_block = "\n".join(
-        f"- {item.title}: {item.link}" for item in news_items if item.link
-    )
+    links_block = "\n".join(f"- {item.title}: {item.link}" for item in news_items if item.link)
 
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
     prompt = base_prompt.format(text_block=text_block, links_block=links_block)
@@ -116,7 +114,7 @@ def generate_batch_summary(
             max_tokens=max_tokens,
             temperature=_TEMPS.get(style, 0.7),
         )
-        raw_text: Union[str, Dict] = response.choices[0].message.content.strip()
+        raw_text: Union[str, dict] = response.choices[0].message.content.strip()
         formatted = format_digest_output(raw_text, style=style)
 
         if "<b>Почему это важно" not in formatted:

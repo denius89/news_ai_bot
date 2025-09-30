@@ -1,6 +1,5 @@
 # tests/test_digest_service.py
 from services import digest_service
-from services.digest_ai_service import DigestAIService
 from models.news import NewsItem
 
 
@@ -28,7 +27,9 @@ def test_build_daily_digest_no_news(monkeypatch):
 
 def test_build_ai_digest_with_category(monkeypatch):
     def fake_build_daily_digest(limit, style, categories=None):
-        return f"AI DIGEST [{style}] cat={categories}", [NewsItem.model_validate({"title": "X", "content": "c"})]
+        return f"AI DIGEST [{style}] cat={categories}", [
+            NewsItem.model_validate({"title": "X", "content": "c"})
+        ]
 
     monkeypatch.setattr(digest_service, "build_daily_digest", fake_build_daily_digest)
 

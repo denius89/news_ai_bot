@@ -1,5 +1,4 @@
 import pytest
-from models.news import NewsItem
 
 
 @pytest.mark.unit
@@ -7,11 +6,11 @@ def test_generate_digest_no_ai(monkeypatch):
     """Обычный дайджест без AI"""
     # Import first
     import digests.generator as generator
-    
+
     # Mock the generate_digest function directly
     def mock_generate_digest(limit=10, category=None, ai=False, style="analytical"):
         return "📰 <b>Дайджест новостей:</b>\n\n<b>1. <a href=\"http://test1\">Новость 1</a></b>\n<b>2. Новость 2</b>"
-    
+
     monkeypatch.setattr(generator, "generate_digest", mock_generate_digest)
 
     text = generator.generate_digest(limit=2, ai=False)
@@ -30,13 +29,13 @@ def test_generate_digest_ai(monkeypatch):
     """AI-дайджест должен использовать generate_batch_summary"""
     # Import first
     import digests.generator as generator
-    
+
     # Mock the generate_digest function directly
     def mock_generate_digest(limit=10, category=None, ai=False, style="analytical"):
         if ai:
             return "AI DIGEST (cat=None):\n\nAI Дайджест"
         return "Regular digest"
-    
+
     monkeypatch.setattr(generator, "generate_digest", mock_generate_digest)
 
     text = generator.generate_digest(limit=1, ai=True, style="analytical")
@@ -48,11 +47,11 @@ def test_generate_digest_empty(monkeypatch):
     """Если нет новостей → должен быть заголовок"""
     # Import first
     import digests.generator as generator
-    
+
     # Mock the generate_digest function directly
     def mock_generate_digest(limit=10, category=None, ai=False, style="analytical"):
         return "📰 <b>Дайджест новостей:</b>\n\nСегодня новостей нет."
-    
+
     monkeypatch.setattr(generator, "generate_digest", mock_generate_digest)
 
     text = generator.generate_digest(limit=5, ai=False)
@@ -88,7 +87,7 @@ def test_fetch_recent_news_formats_dates(monkeypatch):
 
     # Import after monkeypatch
     import digests.generator as generator
-    
+
     monkeypatch.setattr(
         generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})()
     )
@@ -128,7 +127,7 @@ def test_fetch_recent_news_contains_expected_titles(monkeypatch):
 
     # Import after monkeypatch
     import digests.generator as generator
-    
+
     monkeypatch.setattr(
         generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})()
     )
