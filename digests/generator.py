@@ -1,4 +1,10 @@
 # digests/generator.py
+"""Генерация дайджестов: обычных и AI.
+
+- fetch_recent_news: загрузка новостей из Supabase.
+- generate_digest: формирование HTML-дайджеста (AI/не-AI).
+"""
+
 import argparse
 import logging
 from datetime import datetime
@@ -11,56 +17,57 @@ logger = logging.getLogger("generator")
 
 
 def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[Dict]:
-    """Получаем свежие новости из БД (supabase)."""
+    """Получить свежие новости из БД (Supabase).
+
+    Args:
+        limit: максимальное число новостей.
+        category: категория для фильтрации (в БД хранится в lowercase).
+
+    Returns:
+        Список словарей с новостями.
+    """
     if not supabase:
-        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список.")
+        logger.warning("⚠️ Supabase не инициализирован — возвращаем пустой список новостей.")
         return []
 
-    try:
-        query = (
-            supabase.table("news")
-            .select("id, title, content, link, importance, published_at, source, category")
-            .order("importance", desc=True)
-            .order("published_at", desc=True)
-            .limit(limit)
-        )
+    query = (
+        supabase.table("news")
+        .select("id, title, content, link, importance, published_at, source, category")
+        .order("importance", desc=True)
+        .order("published_at", desc=True)
+        .limit(limit)
+    )
+    if category:
+        query = query.eq("category", category.lower())
 
-        if category:
-            query = query.eq("category", category)
+    response = query.execute()
+    rows = response.data or []
 
-        # ⚠️ Оборачиваем в try/except на случай 414 или разрыва соединения
-        response = query.execute()
-        rows = response.data or []
-        logger.debug("fetch_recent_news: %s rows fetched (category=%s)", len(rows), category)
-
-    except Exception as e:
-        logger.error(f"❌ Ошибка при запросе новостей из Supabase: {e}")
-        return []
-
-    news: List[Dict] = []
     for row in rows:
-        published_at = row.get("published_at") or ""
         published_at_fmt = "—"
-        if published_at:
+        if row.get("published_at"):
             try:
-                dt = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+                dt = datetime.fromisoformat(row["published_at"].replace("Z", "+00:00"))
                 published_at_fmt = dt.strftime("%d %b %Y, %H:%M")
             except Exception:
                 pass
         row["published_at_fmt"] = published_at_fmt
-        news.append(row)
 
-    return news
+    return rows
 
 
 def generate_digest(
     limit: int = 10,
     ai: bool = False,
     category: Optional[str] = None,
-    style: str = "analytical",  # ✅ стиль прокидываем сюда
+    style: str = "analytical",
 ) -> str:
-    """Генерация дайджеста (AI или простой список новостей)."""
-    # для AI-дайджеста берём больше новостей
+    """Сформировать дайджест.
+
+    Если `ai=True` — вызывается LLM-сводка по списку новостей.
+    Иначе возвращается простой HTML-список.
+    """
+    # для AI-дайджеста берем больше новостей
     if ai and limit < 15:
         limit = 15
 
@@ -69,16 +76,7 @@ def generate_digest(
         return "Сегодня новостей нет."
 
     if ai:
-        try:
-            summary_text = generate_batch_summary(news_items, style=style)
-        except Exception as e:
-            logger.error("Ошибка при генерации AI-дайджеста: %s", e, exc_info=True)
-            return "⚠️ Ошибка при генерации AI-дайджеста."
-
-        if not summary_text or summary_text.strip() == "":
-            return "⚠️ Ошибка при генерации AI-дайджеста."
-
-        # 🚨 fallback: гарантируем блок «Почему это важно»
+        summary_text = generate_batch_summary(news_items, style=style) or ""
         if "<b>Почему это важно" not in summary_text:
             summary_text += (
                 "\n\n<b>Почему это важно:</b>\n"
@@ -86,8 +84,7 @@ def generate_digest(
                 "— Важно для инвесторов\n"
                 "— Может повлиять на стратегию компаний"
             )
-
-        return summary_text.strip()  # HTML-формат
+        return summary_text.strip()
 
     # стандартный (без AI)
     lines = []
