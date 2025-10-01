@@ -8,32 +8,30 @@ from models.event import EventItem
 
 
 def format_date(
-    dt: Optional[datetime], 
-    fmt: str = "%-d %b %Y, %H:%M", 
-    tz: str = "Europe/Warsaw"
+    dt: Optional[datetime], fmt: str = "%-d %b %Y, %H:%M", tz: str = "Europe/Warsaw"
 ) -> str:
     """
     Format datetime object to human-readable string with timezone support.
-    
+
     Args:
         dt: datetime object to format (can be None)
         fmt: strftime format string (default: "%-d %b %Y, %H:%M")
         tz: target timezone (default: "Europe/Warsaw")
-        
+
     Returns:
         Formatted date string or "—" if None
     """
     if not dt:
         return "—"
-    
+
     try:
         # Convert to target timezone
         target_tz = zoneinfo.ZoneInfo(tz)
         localized_dt = dt.astimezone(target_tz)
-        
+
         # Format with the provided format
         return localized_dt.strftime(fmt)
-    except Exception as e:
+    except Exception:
         # Fallback to ISO format with minutes precision
         try:
             return dt.isoformat(timespec="minutes")

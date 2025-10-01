@@ -20,6 +20,7 @@ logger = logging.getLogger("generator")
 def _dummy_news() -> NewsItem:
     """Fallback news item for stability."""
     from datetime import datetime
+
     now = datetime.utcnow()
     return NewsItem(
         id="dummy-1",
@@ -37,30 +38,30 @@ def _dummy_news() -> NewsItem:
 def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[NewsItem]:
     """
     Fetch recent news from Supabase.
-    
+
     Args:
         limit: Maximum number of news items to fetch
         category: Optional category filter
-        
+
     Returns:
         List of NewsItem objects
     """
     if not supabase:
         logger.warning("Supabase not initialized, returning dummy news")
         return [_dummy_news()]
-    
+
     try:
         query = supabase.table("news").select("*").order("published_at", desc=True).limit(limit)
-        
+
         if category:
             query = query.eq("category", category.lower())
-        
+
         response = query.execute()
-        
+
         if not response.data:
             logger.info("No news found in database, returning dummy news")
             return [_dummy_news()]
-        
+
         news_items = []
         for row in response.data:
             try:
@@ -71,43 +72,40 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[N
             except Exception as e:
                 logger.warning(f"Failed to validate news item: {e}")
                 continue
-        
+
         logger.info(f"Fetched {len(news_items)} news items")
         return news_items if news_items else [_dummy_news()]
-        
+
     except Exception as e:
         logger.error(f"Error fetching news: {e}")
         return [_dummy_news()]
 
 
 async def generate_digest(
-    limit: int = 10, 
-    category: Optional[str] = None, 
-    ai: bool = False, 
-    style: str = "analytical"
+    limit: int = 10, category: Optional[str] = None, ai: bool = False, style: str = "analytical"
 ) -> str:
     """
     Generate digest using DigestAIService.
-    
+
     Args:
         limit: Maximum number of news items
         category: Optional category filter
         ai: Whether to use AI summarization
         style: Digest style
-        
+
     Returns:
         Generated digest text
     """
     # Fetch news items
     news_items = fetch_recent_news(limit=limit, category=category)
-    
+
     if not news_items:
         return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
-    
+
     # Create service with configuration
     config = DigestConfig(max_items=8, include_fallback=True)
     service = DigestAIService(config)
-    
+
     if ai:
         return await service.build_digest(news_items, style)
     else:
@@ -120,20 +118,21 @@ def main():
     parser.add_argument("--limit", type=int, default=10, help="Number of news items")
     parser.add_argument("--category", type=str, help="News category filter")
     parser.add_argument("--ai", action="store_true", help="Use AI summarization")
-    parser.add_argument("--style", type=str, default="analytical", 
-                       choices=["analytical", "business", "meme"],
-                       help="Digest style")
-    
+    parser.add_argument(
+        "--style",
+        type=str,
+        default="analytical",
+        choices=["analytical", "business", "meme"],
+        help="Digest style",
+    )
+
     args = parser.parse_args()
-    
+
     # Generate digest
-    digest = asyncio.run(generate_digest(
-        limit=args.limit,
-        category=args.category,
-        ai=args.ai,
-        style=args.style
-    ))
-    
+    digest = asyncio.run(
+        generate_digest(limit=args.limit, category=args.category, ai=args.ai, style=args.style)
+    )
+
     print(digest)
 
 

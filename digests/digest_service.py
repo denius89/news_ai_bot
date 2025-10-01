@@ -10,7 +10,7 @@ from digests.ai_service import (
     DigestAIService,
     DigestConfig,
     generate_ai_digest,
-    generate_fallback_digest
+    generate_fallback_digest,
 )
 
 # Re-export NewsItem from models
@@ -22,8 +22,8 @@ DigestService = DigestAIService  # Alias for old name
 __all__ = [
     "DigestAIService",
     "DigestService",  # Backward compatibility
-    "DigestConfig", 
+    "DigestConfig",
     "NewsItem",
     "generate_ai_digest",
-    "generate_fallback_digest"
+    "generate_fallback_digest",
 ]

@@ -49,12 +49,13 @@ class NewsItem(BaseModel):
 
     @property
     def published_at_fmt(self) -> Optional[str]:
-        if not self.published_at:
-            return "—"
-        try:
-            return self.published_at.strftime("%d %b %Y, %H:%M")
-        except Exception:
-            return "—"
+        """
+        Форматированная дата публикации для обратной совместимости.
+        Использует utils.formatters.format_date.
+        """
+        from utils.formatters import format_date
+
+        return format_date(self.published_at)
 
     @property
     def published_at_dt(self) -> Optional[datetime]:

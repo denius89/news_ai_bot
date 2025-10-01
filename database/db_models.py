@@ -66,19 +66,19 @@ def make_event_id(title: str, country: str, event_time: str) -> str:
 def parse_datetime_from_row(value: Union[str, datetime, None]) -> Optional[datetime]:
     """
     Парсит значение даты из строки БД в datetime объект.
-    
+
     Args:
         value: Значение из БД (строка или datetime)
-        
+
     Returns:
         datetime объект или None
     """
     if value is None:
         return None
-    
+
     if isinstance(value, datetime):
         return value
-    
+
     if isinstance(value, str):
         try:
             # Попробуем ISO формат
@@ -94,7 +94,7 @@ def parse_datetime_from_row(value: Union[str, datetime, None]) -> Optional[datet
         except Exception as e:
             logger.warning(f"Ошибка парсинга даты '{value}': {e}")
             return datetime.now(timezone.utc)
-    
+
     return None
 
 
