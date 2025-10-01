@@ -26,12 +26,8 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov flake8 black
 
-      - name: Lint (flake8)
-        run: flake8 .
+      - name: Lint
+        run: make lint
 
-      - name: Lint (black)
-        run: black --check .
-
-      - name: Run tests with coverage (exclude integration)
-        run: |
-          pytest -m "not integration" --cov=./ --cov-report=term-missing --cov-fail-under=20
+      - name: Run tests
+        run: make test
