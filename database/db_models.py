@@ -3,7 +3,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from pathlib import Path
 import httpx
 from dotenv import load_dotenv
@@ -60,6 +60,42 @@ def make_uid(url: str, title: str) -> str:
 def make_event_id(title: str, country: str, event_time: str) -> str:
     raw = f"{title}|{country}|{event_time}"
     return hashlib.sha256(raw.encode()).hexdigest()
+
+
+# --- Парсинг дат ---
+def parse_datetime_from_row(value: Union[str, datetime, None]) -> Optional[datetime]:
+    """
+    Парсит значение даты из строки БД в datetime объект.
+
+    Args:
+        value: Значение из БД (строка или datetime)
+
+    Returns:
+        datetime объект или None
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, datetime):
+        return value
+
+    if isinstance(value, str):
+        try:
+            # Попробуем ISO формат
+            if 'T' in value or '+' in value or value.endswith('Z'):
+                return datetime.fromisoformat(value.replace('Z', '+00:00'))
+            # Попробуем простой формат даты
+            elif len(value) == 10 and value.count('-') == 2:
+                return datetime.fromisoformat(value + 'T00:00:00+00:00')
+            # Fallback к текущему времени
+            else:
+                logger.warning(f"Не удалось распарсить дату: {value}")
+                return datetime.now(timezone.utc)
+        except Exception as e:
+            logger.warning(f"Ошибка парсинга даты '{value}': {e}")
+            return datetime.now(timezone.utc)
+
+    return None
 
 
 # --- Обогащение новостей AI ---
@@ -250,6 +286,9 @@ def get_latest_news(
         data = safe_execute(query).data or []
         logger.debug("get_latest_news: fetched %d rows", len(data))
         for row in data:
+            # Парсим published_at в datetime объект
+            row["published_at"] = parse_datetime_from_row(row.get("published_at"))
+            # Добавляем форматированную строку для обратной совместимости
             row["published_at_fmt"] = format_datetime(row.get("published_at"))
         return data
     except Exception as e:
