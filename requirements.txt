@@ -1,5 +1,6 @@
 # Core
 annotated-types>=0.7.0
+pytz>=2025.1
 anyio>=4.10.0
 beautifulsoup4>=4.13.5
 blinker>=1.9.0

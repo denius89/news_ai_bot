@@ -12,6 +12,7 @@ PulseAI is built as an ETL pipeline with AI analysis and output to different int
 - [Database Schema](#database-schema)
 - [API Design](#api-design)
 - [Deployment Architecture](#deployment-architecture)
+- [Subscriptions & Notifications](#subscriptions--notifications)
 
 ## System Overview
 
@@ -81,7 +82,7 @@ flowchart TD
 ## Data Flow Diagram
 
 **Поток данных:**
-Telegram → Handlers → Services → Repositories → Supabase
+Telegram → Handlers → Services (DigestAIService, SubscriptionService, NotificationService) → Repositories → Supabase
 
 ```mermaid
 flowchart TD
@@ -152,6 +153,43 @@ flowchart TD
 - **Repositories**: работа с БД (модели, `database/db_models.py`, `repositories/`)
 - **Supabase**: хранение новостей, пользователей, категорий
 - **AI**: модули в `ai_modules/` для оценки важности и генерации дайджестов
+
+## AI Digest UX
+
+### Progress Animation
+- **Immediate feedback**: Instant response to user actions
+- **Animated progress**: Visual steps with progress bar
+- **Real-time updates**: Live progress indication during generation
+
+### User Experience Flow
+1. **User request**: `/digest_ai` or category selection
+2. **Immediate response**: "⏳ Генерация дайджеста для тебя..."
+3. **Progress animation**: 5 animated steps with visual progress bar
+4. **Final result**: Personalized digest with action buttons
+5. **Action buttons**: Subscribe to category, enable auto-digest
+
+### Technical Implementation
+- **`utils/progress_animation.py`**: Core animation system
+- **`ProgressAnimation` class**: Manages animated progress display
+- **Async handling**: Non-blocking animation with `asyncio.create_task`
+- **Error handling**: Graceful fallback for API errors
+
+## Growth: Subscriptions & Notifications
+
+### User Management
+- **User registration**: Automatic creation via Telegram ID
+- **Profile management**: Username, locale, preferences
+- **UUID-based**: Scalable user identification system
+
+### Subscription System
+- **Category subscriptions**: Users can subscribe to news categories
+- **Flexible management**: Add/remove subscriptions via bot commands
+- **Database integration**: Persistent subscription storage
+
+### Notification System
+- **Daily digests**: Automated morning digest delivery
+- **Custom scheduling**: User-configurable notification times
+- **Frequency options**: Daily, weekly, instant notifications
 
 ## Technology Stack
 
@@ -255,3 +293,129 @@ CREATE TABLE events (
 - Caching strategies for frequently accessed data
 - Asynchronous processing for AI operations
 - CDN for static assets
+
+## Subscriptions & Notifications
+
+### Overview
+
+The subscription and notification system allows users to personalize their news consumption by subscribing to specific categories and configuring notification preferences. The system supports both manual subscription management through Telegram commands and automated digest delivery.
+
+**Flow:** Telegram → Handlers → Services (Subscriptions/Notifications) → Repositories → Supabase
+
+### Architecture Components
+
+- **Handlers**: `routes/subscriptions.py` - Telegram bot command handlers
+- **Services**: `services/subscription_service.py`, `services/notification_service.py` - Business logic layer
+- **Repositories**: `database/db_models.py` - Data access layer
+- **Database**: Supabase/PostgreSQL with dedicated tables for users, subscriptions, and notifications
+
+### Subscription Management Flow
+
+```mermaid
+flowchart TD
+    TG[Telegram Bot] --> H[Handlers]
+    H --> S1[SubscriptionService]
+    H --> S2[NotificationService]
+    S1 --> DB[(Supabase/Postgres)]
+    S2 --> DB
+    S2 -->|Cron| TG
+    
+    subgraph "Telegram Commands"
+        C1[/subscribe category]
+        C2[/unsubscribe category]
+        C3[/my_subs]
+        C4[/categories]
+    end
+    
+    subgraph "Database Tables"
+        T1[users]
+        T2[subscriptions]
+        T3[notifications]
+    end
+    
+    C1 --> H
+    C2 --> H
+    C3 --> H
+    C4 --> H
+    
+    S1 --> T1
+    S1 --> T2
+    S2 --> T1
+    S2 --> T3
+    
+    style TG fill:#e3f2fd
+    style H fill:#f3e5f5
+    style S1 fill:#fce4ec
+    style S2 fill:#fce4ec
+    style DB fill:#ffebee
+```
+
+### Key Features
+
+#### User Management
+- Automatic user creation on first interaction
+- Telegram ID mapping to internal user records
+- User preferences (locale, username) storage
+
+#### Subscription System
+- Category-based subscriptions (crypto, economy, world, technology, politics)
+- One subscription per category per user (UNIQUE constraint)
+- Easy subscribe/unsubscribe via Telegram commands
+
+#### Notification Preferences
+- Multiple notification types: `digest`, `events`, `breaking`
+- Frequency options: `daily`, `weekly`, `instant`
+- Timezone-aware delivery (Europe/Warsaw)
+- Per-user preferred delivery hours
+
+#### Automated Digest Delivery
+- Cron-based scheduling via `tools/send_daily_digests.py`
+- Personalized content based on user subscriptions
+- AI-powered digest generation
+- Batch processing with error handling
+
+### Database Schema
+
+#### Users Table
+```sql
+CREATE TABLE users (
+  id BIGSERIAL PRIMARY KEY,
+  telegram_id BIGINT UNIQUE NOT NULL,
+  username TEXT,
+  locale TEXT DEFAULT 'ru',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+#### Subscriptions Table
+```sql
+CREATE TABLE subscriptions (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+  category TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, category)
+);
+```
+
+#### Notifications Table
+```sql
+CREATE TABLE notifications (
+  id BIGSERIAL PRIMARY KEY,
+  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL CHECK (type IN ('digest','events','breaking')),
+  frequency TEXT NOT NULL DEFAULT 'daily' CHECK (frequency IN ('daily','weekly','instant')),
+  preferred_hour SMALLINT DEFAULT 9 CHECK (preferred_hour BETWEEN 0 AND 23),
+  enabled BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, type)
+);
+```
+
+### Integration Points
+
+- **Telegram Bot**: Command handlers for user interaction
+- **Digest Service**: Generates personalized content based on subscriptions
+- **Scheduler**: Cron jobs for automated delivery
+- **AI Service**: Powers intelligent digest generation

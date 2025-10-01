@@ -1,6 +1,6 @@
-# 📝 TASKS (last updated: 2025-10-01 15:30:00)
+# 📝 TASKS (last updated: 2025-10-01 20:01:52)
 
-_Last updated: 2025-10-01 15:30:00_
+_Last updated: 2025-10-01 19:00:00_
 
 ## Table of Contents
 
@@ -123,10 +123,10 @@ Complete refactoring to Pydantic models, centralized services, and comprehensive
 
 ---
 
-### Day 07 — Digest System Refactoring + Date Handling + Test Coverage ✅ (Closed)
+### Day 07 — Digest System Refactoring + Date Handling + Test Coverage + UX Enhancement ✅ (Closed)
 **Priority:** 🔴  
 **Context:**  
-Complete refactoring of digest system, proper datetime handling, and comprehensive test coverage with async support.
+Complete refactoring of digest system, proper datetime handling, comprehensive test coverage with async support, and enhanced UX with progress animation.
 
 **Completed:**
 - **Refactor**: вынесена логика в `DigestAIService`, упрощён `generator.py`, 
@@ -142,11 +142,19 @@ Complete refactoring of digest system, proper datetime handling, and comprehensi
   (`%d` вместо `%-d`)
 - **Documentation**: обновлены `README.md` с Quick Start и `ARCHITECTURE.md` 
   с диаграммой потоков данных
+- **DevOps**: настроены make lint/format/test, pytest.ini с --maxfail=1, 
+  GitHub Actions с make lint
+- **UX Enhancement**: создана анимация прогресса с визуальным прогресс-баром, 
+  мгновенная обратная связь, персонализированные результаты
+- **Growth**: добавлены users/subscriptions/notifications, сервисы/хендлеры/клавиатуры, 
+  исправлен upsert для дублирования ключей
 
 **Acceptance Criteria:**
 - ✅ Digest system uses centralized `DigestAIService`
 - ✅ All dates properly handled as `datetime` objects
 - ✅ Comprehensive test coverage with async support
+- ✅ Enhanced UX with progress animation and action buttons
+- ✅ Subscriptions and notifications system implemented
 - ✅ All tests pass including edge cases
 - ✅ Documentation updated with architecture diagrams
 
@@ -154,58 +162,39 @@ Complete refactoring of digest system, proper datetime handling, and comprehensi
 
 ## Current Tasks
 
-### Data Model Refinement 🟡
+### Subscriptions Integration 🟡
 **Priority:** 🟡  
 **Context:**  
-Уточнить модель данных для NewsItem и EventItem, особенно обработку 
-published_at как datetime.
+Интегрировать систему подписок и уведомлений с реальной логикой бота.
 
 **Subtasks:**
-- [ ] Проверить корректность парсинга ISO 8601 дат в Pydantic моделях
-- [ ] Убедиться, что published_at_fmt и event_time_fmt работают правильно
-- [ ] Добавить валидацию для edge cases (некорректные даты, null значения)
+- [ ] Подключить SubscriptionService к обработчикам подписок
+- [ ] Реализовать автоматическую отправку дайджестов через tools/send_daily_digests.py
+- [ ] Добавить cron-задачи для регулярных уведомлений
+- [ ] Протестировать полный цикл: подписка → генерация → отправка
 
 **Acceptance Criteria:**
-- Все даты корректно парсятся и форматируются
-- Нет ошибок валидации в тестах
-- Fallback для некорректных дат работает
+- Пользователи могут подписываться на категории
+- Автоматические дайджесты отправляются по расписанию
+- Система уведомлений работает стабильно
 
 ---
 
-### Test Coverage Enhancement 🟡
-**Priority:** 🟡  
-**Context:**  
-Доработать тесты: покрыть кейсы с пустыми данными и ошибками 
-Supabase.
-
-**Subtasks:**
-- [ ] Добавить тесты для пустых результатов из Supabase
-- [ ] Покрыть кейсы ошибок подключения к базе данных
-- [ ] Добавить тесты для edge cases в репозиториях
-- [ ] Улучшить моки для интеграционных тестов
-
-**Acceptance Criteria:**
-- Покрытие тестами > 80%
-- Все edge cases покрыты
-- Интеграционные тесты стабильны
-
----
-
-### Documentation Final Review 🟢
+### Performance Optimization 🟢
 **Priority:** 🟢  
 **Context:**  
-Пройтись по всем .md файлам ещё раз для финальной проверки.
+Оптимизировать производительность системы для масштабирования.
 
 **Subtasks:**
-- [ ] Проверить актуальность всех ссылок
-- [ ] Убедиться в консистентности стиля
-- [ ] Проверить корректность TOC во всех файлах
-- [ ] Обновить примеры кода, если нужно
+- [ ] Добавить кэширование для часто запрашиваемых данных
+- [ ] Оптимизировать запросы к Supabase
+- [ ] Реализовать rate limiting для Telegram API
+- [ ] Добавить мониторинг производительности
 
 **Acceptance Criteria:**
-- Все ссылки работают
-- Стиль единообразен
-- TOC корректны
+- Система выдерживает высокую нагрузку
+- Время ответа бота < 2 секунд
+- Нет утечек памяти
 
 ### Documentation Cleanup
 **Priority:** 🟡  
@@ -327,3 +316,4 @@ Digests should arrive automatically morning/evening.
 - ✅ 2025-09-25 — Day 2 closed (sources, cleaning, tests, utilities, documentation)
 - ✅ 2025-09-26 — Day 3 (AI + Events + Telegram) — added Telegram bot, AI digest, Investing events
 - ✅ 2025-09-27-30 — Days 4-6 (Architecture Refactoring) — Pydantic models, centralized services, repositories
+- ✅ 2025-10-01 — Day 7 closed (DigestAIService, date handling, tests, UX enhancement, subscriptions)
