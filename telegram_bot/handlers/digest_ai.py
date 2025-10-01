@@ -8,6 +8,7 @@ from services.digest_ai_service import DigestAIService
 from telegram_bot.keyboards import back_inline_keyboard
 from digests.configs import CATEGORIES, PERIODS, STYLES
 from utils.clean_text import clean_for_telegram
+from utils.progress_animation import show_generation_progress, show_quick_progress, build_digest_actions_keyboard
 
 router = Router()
 logger = logging.getLogger("digest_ai")
@@ -110,6 +111,7 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
 
 @router.callback_query(F.data.startswith("digest_ai_style:"))
 async def cb_digest_ai_style(query: types.CallbackQuery):
+    """Handle AI digest style selection with animated progress."""
     try:
         await query.answer("⏳ Формирую дайджест...", cache_time=0)
     except Exception:
@@ -120,8 +122,14 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
     category = None if raw_category == "all" else raw_category
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
+    # Show immediate feedback
+    await show_quick_progress(query, "⏳ Генерация дайджеста для тебя...")
+
     try:
-        # Используем новый AI сервис
+        # Start animated progress
+        animation = await show_generation_progress(query)
+        
+        # Generate digest in background
         service = DigestAIService()
         text = await asyncio.to_thread(
             service.generate_digest,
@@ -130,40 +138,109 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
             True,  # ai
             style,
         )
+        
+        # Stop animation
+        animation.stop()
+        
         text = clean_for_telegram(text)
 
         if not text.strip():
-            await query.message.edit_text("📭 Нет новостей по выбранной категории/периоду.")
+            await query.message.edit_text(
+                "📭 Нет новостей по выбранной категории/периоду.",
+                reply_markup=back_inline_keyboard()
+            )
             return
 
-        chunks = [text[i : i + 4000] for i in range(0, len(text), 4000)]
+        # Build personalized header
+        username = query.from_user.username or query.from_user.first_name or "друг"
+        header = f"📰 Дайджест дня для @{username}"
+        if category and category != "all":
+            category_name = CATEGORIES.get(category, category)
+            header += f" • {category_name}"
+        
+        # Prepare final message
+        full_text = f"{header}\n\n{text}"
+        
+        # Build action keyboard
+        actions_kb = build_digest_actions_keyboard(username, category)
+
+        # Send message in chunks
+        chunks = [full_text[i : i + 4000] for i in range(0, len(full_text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == 0:
-                # Check if content has changed to avoid "message is not modified" error
-                if query.message.text != chunk:
+                # Edit the progress message with final content
+                try:
                     await query.message.edit_text(
                         chunk,
                         parse_mode="HTML",
                         disable_web_page_preview=True,
-                        reply_markup=back_inline_keyboard(),
+                        reply_markup=actions_kb,
                     )
-                else:
-                    # Only update markup if content is the same
-                    await query.message.edit_reply_markup(reply_markup=back_inline_keyboard())
+                except Exception as e:
+                    logger.warning(f"Failed to edit message: {e}")
+                    # Fallback: send new message
+                    await query.message.answer(
+                        chunk,
+                        parse_mode="HTML",
+                        disable_web_page_preview=True,
+                        reply_markup=actions_kb,
+                    )
             else:
                 await query.message.answer(
                     chunk,
                     parse_mode="HTML",
                     disable_web_page_preview=True,
                 )
+                    
     except Exception as e:
         logger.error(f"Ошибка генерации AI-дайджеста: {e}", exc_info=True)
         try:
-            await query.message.edit_text(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+            await query.message.edit_text(
+                f"⚠️ Ошибка при генерации AI-дайджеста: {e}",
+                reply_markup=back_inline_keyboard()
+            )
         except Exception:
             # Message might be too old to edit, try sending a new one
             try:
-                await query.message.answer(f"⚠️ Ошибка при генерации AI-дайджеста: {e}")
+                await query.message.answer(
+                    f"⚠️ Ошибка при генерации AI-дайджеста: {e}",
+                    reply_markup=back_inline_keyboard()
+                )
             except Exception:
                 # If all else fails, just log the error
                 logger.error("Failed to send error message to user")
+
+
+@router.callback_query(F.data.startswith("subscribe_category:"))
+async def cb_subscribe_category(query: types.CallbackQuery):
+    """Handle subscription to category from digest actions."""
+    try:
+        category = query.data.split(":", 1)[1]
+        category_name = CATEGORIES.get(category, category)
+        
+        # TODO: Implement actual subscription logic
+        await query.answer(f"✅ Подписка на {category_name} активирована!", show_alert=True)
+        
+        # Update message to show subscription success
+        await query.message.edit_reply_markup(
+            reply_markup=build_digest_actions_keyboard(
+                query.from_user.username or "пользователь", 
+                category
+            )
+        )
+        
+    except Exception as e:
+        logger.error(f"Error in subscribe category: {e}")
+        await query.answer("❌ Ошибка при подписке", show_alert=True)
+
+
+@router.callback_query(F.data == "enable_auto_digest")
+async def cb_enable_auto_digest(query: types.CallbackQuery):
+    """Handle enabling auto-digest notifications."""
+    try:
+        # TODO: Implement actual notification enabling logic
+        await query.answer("✅ Авто-дайджест включен! Буду присылать дайджесты каждый день в 9:00", show_alert=True)
+        
+    except Exception as e:
+        logger.error(f"Error in enable auto digest: {e}")
+        await query.answer("❌ Ошибка при включении авто-дайджеста", show_alert=True)

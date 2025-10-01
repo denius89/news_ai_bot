@@ -101,6 +101,14 @@ def parse_datetime_from_row(value: Union[str, datetime, None]) -> Optional[datet
 # --- Обогащение новостей AI ---
 def enrich_news_with_ai(news_item: Dict) -> Dict:
     """Обновляет credibility и importance для новости через AI-модули."""
+    # Проверяем, что news_item - это словарь
+    if not isinstance(news_item, dict):
+        logger.error(f"enrich_news_with_ai получил не словарь: {type(news_item)} = {news_item}")
+        # Возвращаем пустой словарь или исходный объект как словарь
+        if isinstance(news_item, str):
+            return {"content": news_item, "credibility": 0.5, "importance": 0.5}
+        return {"credibility": 0.5, "importance": 0.5}
+
     try:
         news_item["credibility"] = evaluate_credibility(news_item)
     except Exception as e:
@@ -126,6 +134,11 @@ def upsert_news(items: List[Dict]):
     rows: List[Dict] = []
     for item in items:
         try:
+            # Проверяем, что item - это словарь
+            if not isinstance(item, dict):
+                logger.error(f"upsert_news получил не словарь: {type(item)} = {item}")
+                continue
+                
             enriched = enrich_news_with_ai(item)
 
             title = (
@@ -293,4 +306,245 @@ def get_latest_news(
         return data
     except Exception as e:
         logger.error("Ошибка при получении новостей: %s", e)
+        return []
+
+
+# --- USER MANAGEMENT FUNCTIONS ---
+
+
+def upsert_user_by_telegram(
+    telegram_id: int, username: str | None = None, locale: str = 'ru'
+) -> str:
+    """
+    Создает или обновляет пользователя по Telegram ID.
+
+    Args:
+        telegram_id: Telegram user ID
+        username: Telegram username (optional)
+        locale: User locale (default: 'ru')
+
+    Returns:
+        User ID from database
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return ""
+
+    try:
+        # Сначала пытаемся найти существующего пользователя
+        existing_user = (
+            supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
+        )
+
+        if existing_user.data:
+            user_id = existing_user.data[0]["id"]
+            logger.debug("Найден существующий пользователь: ID=%s", user_id)
+            return user_id
+
+        # Создаем нового пользователя
+        new_user = (
+            supabase.table("users")
+            .insert({"telegram_id": telegram_id, "username": username, "locale": locale})
+            .execute()
+        )
+
+        if new_user.data:
+            user_id = new_user.data[0]["id"]
+            logger.info("Создан новый пользователь: ID=%s, telegram_id=%d", user_id, telegram_id)
+            return user_id
+        else:
+            logger.error("Не удалось создать пользователя")
+            return ""
+
+    except Exception as e:
+        logger.error("Ошибка при создании/поиске пользователя: %s", e)
+        return ""
+
+
+def get_user_by_telegram(telegram_id: int) -> dict | None:
+    """
+    Получает пользователя по Telegram ID.
+
+    Args:
+        telegram_id: Telegram user ID
+
+    Returns:
+        User data dict or None if not found
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return None
+
+    try:
+        result = supabase.table("users").select("*").eq("telegram_id", telegram_id).execute()
+
+        if result.data:
+            return result.data[0]
+        return None
+
+    except Exception as e:
+        logger.error("Ошибка при получении пользователя: %s", e)
+        return None
+
+
+def add_subscription(user_id: str, category: str) -> bool:
+    """
+    Добавляет подписку на категорию для пользователя.
+
+    Args:
+        user_id: User ID
+        category: News category
+
+    Returns:
+        True if subscription was added, False if already exists
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        result = (
+            supabase.table("subscriptions")
+            .insert({"user_id": user_id, "category": category})
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
+            return True
+        else:
+            logger.debug("Подписка уже существует: user_id=%d, category=%s", user_id, category)
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при добавлении подписки: %s", e)
+        return False
+
+
+def remove_subscription(user_id: str, category: str) -> int:
+    """
+    Удаляет подписку на категорию для пользователя.
+
+    Args:
+        user_id: User ID
+        category: News category
+
+    Returns:
+        Number of deleted subscriptions (0 or 1)
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return 0
+
+    try:
+        result = (
+            supabase.table("subscriptions")
+            .delete()
+            .eq("user_id", user_id)
+            .eq("category", category)
+            .execute()
+        )
+
+        deleted_count = len(result.data) if result.data else 0
+        if deleted_count > 0:
+            logger.info("Удалена подписка: user_id=%d, category=%s", user_id, category)
+
+        return deleted_count
+
+    except Exception as e:
+        logger.error("Ошибка при удалении подписки: %s", e)
+        return 0
+
+
+def list_subscriptions(user_id: str) -> list[dict]:
+    """
+    Получает список подписок пользователя.
+
+    Args:
+        user_id: User ID
+
+    Returns:
+        List of subscription dicts
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+
+    try:
+        result = supabase.table("subscriptions").select("*").eq("user_id", user_id).execute()
+
+        return result.data or []
+
+    except Exception as e:
+        logger.error("Ошибка при получении подписок: %s", e)
+        return []
+
+
+def upsert_notification(
+    user_id: str,
+    type_: str = 'digest',
+    frequency: str = 'daily',
+    enabled: bool = True,
+    preferred_hour: int = 9,
+) -> None:
+    """
+    Создает или обновляет настройки уведомлений для пользователя.
+
+    Args:
+        user_id: User ID
+        type_: Notification type ('digest', 'events', 'breaking')
+        frequency: Notification frequency ('daily', 'weekly', 'instant')
+        enabled: Whether notification is enabled
+        preferred_hour: Preferred hour for daily notifications (0-23)
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return
+
+    try:
+        # Используем upsert для создания или обновления
+        # Указываем on_conflict для обработки дубликатов по (user_id, type)
+        result = (
+            supabase.table("notifications")
+            .upsert(
+                {
+                    "user_id": user_id,
+                    "type": type_,
+                    "frequency": frequency,
+                    "enabled": enabled,
+                    "preferred_hour": preferred_hour,
+                },
+                on_conflict="user_id,type"  # Указываем колонки для обработки конфликтов
+            )
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Обновлены настройки уведомлений: user_id=%s, type=%s", user_id, type_)
+
+    except Exception as e:
+        logger.error("Ошибка при обновлении настроек уведомлений: %s", e)
+
+
+def list_notifications(user_id: str) -> list[dict]:
+    """
+    Получает список настроек уведомлений пользователя.
+
+    Args:
+        user_id: User ID
+
+    Returns:
+        List of notification settings dicts
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+
+    try:
+        result = supabase.table("notifications").select("*").eq("user_id", user_id).execute()
+
+        return result.data or []
+
+    except Exception as e:
+        logger.error("Ошибка при получении настроек уведомлений: %s", e)
         return []
