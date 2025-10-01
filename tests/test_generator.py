@@ -35,9 +35,11 @@ async def test_generate_digest_wraps_service():
         # Мокаем DigestAIService.build_digest
         with patch('digests.generator.DigestAIService') as mock_service_class:
             mock_service = MagicMock()
+
             # Делаем мок асинхронным
             async def mock_build_digest(*args, **kwargs):
                 return "📰 <b>Test Digest</b>\n\nTest content"
+
             mock_service.build_digest = mock_build_digest
             mock_service_class.return_value = mock_service
 
