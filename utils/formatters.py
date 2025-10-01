@@ -1,8 +1,44 @@
 from typing import Union, Dict, Any, List, Optional
 from html import escape
+from datetime import datetime
+import zoneinfo
 
 from models.news import NewsItem
 from models.event import EventItem
+
+
+def format_date(
+    dt: Optional[datetime], 
+    fmt: str = "%-d %b %Y, %H:%M", 
+    tz: str = "Europe/Warsaw"
+) -> str:
+    """
+    Format datetime object to human-readable string with timezone support.
+    
+    Args:
+        dt: datetime object to format (can be None)
+        fmt: strftime format string (default: "%-d %b %Y, %H:%M")
+        tz: target timezone (default: "Europe/Warsaw")
+        
+    Returns:
+        Formatted date string or "—" if None
+    """
+    if not dt:
+        return "—"
+    
+    try:
+        # Convert to target timezone
+        target_tz = zoneinfo.ZoneInfo(tz)
+        localized_dt = dt.astimezone(target_tz)
+        
+        # Format with the provided format
+        return localized_dt.strftime(fmt)
+    except Exception as e:
+        # Fallback to ISO format with minutes precision
+        try:
+            return dt.isoformat(timespec="minutes")
+        except Exception:
+            return "—"
 
 
 def format_digest_output(data: Union[str, Dict[str, Any]], style: str = "analytical") -> str:
@@ -38,7 +74,7 @@ def format_news_item(item: NewsItem, index: Optional[int] = None) -> str:
     title = escape(title_raw)
     link = item.link or ""
     source = escape(item.source or "—")
-    published = item.published_at_fmt or "—"
+    published = format_date(item.published_at)
 
     cred = float(item.credibility or 0.0)
     imp = float(item.importance or 0.0)
@@ -121,7 +157,7 @@ def format_news_items(news: List[NewsItem], limit: int = 5, min_importance: floa
         title = escape(title_raw)
         link = item.link or ""
         source = escape(item.source or "—")
-        published = item.published_at_fmt or "—"
+        published = format_date(item.published_at)
 
         cred = float(item.credibility or 0.0)
         imp = float(item.importance or 0.0)

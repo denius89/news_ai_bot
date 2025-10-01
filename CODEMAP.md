@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-09-30 14:42:19 UTC_
+_Generated on 2025-10-01 12:08:14 UTC_
 
 ```
 ├── .github/
@@ -36,14 +36,18 @@ _Generated on 2025-09-30 14:42:19 UTC_
 │   ├── settings.py
 │   └── sources.yaml
 ├── database/
+│   ├── migrations/
+│   │   └── 2025_10_01_published_at_datetime.sql
 │   ├── __init__.py
 │   ├── db_models.py
 │   ├── init_tables.sql
 │   └── seed_data.sql
 ├── digests/
 │   ├── __init__.py
+│   ├── ai_service.py
 │   ├── ai_summary.py
 │   ├── configs.py
+│   ├── digest_service.py
 │   ├── generator.py
 │   └── prompts.py
 ├── docs/
@@ -91,6 +95,7 @@ _Generated on 2025-09-30 14:42:19 UTC_
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_ai_modules.py
+│   ├── test_ai_service.py
 │   ├── test_ai_summary.py
 │   ├── test_clean_text.py
 │   ├── test_db_content.py

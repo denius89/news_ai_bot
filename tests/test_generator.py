@@ -1,4 +1,52 @@
+"""
+Тесты для генератора дайджестов.
+"""
+
 import pytest
+from datetime import datetime, timezone
+from unittest.mock import patch, MagicMock
+
+from models.news import NewsItem
+
+
+@pytest.mark.asyncio
+@pytest.mark.unit
+async def test_generate_digest_wraps_service():
+    """Тест что generate_digest является оберткой над DigestAIService."""
+    from digests import generator
+    
+    # Создаем тестовую новость
+    test_news = NewsItem(
+        id="1",
+        title="Test News",
+        content="Test content",
+        link="http://example.com/1",
+        published_at=datetime.now(timezone.utc),
+        source="test_source",
+        category="crypto",
+        credibility=0.8,
+        importance=0.7
+    )
+    
+    # Мокаем fetch_recent_news чтобы вернуть нашу тестовую новость
+    with patch.object(generator, 'fetch_recent_news') as mock_fetch:
+        mock_fetch.return_value = [test_news]
+        
+        # Мокаем DigestAIService.build_digest
+        with patch('digests.generator.DigestAIService') as mock_service_class:
+            mock_service = MagicMock()
+            mock_service.build_digest.return_value = "📰 <b>Test Digest</b>\n\nTest content"
+            mock_service_class.return_value = mock_service
+            
+            # Вызываем generate_digest
+            result = await generator.generate_digest(limit=1, ai=True, style="analytical")
+            
+            # Проверяем результат
+            assert isinstance(result, str)
+            assert "Test Digest" in result
+            
+            # Проверяем, что сервис был вызван
+            mock_service.build_digest.assert_called_once()
 
 
 @pytest.mark.unit
