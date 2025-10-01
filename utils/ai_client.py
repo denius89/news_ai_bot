@@ -1,5 +1,6 @@
 # utils/ai_client.py
 import logging
+import asyncio
 import openai
 from config.settings import OPENAI_API_KEY, AI_MODEL_SUMMARY, AI_MAX_TOKENS
 
@@ -30,4 +31,40 @@ def ask(prompt: str, model: str = None, max_tokens: int = None) -> str:
         return content
     except Exception as e:
         logger.exception("❌ Ошибка в запросе к OpenAI")
+        raise e
+
+
+async def ask_async(
+    prompt: str, model: str = None, max_tokens: int = None, style: str = "analytical"
+) -> str:
+    """
+    Асинхронная функция для обращения к OpenAI ChatCompletion.
+    """
+    if not prompt.strip():
+        raise ValueError("❌ Пустой prompt для AI запроса")
+
+    model = model or AI_MODEL_SUMMARY
+    max_tokens = max_tokens or AI_MAX_TOKENS
+
+    # Temperature based on style
+    temps = {"analytical": 0.3, "business": 0.5, "meme": 0.8}
+    temperature = temps.get(style, 0.7)
+
+    try:
+        # Run in thread pool to avoid blocking
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(
+            None,
+            lambda: openai.ChatCompletion.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=temperature,
+            ),
+        )
+        content = response["choices"][0]["message"]["content"].strip()
+        logger.debug("AI response (model=%s, style=%s): %s", model, style, content[:200])
+        return content
+    except Exception as e:
+        logger.exception("❌ Ошибка в асинхронном запросе к OpenAI")
         raise e
