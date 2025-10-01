@@ -8,14 +8,14 @@ from models.event import EventItem
 
 
 def format_date(
-    dt: Optional[datetime], fmt: str = "%-d %b %Y, %H:%M", tz: str = "Europe/Warsaw"
+    dt: Optional[datetime], fmt: str = "%d %b %Y, %H:%M", tz: str = "Europe/Warsaw"
 ) -> str:
     """
     Format datetime object to human-readable string with timezone support.
 
     Args:
         dt: datetime object to format (can be None)
-        fmt: strftime format string (default: "%-d %b %Y, %H:%M")
+        fmt: strftime format string (default: "%d %b %Y, %H:%M")
         tz: target timezone (default: "Europe/Warsaw")
 
     Returns:
