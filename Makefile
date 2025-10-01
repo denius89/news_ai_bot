@@ -1,12 +1,12 @@
 # Makefile for news_ai_bot — quick dev commands
 
-PY?=python
+PY?=python3
 
-.PHONY: run-bot run-web run-digests run-events run-news test test-cov lint format check dev
+.PHONY: run-bot run-web run-digests run-events run-news test test-cov lint format check dev run-tests-bot check-db
 
 # 1) Run Telegram bot
 run-bot:
-	ENV=.env $(PY) -m telegram_bot.bot
+	$(PY) -m telegram_bot.bot
 
 # 2) Run web app
 run-web:
@@ -24,17 +24,17 @@ run-events:
 run-news:
 	$(PY) tools/fetch_and_store_news.py
 
-# 6) Run tests (quiet, no warnings)
+# 6) Run tests
 test:
-	pytest -q --disable-warnings
+	$(PY) -m pytest
 
 # 7) Run tests with coverage
 test-cov:
-	pytest --cov --cov-report=term-missing
+	$(PY) -m pytest --cov --cov-report=term-missing
 
-# 8) Lint (ruff)
+# 8) Lint
 lint:
-	ruff check .
+	flake8 .
 
 # 9) Format (black)
 format:
@@ -45,7 +45,16 @@ check:
 	$(MAKE) lint
 	$(MAKE) test
 
-# 11) Dev: run bot and web together
+# 11) Run tests then bot
+run-tests-bot:
+	$(MAKE) test
+	$(MAKE) run-bot
+
+# 12) Check database schema
+check-db:
+	$(PY) tools/check_database.py
+
+# 13) Dev: run bot and web together
 dev:
 	$(MAKE) run-bot & \
 	$(MAKE) run-web

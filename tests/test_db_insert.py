@@ -27,8 +27,7 @@ def test_insert_news():
     assert len(items) > 0
 
     # проверяем вставку нескольких новостей
-    for item in items[:3]:  # ограничим до 3, чтобы не перегружать базу
-        upsert_news(item)
+    upsert_news(items[:3])  # ограничим до 3, чтобы не перегружать базу
 
     print(f"✅ Добавлено {min(len(items), 3)} новостей в базу (интеграционный тест)")
 

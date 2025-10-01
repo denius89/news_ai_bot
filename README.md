@@ -57,14 +57,40 @@
 
 ## Quick Start
 
-1. Скопируй `.env.example` в `.env` и заполни токены (OpenAI, Supabase, Telegram).
-2. Установи зависимости: `pip install -r requirements.txt`.
-3. Запусти бота: `make run-bot`.
+1. **Настройка окружения:**
+   ```bash
+   cp .env.example .env
+   # Заполните обязательные переменные:
+   # TELEGRAM_BOT_TOKEN=your_bot_token
+   # SUPABASE_URL=your_supabase_url
+   # SUPABASE_KEY=your_supabase_key
+   # OPENAI_API_KEY=your_openai_key (опционально)
+   ```
 
-### Dev
-- Линтер: `make lint`
-- Форматирование: `make format`
-- Тесты: `make test`
+2. **Установка зависимостей:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Запуск бота:**
+   ```bash
+   make run-bot
+   ```
+
+### Commands
+
+- **Запуск бота:** `make run-bot`
+- **Тесты:** `make test`
+- **Линтер:** `make lint`
+- **Форматирование:** `make format`
+- **Тесты + бот:** `make run-tests-bot`
+
+### Daily Digests
+
+Автоматическая отправка дайджестов пользователям:
+```bash
+python tools/send_daily_digests.py
+```
 
 Проект тестируется через pytest и поддерживает async (pytest-asyncio).
 
@@ -253,6 +279,34 @@ flowchart TD
 - ⏰ Автоматические дайджесты (утро/вечер)
 - ⚙️ CI через GitHub Actions (полный прогон тестов + форматирование)
 - 📊 Улучшенные **AI-аналитические отчёты**
+
+## Troubleshooting
+
+### Common Issues
+
+#### "Message is not modified" error
+```
+TelegramBadRequest: message is not modified
+```
+**Solution:** This is handled automatically in the bot handlers. The error occurs when trying to edit a message with identical content.
+
+#### Database duplicate key error
+```
+duplicate key value violates unique constraint "notifications_user_id_type_key"
+```
+**Solution:** Fixed in `database/db_models.py` with proper `on_conflict` handling in `upsert_notification`.
+
+#### Make command not found
+```
+make: python: No such file or directory
+```
+**Solution:** Ensure virtual environment is activated and use `make run-bot` or `python3 -m telegram_bot.bot` directly.
+
+#### Tests failing with async errors
+```
+RuntimeError: asyncio.run() cannot be called from a running event loop
+```
+**Solution:** Tests are configured with `pytest-asyncio` in `auto` mode. Use `make test` or `python -m pytest`.
 
 ## Monetization
 

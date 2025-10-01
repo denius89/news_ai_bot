@@ -10,6 +10,7 @@ Complete guide for local setup and deployment of PulseAI.
 - [Services](#services)
 - [Production Deployment](#production-deployment)
 - [Database Setup](#database-setup)
+  - [Database Migrations](#database-migrations)
 - [Monitoring](#monitoring)
 
 ## Environment Setup
@@ -252,6 +253,94 @@ For periodic news and events parsing, use **Render Cron Jobs** or **Linux CRON**
 
 3. **API Keys**
    - Copy `SUPABASE_URL` and `SUPABASE_KEY` to your `.env` file
+
+### Database Migrations
+
+#### Local Development with Supabase CLI
+
+1. **Install Supabase CLI**
+   ```bash
+   # macOS
+   brew install supabase/tap/supabase
+   
+   # Linux
+   curl -fsSL https://supabase.com/install.sh | sh
+   
+   # Windows
+   scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+   scoop install supabase
+   ```
+
+2. **Initialize Supabase Project**
+   ```bash
+   # Initialize Supabase in your project directory
+   supabase init
+   
+   # Link to your remote project
+   supabase link --project-ref YOUR_PROJECT_REF
+   ```
+
+3. **Create and Apply Migrations**
+   ```bash
+   # Create new migration
+   supabase migration new subscriptions_notifications
+   
+   # Copy SQL from database/migrations/2025_10_02_subscriptions_notifications.sql
+   # to the generated migration file
+   
+   # Apply migration to remote database
+   supabase db push
+   ```
+
+4. **Migration Files Location**
+   - Local migrations: `supabase/migrations/`
+   - Project migrations: `database/migrations/`
+   - Copy SQL from project migrations to Supabase CLI migrations
+
+#### Row Level Security (RLS)
+
+**Option 1: Service Key (Recommended for Telegram Bot)**
+- If using service key in bot, RLS can remain disabled
+- Service key bypasses RLS policies
+- Simpler setup for Telegram bot integration
+
+**Option 2: RLS Enabled**
+- Enable RLS on tables if using auth.uid() policies
+- Configure policies for authenticated users
+- More complex but more secure for web applications
+
+```sql
+-- Enable RLS on tables
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- Example policy for authenticated users
+CREATE POLICY "Users can view own data" ON users
+FOR ALL USING (auth.uid()::text = telegram_id::text);
+```
+
+#### Migration Examples
+
+**Users, Subscriptions, and Notifications Tables:**
+```bash
+# Create migration
+supabase migration new subscriptions_notifications
+
+# Copy content from database/migrations/2025_10_02_subscriptions_notifications.sql
+# Then apply:
+supabase db push
+```
+
+**Published Date Migration:**
+```bash
+# Create migration
+supabase migration new published_at_datetime
+
+# Copy content from database/migrations/2025_10_01_published_at_datetime.sql
+# Then apply:
+supabase db push
+```
 
 ## Monitoring
 

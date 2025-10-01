@@ -27,7 +27,7 @@ jobs:
           pip install pytest pytest-cov flake8 black
 
       - name: Lint
-        run: make lint
+        run: flake8 .
 
       - name: Run tests
         run: make test

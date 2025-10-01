@@ -86,8 +86,7 @@ def main():
         logger.info(f"Ограничение: берём только {args.limit} новостей")
 
     logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
-    for item in items:
-        upsert_news(item)
+    upsert_news(items)
 
     logger.info("Готово ✅")
 

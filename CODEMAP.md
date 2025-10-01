@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-01 12:42:53 UTC_
+_Generated on 2025-10-01 18:01:51 UTC_
 
 ```
 ├── .github/
@@ -37,10 +37,14 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   └── sources.yaml
 ├── database/
 │   ├── migrations/
-│   │   └── 2025_10_01_published_at_datetime.sql
+│   │   ├── 2025_10_01_published_at_datetime.sql
+│   │   ├── 2025_10_02_add_missing_columns.sql
+│   │   ├── 2025_10_02_add_updated_at.sql
+│   │   └── 2025_10_02_subscriptions_notifications.sql
 │   ├── __init__.py
 │   ├── db_models.py
 │   ├── init_tables.sql
+│   ├── MIGRATION_INSTRUCTIONS.md
 │   └── seed_data.sql
 ├── digests/
 │   ├── __init__.py
@@ -54,8 +58,12 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   ├── ARCHITECTURE.md
 │   ├── COMMUNICATION.md
 │   ├── DEPLOY.md
+│   ├── PROGRESS_ANIMATION.md
 │   ├── ROADMAP.md
+│   ├── TELEGRAM_KEYBOARDS.md
 │   └── VISION.md
+├── examples/
+│   └── telegram_sender_example.py
 ├── logs/
 ├── models/
 │   ├── event.py
@@ -69,11 +77,14 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
-│   └── news_routes.py
+│   ├── news_routes.py
+│   └── subscriptions.py
 ├── services/
 │   ├── __init__.py
 │   ├── digest_ai_service.py
-│   └── digest_service.py
+│   ├── digest_service.py
+│   ├── notification_service.py
+│   └── subscription_service.py
 ├── static/
 │   └── style.css
 ├── telegram_bot/
@@ -82,7 +93,8 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
-│   │   └── start.py
+│   │   ├── start.py
+│   │   └── subscriptions.py
 │   ├── __init__.py
 │   ├── bot.py
 │   └── keyboards.py
@@ -97,6 +109,7 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   ├── test_ai_modules.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
+│   ├── test_bot_routers.py
 │   ├── test_clean_text.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
@@ -107,24 +120,35 @@ _Generated on 2025-10-01 12:42:53 UTC_
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
 │   ├── test_generator.py
+│   ├── test_keyboards_subscriptions.py
 │   ├── test_main.py
 │   ├── test_main_import.py
 │   ├── test_news_repository.py
 │   ├── test_openai.py
 │   ├── test_parsers.py
+│   ├── test_progress_animation.py
 │   ├── test_routes.py
+│   ├── test_subscriptions.py
 │   ├── test_supabase.py
+│   ├── test_telegram_keyboards.py
+│   ├── test_telegram_sender.py
 │   └── test_webapp.py
 ├── tools/
+│   ├── apply_migration.py
+│   ├── check_database.py
 │   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
+│   ├── README_daily_digests.md
 │   ├── repo_map.py
-│   └── show_news.py
+│   ├── send_daily_digests.py
+│   ├── show_news.py
+│   └── test_daily_digests.py
 ├── .coverage
 ├── .editorconfig
 ├── .env.example
 ├── .gitignore
+├── =2025.1
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -133,6 +157,7 @@ _Generated on 2025-10-01 12:42:53 UTC_
 ├── MASTER_FILE.md
 ├── pyproject.toml
 ├── pytest.ini
+├── QUICK_FIX.md
 ├── README.md
 ├── requirements.txt
 ├── setup.cfg
