@@ -1,5 +1,5 @@
 # telegram_bot/handlers/__init__.py
-from . import start, digest, digest_ai, events
+from . import start, digest, digest_ai, events, subscriptions
 
 # Список всех роутеров для подключения в bot.py
 routers = [
@@ -7,4 +7,5 @@ routers = [
     digest_ai.router,
     digest.router,
     events.router,
+    subscriptions.router,
 ]
