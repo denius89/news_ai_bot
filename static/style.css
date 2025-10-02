@@ -1,0 +1,134 @@
+/* PulseAI - Base Styles */
+
+:root {
+  --pulse-dark-blue: #1E3A8A;
+  --pulse-purple: #6B21A8;
+  --pulse-light-blue: #3B82F6;
+  --pulse-bg-dark: #0A0F2D;
+  --pulse-bg-light: #F8FAFC;
+  --pulse-text-light: #FFFFFF;
+  --pulse-text-dark: #1F2937;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  line-height: 1.6;
+  color: var(--pulse-text-dark);
+  background: var(--pulse-bg-light);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Header Styles */
+.pulse-header {
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
+  color: var(--pulse-text-light);
+  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.pulse-header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pulse-logo {
+  text-decoration: none;
+  color: var(--pulse-text-light);
+}
+
+.pulse-logo h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.pulse-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.pulse-nav a {
+  color: var(--pulse-text-light);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.pulse-nav a:hover,
+.pulse-nav a.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* PWA Specific Styles */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .pulse-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .pulse-header .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pulse-nav {
+    gap: 1rem;
+  }
+  
+  .pulse-nav a {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pulse-btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
+  color: var(--pulse-text-light);
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pulse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+}

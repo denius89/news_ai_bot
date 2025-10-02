@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 09:09:35 UTC_
+_Generated on 2025-10-02 09:20:33 UTC_
 
 ```
 ├── .github/
@@ -86,10 +86,19 @@ _Generated on 2025-10-02 09:09:35 UTC_
 │   ├── notification_service.py
 │   └── subscription_service.py
 ├── static/
-│   └── assets/
-│       └── logo/
-│           ├── logo_full.jpg
-│           └── logo_icon.PNG
+│   ├── assets/
+│   │   └── logo/
+│   │       ├── favicon.ico
+│   │       ├── logo_full.jpg
+│   │       ├── logo_icon.PNG
+│   │       ├── logo_icon_16.png
+│   │       ├── logo_icon_180.png
+│   │       ├── logo_icon_192.png
+│   │       ├── logo_icon_32.png
+│   │       ├── logo_icon_512.png
+│   │       ├── logo_icon_96.png
+│   │       └── site.webmanifest
+│   └── style.css
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
