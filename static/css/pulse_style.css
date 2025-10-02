@@ -1,0 +1,214 @@
+/* PulseAI Brand Styles */
+
+:root {
+  --pulse-blue: #2E5BFF;
+  --pulse-purple: #6B46C1;
+  --pulse-light-blue: #3B82F6;
+  --pulse-dark-blue: #1E40AF;
+  --pulse-white: #FFFFFF;
+  --pulse-gray: #F8FAFC;
+  --pulse-dark-gray: #64748B;
+}
+
+/* Logo styles */
+.pulse-logo {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.pulse-logo svg {
+  width: auto;
+  height: 40px;
+  transition: transform 0.3s ease;
+}
+
+.pulse-logo:hover svg {
+  transform: scale(1.05);
+}
+
+/* Brand text */
+.pulse-brand {
+  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: bold;
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
+}
+
+/* Header with logo */
+.pulse-header {
+  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  color: var(--pulse-white);
+  padding: 1rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pulse-header .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pulse-header .logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.pulse-header .logo-section h1 {
+  margin: 0;
+  margin-left: 0.75rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+/* Navigation */
+.pulse-nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.pulse-nav a {
+  color: var(--pulse-white);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.pulse-nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Cards with pulse theme */
+.pulse-card {
+  background: var(--pulse-white);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(46, 91, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.pulse-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(46, 91, 255, 0.15);
+}
+
+/* Buttons */
+.pulse-btn {
+  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  color: var(--pulse-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.pulse-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 91, 255, 0.4);
+  color: var(--pulse-white);
+  text-decoration: none;
+}
+
+.pulse-btn-outline {
+  background: transparent;
+  color: var(--pulse-blue);
+  border: 2px solid var(--pulse-blue);
+}
+
+.pulse-btn-outline:hover {
+  background: var(--pulse-blue);
+  color: var(--pulse-white);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse-animate {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pulse-header .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .pulse-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .pulse-logo svg {
+    height: 32px;
+  }
+  
+  .pulse-header .logo-section h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* News item styles */
+.news-item {
+  border-left: 4px solid var(--pulse-blue);
+  padding-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.news-item .title {
+  color: var(--pulse-dark-blue);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.news-item .meta {
+  color: var(--pulse-dark-gray);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.news-item .content {
+  color: #374151;
+  line-height: 1.6;
+}
+
+/* Status indicators */
+.status-indicator {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-high {
+  background-color: #FEE2E2;
+  color: #DC2626;
+}
+
+.status-medium {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.status-low {
+  background-color: #DCFCE7;
+  color: #16A34A;
+}

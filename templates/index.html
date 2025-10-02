@@ -1,12 +1,131 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>News AI Bot</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <h1>Welcome to News AI Bot</h1>
-    <p><a href="/digest">View latest digest</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
+    <!-- Hero Section -->
+    <section class="hero" style="text-align: center; padding: 4rem 0;">
+        <div class="pulse-logo" style="margin-bottom: 2rem;">
+            <svg width="120" height="120" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="heroBgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2E5BFF"/>
+                        <stop offset="100%" style="stop-color:#6B46C1"/>
+                    </linearGradient>
+                    <linearGradient id="heroAiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3B82F6"/>
+                        <stop offset="100%" style="stop-color:#1E40AF"/>
+                    </linearGradient>
+                </defs>
+                
+                <rect width="200" height="200" rx="40" ry="40" fill="url(#heroBgGradient)"/>
+                
+                <!-- Letter P -->
+                <g transform="translate(50, 40)">
+                    <path d="M0,0 L0,120 L15,120 L15,70 L50,70 C70,70 85,55 85,35 C85,15 70,0 50,0 Z M15,15 L50,15 C60,15 70,25 70,35 C70,45 60,55 50,55 L15,55 Z" 
+                          fill="white"/>
+                    
+                    <!-- Animated pulse line -->
+                    <g transform="translate(5, 25)">
+                        <path d="M5,20 L15,20 L20,5 L25,35 L30,10 L35,25 L40,20 L60,20" 
+                              stroke="#2E5BFF" 
+                              stroke-width="3" 
+                              fill="none" 
+                              stroke-linecap="round">
+                            <animate attributeName="stroke-dasharray" 
+                                     values="0,100;50,50;100,0" 
+                                     dur="2s" 
+                                     repeatCount="indefinite"/>
+                        </path>
+                    </g>
+                </g>
+                
+                <!-- AI Badge -->
+                <g transform="translate(140, 30)">
+                    <circle cx="20" cy="20" r="20" fill="url(#heroAiGradient)"/>
+                    <text x="20" y="26" 
+                          font-family="Arial, sans-serif" 
+                          font-size="14" 
+                          font-weight="bold" 
+                          fill="white" 
+                          text-anchor="middle">AI</text>
+                </g>
+            </svg>
+        </div>
+        
+        <h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #2E5BFF, #6B46C1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Добро пожаловать в PulseAI
+        </h1>
+        
+        <p style="font-size: 1.25rem; color: #64748B; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            AI-платформа для персонализированных дайджестов новостей и умного календаря событий. 
+            Получайте только важную информацию с AI-анализом достоверности и значимости.
+        </p>
+        
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/digest" class="pulse-btn">📰 Посмотреть дайджест</a>
+            <a href="/events" class="pulse-btn pulse-btn-outline">📅 События</a>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features" style="padding: 4rem 0;">
+        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #1E293B;">
+            Возможности платформы
+        </h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <!-- Feature 1 -->
+            <div class="pulse-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🧠</div>
+                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">AI-анализ новостей</h3>
+                <p style="color: #64748B; line-height: 1.6;">
+                    Автоматическая оценка достоверности и важности каждой новости с помощью 
+                    искусственного интеллекта.
+                </p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="pulse-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Персонализированные дайджесты</h3>
+                <p style="color: #64748B; line-height: 1.6;">
+                    Получайте дайджесты, адаптированные под ваши интересы и предпочтения 
+                    по категориям.
+                </p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="pulse-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">📅</div>
+                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Умный календарь событий</h3>
+                <p style="color: #64748B; line-height: 1.6;">
+                    Отслеживайте важные события в мире криптовалют, экономики и технологий 
+                    в одном месте.
+                </p>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="pulse-card">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
+                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Telegram-бот</h3>
+                <p style="color: #64748B; line-height: 1.6;">
+                    Удобный доступ ко всем функциям через Telegram с подписками 
+                    и уведомлениями.
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta" style="background: linear-gradient(135deg, #2E5BFF, #6B46C1); padding: 4rem 2rem; border-radius: 2rem; text-align: center; color: white; margin: 4rem 0;">
+        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Начните использовать PulseAI уже сегодня</h2>
+        <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">
+            Присоединяйтесь к тысячам пользователей, которые уже получают качественные новости с AI-анализом
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/digest" class="pulse-btn" style="background: white; color: #2E5BFF;">Попробовать сейчас</a>
+            <a href="https://t.me/your_bot" class="pulse-btn" style="background: rgba(255,255,255,0.2); border: 2px solid white;">Telegram-бот</a>
+        </div>
+    </section>
+</div>
+{% endblock %}
