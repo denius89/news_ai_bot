@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1E3A8A">
+    <meta name="description" content="PulseAI — умные дайджесты и события с искусственным интеллектом">
     <title>{{ title or "PulseAI - AI-Powered News & Events" }}</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="{{ url_for('static', filename='assets/logo/site.webmanifest') }}">
-    <meta name="theme-color" content="#1E3A8A">
     
-    <!-- Favicon -->
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/logo/logo_icon_16.png') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/logo/favicon.ico') }}" sizes="any">
     
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
     
-    <!-- Meta tags -->
-    <meta name="description" content="PulseAI - AI-платформа для персонализированных дайджестов новостей и умного календаря событий">
-    <meta name="keywords" content="AI, новости, дайджест, события, искусственный интеллект">
+    <!-- Additional PWA Meta Tags -->
     <meta name="application-name" content="PulseAI">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="PulseAI">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="msapplication-TileColor" content="#1E3A8A">
-    <meta name="msapplication-config" content="none">
+    <meta name="keywords" content="AI, новости, дайджест, события, искусственный интеллект">
 </head>
 <body>
     <!-- Site Header -->
