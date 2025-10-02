@@ -13,3 +13,183 @@
 2025-10-02 12:47:10,555 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
 2025-10-02 12:47:10,662 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
 2025-10-02 12:47:10,664 [INFO] aiogram.event: Update id=938694672 is handled. Duration 122 ms by bot id=8062922612
+2025-10-02 12:47:24,877 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:47:25,124 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:47:25,125 [INFO] aiogram.event: Update id=938694673 is handled. Duration 249 ms by bot id=8062922612
+2025-10-02 12:48:18,631 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:48:18,765 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:48:18,765 [INFO] aiogram.event: Update id=938694674 is handled. Duration 147 ms by bot id=8062922612
+2025-10-02 12:49:45,847 [INFO] aiogram.event: Update id=938694675 is handled. Duration 95 ms by bot id=8062922612
+2025-10-02 12:49:48,550 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:49:48,687 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:49:48,688 [INFO] aiogram.event: Update id=938694676 is handled. Duration 139 ms by bot id=8062922612
+2025-10-02 12:53:11,520 [INFO] aiogram.event: Update id=938694677 is handled. Duration 105 ms by bot id=8062922612
+2025-10-02 12:53:16,009 [INFO] aiogram.event: Update id=938694678 is handled. Duration 414 ms by bot id=8062922612
+2025-10-02 12:53:25,345 [INFO] aiogram.event: Update id=938694679 is handled. Duration 111 ms by bot id=8062922612
+2025-10-02 12:53:28,808 [INFO] aiogram.event: Update id=938694680 is handled. Duration 143 ms by bot id=8062922612
+2025-10-02 12:53:34,205 [INFO] aiogram.event: Update id=938694681 is handled. Duration 132 ms by bot id=8062922612
+2025-10-02 12:53:45,234 [INFO] aiogram.event: Update id=938694682 is handled. Duration 205 ms by bot id=8062922612
+2025-10-02 12:53:50,778 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 1879652637
+2025-10-02 12:53:50,878 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 1879652637
+2025-10-02 12:53:50,879 [INFO] aiogram.event: Update id=938694683 is handled. Duration 105 ms by bot id=8062922612
+2025-10-02 13:00:48,877 [INFO] aiogram.event: Update id=938694684 is handled. Duration 108 ms by bot id=8062922612
+2025-10-02 13:00:50,777 [INFO] aiogram.event: Update id=938694685 is handled. Duration 147 ms by bot id=8062922612
+2025-10-02 13:00:52,356 [INFO] aiogram.event: Update id=938694686 is handled. Duration 152 ms by bot id=8062922612
+2025-10-02 13:00:57,025 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/users?select=%2A&telegram_id=eq.1879652637 "HTTP/2 200 OK"
+2025-10-02 13:00:57,247 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/users?select=id&telegram_id=eq.1879652637 "HTTP/2 200 OK"
+2025-10-02 13:00:57,445 [INFO] httpx: HTTP Request: POST https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/users "HTTP/2 201 Created"
+2025-10-02 13:00:57,456 [INFO] database: Создан новый пользователь: ID=901b21b1-2925-446e-a570-010a8ab77aad, telegram_id=1879652637
+2025-10-02 13:00:57,456 [INFO] services.subscription_service: Created new user: ID=901b21b1-2925-446e-a570-010a8ab77aad, telegram_id=1879652637
+2025-10-02 13:00:57,635 [INFO] httpx: HTTP Request: POST https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/subscriptions "HTTP/2 201 Created"
+--- Logging error ---
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 377, in getMessage
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: %d format: a real number is required, not str
+Call stack:
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 995, in _bootstrap
+    self._bootstrap_inner()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 83, in _worker
+    work_item.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/denisfedko/news_ai_bot/database/db_models.py", line 413, in add_subscription
+    logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
+Message: 'Добавлена подписка: user_id=%d, category=%s'
+Arguments: ('901b21b1-2925-446e-a570-010a8ab77aad', 'technology')
+--- Logging error ---
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/handlers.py", line 73, in emit
+    if self.shouldRollover(record):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/handlers.py", line 196, in shouldRollover
+    msg = "%s\n" % self.format(record)
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 377, in getMessage
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: %d format: a real number is required, not str
+Call stack:
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 995, in _bootstrap
+    self._bootstrap_inner()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 83, in _worker
+    work_item.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/denisfedko/news_ai_bot/database/db_models.py", line 413, in add_subscription
+    logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
+Message: 'Добавлена подписка: user_id=%d, category=%s'
+Arguments: ('901b21b1-2925-446e-a570-010a8ab77aad', 'technology')
+2025-10-02 13:00:57,663 [INFO] services.subscription_service: Subscription add result: user_id=901b21b1-2925-446e-a570-010a8ab77aad, category=technology, added=True
+2025-10-02 13:00:57,849 [INFO] aiogram.event: Update id=938694687 is handled. Duration 1943 ms by bot id=8062922612
+2025-10-02 13:01:00,209 [INFO] aiogram.event: Update id=938694688 is handled. Duration 109 ms by bot id=8062922612
+2025-10-02 13:01:03,550 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/users?select=%2A&telegram_id=eq.1879652637 "HTTP/2 200 OK"
+2025-10-02 13:01:03,735 [INFO] httpx: HTTP Request: POST https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/subscriptions "HTTP/2 201 Created"
+--- Logging error ---
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 1110, in emit
+    msg = self.format(record)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 377, in getMessage
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: %d format: a real number is required, not str
+Call stack:
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 995, in _bootstrap
+    self._bootstrap_inner()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 83, in _worker
+    work_item.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/denisfedko/news_ai_bot/database/db_models.py", line 413, in add_subscription
+    logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
+Message: 'Добавлена подписка: user_id=%d, category=%s'
+Arguments: ('901b21b1-2925-446e-a570-010a8ab77aad', 'world')
+--- Logging error ---
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/handlers.py", line 73, in emit
+    if self.shouldRollover(record):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/handlers.py", line 196, in shouldRollover
+    msg = "%s\n" % self.format(record)
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 953, in format
+    return fmt.format(record)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 687, in format
+    record.message = record.getMessage()
+                     ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/logging/__init__.py", line 377, in getMessage
+    msg = msg % self.args
+          ~~~~^~~~~~~~~~~
+TypeError: %d format: a real number is required, not str
+Call stack:
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 995, in _bootstrap
+    self._bootstrap_inner()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 83, in _worker
+    work_item.run()
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/denisfedko/news_ai_bot/database/db_models.py", line 413, in add_subscription
+    logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
+Message: 'Добавлена подписка: user_id=%d, category=%s'
+Arguments: ('901b21b1-2925-446e-a570-010a8ab77aad', 'world')
+2025-10-02 13:01:03,739 [INFO] services.subscription_service: Subscription add result: user_id=901b21b1-2925-446e-a570-010a8ab77aad, category=world, added=True
+2025-10-02 13:01:03,911 [INFO] aiogram.event: Update id=938694689 is handled. Duration 663 ms by bot id=8062922612
+2025-10-02 13:01:05,188 [INFO] aiogram.event: Update id=938694690 is handled. Duration 114 ms by bot id=8062922612
+2025-10-02 13:04:43,255 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 13:04:43,402 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 13:04:43,402 [INFO] aiogram.event: Update id=938694691 is handled. Duration 155 ms by bot id=8062922612
+2025-10-02 13:07:24,766 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 1879652637
+2025-10-02 13:07:25,086 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 1879652637
+2025-10-02 13:07:25,088 [INFO] aiogram.event: Update id=938694692 is handled. Duration 338 ms by bot id=8062922612
+2025-10-02 13:08:14,275 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 1879652637
+2025-10-02 13:08:14,375 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 1879652637
+2025-10-02 13:08:14,375 [INFO] aiogram.event: Update id=938694693 is handled. Duration 103 ms by bot id=8062922612
+2025-10-02 13:46:01,298 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 13:46:01,666 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 13:46:01,667 [INFO] aiogram.event: Update id=938694694 is handled. Duration 381 ms by bot id=8062922612
+2025-10-02 13:48:39,426 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 13:48:39,525 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 13:48:39,525 [INFO] aiogram.event: Update id=938694695 is handled. Duration 109 ms by bot id=8062922612
+2025-10-02 13:55:18,458 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 13:55:18,719 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 13:55:18,720 [INFO] aiogram.event: Update id=938694696 is handled. Duration 283 ms by bot id=8062922612

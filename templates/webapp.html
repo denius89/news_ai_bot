@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Additional PWA Meta Tags -->
     <meta name="application-name" content="PulseAI">
@@ -33,7 +33,7 @@
 <body style="margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: 'SF Pro', 'Roboto', 'Inter', sans-serif;">
   <header class="webapp-header">
     <img src="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}" alt="PulseAI" class="logo">
-    <h1>PulseAI Dashboard</h1>
+    <span class="header-title">Dashboard</span>
   </header>
 
   <main id="webapp-content">
