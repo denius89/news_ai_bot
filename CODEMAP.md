@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 10:16:46 UTC_
+_Generated on 2025-10-02 10:22:15 UTC_
 
 ```
 ├── .github/
@@ -104,6 +104,7 @@ _Generated on 2025-10-02 10:16:46 UTC_
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
+│   │   ├── dashboard.py
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
@@ -126,6 +127,7 @@ _Generated on 2025-10-02 10:16:46 UTC_
 │   ├── test_ai_summary.py
 │   ├── test_bot_routers.py
 │   ├── test_clean_text.py
+│   ├── test_dashboard_handler.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_db_models.py
