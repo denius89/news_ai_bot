@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 09:55:10 UTC_
+_Generated on 2025-10-02 10:12:41 UTC_
 
 ```
 ├── .github/
@@ -98,6 +98,8 @@ _Generated on 2025-10-02 09:55:10 UTC_
 │   │       ├── logo_icon_512.png
 │   │       ├── logo_icon_96.png
 │   │       └── site.webmanifest
+│   ├── js/
+│   │   └── webapp.js
 │   └── style.css
 ├── telegram_bot/
 │   ├── handlers/
@@ -114,7 +116,8 @@ _Generated on 2025-10-02 09:55:10 UTC_
 │   ├── base.html
 │   ├── digest.html
 │   ├── events.html
-│   └── index.html
+│   ├── index.html
+│   └── webapp.html
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py

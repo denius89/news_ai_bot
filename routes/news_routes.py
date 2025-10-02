@@ -63,4 +63,12 @@ def events():
     )
 
 
+# --- WebApp Dashboard ---
+@news_bp.route("/webapp")
+def webapp():
+    """WebApp Dashboard with tabs for subscriptions, notifications, and calendar."""
+    logger.info("📱 WebApp dashboard accessed")
+    return render_template("webapp.html")
+
+
 __all__ = ["news_bp"]
