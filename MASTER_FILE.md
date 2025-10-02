@@ -217,7 +217,7 @@ python tools/fix_old_news.py --mode fill-missing
 - **PyYAML** — source configurations (`config/sources.yaml`)
 - **Logging (RotatingFileHandler)** — unified log collection to console and file
 - **Jinja2** (via Flask) — template engine for UI (pages /digest, /events)
-- **Custom CSS (static/style.css)** — custom styles with light/dark theme adaptation and mobile devices
+- **Custom CSS** — custom styles with light/dark theme adaptation and mobile devices
 - **aiogram 3.x** — Telegram bot framework
 - **Pydantic** — data validation and models
 - Ability to connect **new news sources** via `sources.yaml`
