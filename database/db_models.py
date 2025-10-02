@@ -138,7 +138,7 @@ def upsert_news(items: List[Dict]):
             if not isinstance(item, dict):
                 logger.error(f"upsert_news получил не словарь: {type(item)} = {item}")
                 continue
-                
+
             enriched = enrich_news_with_ai(item)
 
             title = (
@@ -514,7 +514,7 @@ def upsert_notification(
                     "enabled": enabled,
                     "preferred_hour": preferred_hour,
                 },
-                on_conflict="user_id,type"  # Указываем колонки для обработки конфликтов
+                on_conflict="user_id,type",  # Указываем колонки для обработки конфликтов
             )
             .execute()
         )
