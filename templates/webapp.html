@@ -19,6 +19,9 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
     <!-- Additional PWA Meta Tags -->
     <meta name="application-name" content="PulseAI">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,9 +54,18 @@
   </main>
 
   <nav class="webapp-nav">
-    <button data-tab="subscriptions" class="nav-btn active">📑 Subscriptions</button>
-    <button data-tab="notifications" class="nav-btn">🔔 Notifications</button>
-    <button data-tab="calendar" class="nav-btn">📅 Calendar</button>
+    <button data-tab="subscriptions" class="nav-btn active">
+      <i data-lucide="bookmark"></i>
+      Subscriptions
+    </button>
+    <button data-tab="notifications" class="nav-btn">
+      <i data-lucide="bell"></i>
+      Notifications
+    </button>
+    <button data-tab="calendar" class="nav-btn">
+      <i data-lucide="calendar"></i>
+      Calendar
+    </button>
   </nav>
 
   <!-- JavaScript -->
