@@ -82,6 +82,7 @@ def test_keyboard_structure():
 
         # Test categories keyboard
         from telegram_bot.keyboards import categories_inline_keyboard
+
         cat_kb = categories_inline_keyboard("subscribe")
         assert hasattr(cat_kb, 'inline_keyboard')
         assert len(cat_kb.inline_keyboard) > 1  # Categories + back button
