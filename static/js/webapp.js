@@ -1,8 +1,24 @@
 // PulseAI WebApp JavaScript
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("WebApp JS loaded");
+    
     // Get all tab buttons and content sections
     const tabButtons = document.querySelectorAll('.webapp-nav .nav-btn');
     const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Function to update icon colors
+    function updateIconColors() {
+        tabButtons.forEach(btn => {
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                if (btn.classList.contains('active')) {
+                    svg.setAttribute('stroke', '#1E3A8A');
+                } else {
+                    svg.setAttribute('stroke', '#6b7280');
+                }
+            }
+        });
+    }
     
     // Function to switch tabs
     function switchTab(targetTab) {
@@ -21,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeContent) {
             activeContent.classList.add('active');
         }
+        
+        // Update icon colors
+        updateIconColors();
         
         // Update URL hash without scrolling
         history.replaceState(null, null, `#${targetTab}`);
@@ -53,10 +72,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle browser back/forward buttons
     window.addEventListener('hashchange', initializeTab);
     
-    // Add smooth transitions
-    tabContents.forEach(content => {
-        content.style.transition = 'opacity 0.3s ease-in-out';
-    });
+    // Initialize Lucide icons after render
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+        console.log('Lucide icons initialized');
+    }
     
     console.log('PulseAI WebApp initialized');
 });
