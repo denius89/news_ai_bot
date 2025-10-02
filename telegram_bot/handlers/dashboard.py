@@ -18,24 +18,19 @@ async def open_dashboard(message: types.Message):
     Sends a keyboard with WebApp button to open PulseAI Dashboard.
     """
     logger.info("📱 Dashboard command received from user %s", message.from_user.id)
-    
+
     # TODO: Move WebApp URL to config.py
     webapp_url = "https://xxxx.ngrok.io/webapp"
-    
+
     # Create keyboard with WebApp button
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [
-                KeyboardButton(
-                    text="📱 Открыть Dashboard",
-                    web_app=WebAppInfo(url=webapp_url)
-                )
-            ]
+            [KeyboardButton(text="📱 Открыть Dashboard", web_app=WebAppInfo(url=webapp_url))]
         ],
         resize_keyboard=True,
-        one_time_keyboard=False
+        one_time_keyboard=False,
     )
-    
+
     await message.answer(
         "🚀 <b>PulseAI Dashboard</b>\n\n"
         "Откройте ваш персональный дашборд для управления:\n"
@@ -44,9 +39,9 @@ async def open_dashboard(message: types.Message):
         "• 📅 Календарем событий\n\n"
         "Нажмите кнопку ниже для запуска:",
         reply_markup=keyboard,
-        parse_mode="HTML"
+        parse_mode="HTML",
     )
-    
+
     logger.info("📱 Dashboard WebApp sent to user %s", message.from_user.id)
 
 
