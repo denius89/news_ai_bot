@@ -3,7 +3,7 @@ Tests for dashboard handler.
 """
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 from aiogram.types import Message, User, Chat, WebAppInfo
 
 from telegram_bot.handlers.dashboard import open_dashboard
