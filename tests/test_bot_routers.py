@@ -17,15 +17,15 @@ def test_routers_import():
     """Test that all routers can be imported."""
     try:
         from telegram_bot.handlers import routers
-        
+
         # Check that routers list exists and is not empty
         assert routers is not None
         assert isinstance(routers, list)
         assert len(routers) > 0
-        
+
         print(f"✅ Импортировано {len(routers)} роутеров")
         return True
-        
+
     except ImportError as e:
         print(f"❌ Ошибка импорта роутеров: {e}")
         return False
@@ -39,14 +39,14 @@ def test_subscriptions_router():
     try:
         # Test individual imports
         from telegram_bot.handlers import subscriptions
-        
+
         # Check that router exists
         assert hasattr(subscriptions, 'router')
         assert subscriptions.router is not None
-        
+
         print("✅ Subscriptions роутер найден")
         return True
-        
+
     except ImportError as e:
         print(f"❌ Ошибка импорта subscriptions: {e}")
         return False
@@ -59,16 +59,16 @@ def test_all_handlers():
     """Test that all handler modules can be imported."""
     try:
         from telegram_bot.handlers import start, digest, digest_ai, events, subscriptions
-        
+
         # Check that all modules have router attribute
         modules = [start, digest, digest_ai, events, subscriptions]
         for module in modules:
             assert hasattr(module, 'router'), f"Модуль {module.__name__} не имеет router"
             assert module.router is not None, f"Router в {module.__name__} равен None"
-        
+
         print("✅ Все обработчики имеют роутеры")
         return True
-        
+
     except ImportError as e:
         print(f"❌ Ошибка импорта обработчиков: {e}")
         return False
@@ -81,16 +81,16 @@ def main():
     """Run all router tests."""
     print("🧪 Тестирование конфигурации роутеров Telegram бота")
     print("=" * 50)
-    
+
     tests = [
         test_routers_import,
         test_subscriptions_router,
         test_all_handlers,
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         try:
             if test():
@@ -99,15 +99,15 @@ def main():
         except Exception as e:
             print(f"❌ Тест {test.__name__} упал: {e}")
             print()
-    
+
     print("=" * 50)
     print(f"📊 Результат: {passed}/{total} тестов пройдено")
-    
+
     if passed == total:
         print("✅ Все роутеры настроены правильно!")
         print("\n🎯 Доступные команды:")
         print("   /subscribe <category> - подписаться на категорию")
-        print("   /unsubscribe <category> - отписаться от категории") 
+        print("   /unsubscribe <category> - отписаться от категории")
         print("   /my_subs - показать мои подписки")
         print("   /notify_on <type> - включить уведомления")
         print("   /notify_off <type> - отключить уведомления")

@@ -218,19 +218,16 @@ class NotificationService:
             # In a real scenario, you'd query the database directly
             # For now, we'll return an empty list since we don't have
             # a direct database query method for this complex join
-            
-            logger.info(
-                "Getting users for notification type=%s, hour=%s", 
-                type_, preferred_hour
-            )
-            
+
+            logger.info("Getting users for notification type=%s, hour=%s", type_, preferred_hour)
+
             # TODO: Implement actual database query:
-            # SELECT u.id, u.telegram_id, u.username, u.locale 
-            # FROM users u 
-            # JOIN notifications n ON u.id = n.user_id 
-            # WHERE n.type = ? AND n.enabled = true 
+            # SELECT u.id, u.telegram_id, u.username, u.locale
+            # FROM users u
+            # JOIN notifications n ON u.id = n.user_id
+            # WHERE n.type = ? AND n.enabled = true
             # AND (? IS NULL OR n.preferred_hour = ?)
-            
+
             # For now, return empty list
             users = []
             logger.info("Found %d users for notification type %s", len(users), type_)
