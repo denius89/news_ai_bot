@@ -24,7 +24,7 @@ def test_keyboard_imports():
             notifications_inline_keyboard,
             categories_inline_keyboard,
         )
-        
+
         # Check that all functions exist
         functions = [
             start_inline_keyboard,
@@ -34,13 +34,13 @@ def test_keyboard_imports():
             notifications_inline_keyboard,
             categories_inline_keyboard,
         ]
-        
+
         for func in functions:
             assert callable(func), f"Function {func.__name__} is not callable"
-        
+
         print("✅ Все функции клавиатур импортированы успешно")
         return True
-        
+
     except ImportError as e:
         print(f"❌ Ошибка импорта клавиатур: {e}")
         return False
@@ -58,39 +58,39 @@ def test_keyboard_structure():
             notifications_inline_keyboard,
             categories_inline_keyboard,
         )
-        
+
         # Test main keyboard
         main_kb = main_inline_keyboard()
         assert hasattr(main_kb, 'inline_keyboard')
         assert len(main_kb.inline_keyboard) >= 5  # Should have at least 5 buttons now
-        
+
         # Check for new buttons
         all_buttons = []
         for row in main_kb.inline_keyboard:
             for button in row:
                 all_buttons.append(button.text)
-        
+
         assert "📋 Подписки" in all_buttons, "Subscriptions button not found in main keyboard"
         assert "🔔 Уведомления" in all_buttons, "Notifications button not found in main keyboard"
-        
+
         # Test subscriptions keyboard
         subs_kb = subscriptions_inline_keyboard()
         assert hasattr(subs_kb, 'inline_keyboard')
         assert len(subs_kb.inline_keyboard) == 4  # 3 action buttons + back
-        
+
         # Test notifications keyboard
         notif_kb = notifications_inline_keyboard()
         assert hasattr(notif_kb, 'inline_keyboard')
         assert len(notif_kb.inline_keyboard) == 4  # 3 action buttons + back
-        
+
         # Test categories keyboard
         cat_kb = categories_inline_keyboard("subscribe")
         assert hasattr(cat_kb, 'inline_keyboard')
         assert len(cat_kb.inline_keyboard) > 1  # Categories + back button
-        
+
         print("✅ Структура клавиатур корректна")
         return True
-        
+
     except Exception as e:
         print(f"❌ Ошибка структуры клавиатур: {e}")
         return False
@@ -105,42 +105,47 @@ def test_callback_data():
             notifications_inline_keyboard,
             categories_inline_keyboard,
         )
-        
+
         # Test main keyboard callback data
         main_kb = main_inline_keyboard()
         callback_data_list = []
         for row in main_kb.inline_keyboard:
             for button in row:
                 callback_data_list.append(button.callback_data)
-        
+
         assert "subscriptions" in callback_data_list
         assert "notifications" in callback_data_list
-        
+
         # Test subscriptions keyboard callback data
         subs_kb = subscriptions_inline_keyboard()
         subs_callbacks = []
         for row in subs_kb.inline_keyboard:
             for button in row:
                 subs_callbacks.append(button.callback_data)
-        
+
         expected_subs_callbacks = ["my_subs", "subscribe_menu", "unsubscribe_menu", "back"]
         for expected in expected_subs_callbacks:
             assert expected in subs_callbacks, f"Missing callback: {expected}"
-        
+
         # Test notifications keyboard callback data
         notif_kb = notifications_inline_keyboard()
         notif_callbacks = []
         for row in notif_kb.inline_keyboard:
             for button in row:
                 notif_callbacks.append(button.callback_data)
-        
-        expected_notif_callbacks = ["my_notifications", "notify_on_digest", "notify_off_digest", "back"]
+
+        expected_notif_callbacks = [
+            "my_notifications",
+            "notify_on_digest",
+            "notify_off_digest",
+            "back",
+        ]
         for expected in expected_notif_callbacks:
             assert expected in notif_callbacks, f"Missing callback: {expected}"
-        
+
         print("✅ Callback data корректно настроен")
         return True
-        
+
     except Exception as e:
         print(f"❌ Ошибка callback data: {e}")
         return False
@@ -150,16 +155,16 @@ def main():
     """Run all keyboard tests."""
     print("🧪 Тестирование Telegram клавиатур")
     print("=" * 50)
-    
+
     tests = [
         test_keyboard_imports,
         test_keyboard_structure,
         test_callback_data,
     ]
-    
+
     passed = 0
     total = len(tests)
-    
+
     for test in tests:
         try:
             if test():
@@ -168,10 +173,10 @@ def main():
         except Exception as e:
             print(f"❌ Тест {test.__name__} упал: {e}")
             print()
-    
+
     print("=" * 50)
     print(f"📊 Результат: {passed}/{total} тестов пройдено")
-    
+
     if passed == total:
         print("✅ Все клавиатуры настроены правильно!")
         print("\n🎯 Доступные клавиатуры:")

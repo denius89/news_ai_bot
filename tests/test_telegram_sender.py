@@ -76,7 +76,9 @@ class TestTelegramSender:
 
         with patch("utils.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
-            mock_bot.send_message = AsyncMock(side_effect=TelegramForbiddenError("Forbidden", "Forbidden"))
+            mock_bot.send_message = AsyncMock(
+                side_effect=TelegramForbiddenError("Forbidden", "Forbidden")
+            )
             mock_bot_class.return_value = mock_bot
 
             sender = TelegramSender("123456789:ABCdefGHIjklMNOpqrsTUVwxyz")
@@ -91,7 +93,9 @@ class TestTelegramSender:
 
         with patch("utils.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
-            mock_bot.send_message = AsyncMock(side_effect=TelegramBadRequest("Bad Request", "Bad Request"))
+            mock_bot.send_message = AsyncMock(
+                side_effect=TelegramBadRequest("Bad Request", "Bad Request")
+            )
             mock_bot_class.return_value = mock_bot
 
             sender = TelegramSender("123456789:ABCdefGHIjklMNOpqrsTUVwxyz")
@@ -109,7 +113,10 @@ class TestTelegramSender:
 
             # First call raises RetryAfter, second succeeds
             mock_bot.send_message = AsyncMock(
-                side_effect=[TelegramRetryAfter(retry_after=1, message="Retry after", method="sendMessage"), None]  # Success on retry
+                side_effect=[
+                    TelegramRetryAfter(retry_after=1, message="Retry after", method="sendMessage"),
+                    None,
+                ]  # Success on retry
             )
             mock_bot_class.return_value = mock_bot
 
