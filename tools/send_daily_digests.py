@@ -14,19 +14,12 @@ import asyncio
 import logging
 import os
 import sys
-from datetime import datetime
-from typing import List, Dict
 import zoneinfo
+from datetime import datetime
 from pathlib import Path
-
-# Добавляем корневую директорию в PYTHONPATH для импортов
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
+from typing import List, Dict
 
 from dotenv import load_dotenv
-
-# Загружаем переменные окружения
-load_dotenv()
 
 from services.subscription_service import SubscriptionService
 from services.notification_service import NotificationService
@@ -34,6 +27,14 @@ from digests.ai_service import DigestAIService, DigestConfig
 from database.db_models import get_latest_news
 from models.news import NewsItem
 from config.constants import CATEGORIES
+from utils.telegram_sender import TelegramSender
+
+# Добавляем корневую директорию в PYTHONPATH для импортов
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+# Загружаем переменные окружения
+load_dotenv()
 
 # Настройка логирования
 logging.basicConfig(
@@ -43,8 +44,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
-from utils.telegram_sender import TelegramSender
 
 
 async def get_current_hour_warsaw() -> int:

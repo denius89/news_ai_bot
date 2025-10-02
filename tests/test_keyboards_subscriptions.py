@@ -6,7 +6,7 @@ for subscription and notification management.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from telegram_bot.keyboards import (
     subscriptions_inline_keyboard,
