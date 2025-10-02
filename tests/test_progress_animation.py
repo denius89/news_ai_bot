@@ -81,7 +81,6 @@ async def test_progress_animation_stop(mock_callback_query):
 
     # Mock sleep to be instant and track calls
     sleep_calls = 0
-    original_sleep = asyncio.sleep
 
     async def mock_sleep(delay):
         nonlocal sleep_calls

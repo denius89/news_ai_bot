@@ -5,7 +5,7 @@ Provides animated progress indicators for AI digest generation.
 
 import asyncio
 import logging
-from typing import List, Optional, Callable, Any
+from typing import List, Optional
 from aiogram import types
 from aiogram.exceptions import TelegramBadRequest
 
