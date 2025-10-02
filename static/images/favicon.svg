@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+    <!-- Diagonal gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#1E3A8A"/>
       <stop offset="100%" style="stop-color:#6B21A8"/>
     </linearGradient>
@@ -10,20 +11,28 @@
   <!-- Background with rounded corners -->
   <rect width="32" height="32" rx="6" fill="url(#bgGrad)"/>
   
-  <!-- Simplified P with smooth curves -->
+  <!-- Simplified P with integrated pulse -->
   <g transform="translate(6, 4)">
-    <path d="M0,0 L0,24 L2,24 L2,14 L8,14 C11,14 13.5,11.5 13.5,8.5 C13.5,5.5 11,3 8,3 L2,3 L2,0 Z M2,5 L8,5 C9.5,5 11.5,6 11.5,8.5 C11.5,11 9.5,12 8,12 L2,12 Z" 
-          fill="#FFFFFF"/>
+    <!-- P filled shape -->
+    <path d="M0,2 L0,26 L2,26 L2,16 L8,16 C11,16 14,13 14,9 C14,5 11,2 8,2 Z M2,4 L8,4 C10,4 12,6 12,9 C12,12 10,14 8,14 L2,14 Z" 
+          fill="white"/>
     
-    <!-- Pulse line integrated -->
-    <path d="M1,6 L3,6 L4,3 L5,9 L6,4 L7,7 L8,6 L11,6" 
+    <!-- Pulse line integrated in vertical part -->
+    <path d="M1,8 L2,6 L3,10 L4,7 L5,9 L6,8" 
           stroke="white" 
           stroke-width="1.5" 
           fill="none"
-          stroke-linecap="round"/>
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
   </g>
   
   <!-- AI badge -->
-  <circle cx="24" cy="8" r="5" fill="#3B82F6"/>
-  <text x="24" y="11" font-family="Inter, Arial" font-size="5" font-weight="bold" fill="white" text-anchor="middle">AI</text>
+  <circle cx="25" cy="7" r="4" fill="#3B82F6"/>
+  <text x="25" y="7" 
+        font-family="Inter, sans-serif" 
+        font-weight="700" 
+        font-size="4" 
+        fill="white" 
+        text-anchor="middle" 
+        alignment-baseline="middle">AI</text>
 </svg>
