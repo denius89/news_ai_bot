@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 09:01:30 UTC_
+_Generated on 2025-10-02 09:09:35 UTC_
 
 ```
 ├── .github/
@@ -86,14 +86,10 @@ _Generated on 2025-10-02 09:01:30 UTC_
 │   ├── notification_service.py
 │   └── subscription_service.py
 ├── static/
-│   ├── assets/
-│   ├── css/
-│   │   └── pulse_style.css
-│   ├── images/
-│   │   ├── favicon.svg
-│   │   └── pulse_logo.svg
-│   ├── js/
-│   └── style.css
+│   └── assets/
+│       └── logo/
+│           ├── logo_full.jpg
+│           └── logo_icon.PNG
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
