@@ -1,0 +1,12 @@
+2025-10-02 12:42:05,529 [INFO] telegram_bot: 🚀 Telegram bot started
+2025-10-02 12:42:05,530 [INFO] aiogram.dispatcher: Start polling
+2025-10-02 12:42:05,839 [INFO] aiogram.dispatcher: Run polling for bot @PulseAIDigest_bot id=8062922612 - 'PulseAI'
+2025-10-02 12:44:43,629 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:44:44,023 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:44:44,024 [INFO] aiogram.event: Update id=938694669 is handled. Duration 422 ms by bot id=8062922612
+2025-10-02 12:44:55,404 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:44:55,527 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:44:55,528 [INFO] aiogram.event: Update id=938694670 is handled. Duration 145 ms by bot id=8062922612
+2025-10-02 12:45:13,679 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 320711822
+2025-10-02 12:45:13,768 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 320711822
+2025-10-02 12:45:13,771 [INFO] aiogram.event: Update id=938694671 is handled. Duration 108 ms by bot id=8062922612

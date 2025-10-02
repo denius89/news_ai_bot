@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 10:29:39 UTC_
+_Generated on 2025-10-02 10:47:03 UTC_
 
 ```
 ├── .github/
@@ -78,7 +78,8 @@ _Generated on 2025-10-02 10:29:39 UTC_
 ├── routes/
 │   ├── __init__.py
 │   ├── news_routes.py
-│   └── subscriptions.py
+│   ├── subscriptions.py
+│   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
 │   ├── digest_ai_service.py
@@ -166,6 +167,7 @@ _Generated on 2025-10-02 10:29:39 UTC_
 ├── .env.example
 ├── .gitignore
 ├── =2025.1
+├── bot.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -179,5 +181,6 @@ _Generated on 2025-10-02 10:29:39 UTC_
 ├── requirements.txt
 ├── setup.cfg
 ├── TASKS.md
+├── webapp.log
 └── webapp.py
 ```

@@ -1,0 +1,10 @@
+2025-10-02 12:46:30,205 [INFO] news_ai_bot: 🚀 Webapp запущен (хост 0.0.0.0, порт 8001, debug=False)
+2025-10-02 12:46:30,608 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Cuid%2Ctitle%2Ccontent%2Clink%2Cpublished_at%2Csource%2Ccategory%2Ccredibility%2Cimportance&order=published_at.desc&limit=5 "HTTP/2 200 OK"
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+2025-10-02 12:46:30,636 [INFO] werkzeug: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8001
+ * Running on http://192.168.0.32:8001
+2025-10-02 12:46:30,636 [INFO] werkzeug: [33mPress CTRL+C to quit[0m
+2025-10-02 12:46:49,080 [INFO] werkzeug: 127.0.0.1 - - [02/Oct/2025 12:46:49] "HEAD /webapp HTTP/1.1" 200 -
