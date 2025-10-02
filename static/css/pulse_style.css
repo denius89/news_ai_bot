@@ -1,10 +1,10 @@
 /* PulseAI Brand Styles */
 
 :root {
-  --pulse-blue: #2E5BFF;
-  --pulse-purple: #6B46C1;
+  --pulse-dark-blue: #1E3A8A;
+  --pulse-purple: #6B21A8;
   --pulse-light-blue: #3B82F6;
-  --pulse-dark-blue: #1E40AF;
+  --pulse-blue: #2563EB;
   --pulse-white: #FFFFFF;
   --pulse-gray: #F8FAFC;
   --pulse-dark-gray: #64748B;
@@ -28,7 +28,7 @@
 
 /* Brand text */
 .pulse-brand {
-  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -39,7 +39,7 @@
 
 /* Header with logo */
 .pulse-header {
-  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
   color: var(--pulse-white);
   padding: 1rem 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -102,7 +102,7 @@
 
 /* Buttons */
 .pulse-btn {
-  background: linear-gradient(135deg, var(--pulse-blue), var(--pulse-purple));
+  background: linear-gradient(135deg, var(--pulse-dark-blue), var(--pulse-purple));
   color: var(--pulse-white);
   border: none;
   padding: 0.75rem 1.5rem;
@@ -116,19 +116,19 @@
 
 .pulse-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(46, 91, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.4);
   color: var(--pulse-white);
   text-decoration: none;
 }
 
 .pulse-btn-outline {
   background: transparent;
-  color: var(--pulse-blue);
-  border: 2px solid var(--pulse-blue);
+  color: var(--pulse-dark-blue);
+  border: 2px solid var(--pulse-dark-blue);
 }
 
 .pulse-btn-outline:hover {
-  background: var(--pulse-blue);
+  background: var(--pulse-dark-blue);
   color: var(--pulse-white);
 }
 
