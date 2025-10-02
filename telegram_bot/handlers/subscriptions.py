@@ -34,6 +34,7 @@ NOTIFICATION_TYPES = ["digest", "events", "breaking"]
 
 # --- COMMAND HANDLERS ---
 
+
 @router.message(Command("subscribe"))
 async def cmd_subscribe(message: types.Message):
     """Handle /subscribe <category> command to add subscription."""
@@ -57,9 +58,7 @@ async def cmd_subscribe(message: types.Message):
 
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=message.from_user.id,
-            username=message.from_user.username,
-            locale="ru"
+            telegram_id=message.from_user.id, username=message.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -68,7 +67,7 @@ async def cmd_subscribe(message: types.Message):
 
         # Add subscription
         success = await subscription_service.add(user_id, category)
-        
+
         if success:
             await message.answer(f"✅ Подписка на {category} добавлена")
         else:
@@ -102,9 +101,7 @@ async def cmd_unsubscribe(message: types.Message):
 
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=message.from_user.id,
-            username=message.from_user.username,
-            locale="ru"
+            telegram_id=message.from_user.id, username=message.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -113,7 +110,7 @@ async def cmd_unsubscribe(message: types.Message):
 
         # Remove subscription
         removed_count = await subscription_service.remove(user_id, category)
-        
+
         if removed_count > 0:
             await message.answer(f"✅ Подписка на {category} удалена")
         else:
@@ -130,9 +127,7 @@ async def cmd_my_subs(message: types.Message):
     try:
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=message.from_user.id,
-            username=message.from_user.username,
-            locale="ru"
+            telegram_id=message.from_user.id, username=message.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -141,7 +136,7 @@ async def cmd_my_subs(message: types.Message):
 
         # Get subscriptions
         subscriptions = await subscription_service.list(user_id)
-        
+
         if not subscriptions:
             await message.answer(
                 "📋 У вас пока нет подписок.\n"
@@ -154,7 +149,7 @@ async def cmd_my_subs(message: types.Message):
             text = "📋 <b>Ваши подписки:</b>\n\n"
             for i, category in enumerate(categories, 1):
                 text += f"{i}. {category}\n"
-            
+
             await message.answer(text, parse_mode="HTML")
 
     except Exception as e:
@@ -191,23 +186,21 @@ async def cmd_help_subs(message: types.Message):
 /notify_on digest
 /notify_off events
 """.format(
-        ', '.join(CATEGORIES), 
-        ', '.join(NOTIFICATION_TYPES)
+        ', '.join(CATEGORIES), ', '.join(NOTIFICATION_TYPES)
     )
-    
+
     await message.answer(help_text, parse_mode="HTML")
 
 
 # --- CALLBACK HANDLERS ---
+
 
 @router.callback_query(F.data == "subscriptions")
 async def cb_subscriptions_menu(query: types.CallbackQuery):
     """Показать меню подписок"""
     text = "📋 <b>Управление подписками</b>\n\nВыберите действие:"
     await query.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=subscriptions_inline_keyboard()
+        text, parse_mode="HTML", reply_markup=subscriptions_inline_keyboard()
     )
 
 
@@ -216,9 +209,7 @@ async def cb_notifications_menu(query: types.CallbackQuery):
     """Показать меню уведомлений"""
     text = "🔔 <b>Управление уведомлениями</b>\n\nВыберите действие:"
     await query.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=notifications_inline_keyboard()
+        text, parse_mode="HTML", reply_markup=notifications_inline_keyboard()
     )
 
 
@@ -228,21 +219,18 @@ async def cb_my_subs(query: types.CallbackQuery):
     try:
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:
             await query.message.edit_text(
-                "❌ Не удалось выполнить действие",
-                reply_markup=back_inline_keyboard()
+                "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
             )
             return
 
         # Get subscriptions
         subscriptions = await subscription_service.list(user_id)
-        
+
         if not subscriptions:
             text = (
                 "📋 <b>Ваши подписки</b>\n\n"
@@ -257,17 +245,12 @@ async def cb_my_subs(query: types.CallbackQuery):
             for i, category in enumerate(categories, 1):
                 text += f"{i}. {category}\n"
 
-        await query.message.edit_text(
-            text,
-            parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
-        )
+        await query.message.edit_text(text, parse_mode="HTML", reply_markup=back_inline_keyboard())
 
     except Exception as e:
         logger.error("Error in cb_my_subs: %s", e)
         await query.message.edit_text(
-            "❌ Не удалось выполнить действие",
-            reply_markup=back_inline_keyboard()
+            "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
         )
 
 
@@ -276,9 +259,7 @@ async def cb_subscribe_menu(query: types.CallbackQuery):
     """Показать меню выбора категории для подписки"""
     text = "➕ <b>Подписаться на категорию</b>\n\nВыберите категорию:"
     await query.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=categories_inline_keyboard("subscribe")
+        text, parse_mode="HTML", reply_markup=categories_inline_keyboard("subscribe")
     )
 
 
@@ -287,9 +268,7 @@ async def cb_unsubscribe_menu(query: types.CallbackQuery):
     """Показать меню выбора категории для отписки"""
     text = "➖ <b>Отписаться от категории</b>\n\nВыберите категорию:"
     await query.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=categories_inline_keyboard("unsubscribe")
+        text, parse_mode="HTML", reply_markup=categories_inline_keyboard("unsubscribe")
     )
 
 
@@ -298,12 +277,10 @@ async def cb_subscribe_category(query: types.CallbackQuery):
     """Подписаться на выбранную категорию"""
     try:
         category = query.data.split(":", 1)[1]
-        
+
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -312,7 +289,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
 
         # Add subscription
         success = await subscription_service.add(user_id, category)
-        
+
         if success:
             await query.answer(f"✅ Подписка на {category} добавлена")
         else:
@@ -337,12 +314,10 @@ async def cb_unsubscribe_category(query: types.CallbackQuery):
     """Отписаться от выбранной категории"""
     try:
         category = query.data.split(":", 1)[1]
-        
+
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -351,7 +326,7 @@ async def cb_unsubscribe_category(query: types.CallbackQuery):
 
         # Remove subscription
         removed_count = await subscription_service.remove(user_id, category)
-        
+
         if removed_count > 0:
             await query.answer(f"✅ Подписка на {category} удалена")
         else:
@@ -377,21 +352,18 @@ async def cb_my_notifications(query: types.CallbackQuery):
     try:
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:
             await query.message.edit_text(
-                "❌ Не удалось выполнить действие",
-                reply_markup=back_inline_keyboard()
+                "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
             )
             return
 
         # Get notifications
         notifications = await notification_service.list(user_id)
-        
+
         if not notifications:
             text = (
                 "🔔 <b>Ваши уведомления</b>\n\n"
@@ -413,17 +385,12 @@ async def cb_my_notifications(query: types.CallbackQuery):
                     else:
                         text += f"   Частота: {frequency}, время: {hour}:00\n"
 
-        await query.message.edit_text(
-            text,
-            parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
-        )
+        await query.message.edit_text(text, parse_mode="HTML", reply_markup=back_inline_keyboard())
 
     except Exception as e:
         logger.error("Error in cb_my_notifications: %s", e)
         await query.message.edit_text(
-            "❌ Не удалось выполнить действие",
-            reply_markup=back_inline_keyboard()
+            "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
         )
 
 
@@ -433,9 +400,7 @@ async def cb_notify_on_digest(query: types.CallbackQuery):
     try:
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:
@@ -466,9 +431,7 @@ async def cb_notify_off_digest(query: types.CallbackQuery):
     try:
         # Get or create user
         user_id = await subscription_service.get_or_create_user(
-            telegram_id=query.from_user.id,
-            username=query.from_user.username,
-            locale="ru"
+            telegram_id=query.from_user.id, username=query.from_user.username, locale="ru"
         )
 
         if not user_id:

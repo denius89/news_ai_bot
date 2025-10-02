@@ -12,9 +12,11 @@ from pathlib import Path
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
 import sys
+
 sys.path.insert(0, str(project_root))
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from tools.send_daily_digests import (
