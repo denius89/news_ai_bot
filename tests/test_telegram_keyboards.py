@@ -22,7 +22,6 @@ def test_keyboard_imports():
             back_inline_keyboard,
             subscriptions_inline_keyboard,
             notifications_inline_keyboard,
-            categories_inline_keyboard,
         )
 
         # Check that all functions exist
@@ -32,7 +31,6 @@ def test_keyboard_imports():
             back_inline_keyboard,
             subscriptions_inline_keyboard,
             notifications_inline_keyboard,
-            categories_inline_keyboard,
         ]
 
         for func in functions:
@@ -56,7 +54,6 @@ def test_keyboard_structure():
             main_inline_keyboard,
             subscriptions_inline_keyboard,
             notifications_inline_keyboard,
-            categories_inline_keyboard,
         )
 
         # Test main keyboard
@@ -84,6 +81,7 @@ def test_keyboard_structure():
         assert len(notif_kb.inline_keyboard) == 4  # 3 action buttons + back
 
         # Test categories keyboard
+        from telegram_bot.keyboards import categories_inline_keyboard
         cat_kb = categories_inline_keyboard("subscribe")
         assert hasattr(cat_kb, 'inline_keyboard')
         assert len(cat_kb.inline_keyboard) > 1  # Categories + back button
@@ -103,7 +101,6 @@ def test_callback_data():
             main_inline_keyboard,
             subscriptions_inline_keyboard,
             notifications_inline_keyboard,
-            categories_inline_keyboard,
         )
 
         # Test main keyboard callback data

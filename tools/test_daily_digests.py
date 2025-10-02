@@ -6,18 +6,10 @@ This script tests the daily digest functionality without actually sending messag
 
 import asyncio
 import logging
-import os
+import sys
 from pathlib import Path
 
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
-import sys
-
-sys.path.insert(0, str(project_root))
-
 from dotenv import load_dotenv
-
-load_dotenv()
 
 from tools.send_daily_digests import (
     get_current_hour_warsaw,
@@ -27,6 +19,12 @@ from tools.send_daily_digests import (
 )
 from services.subscription_service import SubscriptionService
 from services.notification_service import NotificationService
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+load_dotenv()
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
