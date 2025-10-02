@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const svg = btn.querySelector('svg');
             if (svg) {
                 if (btn.classList.contains('active')) {
-                    svg.setAttribute('stroke', '#1E3A8A');
+                    svg.setAttribute('stroke', '#2E5BFF');
                 } else {
                     svg.setAttribute('stroke', '#6b7280');
                 }
@@ -66,17 +66,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Initialize on load
-    initializeTab();
-    
-    // Handle browser back/forward buttons
-    window.addEventListener('hashchange', initializeTab);
-    
-    // Initialize Lucide icons after render
+    // Initialize Lucide icons first
     if (typeof lucide !== 'undefined' && lucide.createIcons) {
         lucide.createIcons();
         console.log('Lucide icons initialized');
+        
+        // Small delay to ensure icons are rendered before initializing tabs
+        setTimeout(() => {
+            initializeTab();
+            updateIconColors();
+        }, 100);
+    } else {
+        // Fallback if Lucide is not available
+        initializeTab();
     }
+    
+    // Handle browser back/forward buttons
+    window.addEventListener('hashchange', initializeTab);
     
     console.log('PulseAI WebApp initialized');
 });
