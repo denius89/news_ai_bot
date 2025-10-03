@@ -3,6 +3,7 @@ Unit tests for Subscriptions API endpoints.
 """
 
 import pytest
+from unittest.mock import patch
 
 from webapp import app
 
@@ -29,15 +30,19 @@ class TestSubscriptionsAPI:
         else:
             assert response.status_code == 400
 
-    def test_get_subscriptions_success(self, client):
+    @patch('services.subscription_service.SubscriptionService.list')
+    def test_get_subscriptions_success(self, mock_list, client):
         """Test successful GET /api/subscriptions."""
+        # Mock service response
+        mock_list.return_value = [{'category': 'crypto'}, {'category': 'economy'}]
+
         response = client.get('/api/subscriptions?user_id=123')
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
         assert 'categories' in data['data']
         assert 'total_subscriptions' in data['data']
-        assert data['data']['total_subscriptions'] == 0  # Demo returns empty subscriptions
+        assert data['data']['total_subscriptions'] == 2
 
     def test_update_subscription_missing_json(self, client):
         """Test POST /api/subscriptions/update without JSON body."""
@@ -69,8 +74,11 @@ class TestSubscriptionsAPI:
         assert data['status'] == 'error'
         assert 'Invalid category' in data['message']
 
-    def test_update_subscription_enable_success(self, client):
+    @patch('services.subscription_service.SubscriptionService.add')
+    def test_update_subscription_enable_success(self, mock_add, client):
         """Test successful subscription enable."""
+        mock_add.return_value = True
+
         response = client.post(
             '/api/subscriptions/update',
             json={'user_id': '123', 'category': 'crypto', 'enabled': True},
@@ -80,8 +88,11 @@ class TestSubscriptionsAPI:
         assert data['status'] == 'success'
         assert 'subscribed to' in data['message']
 
-    def test_update_subscription_disable_success(self, client):
+    @patch('services.subscription_service.SubscriptionService.remove')
+    def test_update_subscription_disable_success(self, mock_remove, client):
         """Test successful subscription disable."""
+        mock_remove.return_value = True
+
         response = client.post(
             '/api/subscriptions/update',
             json={'user_id': '123', 'category': 'crypto', 'enabled': False},
@@ -110,15 +121,18 @@ class TestSubscriptionsAPI:
         assert data['status'] == 'error'
         assert 'telegram_id is required' in data['message']
 
-    def test_create_user_success(self, client):
+    @patch('services.subscription_service.SubscriptionService.get_or_create_user')
+    def test_create_user_success(self, mock_get_user, client):
         """Test successful user creation."""
+        mock_get_user.return_value = 'user-uuid-123'
+
         response = client.post(
             '/api/users', json={'telegram_id': 123456789, 'username': 'testuser'}
         )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
-        assert 'user_id' in data['data']
+        assert data['data']['user_id'] == 'user-uuid-123'
         assert data['data']['telegram_id'] == 123456789
 
     def test_health_check(self, client):
