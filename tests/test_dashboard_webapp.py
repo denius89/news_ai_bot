@@ -27,8 +27,8 @@ async def test_dashboard_command():
 
     # Check message content
     assert "PulseAI Dashboard" in args[0]
-    assert "подписками" in args[0]
-    assert "уведомлениями" in args[0]
+    assert "Подписками" in args[0]
+    assert "Уведомлениями" in args[0]
     assert "Back to Bot" in args[0]
 
     # Check markup
