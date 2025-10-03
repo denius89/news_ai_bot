@@ -1,6 +1,10 @@
 # config/settings.py
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 # Корень репозитория
 BASE_DIR = Path(__file__).resolve().parents[1]
