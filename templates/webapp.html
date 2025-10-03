@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1E3A8A">
+    <meta name="description" content="PulseAI — умные дайджесты и события с искусственным интеллектом">
+    <title>PulseAI Dashboard</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='assets/logo/site.webmanifest') }}">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/logo/logo_icon_16.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/logo/favicon.ico') }}" sizes="any">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='webapp.css') }}">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Additional PWA Meta Tags -->
+    <meta name="application-name" content="PulseAI">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PulseAI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#1E3A8A">
+</head>
+<body style="margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: 'SF Pro', 'Roboto', 'Inter', sans-serif;">
+  <header class="webapp-header">
+    <img src="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}" alt="PulseAI" class="logo">
+    <h1>PulseAI Dashboard</h1>
+  </header>
+
+  <main id="webapp-content">
+    <section id="subscriptions" class="tab-content active">
+      <h2>Subscriptions</h2>
+      <p>Subscriptions UI placeholder</p>
+    </section>
+    
+    <section id="notifications" class="tab-content">
+      <h2>Notifications</h2>
+      <p>Notifications UI placeholder</p>
+    </section>
+    
+    <section id="calendar" class="tab-content">
+      <h2>Calendar</h2>
+      <p>Calendar UI placeholder</p>
+    </section>
+  </main>
+
+  <nav class="webapp-nav">
+    <button data-tab="subscriptions" class="nav-btn active">
+      <i data-lucide="bookmark"></i>
+      Subscriptions
+    </button>
+    <button data-tab="notifications" class="nav-btn">
+      <i data-lucide="bell"></i>
+      Notifications
+    </button>
+    <button data-tab="calendar" class="nav-btn">
+      <i data-lucide="calendar"></i>
+      Calendar
+    </button>
+  </nav>
+
+  <!-- JavaScript -->
+  <script src="{{ url_for('static', filename='js/webapp.js') }}"></script>
+</body>
+</html>

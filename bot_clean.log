@@ -1,0 +1,185 @@
+2025-10-02 19:42:54,088 [INFO] telegram_bot: 🚀 Telegram bot started
+2025-10-02 19:42:54,088 [INFO] aiogram.dispatcher: Start polling
+2025-10-02 19:42:54,429 [INFO] aiogram.dispatcher: Run polling for bot @PulseAIDigest_bot id=8062922612 - 'PulseAI'
+2025-10-02 19:43:12,318 [INFO] aiogram.event: Update id=938694864 is handled. Duration 292 ms by bot id=8062922612
+2025-10-02 19:43:12,476 [INFO] aiogram.event: Update id=938694865 is handled. Duration 72 ms by bot id=8062922612
+2025-10-02 19:43:26,389 [INFO] aiogram.event: Update id=938694866 is handled. Duration 79 ms by bot id=8062922612
+2025-10-02 19:43:30,280 [INFO] aiogram.event: Update id=938694867 is handled. Duration 206 ms by bot id=8062922612
+2025-10-02 19:43:32,700 [INFO] aiogram.event: Update id=938694868 is handled. Duration 143 ms by bot id=8062922612
+2025-10-02 19:43:33,873 [INFO] aiogram.event: Update id=938694869 is handled. Duration 225 ms by bot id=8062922612
+2025-10-02 19:43:35,028 [INFO] digest_ai: ➡️ Генерация: category=politics, period=7d, style=meme
+2025-10-02 19:43:37,594 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=20&category=eq.politics "HTTP/2 200 OK"
+2025-10-02 19:43:37,653 [ERROR] ai_summary: Ошибка при batch-аннотации: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+Traceback (most recent call last):
+  File "/Users/denisfedko/news_ai_bot/digests/ai_summary.py", line 111, in generate_batch_summary
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/functools.py", line 1001, in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/_client.py", line 185, in chat
+    from .resources.chat import Chat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/beta.py", line 23, in <module>
+    from ...resources.chat import Chat, AsyncChat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/__init__.py", line 3, in <module>
+    from .chat import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/chat.py", line 7, in <module>
+    from .completions.completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/__init__.py", line 11, in <module>
+    from .completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 42, in <module>
+    from ....lib.streaming.chat import ChatCompletionStreamManager, AsyncChatCompletionStreamManager
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/__init__.py", line 21, in <module>
+    from ._completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/_completions.py", line 8, in <module>
+    from jiter import from_json
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/__init__.py", line 1, in <module>
+    from .jiter import *
+ImportError: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+2025-10-02 19:43:37,783 [INFO] aiogram.event: Update id=938694870 is handled. Duration 2956 ms by bot id=8062922612
+2025-10-02 19:47:31,409 [INFO] aiogram.event: Update id=938694871 is handled. Duration 223 ms by bot id=8062922612
+2025-10-02 19:47:34,002 [INFO] aiogram.event: Update id=938694872 is handled. Duration 228 ms by bot id=8062922612
+2025-10-02 19:47:35,288 [INFO] aiogram.event: Update id=938694873 is handled. Duration 338 ms by bot id=8062922612
+2025-10-02 19:47:36,445 [INFO] aiogram.event: Update id=938694874 is handled. Duration 236 ms by bot id=8062922612
+2025-10-02 19:47:37,622 [INFO] digest_ai: ➡️ Генерация: category=world, period=7d, style=meme
+2025-10-02 19:47:40,308 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=20&category=eq.world "HTTP/2 200 OK"
+2025-10-02 19:47:40,382 [ERROR] ai_summary: Ошибка при batch-аннотации: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+Traceback (most recent call last):
+  File "/Users/denisfedko/news_ai_bot/digests/ai_summary.py", line 111, in generate_batch_summary
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/functools.py", line 1001, in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/_client.py", line 185, in chat
+    from .resources.chat import Chat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/beta.py", line 23, in <module>
+    from ...resources.chat import Chat, AsyncChat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/__init__.py", line 3, in <module>
+    from .chat import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/chat.py", line 7, in <module>
+    from .completions.completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/__init__.py", line 11, in <module>
+    from .completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 42, in <module>
+    from ....lib.streaming.chat import ChatCompletionStreamManager, AsyncChatCompletionStreamManager
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/__init__.py", line 21, in <module>
+    from ._completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/_completions.py", line 8, in <module>
+    from jiter import from_json
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/__init__.py", line 1, in <module>
+    from .jiter import *
+ImportError: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+2025-10-02 19:47:40,542 [INFO] aiogram.event: Update id=938694875 is handled. Duration 3025 ms by bot id=8062922612
+2025-10-02 19:47:41,774 [INFO] aiogram.event: Update id=938694876 is handled. Duration 82 ms by bot id=8062922612
+2025-10-02 19:47:43,981 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 8062922612
+2025-10-02 19:47:44,092 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 8062922612
+2025-10-02 19:47:44,093 [INFO] aiogram.event: Update id=938694877 is handled. Duration 113 ms by bot id=8062922612
+2025-10-02 19:48:20,662 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=5 "HTTP/2 200 OK"
+2025-10-02 19:48:21,055 [INFO] telegram_bot.handlers.digest: ✅ Digest sent: category=all, count=5
+2025-10-02 19:48:21,056 [INFO] aiogram.event: Update id=938694878 is handled. Duration 661 ms by bot id=8062922612
+2025-10-02 19:48:24,740 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=5&category=eq.economy "HTTP/2 200 OK"
+2025-10-02 19:48:24,941 [INFO] telegram_bot.handlers.digest: ✅ Digest sent: category=economy, count=5
+2025-10-02 19:48:24,942 [INFO] aiogram.event: Update id=938694879 is handled. Duration 355 ms by bot id=8062922612
+2025-10-02 19:48:27,720 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=5&category=eq.world "HTTP/2 200 OK"
+2025-10-02 19:48:27,874 [INFO] telegram_bot.handlers.digest: ✅ Digest sent: category=world, count=5
+2025-10-02 19:48:27,874 [INFO] aiogram.event: Update id=938694880 is handled. Duration 352 ms by bot id=8062922612
+2025-10-02 19:48:29,154 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=5&category=eq.politics "HTTP/2 200 OK"
+2025-10-02 19:48:29,473 [INFO] telegram_bot.handlers.digest: ✅ Digest sent: category=politics, count=5
+2025-10-02 19:48:29,473 [INFO] aiogram.event: Update id=938694881 is handled. Duration 452 ms by bot id=8062922612
+2025-10-02 19:48:31,551 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=5 "HTTP/2 200 OK"
+2025-10-02 19:48:31,912 [INFO] telegram_bot.handlers.digest: ✅ Digest sent: category=all, count=5
+2025-10-02 19:48:31,912 [INFO] aiogram.event: Update id=938694882 is handled. Duration 502 ms by bot id=8062922612
+2025-10-02 19:48:32,988 [INFO] aiogram.event: Update id=938694883 is handled. Duration 130 ms by bot id=8062922612
+2025-10-02 19:48:35,068 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/events?select=event_time%2Ccountry%2Ccountry_code%2Ccurrency%2Ctitle%2Cimportance%2Cfact%2Cforecast%2Cprevious%2Csource&order=event_time.asc&limit=5 "HTTP/2 200 OK"
+2025-10-02 19:48:35,214 [INFO] aiogram.event: Update id=938694884 is handled. Duration 316 ms by bot id=8062922612
+2025-10-02 19:48:36,515 [INFO] aiogram.event: Update id=938694885 is handled. Duration 89 ms by bot id=8062922612
+2025-10-02 19:59:00,235 [INFO] aiogram.event: Update id=938694886 is handled. Duration 192 ms by bot id=8062922612
+2025-10-02 19:59:01,563 [INFO] aiogram.event: Update id=938694887 is handled. Duration 279 ms by bot id=8062922612
+2025-10-02 19:59:02,611 [INFO] aiogram.event: Update id=938694888 is handled. Duration 267 ms by bot id=8062922612
+2025-10-02 19:59:03,527 [INFO] digest_ai: ➡️ Генерация: category=world, period=7d, style=business
+2025-10-02 19:59:06,299 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=20&category=eq.world "HTTP/2 200 OK"
+2025-10-02 19:59:06,402 [ERROR] ai_summary: Ошибка при batch-аннотации: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+Traceback (most recent call last):
+  File "/Users/denisfedko/news_ai_bot/digests/ai_summary.py", line 111, in generate_batch_summary
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/functools.py", line 1001, in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/_client.py", line 185, in chat
+    from .resources.chat import Chat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/beta.py", line 23, in <module>
+    from ...resources.chat import Chat, AsyncChat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/__init__.py", line 3, in <module>
+    from .chat import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/chat.py", line 7, in <module>
+    from .completions.completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/__init__.py", line 11, in <module>
+    from .completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 42, in <module>
+    from ....lib.streaming.chat import ChatCompletionStreamManager, AsyncChatCompletionStreamManager
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/__init__.py", line 21, in <module>
+    from ._completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/_completions.py", line 8, in <module>
+    from jiter import from_json
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/__init__.py", line 1, in <module>
+    from .jiter import *
+ImportError: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+2025-10-02 19:59:06,476 [INFO] aiogram.event: Update id=938694889 is handled. Duration 3068 ms by bot id=8062922612
+2025-10-02 20:07:46,134 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard command received from user 8062922612
+2025-10-02 20:07:46,418 [INFO] telegram_bot.handlers.dashboard: 📱 Dashboard WebApp sent to user 8062922612
+2025-10-02 20:07:46,418 [INFO] aiogram.event: Update id=938694890 is handled. Duration 288 ms by bot id=8062922612
+2025-10-02 20:08:26,061 [INFO] aiogram.event: Update id=938694891 is handled. Duration 162 ms by bot id=8062922612
+2025-10-02 20:08:27,710 [INFO] aiogram.event: Update id=938694892 is handled. Duration 250 ms by bot id=8062922612
+2025-10-02 20:08:29,163 [INFO] aiogram.event: Update id=938694893 is handled. Duration 194 ms by bot id=8062922612
+2025-10-02 20:08:31,069 [INFO] aiogram.event: Update id=938694894 is handled. Duration 122 ms by bot id=8062922612
+2025-10-02 20:08:32,590 [INFO] digest_ai: ➡️ Генерация: category=technology, period=today, style=analytical
+2025-10-02 20:08:35,151 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=20&category=eq.technology "HTTP/2 200 OK"
+2025-10-02 20:08:35,195 [ERROR] ai_summary: Ошибка при batch-аннотации: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+Traceback (most recent call last):
+  File "/Users/denisfedko/news_ai_bot/digests/ai_summary.py", line 111, in generate_batch_summary
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/functools.py", line 1001, in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/_client.py", line 185, in chat
+    from .resources.chat import Chat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/beta.py", line 23, in <module>
+    from ...resources.chat import Chat, AsyncChat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/__init__.py", line 3, in <module>
+    from .chat import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/chat.py", line 7, in <module>
+    from .completions.completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/__init__.py", line 11, in <module>
+    from .completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 42, in <module>
+    from ....lib.streaming.chat import ChatCompletionStreamManager, AsyncChatCompletionStreamManager
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/__init__.py", line 21, in <module>
+    from ._completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/_completions.py", line 8, in <module>
+    from jiter import from_json
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/__init__.py", line 1, in <module>
+    from .jiter import *
+ImportError: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+2025-10-02 20:08:35,334 [INFO] aiogram.event: Update id=938694895 is handled. Duration 2809 ms by bot id=8062922612
+2025-10-02 20:16:47,153 [WARNING] aiogram.dispatcher: Received SIGTERM signal
+2025-10-02 20:16:47,198 [INFO] aiogram.dispatcher: Polling stopped for bot @PulseAIDigest_bot id=8062922612 - 'PulseAI'
+2025-10-02 20:16:47,205 [INFO] aiogram.dispatcher: Polling stopped

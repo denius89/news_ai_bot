@@ -7,19 +7,18 @@ This script demonstrates how to use the TelegramSender class and global function
 import asyncio
 import logging
 import os
-from pathlib import Path
-
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
 import sys
-
-sys.path.insert(0, str(project_root))
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from utils.telegram_sender import TelegramSender, send_message, send_digest
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from utils.telegram_sender import TelegramSender, send_message, send_digest  # noqa: E402
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

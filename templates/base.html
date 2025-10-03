@@ -1,37 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title or "Pulse AI" }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ config['VERSION'] }}">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1E3A8A">
+    <meta name="description" content="PulseAI — умные дайджесты и события с искусственным интеллектом">
+    <title>{{ title or "PulseAI - AI-Powered News & Events" }}</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='assets/logo/site.webmanifest') }}">
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/logo/logo_icon_16.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='assets/logo/favicon.ico') }}" sizes="any">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+    
+    <!-- Additional PWA Meta Tags -->
+    <meta name="application-name" content="PulseAI">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PulseAI">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-TileColor" content="#1E3A8A">
+    <meta name="keywords" content="AI, новости, дайджест, события, искусственный интеллект">
 </head>
 <body>
     <!-- Site Header -->
-    <header class="site-header">
-  <div class="header-inner">
-    <!-- Логотип -->
-    <a href="/" class="brand">
-      <div class="brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="2 12 6 12 10 4 14 20 18 12 22 12"></polyline>
-        </svg>
-      </div>
-      <div class="brand-text">
-        <div class="brand-title">
-          Pulse<span class="brand-ai">AI</span>
-        </div>
-        <div class="brand-subtitle">AI-Powered News & Events</div>
-      </div>
-    </a>
+    <header class="pulse-header">
+        <div class="container">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <a href="/" class="pulse-logo">
+                    <h1>PulseAI</h1>
+                </a>
+            </div>
 
-    <!-- Навигация -->
-    <nav class="top-nav">
-      <a href="/digest" class="{% if active_page == 'digest' %}active{% endif %}">Digest</a>
-      <a href="/events" class="{% if active_page == 'events' %}active{% endif %}">Events</a>
-    </nav>
-  </div>
-</header>
+            <!-- Navigation -->
+            <nav class="pulse-nav">
+                <a href="/" class="{% if active_page == 'home' %}active{% endif %}">Главная</a>
+                <a href="/digest" class="{% if active_page == 'digest' %}active{% endif %}">Дайджест</a>
+                <a href="/events" class="{% if active_page == 'events' %}active{% endif %}">События</a>
+            </nav>
+        </div>
+    </header>
 
     <!-- Subnav (filters, etc.) -->
     {% block subnav %}{% endblock %}

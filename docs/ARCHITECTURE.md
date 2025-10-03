@@ -292,7 +292,7 @@ CREATE TABLE events (
 - Database connection pooling
 - Caching strategies for frequently accessed data
 - Asynchronous processing for AI operations
-- CDN for static assets
+- CDN for web assets
 
 ## Subscriptions & Notifications
 
