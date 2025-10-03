@@ -1,0 +1,62 @@
+"""
+Unit tests for Dashboard WebApp functionality.
+"""
+import pytest
+from unittest.mock import AsyncMock, MagicMock
+
+from telegram_bot.handlers.dashboard import open_dashboard
+from aiogram.types import Message, User
+
+
+@pytest.mark.asyncio
+async def test_dashboard_command():
+    """Test /dashboard command handler."""
+    # Mock message and user
+    user = User(id=123456789, is_bot=False, first_name="Test")
+    message = MagicMock(spec=Message)
+    message.from_user = user
+    message.answer = AsyncMock()
+
+    # Call handler
+    await open_dashboard(message)
+
+    # Verify response
+    message.answer.assert_called_once()
+    args, kwargs = message.answer.call_args
+
+    # Check message content
+    assert "PulseAI Dashboard" in args[0]
+    assert "подписками" in args[0]
+    assert "уведомлениями" in args[0]
+    assert "Back to Bot" in args[0]
+
+    # Check markup
+    assert "reply_markup" in kwargs
+    assert kwargs["parse_mode"] == "HTML"
+
+    # Check keyboard structure
+    keyboard = kwargs["reply_markup"]
+    assert keyboard.resize_keyboard is True
+    assert len(keyboard.keyboard) == 1
+    assert len(keyboard.keyboard[0]) == 1
+
+    button = keyboard.keyboard[0][0]
+    assert "Открыть Dashboard" in button.text
+    assert button.web_app is not None
+    assert "webapp" in button.web_app.url
+
+
+def test_webapp_url_config():
+    """Test that WebApp URL is properly configured."""
+    from telegram_bot.handlers.dashboard import open_dashboard
+    import inspect
+
+    # Get source code to check URL configuration
+    source = inspect.getsource(open_dashboard)
+
+    # Should contain WebApp URL
+    assert "webapp_url" in source
+    assert "/webapp" in source
+
+    # Should have TODO for moving to config
+    assert "TODO" in source or "config" in source.lower()

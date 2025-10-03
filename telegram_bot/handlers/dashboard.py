@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
+# ID command removed - functionality moved to WebApp
+
 @router.message(Command("dashboard"))
 async def open_dashboard(message: types.Message):
     """
@@ -37,6 +39,7 @@ async def open_dashboard(message: types.Message):
         "• 📑 Подписками на категории\n"
         "• 🔔 Уведомлениями\n"
         "• 📅 Календарем событий\n\n"
+        "💡 <i>Подсказка: В Dashboard есть кнопка 🔙 \"Back to Bot\" для возврата сюда.</i>\n\n"
         "Нажмите кнопку ниже для запуска:",
         reply_markup=keyboard,
         parse_mode="HTML",

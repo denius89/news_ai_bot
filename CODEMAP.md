@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 11:55:58 UTC_
+_Generated on 2025-10-03 07:32:48 UTC_
 
 ```
 ├── .github/
@@ -40,6 +40,8 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   │   ├── 2025_10_01_published_at_datetime.sql
 │   │   ├── 2025_10_02_add_missing_columns.sql
 │   │   ├── 2025_10_02_add_updated_at.sql
+│   │   ├── 2025_10_02_notifications_indexes.sql
+│   │   ├── 2025_10_02_notifications_system.sql
 │   │   └── 2025_10_02_subscriptions_notifications.sql
 │   ├── __init__.py
 │   ├── db_models.py
@@ -77,6 +79,7 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
+│   ├── api_routes.py
 │   ├── news_routes.py
 │   ├── subscriptions.py
 │   └── webapp_routes.py
@@ -101,7 +104,8 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   │       └── site.webmanifest
 │   ├── js/
 │   │   └── webapp.js
-│   └── style.css
+│   ├── style.css
+│   └── webapp.css
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
@@ -109,8 +113,7 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
-│   │   ├── start.py
-│   │   └── subscriptions.py
+│   │   └── start.py
 │   ├── __init__.py
 │   ├── bot.py
 │   └── keyboards.py
@@ -126,9 +129,12 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   ├── test_ai_modules.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
+│   ├── test_api_notifications.py
+│   ├── test_api_subscriptions.py
 │   ├── test_bot_routers.py
 │   ├── test_clean_text.py
 │   ├── test_dashboard_handler.py
+│   ├── test_dashboard_webapp.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_db_models.py
@@ -138,7 +144,6 @@ _Generated on 2025-10-02 11:55:58 UTC_
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
 │   ├── test_generator.py
-│   ├── test_keyboards_subscriptions.py
 │   ├── test_main.py
 │   ├── test_main_import.py
 │   ├── test_news_repository.py
@@ -154,22 +159,39 @@ _Generated on 2025-10-02 11:55:58 UTC_
 ├── tools/
 │   ├── apply_migration.py
 │   ├── check_database.py
+│   ├── check_database_schema.py
+│   ├── check_notifications_schema.py
+│   ├── check_tables.py
+│   ├── clean_notifications_data.py
+│   ├── create_demo_notifications.py
+│   ├── create_table_via_api.py
 │   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
 │   ├── README_daily_digests.md
 │   ├── repo_map.py
+│   ├── reset_user.py
+│   ├── run_migration.py
 │   ├── send_daily_digests.py
 │   ├── show_news.py
-│   └── test_daily_digests.py
+│   ├── test_daily_digests.py
+│   ├── test_notifications_insert.py
+│   └── test_webapp_notifications.py
 ├── .coverage
 ├── .editorconfig
 ├── .env.example
 ├── .gitignore
 ├── =2025.1
 ├── bot.log
+├── bot_clean.log
+├── bot_correct.log
+├── bot_final.log
+├── bot_fixed.log
+├── bot_new.log
+├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
+├── env_temp.txt
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -180,7 +202,11 @@ _Generated on 2025-10-02 11:55:58 UTC_
 ├── README.md
 ├── requirements.txt
 ├── setup.cfg
+├── start_bot.sh
 ├── TASKS.md
+├── test_webapp_debug.html
 ├── webapp.log
-└── webapp.py
+├── webapp.py
+├── webapp_fresh.log
+└── webapp_new.log
 ```
