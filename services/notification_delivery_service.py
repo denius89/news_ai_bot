@@ -8,6 +8,7 @@
 import logging
 from typing import Optional
 from database.db_models import create_user_notification
+
 # from database.db_models import get_user_notifications  # TODO: implement
 from services.telegram_notification_service import telegram_notification_service
 
