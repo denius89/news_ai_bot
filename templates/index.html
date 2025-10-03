@@ -1,87 +1,423 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container" style="max-width: 1200px; margin: 2rem auto; padding: 0 1rem;">
-    <!-- Hero Section -->
-    <section class="hero" style="text-align: center; padding: 4rem 0;">
-        <div class="pulse-logo" style="margin-bottom: 2rem; font-size: 4rem; font-weight: bold; background: linear-gradient(135deg, #1E3A8A, #6B21A8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-            PulseAI
-        </div>
+<style>
+    .landing-page {
+        background: white;
+        transition: background-color 0.2s ease;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .landing-page {
+            background: #1A1A1A;
+        }
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* 1. Hero-блок */
+    .hero-section {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 0;
+    }
+    
+    .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .hero-text {
+        text-align: left;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1A1A1A;
+        line-height: 1.2;
+        margin: 0 0 1rem 0;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #6B7280;
+        line-height: 1.4;
+        margin: 0 0 2rem 0;
+        max-width: 800px;
+    }
+    
+    .hero-description {
+        font-size: 1.1rem;
+        color: #6B7280;
+        line-height: 1.6;
+        margin: 0 0 3rem 0;
+        max-width: 700px;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .hero-illustration {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .btn-primary {
+        background: #007AFF;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #0056CC;
+    }
+    
+    .btn-outline {
+        background: transparent;
+        color: #007AFF;
+        border-color: #007AFF;
+    }
+    
+    .btn-outline:hover {
+        background: #007AFF;
+        color: white;
+    }
+    
+    /* 2. Возможности платформы */
+    .features-section {
+        padding: 4rem 0;
+        background: #F9FAFB;
+    }
+    
+    .features-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .features-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1A1A1A;
+        margin: 0 0 1rem 0;
+    }
+    
+    .features-subtitle {
+        font-size: 1.2rem;
+        color: #6B7280;
+        margin: 0;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .feature-illustration {
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        color: #007AFF;
+        margin: 0 auto 1.5rem;
+        display: block;
+    }
+    
+    .feature-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1A1A1A;
+        margin: 0 0 1rem 0;
+    }
+    
+    .feature-description {
+        color: #6B7280;
+        line-height: 1.6;
+        font-size: 1rem;
+        margin: 0;
+    }
+    
+    /* 3. CTA-блок */
+    .cta-section {
+        background: #F9FAFB;
+        padding: 4rem 0;
+    }
+    
+    .cta-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+    
+    .cta-text-content {
+        text-align: left;
+    }
+    
+    .cta-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1A1A1A;
+        line-height: 1.6;
+        margin: 0 0 2rem 0;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .cta-illustration {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* Dark mode */
+    @media (prefers-color-scheme: dark) {
+        .features-section, .cta-section {
+            background: #1A1A1A;
+        }
         
-        <h1 style="font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #1E3A8A, #6B21A8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-            Добро пожаловать в PulseAI
-        </h1>
+        .feature-card {
+            background: #2A2A2A;
+        }
         
-        <p style="font-size: 1.25rem; color: #64748B; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-            AI-платформа для персонализированных дайджестов новостей и умного календаря событий. 
-            Получайте только важную информацию с AI-анализом достоверности и значимости.
-        </p>
+        .hero-title, .features-title, .feature-title, .cta-text {
+            color: #E0E0E0;
+        }
         
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/digest" class="pulse-btn">📰 Посмотреть дайджест</a>
-            <a href="/events" class="pulse-btn pulse-btn-outline">📅 События</a>
+        .hero-subtitle, .hero-description, .features-subtitle, .feature-description {
+            color: #A0A0A0;
+        }
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0 1rem;
+        }
+        
+        .hero-content, .cta-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .hero-text, .cta-text-content {
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+        }
+        
+        .hero-description {
+            font-size: 1rem;
+        }
+        
+        .features-title {
+            font-size: 2rem;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .feature-card {
+            padding: 1.5rem;
+        }
+        
+        .hero-buttons, .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn {
+            width: 100%;
+            max-width: 280px;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .features-title {
+            font-size: 1.75rem;
+        }
+        
+        .feature-card {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="landing-page">
+    <!-- 1. Hero-блок -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">Добро пожаловать в PulseAI</h1>
+                    <h2 class="hero-subtitle">
+                        AI-платформа для персонализированных дайджестов новостей и умного календаря событий
+                    </h2>
+                    <p class="hero-description">
+                        Получайте только важные новости с оценкой достоверности и значимости.<br>
+                        Следите за ключевыми событиями в мире криптовалют, технологий и экономики.<br>
+                        Настраивайте уведомления и будьте в курсе того, что действительно важно.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="https://t.me/your_bot" class="btn btn-primary">
+                            🚀 Попробовать в Telegram
+                        </a>
+                        <a href="#" class="btn btn-outline">
+                            Подробнее о платформе
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-illustration">
+                    <img src="https://undraw.co/api/illustrations/76b89f74-1f29-4ab0-8ee6-b73998f6da82" alt="AI analysis" class="illustration" />
+                </div>
+            </div>
         </div>
     </section>
     
-    <!-- Features Section -->
-    <section class="features" style="padding: 4rem 0;">
-        <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #1E293B;">
-            Возможности платформы
-        </h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-            <!-- Feature 1 -->
-            <div class="pulse-card">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">🧠</div>
-                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">AI-анализ новостей</h3>
-                <p style="color: #64748B; line-height: 1.6;">
-                    Автоматическая оценка достоверности и важности каждой новости с помощью 
-                    искусственного интеллекта.
-                </p>
+    <!-- 2. Возможности платформы -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-header">
+                <h2 class="features-title">Возможности платформы</h2>
+                <p class="features-subtitle">Всё, что нужно, чтобы быть в курсе ключевых событий</p>
             </div>
-            
-            <!-- Feature 2 -->
-            <div class="pulse-card">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
-                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Персонализированные дайджесты</h3>
-                <p style="color: #64748B; line-height: 1.6;">
-                    Получайте дайджесты, адаптированные под ваши интересы и предпочтения 
-                    по категориям.
-                </p>
-            </div>
-            
-            <!-- Feature 3 -->
-            <div class="pulse-card">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">📅</div>
-                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Умный календарь событий</h3>
-                <p style="color: #64748B; line-height: 1.6;">
-                    Отслеживайте важные события в мире криптовалют, экономики и технологий 
-                    в одном месте.
-                </p>
-            </div>
-            
-            <!-- Feature 4 -->
-            <div class="pulse-card">
-                <div style="font-size: 2rem; margin-bottom: 1rem;">🤖</div>
-                <h3 style="color: #2E5BFF; margin-bottom: 1rem;">Telegram-бот</h3>
-                <p style="color: #64748B; line-height: 1.6;">
-                    Удобный доступ ко всем функциям через Telegram с подписками 
-                    и уведомлениями.
-                </p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-illustration">
+                        <img src="https://undraw.co/api/illustrations/8dd39c1a-9430-457c-9c65-94f6b0f8db1a" alt="Brain AI" class="illustration" />
+                    </div>
+                    <h3 class="feature-title">AI-анализ новостей</h3>
+                    <p class="feature-description">
+                        Автоматическая оценка достоверности и важности каждой новости с помощью искусственного интеллекта.<br>
+                        Фильтруем шум и выделяем только то, что стоит вашего внимания.
+                    </p>
+                    <i data-lucide="brain" class="feature-icon"></i>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-illustration">
+                        <img src="https://undraw.co/api/illustrations/c2d9db11-5536-4ec0-8c8a-b14a0da7f490" alt="News digest" class="illustration" />
+                    </div>
+                    <h3 class="feature-title">Персонализированные дайджесты</h3>
+                    <p class="feature-description">
+                        Дайджесты формируются под ваши интересы и предпочтения по категориям.<br>
+                        Каждый день вы получаете адаптированный обзор ключевых новостей.
+                    </p>
+                    <i data-lucide="list" class="feature-icon"></i>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-illustration">
+                        <img src="https://undraw.co/api/illustrations/7349af20-3d12-493d-95b0-9d2b4e0bc71c" alt="Calendar events" class="illustration" />
+                    </div>
+                    <h3 class="feature-title">Умный календарь событий</h3>
+                    <p class="feature-description">
+                        Отслеживайте важные события в мире криптовалют, экономики и технологий в одном месте.<br>
+                        Не пропустите разлоки токенов, листинги и ключевые апдейты проектов.
+                    </p>
+                    <i data-lucide="calendar" class="feature-icon"></i>
+                </div>
             </div>
         </div>
     </section>
     
-    <!-- CTA Section -->
-    <section class="cta" style="background: linear-gradient(135deg, #1E3A8A, #6B21A8); padding: 4rem 2rem; border-radius: 2rem; text-align: center; color: white; margin: 4rem 0;">
-        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Начните использовать PulseAI уже сегодня</h2>
-        <p style="font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9;">
-            Присоединяйтесь к тысячам пользователей, которые уже получают качественные новости с AI-анализом
-        </p>
-        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/digest" class="pulse-btn" style="background: white; color: #1E3A8A;">Попробовать сейчас</a>
-            <a href="https://t.me/your_bot" class="pulse-btn" style="background: rgba(255,255,255,0.2); border: 2px solid white;">Telegram-бот</a>
+    <!-- 3. CTA-блок -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <div class="cta-text-content">
+                    <p class="cta-text">
+                        PulseAI уже используют энтузиасты и команды для быстрого доступа к важным данным.<br>
+                        Подключайтесь к платформе и настройте персональные уведомления прямо сейчас.
+                    </p>
+                    <div class="cta-buttons">
+                        <a href="https://t.me/your_bot" class="btn btn-primary">
+                            Открыть в Telegram
+                        </a>
+                        <a href="#" class="btn btn-outline">
+                            Узнать больше
+                        </a>
+                    </div>
+                </div>
+                <div class="cta-illustration">
+                    <img src="https://undraw.co/api/illustrations/3cf16a8e-7d2f-4ff7-81eb-2d344c9e43a2" alt="Telegram" class="illustration" />
+                </div>
+            </div>
         </div>
     </section>
 </div>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+    // Инициализация Lucide иконок
+    lucide.createIcons();
+</script>
 {% endblock %}

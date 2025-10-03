@@ -9,7 +9,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- Категории источников ---
-CATEGORIES = ["crypto", "economy", "world", "technology", "politics"]
+CATEGORIES = {
+    "crypto": "Crypto",
+    "economy": "Economy", 
+    "world": "World",
+    "technology": "Technology",
+    "politics": "Politics"
+}
 
 # --- Теги по умолчанию ---
 DEFAULT_TAGS = ["news", "macro", "events"]

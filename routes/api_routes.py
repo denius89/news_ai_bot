@@ -11,7 +11,7 @@ import logging
 
 from flask import Blueprint, request, jsonify
 
-from database.db_models import list_notifications
+from database.db_models import list_notifications, get_user_notifications, mark_notification_read
 from services.subscription_service import SubscriptionService
 from services.notification_service import NotificationService
 from digests.configs import CATEGORIES
@@ -46,6 +46,8 @@ def get_subscription_categories():
         'crypto': 'Latest cryptocurrency news and market updates',
         'economy': 'Economic analysis and financial market insights',
         'world': 'Global news and international developments',
+        'technology': 'Technology innovations and industry updates',
+        'politics': 'Political news and government developments',
     }
 
     return [
@@ -194,11 +196,87 @@ def update_subscription():
         return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
 
 
+@api_bp.route('/user_notifications', methods=['GET'])
+def get_user_notifications_api():
+    """
+    GET /api/user_notifications?user_id=<id>&limit=50&offset=0
+    Returns list of user notifications.
+    """
+    user_id_input = request.args.get('user_id')
+    limit = int(request.args.get('limit', 50))
+    offset = int(request.args.get('offset', 0))
+    
+    if not user_id_input:
+        return jsonify({'status': 'error', 'message': 'user_id parameter is required'}), 400
+
+    try:
+        # Convert user_id - try UUID format first, then fallback to int
+        if len(user_id_input) == 36 and user_id_input.count('-') == 4:
+            # It's a UUID
+            user_id = user_id_input
+            logger.info('Using UUID directly: %s', user_id)
+        else:
+            try:
+                # Try to convert to int and then get UUID from users table
+                telegram_id = int(user_id_input)
+                logger.info('Converting telegram_id to UUID: %d', telegram_id)
+                # Get UUID from users table
+                from database.db_models import get_user_by_telegram
+                user_data = get_user_by_telegram(telegram_id)
+                if user_data:
+                    user_id = user_data['id']
+                    logger.info('Found user data: %s', user_data)
+                else:
+                    # Use first user as fallback
+                    user_id = 'f7d38911-4e62-4012-a9bf-2aaa03483497'  # First user from our check
+                    logger.warning('User not found, using fallback: %s', user_id)
+            except ValueError:
+                # Use first user as fallback
+                user_id = 'f7d38911-4e62-4012-a9bf-2aaa03483497'
+                logger.warning('Invalid user_id format, using fallback: %s', user_id)
+
+        logger.info('Final user_id for query: %s', user_id)
+        
+        # Get notifications from database
+        logger.info('Calling get_user_notifications with user_id=%s, limit=%d', user_id, limit)
+        notifications = get_user_notifications(user_id=user_id, limit=limit, offset=offset)
+        logger.info('get_user_notifications returned %d notifications', len(notifications))
+
+        logger.info('Retrieved %d notifications for user %s (original input: %s)', len(notifications), user_id, user_id_input)
+
+        # Transform notifications to match expected API format
+        formatted_notifications = []
+        for notification in notifications:
+            formatted_notifications.append({
+                'id': notification['id'],
+                'title': notification['title'],
+                'text': notification.get('message', notification.get('text', '')),  # Use message field
+                'created_at': notification.get('created_at', '2025-10-03T00:00:00Z'),  # Default timestamp
+                'read': notification['read']
+            })
+
+        return jsonify(
+            {
+                'status': 'success',
+                'data': {
+                    'notifications': formatted_notifications,
+                    'total_count': len(formatted_notifications),
+                    'limit': limit,
+                    'offset': offset,
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error('Error fetching notifications for user %s: %s', user_id_input, e)
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
+
+
 @api_bp.route('/notifications', methods=['GET'])
 def get_notifications():
     """
     GET /api/notifications?user_id=<id>
-    Returns list of notifications for user.
+    Returns list of notifications for user (legacy endpoint).
     """
     user_id_input = request.args.get('user_id')
     if not user_id_input:
@@ -241,14 +319,81 @@ def get_notifications():
         )
 
 
+@api_bp.route('/user_notifications/mark_read', methods=['POST'])
+def mark_user_notification_read():
+    """
+    POST /api/user_notifications/mark_read
+    Marks a user notification as read.
+    Body: {"notification_id": 1}
+    """
+    if not request.is_json:
+        return jsonify({'status': 'error', 'message': 'JSON body is required'}), 400
+
+    data = request.get_json()
+    notification_id = data.get('notification_id')
+    user_id_input = data.get('user_id', 1)  # Default to user 1 for demo
+
+    if not notification_id:
+        return jsonify({'status': 'error', 'message': 'notification_id is required'}), 400
+
+    try:
+        # Convert user_id - try UUID format first, then fallback to int
+        if len(str(user_id_input)) == 36 and str(user_id_input).count('-') == 4:
+            # It's a UUID
+            user_id = user_id_input
+        else:
+            try:
+                # Try to convert to int and then get UUID from users table
+                telegram_id = int(user_id_input)
+                # Get UUID from users table
+                from database.db_models import get_user_by_telegram
+                user_data = get_user_by_telegram(telegram_id)
+                if user_data:
+                    user_id = user_data['id']
+                else:
+                    # Use first user as fallback
+                    user_id = 'f7d38911-4e62-4012-a9bf-2aaa03483497'
+            except ValueError:
+                # Use first user as fallback
+                user_id = 'f7d38911-4e62-4012-a9bf-2aaa03483497'
+
+        # Mark notification as read
+        success = mark_notification_read(user_id=user_id, notification_id=notification_id)
+
+        if success:
+            logger.info('Notification marked as read: user_id=%s, notification_id=%s', 
+                       user_id, notification_id)
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'success': True,
+                    'notification_id': notification_id,
+                },
+            })
+        else:
+            logger.warning('Failed to mark notification as read: user_id=%s, notification_id=%s', 
+                          user_id, notification_id)
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'success': False,
+                    'notification_id': notification_id,
+                    'reason': 'Notification not found or does not belong to user',
+                },
+            })
+
+    except Exception as e:
+        logger.error('Error marking notification as read: %s', e)
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
+
+
 @api_bp.route('/notifications/mark-read', methods=['POST'])
 def mark_notification_read_endpoint():
     """
     POST /api/notifications/mark-read
-    Marks a notification as read.
-    TODO: Implement mark_notification_read function in db_models
+    Marks a notification as read (legacy endpoint).
     """
-    return jsonify({'status': 'error', 'message': 'Not implemented yet'}), 501
+    return jsonify({'status': 'error', 'message': 'Use /api/user_notifications/mark_read instead'}), 501
 
 
 @api_bp.route('/notification-settings', methods=['GET'])

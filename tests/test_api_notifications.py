@@ -92,7 +92,7 @@ class TestNotificationsAPI:
         assert response.status_code == 501
         data = response.get_json()
         assert data['status'] == 'error'
-        assert 'Not implemented yet' in data['message']
+        assert 'Use /api/user_notifications/mark_read instead' in data['message']
 
     def test_get_notification_settings_not_implemented(self, client):
         """Test getting notification settings (not implemented yet)."""

@@ -189,3 +189,134 @@ async def test_generate_digest_with_news(monkeypatch):
     assert '<a href="http://example.com/1">News 1</a>' in result
     # отдельной ссылки "Подробнее" быть не должно
     assert "Подробнее" not in result
+
+
+class TestDigestsAPI:
+    """Test cases for Digests API endpoints."""
+
+    @pytest.fixture
+    def client(self):
+        """Flask test client."""
+        from webapp import app
+        app.config['TESTING'] = True
+        with app.test_client() as client:
+            yield client
+
+    @patch('routes.api_routes.get_latest_news')
+    def test_get_digests_success(self, mock_get_news, client):
+        """Test successful GET /api/digests."""
+        from datetime import datetime, timezone
+        from models.news import NewsItem
+        
+        mock_news_items = [
+            NewsItem(
+                id="1",
+                title="Test News 1",
+                content="Test content 1",
+                link="http://example.com/1",
+                published_at=datetime.now(timezone.utc),
+                source="test_source",
+                category="crypto",
+                credibility=0.8,
+                importance=0.7,
+            ),
+            NewsItem(
+                id="2",
+                title="Test News 2",
+                content="Test content 2",
+                link="http://example.com/2",
+                published_at=datetime.now(timezone.utc),
+                source="test_source",
+                category="economy",
+                credibility=0.9,
+                importance=0.8,
+            )
+        ]
+        mock_get_news.return_value = mock_news_items
+
+        response = client.get('/api/digests')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert 'news' in data['data']
+        assert len(data['data']['news']) == 2
+        assert data['data']['total_count'] == 2
+
+    @patch('routes.api_routes.get_latest_news')
+    def test_get_digests_with_limit(self, mock_get_news, client):
+        """Test GET /api/digests with limit parameter."""
+        from datetime import datetime, timezone
+        from models.news import NewsItem
+        
+        mock_news_items = [
+            NewsItem(
+                id=str(i),
+                title=f"Test News {i}",
+                content=f"Test content {i}",
+                link=f"http://example.com/{i}",
+                published_at=datetime.now(timezone.utc),
+                source="test_source",
+                category="crypto",
+                credibility=0.8,
+                importance=0.7,
+            )
+            for i in range(1, 6)
+        ]
+        mock_get_news.return_value = mock_news_items
+
+        response = client.get('/api/digests?limit=3')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert len(data['data']['news']) == 5  # Mock returns all, limit handled by DB
+
+    @patch('routes.api_routes.get_latest_news')
+    def test_get_digests_empty_database(self, mock_get_news, client):
+        """Test GET /api/digests with empty database."""
+        mock_get_news.return_value = []
+
+        response = client.get('/api/digests')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert data['data']['news'] == []
+        assert data['data']['total_count'] == 0
+
+    @patch('routes.api_routes.get_latest_news')
+    def test_get_digests_database_error(self, mock_get_news, client):
+        """Test GET /api/digests with database error."""
+        mock_get_news.side_effect = Exception("Database error")
+
+        response = client.get('/api/digests')
+        assert response.status_code == 200  # API should return success with empty data
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert data['data']['news'] == []
+
+    @patch('routes.api_routes.get_latest_news')
+    def test_get_digests_with_category(self, mock_get_news, client):
+        """Test GET /api/digests with category filter."""
+        from datetime import datetime, timezone
+        from models.news import NewsItem
+        
+        mock_news_items = [
+            NewsItem(
+                id="1",
+                title="Crypto News",
+                content="Crypto content",
+                link="http://example.com/1",
+                published_at=datetime.now(timezone.utc),
+                source="test_source",
+                category="crypto",
+                credibility=0.8,
+                importance=0.7,
+            )
+        ]
+        mock_get_news.return_value = mock_news_items
+
+        response = client.get('/api/digests?category=crypto')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert len(data['data']['news']) == 1
+        assert data['data']['news'][0]['category'] == 'crypto'
