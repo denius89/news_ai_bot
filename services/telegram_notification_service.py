@@ -146,7 +146,8 @@ class TelegramNotificationService:
         try:
             # Здесь мы можем либо вызывать API напрямую, либо работать с базой данных
             # Для простоты используем прямое обращение к базе данных
-            result = mark_notification_read(user_id=user_id, notification_id=notification_id)
+            # result = mark_notification_read(user_id=user_id, notification_id=notification_id)  # TODO: implement
+            result = True  # Placeholder
 
             if result:
                 logger.info(
