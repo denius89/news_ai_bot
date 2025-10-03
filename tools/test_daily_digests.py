@@ -6,27 +6,25 @@ This script tests the daily digest functionality without actually sending messag
 
 import asyncio
 import logging
-import os
-from pathlib import Path
-
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
 import sys
-
-sys.path.insert(0, str(project_root))
+from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
+from services.notification_service import NotificationService
+from services.subscription_service import SubscriptionService
 from tools.send_daily_digests import (
-    get_current_hour_warsaw,
-    get_user_subscriptions,
     fetch_news_by_categories,
     generate_personalized_digest,
+    get_current_hour_warsaw,
+    get_user_subscriptions,
 )
-from services.subscription_service import SubscriptionService
-from services.notification_service import NotificationService
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+load_dotenv()
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)

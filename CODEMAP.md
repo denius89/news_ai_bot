@@ -1,10 +1,11 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 07:18:20 UTC_
+_Generated on 2025-10-03 09:37:50 UTC_
 
 ```
 ├── .github/
 │   └── workflows/
+│       ├── daily-digest.yml
 │       ├── integration.yml
 │       └── tests.yml
 ├── .ruff_cache/
@@ -40,6 +41,8 @@ _Generated on 2025-10-02 07:18:20 UTC_
 │   │   ├── 2025_10_01_published_at_datetime.sql
 │   │   ├── 2025_10_02_add_missing_columns.sql
 │   │   ├── 2025_10_02_add_updated_at.sql
+│   │   ├── 2025_10_02_notifications_indexes.sql
+│   │   ├── 2025_10_02_notifications_system.sql
 │   │   └── 2025_10_02_subscriptions_notifications.sql
 │   ├── __init__.py
 │   ├── db_models.py
@@ -77,8 +80,10 @@ _Generated on 2025-10-02 07:18:20 UTC_
 │   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
+│   ├── api_routes.py
 │   ├── news_routes.py
-│   └── subscriptions.py
+│   ├── subscriptions.py
+│   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
 │   ├── digest_ai_service.py
@@ -86,10 +91,26 @@ _Generated on 2025-10-02 07:18:20 UTC_
 │   ├── notification_service.py
 │   └── subscription_service.py
 ├── static/
-│   └── style.css
+│   ├── assets/
+│   │   └── logo/
+│   │       ├── favicon.ico
+│   │       ├── logo_full.jpg
+│   │       ├── logo_icon.PNG
+│   │       ├── logo_icon_16.png
+│   │       ├── logo_icon_180.png
+│   │       ├── logo_icon_192.png
+│   │       ├── logo_icon_32.png
+│   │       ├── logo_icon_512.png
+│   │       ├── logo_icon_96.png
+│   │       └── site.webmanifest
+│   ├── js/
+│   │   └── webapp.js
+│   ├── style.css
+│   └── webapp.css
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
+│   │   ├── dashboard.py
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
@@ -102,15 +123,19 @@ _Generated on 2025-10-02 07:18:20 UTC_
 │   ├── base.html
 │   ├── digest.html
 │   ├── events.html
-│   └── index.html
+│   ├── index.html
+│   └── webapp.html
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_ai_modules.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
+│   ├── test_api_notifications.py
+│   ├── test_api_subscriptions.py
 │   ├── test_bot_routers.py
 │   ├── test_clean_text.py
+│   ├── test_dashboard_webapp.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_db_models.py
@@ -147,8 +172,15 @@ _Generated on 2025-10-02 07:18:20 UTC_
 ├── .coverage
 ├── .editorconfig
 ├── .env.example
+├── .flake8
 ├── .gitignore
 ├── =2025.1
+├── bot_clean.log
+├── bot_correct.log
+├── bot_final.log
+├── bot_fixed.log
+├── bot_new.log
+├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -161,6 +193,10 @@ _Generated on 2025-10-02 07:18:20 UTC_
 ├── README.md
 ├── requirements.txt
 ├── setup.cfg
+├── start_bot.sh
 ├── TASKS.md
-└── webapp.py
+├── test_webapp_debug.html
+├── webapp.py
+├── webapp_fresh.log
+└── webapp_new.log
 ```

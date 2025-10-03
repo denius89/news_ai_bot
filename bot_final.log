@@ -1,0 +1,85 @@
+2025-10-02 19:40:31,467 [INFO] telegram_bot: 🚀 Telegram bot started
+2025-10-02 19:40:31,469 [INFO] aiogram.dispatcher: Start polling
+2025-10-02 19:40:32,445 [INFO] aiogram.dispatcher: Run polling for bot @PulseAIDigest_bot id=8062922612 - 'PulseAI'
+2025-10-02 19:40:34,857 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:34,857 [WARNING] aiogram.dispatcher: Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8062922612)
+2025-10-02 19:40:35,930 [INFO] aiogram.dispatcher: Connection established (tryings = 1, bot id = 8062922612)
+2025-10-02 19:40:36,165 [INFO] aiogram.event: Update id=938694852 is handled. Duration 230 ms by bot id=8062922612
+2025-10-02 19:40:40,099 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:40,100 [WARNING] aiogram.dispatcher: Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8062922612)
+2025-10-02 19:40:42,814 [INFO] aiogram.dispatcher: Connection established (tryings = 1, bot id = 8062922612)
+2025-10-02 19:40:42,973 [INFO] aiogram.event: Update id=938694854 is handled. Duration 157 ms by bot id=8062922612
+2025-10-02 19:40:44,817 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:44,818 [WARNING] aiogram.dispatcher: Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8062922612)
+2025-10-02 19:40:45,342 [INFO] aiogram.event: Update id=938694855 is handled. Duration 688 ms by bot id=8062922612
+2025-10-02 19:40:49,361 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:49,362 [WARNING] aiogram.dispatcher: Sleep for 1.336766 seconds and try again... (tryings = 1, bot id = 8062922612)
+2025-10-02 19:40:51,487 [INFO] aiogram.dispatcher: Connection established (tryings = 2, bot id = 8062922612)
+2025-10-02 19:40:51,712 [INFO] aiogram.event: Update id=938694856 is handled. Duration 223 ms by bot id=8062922612
+2025-10-02 19:40:53,344 [INFO] digest_ai: ➡️ Генерация: category=politics, period=30d, style=meme
+2025-10-02 19:40:54,902 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:54,903 [WARNING] aiogram.dispatcher: Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8062922612)
+2025-10-02 19:40:55,668 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Ctitle%2Ccontent%2Clink%2Cimportance%2Ccredibility%2Cpublished_at%2Csource%2Ccategory&order=importance.desc%2Cpublished_at.desc&limit=20&category=eq.politics "HTTP/2 200 OK"
+2025-10-02 19:40:55,715 [ERROR] ai_summary: Ошибка при batch-аннотации: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+Traceback (most recent call last):
+  File "/Users/denisfedko/news_ai_bot/digests/ai_summary.py", line 111, in generate_batch_summary
+    response = client.chat.completions.create(
+               ^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/functools.py", line 1001, in __get__
+    val = self.func(instance)
+          ^^^^^^^^^^^^^^^^^^^
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/_client.py", line 185, in chat
+    from .resources.chat import Chat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/__init__.py", line 3, in <module>
+    from .beta import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/beta/beta.py", line 23, in <module>
+    from ...resources.chat import Chat, AsyncChat
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/__init__.py", line 3, in <module>
+    from .chat import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/chat.py", line 7, in <module>
+    from .completions.completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/__init__.py", line 11, in <module>
+    from .completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/resources/chat/completions/completions.py", line 42, in <module>
+    from ....lib.streaming.chat import ChatCompletionStreamManager, AsyncChatCompletionStreamManager
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/__init__.py", line 21, in <module>
+    from ._completions import (
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/openai/lib/streaming/chat/_completions.py", line 8, in <module>
+    from jiter import from_json
+  File "/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/__init__.py", line 1, in <module>
+    from .jiter import *
+ImportError: dlopen(/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so, 0x0002): tried: '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64')), '/System/Volumes/Preboot/Cryptexes/OS/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (no such file), '/Users/denisfedko/news_ai_bot/venv/lib/python3.11/site-packages/jiter/jiter.cpython-311-darwin.so' (mach-o file, but is an incompatible architecture (have 'arm64', need 'x86_64'))
+2025-10-02 19:40:55,860 [INFO] aiogram.event: Update id=938694857 is handled. Duration 2568 ms by bot id=8062922612
+2025-10-02 19:40:58,066 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:40:58,067 [WARNING] aiogram.dispatcher: Sleep for 1.451852 seconds and try again... (tryings = 1, bot id = 8062922612)
+2025-10-02 19:41:03,460 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:03,461 [WARNING] aiogram.dispatcher: Sleep for 2.018443 seconds and try again... (tryings = 2, bot id = 8062922612)
+2025-10-02 19:41:09,635 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:09,637 [WARNING] aiogram.dispatcher: Sleep for 2.519826 seconds and try again... (tryings = 3, bot id = 8062922612)
+2025-10-02 19:41:16,807 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:16,812 [WARNING] aiogram.dispatcher: Sleep for 3.287787 seconds and try again... (tryings = 4, bot id = 8062922612)
+2025-10-02 19:41:25,272 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:25,276 [WARNING] aiogram.dispatcher: Sleep for 4.224400 seconds and try again... (tryings = 5, bot id = 8062922612)
+2025-10-02 19:41:29,748 [INFO] aiogram.dispatcher: Connection established (tryings = 6, bot id = 8062922612)
+2025-10-02 19:41:29,937 [INFO] aiogram.event: Update id=938694862 is handled. Duration 187 ms by bot id=8062922612
+2025-10-02 19:41:33,644 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:33,646 [WARNING] aiogram.dispatcher: Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8062922612)
+2025-10-02 19:41:38,343 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:38,345 [WARNING] aiogram.dispatcher: Sleep for 1.411227 seconds and try again... (tryings = 1, bot id = 8062922612)
+2025-10-02 19:41:44,324 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:44,326 [WARNING] aiogram.dispatcher: Sleep for 1.593997 seconds and try again... (tryings = 2, bot id = 8062922612)
+2025-10-02 19:41:50,540 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:50,547 [WARNING] aiogram.dispatcher: Sleep for 2.162317 seconds and try again... (tryings = 3, bot id = 8062922612)
+2025-10-02 19:41:56,364 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:41:56,378 [WARNING] aiogram.dispatcher: Sleep for 2.886196 seconds and try again... (tryings = 4, bot id = 8062922612)
+2025-10-02 19:42:04,209 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:42:04,212 [WARNING] aiogram.dispatcher: Sleep for 3.773238 seconds and try again... (tryings = 5, bot id = 8062922612)
+2025-10-02 19:42:11,686 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:42:11,687 [WARNING] aiogram.dispatcher: Sleep for 4.863374 seconds and try again... (tryings = 6, bot id = 8062922612)
+2025-10-02 19:42:21,478 [ERROR] aiogram.dispatcher: Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-10-02 19:42:21,480 [WARNING] aiogram.dispatcher: Sleep for 5.222490 seconds and try again... (tryings = 7, bot id = 8062922612)
+2025-10-02 19:42:27,105 [WARNING] aiogram.dispatcher: Received SIGTERM signal
+2025-10-02 19:42:27,110 [INFO] aiogram.dispatcher: Polling stopped for bot @PulseAIDigest_bot id=8062922612 - 'PulseAI'
+2025-10-02 19:42:27,110 [INFO] aiogram.dispatcher: Polling stopped
