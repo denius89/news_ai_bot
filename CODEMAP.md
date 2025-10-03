@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-02 10:16:46 UTC_
+_Generated on 2025-10-03 07:39:09 UTC_
 
 ```
 ├── .github/
@@ -40,6 +40,8 @@ _Generated on 2025-10-02 10:16:46 UTC_
 │   │   ├── 2025_10_01_published_at_datetime.sql
 │   │   ├── 2025_10_02_add_missing_columns.sql
 │   │   ├── 2025_10_02_add_updated_at.sql
+│   │   ├── 2025_10_02_notifications_indexes.sql
+│   │   ├── 2025_10_02_notifications_system.sql
 │   │   └── 2025_10_02_subscriptions_notifications.sql
 │   ├── __init__.py
 │   ├── db_models.py
@@ -164,8 +166,15 @@ _Generated on 2025-10-02 10:16:46 UTC_
 ├── .env.example
 ├── .gitignore
 ├── =2025.1
+├── bot_clean.log
+├── bot_correct.log
+├── bot_final.log
+├── bot_fixed.log
+├── bot_new.log
+├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
+├── env_temp.txt
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -176,6 +185,10 @@ _Generated on 2025-10-02 10:16:46 UTC_
 ├── README.md
 ├── requirements.txt
 ├── setup.cfg
+├── start_bot.sh
 ├── TASKS.md
-└── webapp.py
+├── test_webapp_debug.html
+├── webapp.py
+├── webapp_fresh.log
+└── webapp_new.log
 ```
