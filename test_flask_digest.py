@@ -5,6 +5,7 @@ Test Flask digest route
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask
@@ -13,9 +14,10 @@ from routes.news_routes import news_bp
 app = Flask(__name__)
 app.register_blueprint(news_bp)
 
+
 def test_digest_route():
     print("Testing Flask digest route...")
-    
+
     with app.test_client() as client:
         try:
             response = client.get('/digest')
@@ -30,7 +32,9 @@ def test_digest_route():
         except Exception as e:
             print(f"❌ Exception: {e}")
             import traceback
+
             traceback.print_exc()
+
 
 if __name__ == "__main__":
     test_digest_route()

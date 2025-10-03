@@ -29,10 +29,12 @@ def importance_icon(value: float) -> str:
 # Регистрируем фильтр в Jinja
 app.jinja_env.filters["importance_icon"] = importance_icon
 
+
 # Главная страница
 @app.route("/")
 def index():
     return render_template("index.html", active_page="home")
+
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)

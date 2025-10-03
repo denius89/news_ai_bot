@@ -205,7 +205,7 @@ def get_user_notifications_api():
     user_id_input = request.args.get('user_id')
     limit = int(request.args.get('limit', 50))
     offset = int(request.args.get('offset', 0))
-    
+
     if not user_id_input:
         return jsonify({'status': 'error', 'message': 'user_id parameter is required'}), 400
 
@@ -222,6 +222,7 @@ def get_user_notifications_api():
                 logger.info('Converting telegram_id to UUID: %d', telegram_id)
                 # Get UUID from users table
                 from database.db_models import get_user_by_telegram
+
                 user_data = get_user_by_telegram(telegram_id)
                 if user_data:
                     user_id = user_data['id']
@@ -236,24 +237,35 @@ def get_user_notifications_api():
                 logger.warning('Invalid user_id format, using fallback: %s', user_id)
 
         logger.info('Final user_id for query: %s', user_id)
-        
+
         # Get notifications from database
         logger.info('Calling get_user_notifications with user_id=%s, limit=%d', user_id, limit)
         notifications = get_user_notifications(user_id=user_id, limit=limit, offset=offset)
         logger.info('get_user_notifications returned %d notifications', len(notifications))
 
-        logger.info('Retrieved %d notifications for user %s (original input: %s)', len(notifications), user_id, user_id_input)
+        logger.info(
+            'Retrieved %d notifications for user %s (original input: %s)',
+            len(notifications),
+            user_id,
+            user_id_input,
+        )
 
         # Transform notifications to match expected API format
         formatted_notifications = []
         for notification in notifications:
-            formatted_notifications.append({
-                'id': notification['id'],
-                'title': notification['title'],
-                'text': notification.get('message', notification.get('text', '')),  # Use message field
-                'created_at': notification.get('created_at', '2025-10-03T00:00:00Z'),  # Default timestamp
-                'read': notification['read']
-            })
+            formatted_notifications.append(
+                {
+                    'id': notification['id'],
+                    'title': notification['title'],
+                    'text': notification.get(
+                        'message', notification.get('text', '')
+                    ),  # Use message field
+                    'created_at': notification.get(
+                        'created_at', '2025-10-03T00:00:00Z'
+                    ),  # Default timestamp
+                    'read': notification['read'],
+                }
+            )
 
         return jsonify(
             {
@@ -347,6 +359,7 @@ def mark_user_notification_read():
                 telegram_id = int(user_id_input)
                 # Get UUID from users table
                 from database.db_models import get_user_by_telegram
+
                 user_data = get_user_by_telegram(telegram_id)
                 if user_data:
                     user_id = user_data['id']
@@ -361,26 +374,36 @@ def mark_user_notification_read():
         success = mark_notification_read(user_id=user_id, notification_id=notification_id)
 
         if success:
-            logger.info('Notification marked as read: user_id=%s, notification_id=%s', 
-                       user_id, notification_id)
-            return jsonify({
-                'status': 'success',
-                'data': {
-                    'success': True,
-                    'notification_id': notification_id,
-                },
-            })
+            logger.info(
+                'Notification marked as read: user_id=%s, notification_id=%s',
+                user_id,
+                notification_id,
+            )
+            return jsonify(
+                {
+                    'status': 'success',
+                    'data': {
+                        'success': True,
+                        'notification_id': notification_id,
+                    },
+                }
+            )
         else:
-            logger.warning('Failed to mark notification as read: user_id=%s, notification_id=%s', 
-                          user_id, notification_id)
-            return jsonify({
-                'status': 'success',
-                'data': {
-                    'success': False,
-                    'notification_id': notification_id,
-                    'reason': 'Notification not found or does not belong to user',
-                },
-            })
+            logger.warning(
+                'Failed to mark notification as read: user_id=%s, notification_id=%s',
+                user_id,
+                notification_id,
+            )
+            return jsonify(
+                {
+                    'status': 'success',
+                    'data': {
+                        'success': False,
+                        'notification_id': notification_id,
+                        'reason': 'Notification not found or does not belong to user',
+                    },
+                }
+            )
 
     except Exception as e:
         logger.error('Error marking notification as read: %s', e)
@@ -393,7 +416,10 @@ def mark_notification_read_endpoint():
     POST /api/notifications/mark-read
     Marks a notification as read (legacy endpoint).
     """
-    return jsonify({'status': 'error', 'message': 'Use /api/user_notifications/mark_read instead'}), 501
+    return (
+        jsonify({'status': 'error', 'message': 'Use /api/user_notifications/mark_read instead'}),
+        501,
+    )
 
 
 @api_bp.route('/notification-settings', methods=['GET'])

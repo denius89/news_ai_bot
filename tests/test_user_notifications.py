@@ -41,7 +41,7 @@ class TestUserNotificationsAPI:
                 'read': False,
                 'created_at': datetime(2025, 10, 2, 10, 0, 0),
                 'via_telegram': False,
-                'via_webapp': True
+                'via_webapp': True,
             },
             {
                 'id': 'notif-2',
@@ -51,8 +51,8 @@ class TestUserNotificationsAPI:
                 'read': True,
                 'created_at': datetime(2025, 10, 1, 10, 0, 0),
                 'via_telegram': True,
-                'via_webapp': True
-            }
+                'via_webapp': True,
+            },
         ]
         mock_get_notifications.return_value = mock_notifications
 
@@ -84,7 +84,7 @@ class TestUserNotificationsAPI:
                 'read': False,
                 'created_at': datetime(2025, 10, 2, 10, 0, 0),
                 'via_telegram': False,
-                'via_webapp': True
+                'via_webapp': True,
             }
             for i in range(1, 6)
         ]
@@ -132,8 +132,7 @@ class TestUserNotificationsAPI:
     def test_mark_notification_read_missing_user_id(self, client):
         """Test POST /api/user_notifications/mark_read without user_id."""
         response = client.post(
-            '/api/user_notifications/mark_read',
-            json={'notification_id': 'notif-1'}
+            '/api/user_notifications/mark_read', json={'notification_id': 'notif-1'}
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -143,8 +142,7 @@ class TestUserNotificationsAPI:
     def test_mark_notification_read_missing_notification_id(self, client):
         """Test POST /api/user_notifications/mark_read without notification_id."""
         response = client.post(
-            '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123'}
+            '/api/user_notifications/mark_read', json={'user_id': 'test-user-123'}
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -158,7 +156,7 @@ class TestUserNotificationsAPI:
 
         response = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'}
+            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
         )
         assert response.status_code == 200
         data = response.get_json()
@@ -173,14 +171,14 @@ class TestUserNotificationsAPI:
         # First request
         response1 = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'}
+            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
         )
         assert response1.status_code == 200
 
         # Second request (idempotent)
         response2 = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'}
+            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
         )
         assert response2.status_code == 200
 
@@ -191,7 +189,7 @@ class TestUserNotificationsAPI:
 
         response = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123', 'notification_id': 'invalid-id'}
+            json={'user_id': 'test-user-123', 'notification_id': 'invalid-id'},
         )
         assert response.status_code == 404
         data = response.get_json()
@@ -205,7 +203,7 @@ class TestUserNotificationsAPI:
 
         response = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'}
+            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
         )
         assert response.status_code == 500
         data = response.get_json()
@@ -226,8 +224,8 @@ class TestUserNotificationsAPI:
                 'message': 'This notification should be sent via Telegram',
                 'category': 'crypto',
                 'via_telegram': True,
-                'via_webapp': True
-            }
+                'via_webapp': True,
+            },
         )
         assert response.status_code == 201
         data = response.get_json()
@@ -242,7 +240,7 @@ class TestUserNotificationsAPI:
             category='crypto',
             read=False,
             via_telegram=True,
-            via_webapp=True
+            via_webapp=True,
         )
 
     @patch('routes.api_routes.get_user_notifications')
@@ -259,7 +257,7 @@ class TestUserNotificationsAPI:
                 'read': False,
                 'created_at': datetime(2025, 10, 2, 10, 0, 0),
                 'via_telegram': False,
-                'via_webapp': True
+                'via_webapp': True,
             }
         ]
         mock_mark_read.return_value = True
@@ -274,7 +272,7 @@ class TestUserNotificationsAPI:
         # Step 2: Mark as read
         response2 = client.post(
             '/api/user_notifications/mark_read',
-            json={'user_id': 'integration-user', 'notification_id': 'integration-test-1'}
+            json={'user_id': 'integration-user', 'notification_id': 'integration-test-1'},
         )
         assert response2.status_code == 200
 
@@ -288,10 +286,10 @@ class TestUserNotificationsAPI:
                 'read': True,  # Now marked as read
                 'created_at': datetime(2025, 10, 2, 10, 0, 0),
                 'via_telegram': False,
-                'via_webapp': True
+                'via_webapp': True,
             }
         ]
-        
+
         response3 = client.get('/api/user_notifications?user_id=integration-user')
         assert response3.status_code == 200
         data3 = response3.get_json()

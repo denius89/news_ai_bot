@@ -30,13 +30,13 @@ def digest():
             item_dict = item.model_dump()
         else:
             item_dict = dict(item)
-        
+
         item_dict["source"] = item_dict.get("source") or "—"
         item_dict["credibility"] = float(item_dict.get("credibility") or 0.0)
         item_dict["importance"] = float(item_dict.get("importance") or 0.0)
         item_dict["published_at_fmt"] = item_dict.get("published_at_fmt") or "—"
         enriched_items.append(item_dict)
-    
+
     news_items = enriched_items
 
     return render_template(

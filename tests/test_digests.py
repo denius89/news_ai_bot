@@ -198,6 +198,7 @@ class TestDigestsAPI:
     def client(self):
         """Flask test client."""
         from webapp import app
+
         app.config['TESTING'] = True
         with app.test_client() as client:
             yield client
@@ -207,7 +208,7 @@ class TestDigestsAPI:
         """Test successful GET /api/digests."""
         from datetime import datetime, timezone
         from models.news import NewsItem
-        
+
         mock_news_items = [
             NewsItem(
                 id="1",
@@ -230,7 +231,7 @@ class TestDigestsAPI:
                 category="economy",
                 credibility=0.9,
                 importance=0.8,
-            )
+            ),
         ]
         mock_get_news.return_value = mock_news_items
 
@@ -247,7 +248,7 @@ class TestDigestsAPI:
         """Test GET /api/digests with limit parameter."""
         from datetime import datetime, timezone
         from models.news import NewsItem
-        
+
         mock_news_items = [
             NewsItem(
                 id=str(i),
@@ -298,7 +299,7 @@ class TestDigestsAPI:
         """Test GET /api/digests with category filter."""
         from datetime import datetime, timezone
         from models.news import NewsItem
-        
+
         mock_news_items = [
             NewsItem(
                 id="1",

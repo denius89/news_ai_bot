@@ -33,9 +33,9 @@ def fix_schema():
         # Drop and recreate table with correct schema
         try:
             print("🗑️  Dropping existing user_notifications table...")
-            supabase.rpc('exec_sql', {
-                'sql': 'DROP TABLE IF EXISTS user_notifications CASCADE;'
-            }).execute()
+            supabase.rpc(
+                'exec_sql', {'sql': 'DROP TABLE IF EXISTS user_notifications CASCADE;'}
+            ).execute()
             print("✅ Dropped existing table")
         except Exception as e:
             print(f"⚠️  Error dropping table: {e}")
@@ -44,8 +44,10 @@ def fix_schema():
 
         # Create table with UUID reference
         try:
-            supabase.rpc('exec_sql', {
-                'sql': '''
+            supabase.rpc(
+                'exec_sql',
+                {
+                    'sql': '''
                 CREATE TABLE user_notifications (
                   id           BIGSERIAL PRIMARY KEY,
                   user_id      UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -55,7 +57,8 @@ def fix_schema():
                   read         BOOLEAN NOT NULL DEFAULT FALSE
                 );
                 '''
-            }).execute()
+                },
+            ).execute()
             print("✅ Created user_notifications table with UUID reference")
         except Exception as e:
             print(f"❌ Could not create table: {e}")
@@ -63,12 +66,15 @@ def fix_schema():
 
         # Create index
         try:
-            supabase.rpc('exec_sql', {
-                'sql': '''
+            supabase.rpc(
+                'exec_sql',
+                {
+                    'sql': '''
                 CREATE INDEX idx_user_notifications_user_read_created
                   ON user_notifications (user_id, read, created_at DESC);
                 '''
-            }).execute()
+                },
+            ).execute()
             print("✅ Created index")
         except Exception as e:
             print(f"⚠️  Could not create index: {e}")
@@ -81,34 +87,34 @@ def fix_schema():
             if users_result.data:
                 user_id = users_result.data[0]['id']
                 print(f"Using user_id: {user_id}")
-                
+
                 test_notifications = [
                     {
                         'user_id': user_id,
                         'title': 'Новый дайджест готов!',
                         'text': 'Ваш утренний дайджест с последними новостями готов к прочтению.',
-                        'read': False
+                        'read': False,
                     },
                     {
                         'user_id': user_id,
                         'title': 'Важное событие',
                         'text': 'Сегодня в 15:00 ожидается важное экономическое событие в США.',
-                        'read': True
-                    }
+                        'read': True,
+                    },
                 ]
-                
+
                 result = supabase.table('user_notifications').insert(test_notifications).execute()
                 print(f"✅ Added {len(test_notifications)} test notifications")
-                
+
                 # Verify data
                 verify_result = supabase.table('user_notifications').select('*').execute()
                 print(f"✅ Verification: {len(verify_result.data)} notifications in table")
                 for notification in verify_result.data:
                     print(f"  - {notification['title']} (read: {notification['read']})")
-                    
+
             else:
                 print("⚠️  No users found, skipping test data")
-                
+
         except Exception as e:
             print(f"⚠️  Could not add test data: {e}")
 

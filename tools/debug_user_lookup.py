@@ -44,10 +44,10 @@ def debug_user_lookup():
 
         # Test get_user_by_telegram function
         print("\n2. Testing get_user_by_telegram function...")
-        
+
         # Test with different telegram_ids
         test_ids = [123456789, 123, 999999999, 888888888]
-        
+
         for test_id in test_ids:
             print(f"\nTesting telegram_id: {test_id}")
             user_data = get_user_by_telegram(test_id)
