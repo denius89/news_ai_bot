@@ -6,16 +6,24 @@ Categories are centralized in digests/configs.py and imported here
 to maintain consistency across the application.
 """
 
+import asyncio
 import logging
 
 from flask import Blueprint, request, jsonify
 
+from database.db_models import list_notifications
+from services.subscription_service import SubscriptionService
+from services.notification_service import NotificationService
 from digests.configs import CATEGORIES
 
 logger = logging.getLogger(__name__)
 
 # Create API blueprint
 api_bp = Blueprint("api", __name__, url_prefix="/api")
+
+# Initialize services
+subscription_service = SubscriptionService()
+notification_service = NotificationService()
 
 
 def convert_to_uuid(user_id_input):
@@ -55,6 +63,17 @@ def get_subscription_categories():
 SUBSCRIPTION_CATEGORIES = get_subscription_categories()
 
 
+def run_async(coro):
+    """Helper to run async functions in Flask context."""
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    return loop.run_until_complete(coro)
+
+
 @api_bp.route('/subscriptions', methods=['GET'])
 def get_subscriptions():
     """
@@ -66,12 +85,12 @@ def get_subscriptions():
         return jsonify({'status': 'error', 'message': 'user_id parameter is required'}), 400
 
     try:
-        # Convert to UUID if needed (for future use)
-        _ = convert_to_uuid(user_id_input)
+        # Convert to UUID if needed
+        user_id = convert_to_uuid(user_id_input)
 
-        # For demo purposes, return empty subscriptions
-        # TODO: Implement actual database calls
-        subscribed_categories = set()
+        # Get user's current subscriptions
+        subscriptions = run_async(subscription_service.list(user_id))
+        subscribed_categories = {sub['category'] for sub in subscriptions}
 
         # Build response with all categories and their status
         categories_with_status = []
@@ -143,24 +162,32 @@ def update_subscription():
         # Convert to UUID if needed
         user_id = convert_to_uuid(user_id)
 
-        # For demo purposes, just return success
-        # TODO: Implement actual database calls
         if enabled:
-            return jsonify(
-                {
-                    'status': 'success',
-                    'message': f'Successfully subscribed to {category}',
-                    'data': {'category': category, 'subscribed': True},
-                }
-            )
+            # Add subscription
+            success = run_async(subscription_service.add(user_id, category))
+            if success:
+                return jsonify(
+                    {
+                        'status': 'success',
+                        'message': f'Successfully subscribed to {category}',
+                        'data': {'category': category, 'subscribed': True},
+                    }
+                )
+            else:
+                return jsonify({'status': 'error', 'message': 'Failed to add subscription'}), 500
         else:
-            return jsonify(
-                {
-                    'status': 'success',
-                    'message': f'Successfully unsubscribed from {category}',
-                    'data': {'category': category, 'subscribed': False},
-                }
-            )
+            # Remove subscription
+            success = run_async(subscription_service.remove(user_id, category))
+            if success:
+                return jsonify(
+                    {
+                        'status': 'success',
+                        'message': f'Successfully unsubscribed from {category}',
+                        'data': {'category': category, 'subscribed': False},
+                    }
+                )
+            else:
+                return jsonify({'status': 'error', 'message': 'Failed to remove subscription'}), 500
 
     except Exception as e:
         logger.error('Error updating subscription: %s', e)
@@ -178,27 +205,40 @@ def get_notifications():
         return jsonify({'status': 'error', 'message': 'user_id parameter is required'}), 400
 
     try:
-        # Convert to UUID if needed (for future use)
-        _ = convert_to_uuid(user_id_input)
+        # Convert to UUID if needed
+        user_id = convert_to_uuid(user_id_input)
 
-        # For demo purposes, return empty notifications
-        # TODO: Implement actual database calls
-        notifications = []
+        # Get notifications from database
+        notifications = list_notifications(user_id)
+
+        # Format response
+        unread_count = sum(1 for n in notifications if not n.get('read', False))
+        total_count = len(notifications)
 
         return jsonify(
             {
                 'status': 'success',
                 'data': {
                     'notifications': notifications,
-                    'total_count': 0,
-                    'unread_count': 0,
+                    'total_count': total_count,
+                    'unread_count': unread_count,
                 },
             }
         )
 
     except Exception as e:
         logger.error('Error fetching notifications for user %s: %s', user_id_input, e)
-        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
+        # Return empty list on error (graceful degradation)
+        return jsonify(
+            {
+                'status': 'success',
+                'data': {
+                    'notifications': [],
+                    'total_count': 0,
+                    'unread_count': 0,
+                },
+            }
+        )
 
 
 @api_bp.route('/notifications/mark-read', methods=['POST'])
@@ -249,9 +289,8 @@ def create_user():
         return jsonify({'status': 'error', 'message': 'telegram_id is required'}), 400
 
     try:
-        # For demo purposes, just return a mock user ID
-        # TODO: Implement actual database calls
-        user_id = f"user-{telegram_id}"
+        # Create or get user
+        user_id = run_async(subscription_service.get_or_create_user(telegram_id, username))
 
         return jsonify(
             {
