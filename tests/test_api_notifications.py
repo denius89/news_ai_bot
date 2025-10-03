@@ -1,6 +1,7 @@
 """
 Unit tests for Notifications API endpoints.
 """
+
 import pytest
 from unittest.mock import patch
 
@@ -37,7 +38,7 @@ class TestNotificationsAPI:
                 'message': 'Test message',
                 'category': 'crypto',
                 'read': False,
-                'created_at': '2025-10-02T10:00:00Z'
+                'created_at': '2025-10-02T10:00:00Z',
             },
             {
                 'id': 'notif-2',
@@ -45,8 +46,8 @@ class TestNotificationsAPI:
                 'message': 'Already read',
                 'category': 'economy',
                 'read': True,
-                'created_at': '2025-10-01T10:00:00Z'
-            }
+                'created_at': '2025-10-01T10:00:00Z',
+            },
         ]
 
         response = client.get('/api/notifications?user_id=test-user-123')
@@ -84,8 +85,7 @@ class TestNotificationsAPI:
 
     def test_mark_notification_read_missing_json(self, client):
         """Test POST /api/notifications/mark-read without JSON body."""
-        response = client.post('/api/notifications/mark-read',
-                              content_type='application/json')
+        response = client.post('/api/notifications/mark-read', content_type='application/json')
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -93,8 +93,7 @@ class TestNotificationsAPI:
 
     def test_mark_notification_read_missing_fields(self, client):
         """Test POST /api/notifications/mark-read with missing fields."""
-        response = client.post('/api/notifications/mark-read',
-                              json={'user_id': 'test-user'})
+        response = client.post('/api/notifications/mark-read', json={'user_id': 'test-user'})
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -105,11 +104,10 @@ class TestNotificationsAPI:
         """Test successful notification mark as read."""
         mock_mark_read.return_value = True
 
-        response = client.post('/api/notifications/mark-read',
-                              json={
-                                 'user_id': 'test-user-123',
-                                 'notification_id': 'notif-1'
-                             })
+        response = client.post(
+            '/api/notifications/mark-read',
+            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
+        )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
@@ -122,11 +120,10 @@ class TestNotificationsAPI:
         """Test marking non-existent notification as read."""
         mock_mark_read.return_value = False
 
-        response = client.post('/api/notifications/mark-read',
-                              json={
-                                 'user_id': 'test-user-123',
-                                 'notification_id': 'nonexistent'
-                             })
+        response = client.post(
+            '/api/notifications/mark-read',
+            json={'user_id': 'test-user-123', 'notification_id': 'nonexistent'},
+        )
         assert response.status_code == 404
         data = response.get_json()
         assert data['status'] == 'error'
@@ -144,18 +141,8 @@ class TestNotificationsAPI:
     def test_get_notification_settings_success(self, mock_get_settings, client):
         """Test successful GET /api/notification-settings."""
         mock_get_settings.return_value = [
-            {
-                'category': 'crypto',
-                'enabled': True,
-                'via_telegram': True,
-                'via_webapp': True
-            },
-            {
-                'category': 'economy',
-                'enabled': False,
-                'via_telegram': False,
-                'via_webapp': True
-            }
+            {'category': 'crypto', 'enabled': True, 'via_telegram': True, 'via_webapp': True},
+            {'category': 'economy', 'enabled': False, 'via_telegram': False, 'via_webapp': True},
         ]
 
         response = client.get('/api/notification-settings?user_id=test-user-123')
@@ -167,8 +154,7 @@ class TestNotificationsAPI:
 
     def test_update_notification_settings_missing_json(self, client):
         """Test POST /api/notification-settings/update without JSON body."""
-        response = client.post('/api/notification-settings/update',
-                              content_type='application/json')
+        response = client.post('/api/notification-settings/update', content_type='application/json')
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -176,8 +162,7 @@ class TestNotificationsAPI:
 
     def test_update_notification_settings_missing_fields(self, client):
         """Test POST /api/notification-settings/update with missing fields."""
-        response = client.post('/api/notification-settings/update',
-                              json={'user_id': 'test-user'})
+        response = client.post('/api/notification-settings/update', json={'user_id': 'test-user'})
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -185,14 +170,16 @@ class TestNotificationsAPI:
 
     def test_update_notification_settings_invalid_category(self, client):
         """Test POST /api/notification-settings/update with invalid category."""
-        response = client.post('/api/notification-settings/update',
-                              json={
-                                 'user_id': 'test-user',
-                                 'category': 'invalid_category',
-                                 'enabled': True,
-                                 'via_telegram': True,
-                                 'via_webapp': True
-                             })
+        response = client.post(
+            '/api/notification-settings/update',
+            json={
+                'user_id': 'test-user',
+                'category': 'invalid_category',
+                'enabled': True,
+                'via_telegram': True,
+                'via_webapp': True,
+            },
+        )
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -203,14 +190,16 @@ class TestNotificationsAPI:
         """Test successful notification settings update."""
         mock_upsert.return_value = True
 
-        response = client.post('/api/notification-settings/update',
-                              json={
-                                 'user_id': 'test-user-123',
-                                 'category': 'crypto',
-                                 'enabled': True,
-                                 'via_telegram': True,
-                                 'via_webapp': False
-                             })
+        response = client.post(
+            '/api/notification-settings/update',
+            json={
+                'user_id': 'test-user-123',
+                'category': 'crypto',
+                'enabled': True,
+                'via_telegram': True,
+                'via_webapp': False,
+            },
+        )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'

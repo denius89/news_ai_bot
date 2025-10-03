@@ -13,6 +13,7 @@ router = Router()
 
 # ID command removed - functionality moved to WebApp
 
+
 @router.message(Command("dashboard"))
 async def open_dashboard(message: types.Message):
     """

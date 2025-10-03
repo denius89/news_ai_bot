@@ -1,8 +1,10 @@
 """
 Unit tests for Subscriptions API endpoints.
 """
+
 import pytest
 from unittest.mock import patch, AsyncMock
+
 # json is not used
 
 from webapp import app
@@ -35,10 +37,9 @@ class TestSubscriptionsAPI:
         mock_get_user.return_value = AsyncMock()
         mock_get_user.return_value.__await__ = AsyncMock(return_value='user-uuid-123')
         mock_list.return_value = AsyncMock()
-        mock_list.return_value.__await__ = AsyncMock(return_value=[
-            {'category': 'crypto'},
-            {'category': 'economy'}
-        ])
+        mock_list.return_value.__await__ = AsyncMock(
+            return_value=[{'category': 'crypto'}, {'category': 'economy'}]
+        )
 
         response = client.get('/api/subscriptions?user_id=123')
         assert response.status_code == 200
@@ -49,8 +50,7 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_missing_json(self, client):
         """Test POST /api/subscriptions/update without JSON body."""
-        response = client.post('/api/subscriptions/update', 
-                              content_type='application/json')
+        response = client.post('/api/subscriptions/update', content_type='application/json')
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -58,8 +58,7 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_missing_fields(self, client):
         """Test POST /api/subscriptions/update with missing fields."""
-        response = client.post('/api/subscriptions/update',
-                              json={'user_id': '123'})
+        response = client.post('/api/subscriptions/update', json={'user_id': '123'})
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -67,12 +66,10 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_invalid_category(self, client):
         """Test POST /api/subscriptions/update with invalid category."""
-        response = client.post('/api/subscriptions/update',
-                              json={
-                                 'user_id': '123',
-                                 'category': 'invalid_category',
-                                 'enabled': True
-                             })
+        response = client.post(
+            '/api/subscriptions/update',
+            json={'user_id': '123', 'category': 'invalid_category', 'enabled': True},
+        )
         assert response.status_code == 400
         data = response.get_json()
         assert data['status'] == 'error'
@@ -88,12 +85,10 @@ class TestSubscriptionsAPI:
         mock_add.return_value = AsyncMock()
         mock_add.return_value.__await__ = AsyncMock(return_value=True)
 
-        response = client.post('/api/subscriptions/update',
-                              json={
-                                 'user_id': '123',
-                                 'category': 'crypto',
-                                 'enabled': True
-                             })
+        response = client.post(
+            '/api/subscriptions/update',
+            json={'user_id': '123', 'category': 'crypto', 'enabled': True},
+        )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
@@ -109,12 +104,10 @@ class TestSubscriptionsAPI:
         mock_remove.return_value = AsyncMock()
         mock_remove.return_value.__await__ = AsyncMock(return_value=True)
 
-        response = client.post('/api/subscriptions/update',
-                              json={
-                                 'user_id': '123',
-                                 'category': 'crypto',
-                                 'enabled': False
-                             })
+        response = client.post(
+            '/api/subscriptions/update',
+            json={'user_id': '123', 'category': 'crypto', 'enabled': False},
+        )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
@@ -143,11 +136,9 @@ class TestSubscriptionsAPI:
         mock_get_user.return_value = AsyncMock()
         mock_get_user.return_value.__await__ = AsyncMock(return_value='user-uuid-123')
 
-        response = client.post('/api/users',
-                              json={
-                                 'telegram_id': 123456789,
-                                 'username': 'testuser'
-                             })
+        response = client.post(
+            '/api/users', json={'telegram_id': 123456789, 'username': 'testuser'}
+        )
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'

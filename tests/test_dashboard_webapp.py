@@ -1,6 +1,7 @@
 """
 Unit tests for Dashboard WebApp functionality.
 """
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
