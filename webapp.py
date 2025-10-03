@@ -3,6 +3,8 @@ from flask import Flask
 
 from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST
 from routes.news_routes import news_bp
+from routes.webapp_routes import webapp_bp
+from routes.api_routes import api_bp
 from utils.logging_setup import setup_logging
 
 # --- ЛОГИРОВАНИЕ ---
@@ -29,6 +31,8 @@ app.jinja_env.filters["importance_icon"] = importance_icon
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)
+app.register_blueprint(webapp_bp)
+app.register_blueprint(api_bp)
 
 
 # --- Точка входа ---

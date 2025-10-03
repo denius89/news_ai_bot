@@ -1,0 +1,6 @@
+2025-10-02 19:40:22,419 [INFO] news_ai_bot: 🚀 Webapp запущен (хост 0.0.0.0, порт 8001, debug=False)
+2025-10-02 19:40:22,742 [INFO] httpx: HTTP Request: GET https://nzgzolramikbxpdsnzdv.supabase.co/rest/v1/news?select=id%2Cuid%2Ctitle%2Ccontent%2Clink%2Cpublished_at%2Csource%2Ccategory%2Ccredibility%2Cimportance&order=published_at.desc&limit=5 "HTTP/2 200 OK"
+ * Serving Flask app 'webapp'
+ * Debug mode: off
+Address already in use
+Port 8001 is in use by another program. Either identify and stop that program, or start the server with a different port.

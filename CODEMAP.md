@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-03 07:39:09 UTC_
+_Generated on 2025-10-03 07:49:04 UTC_
 
 ```
 ├── .github/
@@ -79,8 +79,10 @@ _Generated on 2025-10-03 07:39:09 UTC_
 │   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
+│   ├── api_routes.py
 │   ├── news_routes.py
-│   └── subscriptions.py
+│   ├── subscriptions.py
+│   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
 │   ├── digest_ai_service.py
@@ -102,10 +104,12 @@ _Generated on 2025-10-03 07:39:09 UTC_
 │   │       └── site.webmanifest
 │   ├── js/
 │   │   └── webapp.js
-│   └── style.css
+│   ├── style.css
+│   └── webapp.css
 ├── telegram_bot/
 │   ├── handlers/
 │   │   ├── __init__.py
+│   │   ├── dashboard.py
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
@@ -126,8 +130,11 @@ _Generated on 2025-10-03 07:39:09 UTC_
 │   ├── test_ai_modules.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
+│   ├── test_api_notifications.py
+│   ├── test_api_subscriptions.py
 │   ├── test_bot_routers.py
 │   ├── test_clean_text.py
+│   ├── test_dashboard_webapp.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_db_models.py
@@ -164,6 +171,7 @@ _Generated on 2025-10-03 07:39:09 UTC_
 ├── .coverage
 ├── .editorconfig
 ├── .env.example
+├── .flake8
 ├── .gitignore
 ├── =2025.1
 ├── bot_clean.log
@@ -174,7 +182,6 @@ _Generated on 2025-10-03 07:39:09 UTC_
 ├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
-├── env_temp.txt
 ├── LICENSE
 ├── main.py
 ├── Makefile
