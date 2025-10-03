@@ -13,7 +13,7 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config.settings import TELEGRAM_BOT_TOKEN
-from database.db_models import get_user_notifications, mark_notification_read
+# from database.db_models import get_user_notifications  # TODO: implement, mark_notification_read
 
 logger = logging.getLogger(__name__)
 

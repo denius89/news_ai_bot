@@ -78,7 +78,7 @@ async def cb_my_notifications(query: types.CallbackQuery):
                     else:
                         dt = created_at
                     formatted_date = dt.strftime("%d.%m.%Y %H:%M")
-                except:
+                except Exception:
                     formatted_date = str(created_at)
             else:
                 formatted_date = "—"

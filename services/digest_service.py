@@ -102,7 +102,7 @@ def build_ai_digest(*args, **kwargs):
 
 
 # --- ⚠️ Backward compatibility ---
-def get_latest_news(limit: int = 10, categories: Optional[List[str]] = None):
+def get_latest_news_backward_compat(limit: int = 10, categories: Optional[List[str]] = None):
     """
     Совместимость для старых тестов и кода.
     Используй DigestService.news_repo.get_recent_news вместо этого метода.
