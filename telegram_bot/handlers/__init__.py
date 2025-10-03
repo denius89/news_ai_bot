@@ -1,12 +1,13 @@
 # telegram_bot/handlers/__init__.py
-from . import start, digest, digest_ai, events, dashboard
+from . import start, digest, digest_ai, events, dashboard, notifications
 
 # Список всех роутеров для подключения в bot.py
-# Subscriptions removed - now handled in WebApp Dashboard
+# Оставляем только основные команды: /start, /digest, /events, /help
 routers = [
     start.router,
-    digest_ai.router,
     digest.router,
+    digest_ai.router,
     events.router,
     dashboard.router,
+    notifications.router,
 ]

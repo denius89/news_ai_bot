@@ -15,8 +15,8 @@ def main_inline_keyboard() -> types.InlineKeyboardMarkup:
             [types.InlineKeyboardButton(text="📰 Новости", callback_data="digest:all")],
             [types.InlineKeyboardButton(text="🤖 AI-дайджест", callback_data="digest_ai")],
             [types.InlineKeyboardButton(text="📅 События", callback_data="events")],
-            [types.InlineKeyboardButton(text="📋 Подписки", callback_data="subscriptions")],
             [types.InlineKeyboardButton(text="🔔 Уведомления", callback_data="notifications")],
+            [types.InlineKeyboardButton(text="🌐 WebApp", callback_data="dashboard")],
         ]
     )
 

@@ -1,5 +1,5 @@
 import logging
-from flask import Flask
+from flask import Flask, render_template
 
 from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST
 from routes.news_routes import news_bp
@@ -28,6 +28,11 @@ def importance_icon(value: float) -> str:
 
 # Регистрируем фильтр в Jinja
 app.jinja_env.filters["importance_icon"] = importance_icon
+
+# Главная страница
+@app.route("/")
+def index():
+    return render_template("index.html", active_page="home")
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)

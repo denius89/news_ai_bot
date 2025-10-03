@@ -548,3 +548,139 @@ def list_notifications(user_id: str) -> list[dict]:
     except Exception as e:
         logger.error("Ошибка при получении настроек уведомлений: %s", e)
         return []
+
+
+# --- USER NOTIFICATIONS FUNCTIONS ---
+
+
+def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: int = 0) -> List[Dict]:
+    """
+    Получает уведомления пользователя.
+    
+    Args:
+        user_id: User ID
+        limit: Maximum number of notifications to return
+        offset: Number of notifications to skip
+        
+    Returns:
+        List of notification dicts
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+    
+    try:
+        result = (
+            supabase.table("user_notifications")
+            .select("id, title, message, read, user_id")
+            .eq("user_id", user_id)
+            .order("id", desc=True)  # Use id instead of created_at
+            .limit(limit)
+            .execute()
+        )
+        
+        notifications = result.data or []
+        logger.info("Получено уведомлений: %d для user_id=%s", len(notifications), user_id)
+        return notifications
+        
+    except Exception as e:
+        logger.error("Ошибка при получении уведомлений: %s", e)
+        return []
+
+
+def create_user_notification(
+    user_id: Union[int, str],
+    title: str,
+    content: str,
+    category: str = "general",
+    read: bool = False,
+    via_telegram: bool = False,
+    via_webapp: bool = True
+) -> Optional[str]:
+    """
+    Создает новое уведомление для пользователя.
+    
+    Args:
+        user_id: User ID
+        title: Заголовок уведомления
+        content: Содержимое уведомления
+        category: Категория уведомления
+        read: Прочитано ли уведомление
+        via_telegram: Отправлять ли через Telegram
+        via_webapp: Показывать ли в WebApp
+        
+    Returns:
+        ID созданного уведомления или None в случае ошибки
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return None
+    
+    try:
+        notification_data = {
+            "user_id": str(user_id),
+            "title": title,
+            "message": content,  # В базе поле называется message
+            "category": category,
+            "read": read,
+            "via_telegram": via_telegram,
+            "via_webapp": via_webapp
+        }
+        
+        result = (
+            supabase.table("user_notifications")
+            .insert(notification_data)
+            .execute()
+        )
+        
+        if result.data and len(result.data) > 0:
+            notification_id = result.data[0].get("id")
+            logger.info(f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}")
+            return str(notification_id)
+        else:
+            logger.error(f"❌ Не удалось создать уведомление для user_id={user_id}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"❌ Ошибка при создании уведомления: {e}")
+        return None
+
+
+def mark_notification_read(user_id: Union[int, str], notification_id: Union[int, str]) -> bool:
+    """
+    Отмечает уведомление как прочитанное.
+    
+    Args:
+        user_id: User ID
+        notification_id: Notification ID
+        
+    Returns:
+        True if notification was marked as read, False otherwise
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+    
+    try:
+        logger.info("Marking notification as read: user_id=%s, notification_id=%s", user_id, notification_id)
+        result = (
+            supabase.table("user_notifications")
+            .update({"read": True})
+            .eq("id", notification_id)
+            .eq("user_id", user_id)  # Безопасность: только свои уведомления
+            .execute()
+        )
+        logger.info("Update result: %s", result.data)
+        
+        if result.data and len(result.data) > 0:
+            logger.info("Уведомление отмечено как прочитанное: user_id=%s, notification_id=%s", 
+                       user_id, notification_id)
+            return True
+        else:
+            logger.warning("Уведомление не найдено или не принадлежит пользователю: user_id=%s, notification_id=%s", 
+                          user_id, notification_id)
+            return False
+            
+    except Exception as e:
+        logger.error("Ошибка при отметке уведомления как прочитанного: %s", e)
+        return False

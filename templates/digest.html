@@ -36,7 +36,7 @@
         </h2>
 
         <!-- Дата -->
-        <div class="card-date">{{ format_date(item.published_at) }}</div>
+        <div class="card-date">{{ item.published_at_fmt or "—" }}</div>
 
         <!-- Краткое содержание -->
         <p class="card-summary">{{ item.content or "Нет текста" }}</p>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseAI WebApp Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #3b82f6;
+            margin: 0;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+        }
+        .demo-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        .button:hover {
+            background: #2563eb;
+        }
+        .button.secondary {
+            background: #6b7280;
+        }
+        .button.secondary:hover {
+            background: #4b5563;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .code {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .feature-list li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PulseAI Notifications WebApp</h1>
+            <p>Современное веб-приложение для управления уведомлениями</p>
+        </div>
+
+        <div class="demo-section">
+            <h2>📱 Демо приложения</h2>
+            <p>Откройте WebApp уведомлений в новой вкладке:</p>
+            <a href="http://localhost:8001/notifications" target="_blank" class="button">
+                Открыть Notifications WebApp
+            </a>
+            <a href="http://localhost:8001/webapp" target="_blank" class="button secondary">
+                Открыть Dashboard WebApp
+            </a>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔧 API тестирование</h2>
+            <p>Проверьте API endpoints:</p>
+            <a href="http://localhost:8001/api/user_notifications?user_id=123&limit=10" target="_blank" class="button">
+                GET Notifications API
+            </a>
+            <a href="http://localhost:8001/api/health" target="_blank" class="button secondary">
+                Health Check API
+            </a>
+        </div>
+
+        <div class="demo-section">
+            <h2>✨ Возможности WebApp</h2>
+            <ul class="feature-list">
+                <li>Mobile-first дизайн с темной темой</li>
+                <li>Оптимистичные обновления UI</li>
+                <li>Обработка ошибок с повтором</li>
+                <li>Скелетоны загрузки</li>
+                <li>Нижняя навигация в стиле iOS</li>
+                <li>Интерактивные карточки уведомлений</li>
+                <li>Автоматическое обновление статуса</li>
+                <li>Адаптивный дизайн</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>🧪 Тестирование</h2>
+            <p>Запустите полные тесты функциональности:</p>
+            <div class="code">
+                cd /Users/denisfedko/news_ai_bot<br>
+                source venv/bin/activate<br>
+                python tools/test_notifications_webapp.py
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📊 Статус системы</h2>
+            <div id="status" class="status">
+                Проверка статуса...
+            </div>
+            <button onclick="checkStatus()" class="button">Обновить статус</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>🔗 Полезные ссылки</h2>
+            <p>
+                <a href="http://localhost:8001/api/health" target="_blank" class="button secondary">API Health</a>
+                <a href="http://localhost:8001/webapp" target="_blank" class="button secondary">Dashboard</a>
+                <a href="http://localhost:8001/notifications" target="_blank" class="button secondary">Notifications</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        async function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = 'Проверка статуса...';
+            
+            try {
+                // Check API health
+                const healthResponse = await fetch('http://localhost:8001/api/health');
+                const healthData = await healthResponse.json();
+                
+                // Check notifications API
+                const notificationsResponse = await fetch('http://localhost:8001/api/user_notifications?user_id=123&limit=5');
+                const notificationsData = await notificationsResponse.json();
+                
+                if (healthData.status === 'success' && notificationsData.status === 'success') {
+                    const notificationCount = notificationsData.data.notifications.length;
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = `✅ Все системы работают! Найдено ${notificationCount} уведомлений.`;
+                } else {
+                    throw new Error('API не отвечает корректно');
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Ошибка: ${error.message}`;
+            }
+        }
+
+        // Check status on page load
+        checkStatus();
+    </script>
+</body>
+</html>

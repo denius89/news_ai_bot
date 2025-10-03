@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-03 09:37:50 UTC_
+_Generated on 2025-10-03 16:11:38 UTC_
 
 ```
 ├── .github/
@@ -26,6 +26,9 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   │   └── 8157489936801255236
 │   ├── .gitignore
 │   └── CACHEDIR.TAG
+├── .runtime/
+│   ├── bot.pid
+│   └── webapp.pid
 ├── ai_modules/
 │   ├── __init__.py
 │   ├── credibility.py
@@ -43,8 +46,10 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   │   ├── 2025_10_02_add_updated_at.sql
 │   │   ├── 2025_10_02_notifications_indexes.sql
 │   │   ├── 2025_10_02_notifications_system.sql
-│   │   └── 2025_10_02_subscriptions_notifications.sql
+│   │   ├── 2025_10_02_subscriptions_notifications.sql
+│   │   └── 2025_10_03_user_notifications.sql
 │   ├── __init__.py
+│   ├── create_user_notifications_table.sql
 │   ├── db_models.py
 │   ├── init_tables.sql
 │   ├── MIGRATION_INSTRUCTIONS.md
@@ -64,7 +69,8 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   ├── PROGRESS_ANIMATION.md
 │   ├── ROADMAP.md
 │   ├── TELEGRAM_KEYBOARDS.md
-│   └── VISION.md
+│   ├── VISION.md
+│   └── WEBAPP_NOTIFICATIONS.md
 ├── examples/
 │   └── telegram_sender_example.py
 ├── logs/
@@ -88,8 +94,10 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   ├── __init__.py
 │   ├── digest_ai_service.py
 │   ├── digest_service.py
+│   ├── notification_delivery_service.py
 │   ├── notification_service.py
-│   └── subscription_service.py
+│   ├── subscription_service.py
+│   └── telegram_notification_service.py
 ├── static/
 │   ├── assets/
 │   │   └── logo/
@@ -105,6 +113,7 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   │       └── site.webmanifest
 │   ├── js/
 │   │   └── webapp.js
+│   ├── notifications.html
 │   ├── style.css
 │   └── webapp.css
 ├── telegram_bot/
@@ -114,6 +123,7 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
 │   │   ├── events.py
+│   │   ├── notifications.py
 │   │   ├── start.py
 │   │   └── subscriptions.py
 │   ├── __init__.py
@@ -142,6 +152,7 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   ├── test_deepl.py
 │   ├── test_digest_service.py
 │   ├── test_digests.py
+│   ├── test_events.py
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
 │   ├── test_generator.py
@@ -157,19 +168,48 @@ _Generated on 2025-10-03 09:37:50 UTC_
 │   ├── test_supabase.py
 │   ├── test_telegram_keyboards.py
 │   ├── test_telegram_sender.py
+│   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
+│   ├── add_notifications_correct.py
+│   ├── add_notifications_final.py
+│   ├── add_test_notifications.py
 │   ├── apply_migration.py
+│   ├── apply_user_notifications_migration.py
+│   ├── check_all_columns.py
+│   ├── check_all_notifications.py
 │   ├── check_database.py
+│   ├── check_notifications_schema.py
+│   ├── check_users_table.py
+│   ├── create_notifications_table.py
+│   ├── debug_api_issue.py
+│   ├── debug_user_lookup.py
 │   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
+│   ├── fix_user_notifications_schema.py
+│   ├── proc_utils.py
 │   ├── README_daily_digests.md
+│   ├── README_PROCESS_MANAGER.md
 │   ├── repo_map.py
+│   ├── run_all.py
 │   ├── send_daily_digests.py
 │   ├── show_news.py
-│   └── test_daily_digests.py
-├── .coverage
+│   ├── test_api_direct.py
+│   ├── test_daily_digests.py
+│   ├── test_get_notifications.py
+│   ├── test_notifications_api.py
+│   ├── test_notifications_webapp.py
+│   └── test_telegram_notifications.py
+├── webapp/
+│   ├── index.html
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── README.md
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
 ├── .editorconfig
 ├── .env.example
 ├── .flake8
@@ -183,6 +223,7 @@ _Generated on 2025-10-03 09:37:50 UTC_
 ├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
+├── DAY9_SUMMARY.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -195,7 +236,10 @@ _Generated on 2025-10-03 09:37:50 UTC_
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md
+├── test_digest_debug.py
+├── test_flask_digest.py
 ├── test_webapp_debug.html
+├── test_webapp_demo.html
 ├── webapp.py
 ├── webapp_fresh.log
 └── webapp_new.log

@@ -2,7 +2,7 @@
 
 PY?=python3
 
-.PHONY: run-bot run-web run-digests run-events run-news test test-cov lint format check dev run-tests-bot check-db
+.PHONY: run-bot run-web run-digests run-events run-news test test-cov lint format check dev run-tests-bot check-db run-all stop-all restart-all status logs
 
 # 1) Run Telegram bot
 run-bot:
@@ -58,4 +58,34 @@ check-db:
 dev:
 	$(MAKE) run-bot & \
 	$(MAKE) run-web
+
+# === Управление всеми процессами ===
+
+# 14) Запустить все процессы (бот + WebApp)
+run-all:
+	$(PY) tools/run_all.py start
+
+# 15) Остановить все процессы
+stop-all:
+	$(PY) tools/run_all.py stop
+
+# 16) Перезапустить все процессы
+restart-all:
+	$(PY) tools/run_all.py restart
+
+# 17) Показать статус процессов
+status:
+	$(PY) tools/run_all.py status
+
+# 18) Показать логи процессов
+logs:
+	@if command -v tail >/dev/null 2>&1; then \
+		tail -n 100 -f logs/bot.log logs/webapp.log; \
+	else \
+		echo "💡 Для просмотра логов откройте файлы:"; \
+		echo "   - logs/bot.log"; \
+		echo "   - logs/webapp.log"; \
+		echo ""; \
+		echo "Или используйте: python tools/run_all.py logs"; \
+	fi
 

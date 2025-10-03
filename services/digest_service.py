@@ -8,7 +8,7 @@ from typing import List, Tuple, Optional
 from repositories.news_repository import NewsRepository
 from models.news import NewsItem
 from services.digest_ai_service import DigestAIService
-from database.db_models import supabase
+from database.db_models import supabase, get_latest_news
 from utils.formatters import format_news
 
 logger = logging.getLogger(__name__)

@@ -401,3 +401,167 @@ async def test_global_service_instances():
 
     assert isinstance(subscription_service, SubscriptionService)
     assert isinstance(notification_service, NotificationService)
+
+
+class TestSubscriptionsAPI:
+    """Test cases for Subscriptions API endpoints."""
+
+    @pytest.fixture
+    def client(self):
+        """Flask test client."""
+        from webapp import app
+        app.config['TESTING'] = True
+        with app.test_client() as client:
+            yield client
+
+    @patch('routes.api_routes.update_subscription')
+    def test_update_subscription_success(self, mock_update_subscription, client):
+        """Test successful POST /api/subscriptions/update."""
+        mock_update_subscription.return_value = True
+
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'user_id': 'test-user-123',
+                'category': 'crypto',
+                'enabled': True
+            }
+        )
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert data['message'] == 'Subscription updated successfully'
+
+    @patch('routes.api_routes.update_subscription')
+    def test_update_subscription_disable(self, mock_update_subscription, client):
+        """Test disabling subscription via API."""
+        mock_update_subscription.return_value = True
+
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'user_id': 'test-user-123',
+                'category': 'economy',
+                'enabled': False
+            }
+        )
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+
+    def test_update_subscription_missing_user_id(self, client):
+        """Test POST /api/subscriptions/update without user_id."""
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'category': 'crypto',
+                'enabled': True
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['status'] == 'error'
+        assert 'user_id is required' in data['message']
+
+    def test_update_subscription_missing_category(self, client):
+        """Test POST /api/subscriptions/update without category."""
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'user_id': 'test-user-123',
+                'enabled': True
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['status'] == 'error'
+        assert 'category is required' in data['message']
+
+    def test_update_subscription_missing_enabled(self, client):
+        """Test POST /api/subscriptions/update without enabled field."""
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'user_id': 'test-user-123',
+                'category': 'crypto'
+            }
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['status'] == 'error'
+        assert 'enabled is required' in data['message']
+
+    def test_update_subscription_invalid_json(self, client):
+        """Test POST /api/subscriptions/update with invalid JSON."""
+        response = client.post(
+            '/api/subscriptions/update',
+            data='invalid json',
+            content_type='application/json'
+        )
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['status'] == 'error'
+
+    @patch('routes.api_routes.update_subscription')
+    def test_update_subscription_database_error(self, mock_update_subscription, client):
+        """Test POST /api/subscriptions/update with database error."""
+        mock_update_subscription.side_effect = Exception("Database error")
+
+        response = client.post(
+            '/api/subscriptions/update',
+            json={
+                'user_id': 'test-user-123',
+                'category': 'crypto',
+                'enabled': True
+            }
+        )
+        assert response.status_code == 500
+        data = response.get_json()
+        assert data['status'] == 'error'
+        assert 'Database error' in data['message']
+
+    @patch('routes.api_routes.get_subscription_categories')
+    def test_get_subscription_categories(self, mock_get_categories, client):
+        """Test GET /api/subscription-categories."""
+        mock_categories = [
+            {
+                'id': 'crypto',
+                'name': 'Crypto',
+                'description': 'Latest cryptocurrency news and market updates'
+            },
+            {
+                'id': 'economy',
+                'name': 'Economy',
+                'description': 'Economic analysis and financial market insights'
+            }
+        ]
+        mock_get_categories.return_value = mock_categories
+
+        response = client.get('/api/subscription-categories')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert len(data['data']['categories']) == 2
+        assert data['data']['categories'][0]['id'] == 'crypto'
+        assert data['data']['categories'][1]['id'] == 'economy'
+
+    @patch('routes.api_routes.get_user_subscriptions')
+    def test_get_user_subscriptions(self, mock_get_subscriptions, client):
+        """Test GET /api/subscriptions."""
+        mock_subscriptions = ['crypto', 'economy', 'technology']
+        mock_get_subscriptions.return_value = mock_subscriptions
+
+        response = client.get('/api/subscriptions?user_id=test-user-123')
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['status'] == 'success'
+        assert data['data']['subscriptions'] == mock_subscriptions
+        assert data['data']['total_count'] == 3
+
+    def test_get_user_subscriptions_missing_user_id(self, client):
+        """Test GET /api/subscriptions without user_id."""
+        response = client.get('/api/subscriptions')
+        assert response.status_code == 400
+        data = response.get_json()
+        assert data['status'] == 'error'
+        assert 'user_id parameter is required' in data['message']
