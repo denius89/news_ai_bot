@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 120
+exclude = 
+    .git,
+    __pycache__,
+    venv,
+    .venv,
+    env,
+    .env,
+    tools/,
+    migrations/,
+    *.pyc,
+    .pytest_cache,
+    build,
+    dist
+ignore = 
+    E402,  # module level import not at top of file
+    F401,  # imported but unused
+    F541,  # f-string is missing placeholders
+    F841,  # local variable assigned but never used
+per-file-ignores =
+    tools/*:E402,F401,F541,F841
