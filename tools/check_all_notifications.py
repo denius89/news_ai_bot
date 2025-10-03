@@ -34,7 +34,7 @@ def check_all_notifications():
         try:
             result = supabase.table('user_notifications').select('*').execute()
             print(f"✅ Found {len(result.data)} notifications")
-            
+
             if result.data:
                 for notification in result.data:
                     print(f"  - ID: {notification['id']}")
@@ -45,7 +45,7 @@ def check_all_notifications():
                     print()
             else:
                 print("❌ No notifications found")
-                
+
         except Exception as e:
             print(f"❌ Error getting notifications: {e}")
 
@@ -56,16 +56,18 @@ def check_all_notifications():
             if result.data:
                 user_ids = set(notification['user_id'] for notification in result.data)
                 print(f"✅ Notifications belong to users: {user_ids}")
-                
+
                 # Check if these users exist
                 for user_id in user_ids:
-                    user_result = supabase.table('users').select('telegram_id').eq('id', user_id).execute()
+                    user_result = (
+                        supabase.table('users').select('telegram_id').eq('id', user_id).execute()
+                    )
                     if user_result.data:
                         telegram_id = user_result.data[0]['telegram_id']
                         print(f"  - User {user_id} has telegram_id: {telegram_id}")
                     else:
                         print(f"  - User {user_id} not found in users table")
-                        
+
         except Exception as e:
             print(f"❌ Error checking ownership: {e}")
 

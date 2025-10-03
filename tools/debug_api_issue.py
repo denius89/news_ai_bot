@@ -54,7 +54,7 @@ def debug_api_logic():
                 print(f"Invalid user_id format, using fallback: {user_id}")
 
         print(f"Final user_id for query: {user_id}")
-        
+
         # Get notifications from database
         print(f"Calling get_user_notifications with user_id={user_id}, limit={limit}")
         notifications = get_user_notifications(user_id=user_id, limit=limit, offset=offset)

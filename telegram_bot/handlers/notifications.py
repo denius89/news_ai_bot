@@ -24,7 +24,7 @@ async def cmd_notifications(message: types.Message):
         "Здесь вы можете управлять своими уведомлениями.\n"
         "Используйте кнопки ниже для навигации.",
         parse_mode="HTML",
-        reply_markup=notifications_inline_keyboard()
+        reply_markup=notifications_inline_keyboard(),
     )
 
 
@@ -36,7 +36,7 @@ async def cb_notifications_menu(query: types.CallbackQuery):
         "Здесь вы можете управлять своими уведомлениями.\n"
         "Используйте кнопки ниже для навигации.",
         parse_mode="HTML",
-        reply_markup=notifications_inline_keyboard()
+        reply_markup=notifications_inline_keyboard(),
     )
     await query.answer()
 
@@ -46,32 +46,33 @@ async def cb_my_notifications(query: types.CallbackQuery):
     """Показать уведомления пользователя."""
     try:
         from database.db_models import get_user_notifications
-        
+
         # Получаем уведомления пользователя
         notifications = await get_user_notifications(user_id=query.from_user.id)
-        
+
         if not notifications:
             await query.message.edit_text(
                 "📭 <b>У вас пока нет уведомлений</b>\n\n"
                 "Когда появятся новые уведомления, они будут показаны здесь.",
                 parse_mode="HTML",
-                reply_markup=back_inline_keyboard()
+                reply_markup=back_inline_keyboard(),
             )
             await query.answer()
             return
-        
+
         # Форматируем список уведомлений
         text = "🔔 <b>Ваши уведомления</b>\n\n"
-        
+
         for i, notification in enumerate(notifications[:10], 1):  # Показываем последние 10
             status = "✅" if notification.get('read', False) else "🔔"
             title = notification.get('title', 'Без заголовка')
             created_at = notification.get('created_at', '')
-            
+
             # Форматируем дату
             if created_at:
                 try:
                     from datetime import datetime
+
                     if isinstance(created_at, str):
                         dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
                     else:
@@ -81,27 +82,23 @@ async def cb_my_notifications(query: types.CallbackQuery):
                     formatted_date = str(created_at)
             else:
                 formatted_date = "—"
-            
+
             text += f"{status} <b>{title}</b>\n"
             text += f"📅 {formatted_date}\n\n"
-        
+
         if len(notifications) > 10:
             text += f"... и еще {len(notifications) - 10} уведомлений"
-        
-        await query.message.edit_text(
-            text,
-            parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
-        )
+
+        await query.message.edit_text(text, parse_mode="HTML", reply_markup=back_inline_keyboard())
         await query.answer()
-        
+
     except Exception as e:
         logger.error(f"❌ Error getting notifications for user {query.from_user.id}: {e}")
         await query.message.edit_text(
             "❌ <b>Ошибка при загрузке уведомлений</b>\n\n"
             "Попробуйте позже или обратитесь в поддержку.",
             parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
+            reply_markup=back_inline_keyboard(),
         )
         await query.answer("❌ Ошибка при загрузке уведомлений")
 
@@ -112,16 +109,17 @@ async def cb_mark_read(query: types.CallbackQuery):
     try:
         # Извлекаем notification_id из callback_data
         notification_id = query.data.split(":", 1)[1]
-        
+
         # Обрабатываем через сервис
         success = await telegram_notification_service.handle_mark_read_callback(
-            query=query,
-            notification_id=notification_id
+            query=query, notification_id=notification_id
         )
-        
+
         if not success:
-            logger.warning(f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}")
-            
+            logger.warning(
+                f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}"
+            )
+
     except Exception as e:
         logger.error(f"❌ Error handling mark_read callback: {e}")
         await query.answer("❌ Произошла ошибка", show_alert=True)
@@ -137,10 +135,10 @@ async def cb_notify_on_digest(query: types.CallbackQuery):
             "✅ <b>Уведомления о дайджестах включены</b>\n\n"
             "Теперь вы будете получать уведомления о новых дайджестах.",
             parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
+            reply_markup=back_inline_keyboard(),
         )
         await query.answer("✅ Уведомления включены")
-        
+
     except Exception as e:
         logger.error(f"❌ Error enabling digest notifications: {e}")
         await query.answer("❌ Ошибка при включении уведомлений")
@@ -156,10 +154,10 @@ async def cb_notify_off_digest(query: types.CallbackQuery):
             "❌ <b>Уведомления о дайджестах выключены</b>\n\n"
             "Вы больше не будете получать уведомления о новых дайджестах.",
             parse_mode="HTML",
-            reply_markup=back_inline_keyboard()
+            reply_markup=back_inline_keyboard(),
         )
         await query.answer("❌ Уведомления выключены")
-        
+
     except Exception as e:
         logger.error(f"❌ Error disabling digest notifications: {e}")
         await query.answer("❌ Ошибка при выключении уведомлений")

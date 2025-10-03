@@ -24,7 +24,7 @@ class TestEventsAPI:
     def test_get_events_success(self, mock_get_events, client):
         """Test successful GET /api/events."""
         from models.event import EventItem
-        
+
         mock_events = [
             EventItem(
                 event_id="event-1",
@@ -32,7 +32,7 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 1, 10, 0, 0, tzinfo=timezone.utc),
                 category="crypto",
                 importance=0.8,
-                description="Major crypto conference"
+                description="Major crypto conference",
             ),
             EventItem(
                 event_id="event-2",
@@ -40,8 +40,8 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 15, 14, 0, 0, tzinfo=timezone.utc),
                 category="economy",
                 importance=0.9,
-                description="Federal Reserve meeting"
-            )
+                description="Federal Reserve meeting",
+            ),
         ]
         mock_get_events.return_value = mock_events
 
@@ -57,7 +57,7 @@ class TestEventsAPI:
     def test_get_events_with_limit_offset(self, mock_get_events, client):
         """Test GET /api/events with limit and offset parameters."""
         from models.event import EventItem
-        
+
         mock_events = [
             EventItem(
                 event_id=f"event-{i}",
@@ -65,7 +65,7 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 1 + i, 10, 0, 0, tzinfo=timezone.utc),
                 category="crypto",
                 importance=0.7,
-                description=f"Test event {i}"
+                description=f"Test event {i}",
             )
             for i in range(1, 6)
         ]
@@ -104,7 +104,7 @@ class TestEventsAPI:
     def test_get_events_with_category_filter(self, mock_get_events, client):
         """Test GET /api/events with category filter."""
         from models.event import EventItem
-        
+
         mock_events = [
             EventItem(
                 event_id="crypto-event-1",
@@ -112,7 +112,7 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 1, 10, 0, 0, tzinfo=timezone.utc),
                 category="crypto",
                 importance=0.8,
-                description="Crypto related event"
+                description="Crypto related event",
             )
         ]
         mock_get_events.return_value = mock_events
@@ -128,7 +128,7 @@ class TestEventsAPI:
     def test_get_events_with_multiple_categories(self, mock_get_events, client):
         """Test GET /api/events with multiple categories filter."""
         from models.event import EventItem
-        
+
         mock_events = [
             EventItem(
                 event_id="multi-event-1",
@@ -136,7 +136,7 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 1, 10, 0, 0, tzinfo=timezone.utc),
                 category="crypto",
                 importance=0.8,
-                description="Event in multiple categories"
+                description="Event in multiple categories",
             ),
             EventItem(
                 event_id="multi-event-2",
@@ -144,8 +144,8 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 2, 10, 0, 0, tzinfo=timezone.utc),
                 category="economy",
                 importance=0.9,
-                description="Another multi-category event"
-            )
+                description="Another multi-category event",
+            ),
         ]
         mock_get_events.return_value = mock_events
 
@@ -159,7 +159,7 @@ class TestEventsAPI:
     def test_get_events_verify_structure(self, mock_get_events, client):
         """Test that GET /api/events returns properly structured event data."""
         from models.event import EventItem
-        
+
         mock_events = [
             EventItem(
                 event_id="structure-test-1",
@@ -167,7 +167,7 @@ class TestEventsAPI:
                 event_time=datetime(2025, 12, 1, 10, 0, 0, tzinfo=timezone.utc),
                 category="technology",
                 importance=0.7,
-                description="Test event for structure verification"
+                description="Test event for structure verification",
             )
         ]
         mock_get_events.return_value = mock_events
@@ -176,13 +176,13 @@ class TestEventsAPI:
         assert response.status_code == 200
         data = response.get_json()
         assert data['status'] == 'success'
-        
+
         # Verify event structure
         event = data['data']['events'][0]
         required_fields = ['id', 'title', 'event_time', 'category', 'importance', 'description']
         for field in required_fields:
             assert field in event, f"Missing required field: {field}"
-        
+
         # Verify data types
         assert isinstance(event['title'], str)
         assert isinstance(event['category'], str)

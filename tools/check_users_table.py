@@ -40,18 +40,16 @@ def check_users_table():
                     print(f"  User: {user}")
             else:
                 print("❌ No users found")
-                
+
                 # Try to create a test user
                 print("🔧 Creating test user...")
-                test_user = {
-                    'telegram_id': 123456789
-                }
+                test_user = {'telegram_id': 123456789}
                 create_result = supabase.table('users').insert(test_user).execute()
                 if create_result.data:
                     print(f"✅ Created test user: {create_result.data[0]}")
                 else:
                     print("❌ Failed to create test user")
-                    
+
         except Exception as e:
             print(f"❌ Error checking users table: {e}")
 

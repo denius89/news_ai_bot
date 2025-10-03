@@ -31,8 +31,17 @@ def check_schema():
         print("🔍 Checking user_notifications table schema...")
 
         # Try to get table info by attempting different column names
-        test_columns = ['id', 'title', 'text', 'content', 'message', 'user_id', 'created_at', 'read']
-        
+        test_columns = [
+            'id',
+            'title',
+            'text',
+            'content',
+            'message',
+            'user_id',
+            'created_at',
+            'read',
+        ]
+
         for col in test_columns:
             try:
                 result = supabase.table('user_notifications').select(col).limit(1).execute()

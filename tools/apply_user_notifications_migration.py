@@ -43,8 +43,10 @@ def apply_migration():
 
             # Create table
             try:
-                supabase.rpc('exec_sql', {
-                    'sql': '''
+                supabase.rpc(
+                    'exec_sql',
+                    {
+                        'sql': '''
                     CREATE TABLE IF NOT EXISTS user_notifications (
                       id           BIGSERIAL PRIMARY KEY,
                       user_id      BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -54,7 +56,8 @@ def apply_migration():
                       read         BOOLEAN NOT NULL DEFAULT FALSE
                     );
                     '''
-                }).execute()
+                    },
+                ).execute()
                 print("✅ Created user_notifications table")
             except Exception as e:
                 print(f"❌ Could not create table: {e}")
@@ -62,12 +65,15 @@ def apply_migration():
 
             # Create index
             try:
-                supabase.rpc('exec_sql', {
-                    'sql': '''
+                supabase.rpc(
+                    'exec_sql',
+                    {
+                        'sql': '''
                     CREATE INDEX IF NOT EXISTS idx_user_notifications_user_read_created
                       ON user_notifications (user_id, read, created_at DESC);
                     '''
-                }).execute()
+                    },
+                ).execute()
                 print("✅ Created index")
             except Exception as e:
                 print(f"⚠️  Could not create index: {e}")
@@ -81,35 +87,39 @@ def apply_migration():
                 print(f"✅ Found {len(result.data)} existing notifications")
             else:
                 print("📝 Adding test data...")
-                
+
                 # Add test data
                 try:
                     # First, check if we have a user
                     users_result = supabase.table('users').select('id').limit(1).execute()
                     if users_result.data:
                         user_id = users_result.data[0]['id']
-                        
+
                         # Insert test notifications
                         test_notifications = [
                             {
                                 'user_id': user_id,
                                 'title': 'Новый дайджест готов!',
                                 'text': 'Ваш утренний дайджест с последними новостями готов к прочтению.',
-                                'read': False
+                                'read': False,
                             },
                             {
                                 'user_id': user_id,
                                 'title': 'Важное событие',
                                 'text': 'Сегодня в 15:00 ожидается важное экономическое событие в США.',
-                                'read': True
-                            }
+                                'read': True,
+                            },
                         ]
-                        
-                        result = supabase.table('user_notifications').insert(test_notifications).execute()
+
+                        result = (
+                            supabase.table('user_notifications')
+                            .insert(test_notifications)
+                            .execute()
+                        )
                         print(f"✅ Added {len(test_notifications)} test notifications")
                     else:
                         print("⚠️  No users found, skipping test data")
-                        
+
                 except Exception as e:
                     print(f"⚠️  Could not add test data: {e}")
 

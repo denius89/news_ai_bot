@@ -410,6 +410,7 @@ class TestSubscriptionsAPI:
     def client(self):
         """Flask test client."""
         from webapp import app
+
         app.config['TESTING'] = True
         with app.test_client() as client:
             yield client
@@ -421,11 +422,7 @@ class TestSubscriptionsAPI:
 
         response = client.post(
             '/api/subscriptions/update',
-            json={
-                'user_id': 'test-user-123',
-                'category': 'crypto',
-                'enabled': True
-            }
+            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': True},
         )
         assert response.status_code == 200
         data = response.get_json()
@@ -439,11 +436,7 @@ class TestSubscriptionsAPI:
 
         response = client.post(
             '/api/subscriptions/update',
-            json={
-                'user_id': 'test-user-123',
-                'category': 'economy',
-                'enabled': False
-            }
+            json={'user_id': 'test-user-123', 'category': 'economy', 'enabled': False},
         )
         assert response.status_code == 200
         data = response.get_json()
@@ -452,11 +445,7 @@ class TestSubscriptionsAPI:
     def test_update_subscription_missing_user_id(self, client):
         """Test POST /api/subscriptions/update without user_id."""
         response = client.post(
-            '/api/subscriptions/update',
-            json={
-                'category': 'crypto',
-                'enabled': True
-            }
+            '/api/subscriptions/update', json={'category': 'crypto', 'enabled': True}
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -466,11 +455,7 @@ class TestSubscriptionsAPI:
     def test_update_subscription_missing_category(self, client):
         """Test POST /api/subscriptions/update without category."""
         response = client.post(
-            '/api/subscriptions/update',
-            json={
-                'user_id': 'test-user-123',
-                'enabled': True
-            }
+            '/api/subscriptions/update', json={'user_id': 'test-user-123', 'enabled': True}
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -480,11 +465,7 @@ class TestSubscriptionsAPI:
     def test_update_subscription_missing_enabled(self, client):
         """Test POST /api/subscriptions/update without enabled field."""
         response = client.post(
-            '/api/subscriptions/update',
-            json={
-                'user_id': 'test-user-123',
-                'category': 'crypto'
-            }
+            '/api/subscriptions/update', json={'user_id': 'test-user-123', 'category': 'crypto'}
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -494,9 +475,7 @@ class TestSubscriptionsAPI:
     def test_update_subscription_invalid_json(self, client):
         """Test POST /api/subscriptions/update with invalid JSON."""
         response = client.post(
-            '/api/subscriptions/update',
-            data='invalid json',
-            content_type='application/json'
+            '/api/subscriptions/update', data='invalid json', content_type='application/json'
         )
         assert response.status_code == 400
         data = response.get_json()
@@ -509,11 +488,7 @@ class TestSubscriptionsAPI:
 
         response = client.post(
             '/api/subscriptions/update',
-            json={
-                'user_id': 'test-user-123',
-                'category': 'crypto',
-                'enabled': True
-            }
+            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': True},
         )
         assert response.status_code == 500
         data = response.get_json()
@@ -527,13 +502,13 @@ class TestSubscriptionsAPI:
             {
                 'id': 'crypto',
                 'name': 'Crypto',
-                'description': 'Latest cryptocurrency news and market updates'
+                'description': 'Latest cryptocurrency news and market updates',
             },
             {
                 'id': 'economy',
                 'name': 'Economy',
-                'description': 'Economic analysis and financial market insights'
-            }
+                'description': 'Economic analysis and financial market insights',
+            },
         ]
         mock_get_categories.return_value = mock_categories
 

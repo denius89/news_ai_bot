@@ -11,10 +11,10 @@ load_dotenv()
 # --- Категории источников ---
 CATEGORIES = {
     "crypto": "Crypto",
-    "economy": "Economy", 
+    "economy": "Economy",
     "world": "World",
     "technology": "Technology",
-    "politics": "Politics"
+    "politics": "Politics",
 }
 
 # --- Теги по умолчанию ---

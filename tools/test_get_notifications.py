@@ -37,14 +37,21 @@ def test_get_notifications():
         if not user_data:
             print("❌ User not found")
             return False
-            
+
         user_id = user_data['id']
         print(f"✅ Found user: {user_id}")
 
         # Test direct Supabase query
         print("\n1. Testing direct Supabase query...")
         try:
-            result = supabase.table('user_notifications').select('id, title, message, read, user_id').eq('user_id', user_id).order('id', desc=True).limit(10).execute()
+            result = (
+                supabase.table('user_notifications')
+                .select('id, title, message, read, user_id')
+                .eq('user_id', user_id)
+                .order('id', desc=True)
+                .limit(10)
+                .execute()
+            )
             print(f"✅ Direct query result: {len(result.data)} notifications")
             for notification in result.data:
                 print(f"  - {notification['title']} (read: {notification['read']})")
@@ -60,11 +67,11 @@ def test_get_notifications():
 
         # Test with different user_id formats
         print("\n3. Testing with different user_id formats...")
-        
+
         # Test with string UUID
         notifications_str = get_user_notifications(user_id=str(user_id), limit=10)
         print(f"✅ Function with string UUID result: {len(notifications_str)} notifications")
-        
+
         # Test with int (should fail gracefully)
         try:
             notifications_int = get_user_notifications(user_id=123, limit=10)

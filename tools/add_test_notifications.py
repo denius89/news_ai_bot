@@ -35,7 +35,7 @@ def add_test_notifications():
         if not users_result.data:
             print("❌ No users found")
             return False
-            
+
         user_id = users_result.data[0]['id']
         print(f"✅ Using user_id: {user_id}")
 
@@ -46,36 +46,36 @@ def add_test_notifications():
                 'user_id': user_id,
                 'title': 'Новый дайджест готов!',
                 'text': 'Ваш утренний дайджест с последними новостями готов к прочтению.',
-                'read': False
+                'read': False,
             },
             {
                 'user_id': user_id,
                 'title': 'Важное событие',
                 'text': 'Сегодня в 15:00 ожидается важное экономическое событие в США.',
-                'read': True
+                'read': True,
             },
             {
                 'user_id': user_id,
                 'title': 'Bitcoin обновил максимум',
                 'text': 'Криптовалюта Bitcoin достигла нового исторического максимума.',
-                'read': False
-            }
+                'read': False,
+            },
         ]
 
         try:
             result = supabase.table('user_notifications').insert(test_notifications).execute()
             if result.data:
                 print(f"✅ Added {len(result.data)} test notifications")
-                
+
                 # Show added notifications
                 for notification in result.data:
                     print(f"  - {notification['title']} (read: {notification['read']})")
-                    
+
                 return True
             else:
                 print("❌ Failed to add notifications")
                 return False
-                
+
         except Exception as e:
             print(f"❌ Error adding notifications: {e}")
             return False

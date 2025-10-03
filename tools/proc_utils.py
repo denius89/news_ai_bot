@@ -46,10 +46,7 @@ def is_running(pid: int) -> bool:
         if sys.platform == "win32":
             # На Windows используем tasklist
             result = subprocess.run(
-                ["tasklist", "/FI", f"PID eq {pid}"],
-                capture_output=True,
-                text=True,
-                check=False
+                ["tasklist", "/FI", f"PID eq {pid}"], capture_output=True, text=True, check=False
             )
             return str(pid) in result.stdout
         else:
@@ -64,7 +61,7 @@ def kill_gracefully(pid: int, timeout: int = 5):
     """Graceful завершение процесса с таймаутом."""
     if not is_running(pid):
         return True
-    
+
     try:
         if sys.platform == "win32":
             # На Windows используем CTRL_BREAK_EVENT
@@ -72,13 +69,13 @@ def kill_gracefully(pid: int, timeout: int = 5):
         else:
             # На Unix отправляем SIGTERM
             os.kill(pid, signal.SIGTERM)
-        
+
         # Ждем завершения
         for _ in range(timeout * 10):  # Проверяем каждые 0.1 секунды
             if not is_running(pid):
                 return True
             time.sleep(0.1)
-        
+
         # Если не завершился - принудительно
         if is_running(pid):
             if sys.platform == "win32":
@@ -86,9 +83,9 @@ def kill_gracefully(pid: int, timeout: int = 5):
             else:
                 os.kill(pid, signal.SIGKILL)
             time.sleep(0.5)  # Даем время на завершение
-            
+
         return not is_running(pid)
-        
+
     except (OSError, subprocess.CalledProcessError) as e:
         print(f"Ошибка при завершении процесса {pid}: {e}")
         return False
@@ -108,43 +105,32 @@ def find_entrypoints() -> Dict[str, List[str]]:
     makefile_path = Path("Makefile")
     if makefile_path.exists():
         makefile_content = makefile_path.read_text()
-        
+
         # Ищем существующие цели
         if "run-bot:" in makefile_content and "run-web:" in makefile_content:
-            return {
-                "bot": ["make", "run-bot"],
-                "webapp": ["make", "run-web"]
-            }
-    
+            return {"bot": ["make", "run-bot"], "webapp": ["make", "run-web"]}
+
     # Если Makefile целей нет - сканируем код
     entrypoints = {}
-    
+
     # Поиск bot entrypoint
-    bot_candidates = [
-        "telegram_bot/bot.py",
-        "main.py", 
-        "bot.py"
-    ]
-    
+    bot_candidates = ["telegram_bot/bot.py", "main.py", "bot.py"]
+
     for candidate in bot_candidates:
         if Path(candidate).exists():
             if _is_bot_entrypoint(candidate):
                 entrypoints["bot"] = [detect_python(), candidate]
                 break
-    
-    # Поиск webapp entrypoint  
-    webapp_candidates = [
-        "webapp.py",
-        "app.py",
-        "main.py"
-    ]
-    
+
+    # Поиск webapp entrypoint
+    webapp_candidates = ["webapp.py", "app.py", "main.py"]
+
     for candidate in webapp_candidates:
         if Path(candidate).exists():
             if _is_webapp_entrypoint(candidate):
                 entrypoints["webapp"] = [detect_python(), candidate]
                 break
-    
+
     return entrypoints
 
 
@@ -152,23 +138,23 @@ def _is_bot_entrypoint(file_path: str) -> bool:
     """Проверить, является ли файл entrypoint для бота."""
     try:
         content = Path(file_path).read_text()
-        
+
         # Ищем признаки Telegram-бота
         bot_indicators = [
             "aiogram",
-            "telebot", 
+            "telebot",
             "telegram",
             "from aiogram",
             "import aiogram",
             "from telebot",
-            "import telebot"
+            "import telebot",
         ]
-        
+
         has_bot_imports = any(indicator in content for indicator in bot_indicators)
         has_main_block = 'if __name__ == "__main__":' in content
-        
+
         return has_bot_imports and has_main_block
-        
+
     except (OSError, UnicodeDecodeError):
         return False
 
@@ -177,7 +163,7 @@ def _is_webapp_entrypoint(file_path: str) -> bool:
     """Проверить, является ли файл entrypoint для WebApp."""
     try:
         content = Path(file_path).read_text()
-        
+
         # Ищем признаки Web-приложения
         webapp_indicators = [
             "Flask",
@@ -188,14 +174,14 @@ def _is_webapp_entrypoint(file_path: str) -> bool:
             "from fastapi",
             "import fastapi",
             "app.run(",
-            "uvicorn.run("
+            "uvicorn.run(",
         ]
-        
+
         has_webapp_imports = any(indicator in content for indicator in webapp_indicators)
         has_main_block = 'if __name__ == "__main__":' in content
-        
+
         return has_webapp_imports and has_main_block
-        
+
     except (OSError, UnicodeDecodeError):
         return False
 
@@ -203,7 +189,7 @@ def _is_webapp_entrypoint(file_path: str) -> bool:
 def check_port_available(port: int) -> bool:
     """Проверить, свободен ли порт."""
     import socket
-    
+
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.settimeout(1)
@@ -222,7 +208,7 @@ def find_webapp_port() -> Optional[int]:
             return int(port_env)
         except ValueError:
             pass
-    
+
     # Проверяем webapp.py
     webapp_path = Path("webapp.py")
     if webapp_path.exists():
@@ -232,15 +218,15 @@ def find_webapp_port() -> Optional[int]:
             port_match = re.search(r'app\.run\([^)]*port\s*=\s*(\d+)', content)
             if port_match:
                 return int(port_match.group(1))
-            
+
             # Ищем переменную WEBAPP_PORT
             port_var_match = re.search(r'WEBAPP_PORT\s*=\s*(\d+)', content)
             if port_var_match:
                 return int(port_var_match.group(1))
-                
+
         except (OSError, UnicodeDecodeError):
             pass
-    
+
     # Проверяем config/settings.py
     settings_path = Path("config/settings.py")
     if settings_path.exists():
@@ -251,7 +237,7 @@ def find_webapp_port() -> Optional[int]:
                 return int(port_match.group(1))
         except (OSError, UnicodeDecodeError):
             pass
-    
+
     # По умолчанию Flask порт
     return 5000
 
@@ -281,9 +267,9 @@ def _find_processes_windows(command_patterns: List[str]) -> List[int]:
             ["wmic", "process", "get", "processid,commandline", "/format:csv"],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
-        
+
         pids = []
         for line in result.stdout.split('\n'):
             if any(pattern in line for pattern in command_patterns):
@@ -294,7 +280,7 @@ def _find_processes_windows(command_patterns: List[str]) -> List[int]:
                     except ValueError:
                         pass
         return pids
-        
+
     except Exception:
         return []
 
@@ -302,13 +288,8 @@ def _find_processes_windows(command_patterns: List[str]) -> List[int]:
 def _find_processes_unix(command_patterns: List[str]) -> List[int]:
     """Найти процессы на Unix-системах."""
     try:
-        result = subprocess.run(
-            ["ps", "aux"],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        
+        result = subprocess.run(["ps", "aux"], capture_output=True, text=True, check=False)
+
         pids = []
         for line in result.stdout.split('\n'):
             if any(pattern in line for pattern in command_patterns):
@@ -319,7 +300,7 @@ def _find_processes_unix(command_patterns: List[str]) -> List[int]:
                     except ValueError:
                         pass
         return pids
-        
+
     except Exception:
         return []
 
@@ -328,6 +309,7 @@ def load_env_file():
     """Загрузить .env файл если доступен python-dotenv."""
     try:
         from dotenv import load_dotenv
+
         env_path = Path(".env")
         if env_path.exists():
             load_dotenv(env_path)

@@ -45,7 +45,9 @@ def test_notifications():
         # Test 2: Get notifications directly from database
         print("\n2. Testing direct database query...")
         try:
-            result = supabase.table('user_notifications').select('*').eq('user_id', user_id).execute()
+            result = (
+                supabase.table('user_notifications').select('*').eq('user_id', user_id).execute()
+            )
             print(f"✅ Direct query result: {len(result.data)} notifications")
             for notification in result.data:
                 print(f"  - {notification['title']} (read: {notification['read']})")
