@@ -8,9 +8,8 @@ import sys
 import signal
 import time
 import subprocess
-import glob
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict
+from typing import List, Optional, Dict
 import re
 
 
