@@ -66,7 +66,7 @@ const iconMap = {
 // Cryptocurrency Icons integration using jsDelivr CDN
 const cryptoIconCache = new Map();
 
-// Crypto symbol mapping for cryptocurrency-icons
+// Crypto symbol mapping for cryptocurrency-icons - each category gets unique icon
 const cryptoSymbols = {
     'btc': 'btc',
     'bitcoin': 'btc',
@@ -74,15 +74,15 @@ const cryptoSymbols = {
     'ethereum': 'eth',
     'ltc': 'ltc',
     'litecoin': 'ltc',
-    'altcoins': 'ltc', // Use Litecoin for altcoins
+    'altcoins': 'ltc', // Litecoin for altcoins
     'altcoin': 'ltc',
-    'defi': 'eth', // Use Ethereum for DeFi
-    'nft': 'eth',  // Use Ethereum for NFT
-    'gamefi': 'eth', // Use Ethereum for GameFi
-    'exchanges': 'eth', // Use Ethereum for exchanges
-    'regulation': 'eth', // Use Ethereum for regulation
-    'security': 'eth', // Use Ethereum for security
-    'market_trends': 'eth' // Use Ethereum for market trends
+    'defi': 'link', // Chainlink for DeFi
+    'nft': 'mana',  // Decentraland (MANA) for NFT
+    'gamefi': 'sand', // The Sandbox for GameFi (AXS not available)
+    'exchanges': 'bnb', // Binance Coin for exchanges
+    'regulation': 'usdt', // USDT for regulation (stablecoin)
+    'security': 'usdc', // USDC for security (stablecoin)
+    'market_trends': 'ada' // Cardano for market trends
 };
 
 // Function to get crypto icon from cryptocurrency-icons CDN
