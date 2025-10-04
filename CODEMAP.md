@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-03 16:14:43 UTC_
+_Generated on 2025-10-04 16:34:14 UTC_
 
 ```
 ├── .github/
@@ -66,11 +66,7 @@ _Generated on 2025-10-03 16:14:43 UTC_
 │   ├── ARCHITECTURE.md
 │   ├── COMMUNICATION.md
 │   ├── DEPLOY.md
-│   ├── PROGRESS_ANIMATION.md
-│   ├── ROADMAP.md
-│   ├── TELEGRAM_KEYBOARDS.md
-│   ├── VISION.md
-│   └── WEBAPP_NOTIFICATIONS.md
+│   └── VISION.md
 ├── examples/
 │   └── telegram_sender_example.py
 ├── logs/
@@ -188,9 +184,9 @@ _Generated on 2025-10-03 16:14:43 UTC_
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
 │   ├── fix_user_notifications_schema.py
+│   ├── port_manager.py
 │   ├── proc_utils.py
 │   ├── README_daily_digests.md
-│   ├── README_PROCESS_MANAGER.md
 │   ├── repo_map.py
 │   ├── run_all.py
 │   ├── send_daily_digests.py
@@ -215,6 +211,7 @@ _Generated on 2025-10-03 16:14:43 UTC_
 ├── .flake8
 ├── .gitignore
 ├── =2025.1
+├── =6.1.0
 ├── bot_clean.log
 ├── bot_correct.log
 ├── bot_final.log
@@ -223,14 +220,12 @@ _Generated on 2025-10-03 16:14:43 UTC_
 ├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
-├── DAY9_SUMMARY.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
 ├── MASTER_FILE.md
 ├── pyproject.toml
 ├── pytest.ini
-├── QUICK_FIX.md
 ├── README.md
 ├── requirements.txt
 ├── setup.cfg

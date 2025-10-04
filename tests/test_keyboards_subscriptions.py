@@ -157,7 +157,7 @@ class TestSubscriptionKeyboards:
 
     @pytest.mark.unit
     def test_main_keyboard_has_subscription_buttons(self):
-        """Test that main keyboard includes subscription and notification buttons."""
+        """Test that main keyboard includes news and notification buttons."""
         keyboard = main_inline_keyboard()
 
         # Flatten all buttons
@@ -169,12 +169,12 @@ class TestSubscriptionKeyboards:
         # Check button texts
         button_texts = [button.text for button in all_buttons]
 
-        assert "📋 Подписки" in button_texts
+        assert "📰 Новости" in button_texts
         assert "🔔 Уведомления" in button_texts
 
     @pytest.mark.unit
     def test_main_keyboard_callback_data(self):
-        """Test that main keyboard has correct callback data for new buttons."""
+        """Test that main keyboard has correct callback data for buttons."""
         keyboard = main_inline_keyboard()
 
         # Flatten all buttons and get callback data
@@ -183,7 +183,7 @@ class TestSubscriptionKeyboards:
             for button in row:
                 callback_data_list.append(button.callback_data)
 
-        assert "subscriptions" in callback_data_list
+        assert "digest:all" in callback_data_list
         assert "notifications" in callback_data_list
 
     @pytest.mark.unit

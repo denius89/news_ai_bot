@@ -4,17 +4,15 @@ from models.news import NewsItem
 
 
 def test_build_daily_digest_with_news(monkeypatch):
-    # Заглушка для репозитория по новостям внутри сервиса
-    class FakeNewsRepo:
-        def get_recent_news(self, limit=10, categories=None):
-            return [NewsItem.model_validate({"title": "Test news", "content": "Some content"})]
-
-    if digest_service._default_service:
-        monkeypatch.setattr(digest_service._default_service, "news_repo", FakeNewsRepo())
+    # Мокаем get_latest_news напрямую, чтобы вернуть NewsItem объекты
+    mock_news = [NewsItem.model_validate({"title": "Test news", "content": "Some content"})]
+    monkeypatch.setattr(digest_service, "get_latest_news", lambda *a, **k: mock_news)
 
     digest_text, news = digest_service.build_daily_digest(limit=5, style="business")
     assert "DIGEST" in digest_text
     assert isinstance(news, list)
+    assert len(news) == 1
+    assert hasattr(news[0], 'title')  # Проверяем, что это NewsItem объект
     assert news[0].title == "Test news"
 
 

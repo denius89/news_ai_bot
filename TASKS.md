@@ -1,6 +1,6 @@
-# 📝 TASKS (last updated: 2025-10-03 18:14:43)
+# 📝 TASKS (last updated: 2025-10-04 18:34:14)
 
-_Last updated: 2025-10-01 19:00:00_
+_Last updated: 2025-10-04 18:00:00_
 
 ## Table of Contents
 
@@ -99,6 +99,46 @@ Added Telegram bot, AI digest, Investing events.
 
 ---
 
+### Day 04 — AI Digests Enhancement ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Improve AI digests with category selection, period options, and better formatting.
+
+**Completed:**
+- Added category and period selection (today/7d/30d) for AI digests
+- Fixed digest formatting issues in Telegram
+- Updated prompts for FT/WSJ-style article generation
+- Added HTML formatting for Telegram
+- Fixed flake8 errors and removed duplicate functions
+- Unified datetime handling with UTC normalization
+
+**Acceptance Criteria:**
+- ✅ AI digests work with category and period selection
+- ✅ Formatting issues resolved
+- ✅ Code cleaned and linted
+
+---
+
+### Day 05 — Prompts Refactoring + Tests ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Refactor prompts into separate modules and add comprehensive test coverage.
+
+**Completed:**
+- Extracted prompts and clean_for_telegram into separate modules
+- Added tests for new modules
+- Enhanced generator tests
+- Fixed AI module errors in ai_digest handler
+- Updated setup.cfg configuration
+- Stabilized all tests with unit/integration markers
+
+**Acceptance Criteria:**
+- ✅ Prompts refactored into separate modules
+- ✅ All tests pass with proper markers
+- ✅ Code is clean and maintainable
+
+---
+
 ### Day 06 — Architecture Refactoring + Documentation ✅ (Closed)
 **Priority:** 🔴  
 **Context:**  
@@ -157,6 +197,47 @@ Complete refactoring of digest system, proper datetime handling, comprehensive t
 - ✅ Subscriptions and notifications system implemented
 - ✅ All tests pass including edge cases
 - ✅ Documentation updated with architecture diagrams
+
+---
+
+### Day 08 — WebApp Development + PWA Support ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Create modern WebApp with PWA support and clean UI.
+
+**Completed:**
+- Created webapp.html with tabbed dashboard interface
+- Added Web App Manifest for PulseAI PWA support
+- Enhanced navigation with Lucide icons
+- Restored and updated style.css with PWA additions
+- Fixed .env file loading and updated requirements.txt
+- Restored all deleted files and organized project structure
+- Final stabilization of all components
+
+**Acceptance Criteria:**
+- ✅ WebApp created with modern interface
+- ✅ PWA support configured
+- ✅ All components working stable
+
+---
+
+### Day 09 — Process Management + System Stabilization ✅ (Closed)
+**Priority:** 🔴  
+**Context:**  
+Create process management system and stabilize all components.
+
+**Completed:**
+- Created Process Manager for automatic bot and WebApp startup
+- Fixed WebApp port conflict issues, added make run-all/stop-all commands
+- Improved Telegram bot Dashboard and AI-digest buttons, updated Cloudflare tunnel URL
+- Fixed all failing tests, added automatic environment preparation
+- Created port management system to prevent conflicts with automatic cleanup
+- Cleaned documentation from temporary files, aligned with original plan
+
+**Acceptance Criteria:**
+- ✅ Process management system working
+- ✅ All tests passing
+- ✅ Documentation clean and organized
 
 ---
 
@@ -315,5 +396,9 @@ Digests should arrive automatically morning/evening.
 - ✅ 2025-09-24 — Day 1 closed
 - ✅ 2025-09-25 — Day 2 closed (sources, cleaning, tests, utilities, documentation)
 - ✅ 2025-09-26 — Day 3 (AI + Events + Telegram) — added Telegram bot, AI digest, Investing events
-- ✅ 2025-09-27-30 — Days 4-6 (Architecture Refactoring) — Pydantic models, centralized services, repositories
+- ✅ 2025-09-27 — Day 4 closed (AI digests enhancement, formatting fixes)
+- ✅ 2025-09-28 — Day 5 closed (prompts refactoring, tests coverage)
+- ✅ 2025-09-30 — Day 6 closed (architecture refactoring, Pydantic models, centralized services)
 - ✅ 2025-10-01 — Day 7 closed (DigestAIService, date handling, tests, UX enhancement, subscriptions)
+- ✅ 2025-10-02 — Day 8 closed (WebApp development, PWA support)
+- ✅ 2025-10-04 — Day 9 closed (process management, system stabilization, documentation cleanup)

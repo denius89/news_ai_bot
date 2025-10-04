@@ -9,6 +9,7 @@ import sys
 import time
 import argparse
 import subprocess
+import socket
 from pathlib import Path
 from typing import List
 
@@ -179,14 +180,26 @@ class ProcessManager:
                 cleanup_pid_file(name)
 
     def _check_webapp_port(self):
-        """Проверить доступность порта WebApp."""
+        """Проверить доступность порта WebApp и освободить при необходимости."""
         port = find_webapp_port()
         if port and not check_port_available(port):
             print(f"⚠️  Порт {port} занят!")
-            print("💡 Попробуйте: make stop-all")
-            print("   или найдите процесс, занимающий порт, и остановите его")
-
-            # Не прерываем запуск - возможно, это наш старый процесс
+            print("🛑 Пытаемся освободить порт...")
+            
+            # Пытаемся освободить порт
+            if cleanup_pid_file('webapp'):
+                print(f"✅ Процесс WebApp остановлен")
+                time.sleep(2)  # Даем время порту освободиться
+                
+                # Проверяем еще раз
+                if check_port_available(port):
+                    print(f"✅ Порт {port} освобожден")
+                else:
+                    print(f"❌ Порт {port} все еще занят")
+                    print("💡 Попробуйте: make free-ports")
+            else:
+                print("❌ Не удалось остановить процесс")
+                print("💡 Попробуйте: make free-ports")
 
     def _start_process(self, name: str, command: List[str]) -> bool:
         """Запустить один процесс."""
