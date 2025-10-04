@@ -49,7 +49,7 @@ def check_all_columns():
                 }
 
                 try:
-                    // test_result = supabase.table('user_notifications').insert(test_data).execute()
+                    # test_result = supabase.table('user_notifications').insert(test_data).execute()
                     print("✅ Test insert successful - no additional required columns")
                 except Exception as e:
                     error_msg = str(e)
