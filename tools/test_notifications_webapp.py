@@ -4,8 +4,6 @@ Test the complete notifications webapp functionality.
 """
 
 import requests
-import json
-import time
 
 
 def test_notifications_webapp():

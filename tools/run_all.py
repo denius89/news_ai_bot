@@ -16,7 +16,6 @@ from typing import List
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from tools.proc_utils import (
     ensure_dirs,
     write_pid,
     read_pid,

@@ -43,7 +43,7 @@ def prepare_test_environment():
     ]
 
     if critical_warnings:
-        print(f"\n❌ Критические ошибки при подготовке окружения:")
+        print("\n❌ Критические ошибки при подготовке окружения:")
         for warning in critical_warnings:
             print(f"   - {warning}")
         print("\n💡 Попробуйте:")
@@ -55,7 +55,7 @@ def prepare_test_environment():
     os.environ['TEST_WEBAPP_PORT'] = str(result['free_ports'].get('webapp', 8001))
     os.environ['TEST_API_PORT'] = str(result['free_ports'].get('api', 5000))
 
-    print(f"✅ Окружение готово для тестов")
+    print("✅ Окружение готово для тестов")
     print(f"   WebApp порт: {os.environ['TEST_WEBAPP_PORT']}")
     print(f"   API порт: {os.environ['TEST_API_PORT']}")
 
