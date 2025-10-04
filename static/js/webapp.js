@@ -89,7 +89,9 @@ async function getCryptoIconUrl(cryptoId) {
     // Fallback to direct CoinGecko CDN URLs
     const fallbackUrls = {
         'bitcoin': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
-        'ethereum': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
+        'ethereum': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+        'litecoin': 'https://assets.coingecko.com/coins/images/2/large/litecoin.png',
+        'chainlink': 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png'
     };
     
     return fallbackUrls[cryptoId] || null;
@@ -97,16 +99,20 @@ async function getCryptoIconUrl(cryptoId) {
 
 // Function to create icon (crypto or Lucide)
 function createIcon(iconKey, className = 'w-5 h-5') {
-    // Crypto icons mapping
+    // Crypto icons mapping - each gets unique icon
     const cryptoIconMap = {
         'btc': 'bitcoin',
-        'eth': 'ethereum',
+        'eth': 'ethereum', 
         'bitcoin': 'bitcoin',
         'ethereum': 'ethereum',
-        'altcoins': 'ethereum', // Fallback for altcoins
-        'defi': 'ethereum',     // Fallback for DeFi
-        'nft': 'ethereum',      // Fallback for NFT
-        'gamefi': 'ethereum'    // Fallback for GameFi
+        'altcoins': 'litecoin',    // Different icon for altcoins
+        'defi': 'chainlink',       // Different icon for DeFi
+        'nft': 'ethereum',         // Keep Ethereum for NFT
+        'gamefi': 'ethereum',      // Keep Ethereum for GameFi
+        'exchanges': 'ethereum',   // Keep Ethereum for exchanges
+        'regulation': 'ethereum',  // Keep Ethereum for regulation
+        'security': 'ethereum',    // Keep Ethereum for security
+        'market_trends': 'ethereum' // Keep Ethereum for market trends
     };
     
     const cryptoId = cryptoIconMap[iconKey.toLowerCase()];
@@ -128,7 +134,7 @@ function createIcon(iconKey, className = 'w-5 h-5') {
         });
         
         return `<img id="${iconId}" 
-                     src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNmMGYwZjAiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPgo8L3N2Zz4K" 
+                     src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMTAiIGZpbGw9IiNmMGYwZjAiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI0IiB5PSI0Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPgo8L3N2Zz4K" 
                      alt="${iconKey}" 
                      class="${className} rounded-full" 
                      style="display:none;"
