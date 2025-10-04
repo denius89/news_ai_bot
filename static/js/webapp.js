@@ -112,7 +112,11 @@ function createIcon(iconKey, className = 'w-5 h-5') {
         'exchanges': 'ethereum',   // Keep Ethereum for exchanges
         'regulation': 'ethereum',  // Keep Ethereum for regulation
         'security': 'ethereum',    // Keep Ethereum for security
-        'market_trends': 'ethereum' // Keep Ethereum for market trends
+        'market_trends': 'ethereum', // Keep Ethereum for market trends
+        // Add support for all icon keys from sources.yaml
+        'altcoin': 'litecoin',
+        'exchange': 'ethereum',
+        'gamefi': 'ethereum'
     };
     
     const cryptoId = cryptoIconMap[iconKey.toLowerCase()];
