@@ -63,32 +63,58 @@ const iconMap = {
     'global_risks': 'alert-circle'
 };
 
-// Removed CoinGecko API integration to avoid CORS issues
+// Cryptocurrency Icons integration using jsDelivr CDN
+const cryptoIconCache = new Map();
+
+// Crypto symbol mapping for cryptocurrency-icons
+const cryptoSymbols = {
+    'btc': 'btc',
+    'bitcoin': 'btc',
+    'eth': 'eth',
+    'ethereum': 'eth',
+    'ltc': 'ltc',
+    'litecoin': 'ltc',
+    'altcoins': 'ltc', // Use Litecoin for altcoins
+    'altcoin': 'ltc',
+    'defi': 'eth', // Use Ethereum for DeFi
+    'nft': 'eth',  // Use Ethereum for NFT
+    'gamefi': 'eth', // Use Ethereum for GameFi
+    'exchanges': 'eth', // Use Ethereum for exchanges
+    'regulation': 'eth', // Use Ethereum for regulation
+    'security': 'eth', // Use Ethereum for security
+    'market_trends': 'eth' // Use Ethereum for market trends
+};
+
+// Function to get crypto icon from cryptocurrency-icons CDN
+function getCryptoIconUrl(iconKey) {
+    const symbol = cryptoSymbols[iconKey.toLowerCase()];
+    if (symbol) {
+        // Use jsDelivr CDN for cryptocurrency-icons
+        return `https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.0/svg/color/${symbol}.svg`;
+    }
+    return null;
+}
 
 // Function to create icon (crypto or Lucide)
 function createIcon(iconKey, className = 'w-4 h-4') {
-    // Simple crypto icon mapping to Lucide icons
-    const cryptoIconMap = {
-        'btc': 'bitcoin',
-        'eth': 'ethereum', 
-        'bitcoin': 'bitcoin',
-        'ethereum': 'ethereum',
-        'altcoins': 'coins',        // Use coins for altcoins
-        'defi': 'trending-up',      // Use trending-up for DeFi
-        'nft': 'layers',            // Use layers for NFT
-        'gamefi': 'gamepad-2',      // Use gamepad for GameFi
-        'exchanges': 'building-2',  // Use building for exchanges
-        'regulation': 'shield',     // Use shield for regulation
-        'security': 'shield-check', // Use shield-check for security
-        'market_trends': 'trending-up', // Use trending-up for market trends
-        // Add support for all icon keys from sources.yaml
-        'altcoin': 'coins',
-        'exchange': 'building-2',
-        'gamefi': 'gamepad-2'
-    };
+    const cryptoIconUrl = getCryptoIconUrl(iconKey);
     
-    const iconName = cryptoIconMap[iconKey.toLowerCase()] || iconMap[iconKey] || 'activity';
-    return `<i data-lucide="${iconName}" class="${className}"></i>`;
+    if (cryptoIconUrl) {
+        // Create a unique ID for this icon
+        const iconId = `crypto-icon-${iconKey}-${Date.now()}`;
+        
+        return `<img id="${iconId}" 
+                     src="${cryptoIconUrl}" 
+                     alt="${iconKey}" 
+                     class="${className}" 
+                     style="width: 16px; height: 16px;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <i data-lucide="coins" class="${className}" style="display:none;"></i>`;
+    } else {
+        // Fallback to Lucide icons for non-crypto items
+        const iconName = iconMap[iconKey] || 'activity';
+        return `<i data-lucide="${iconName}" class="${className}"></i>`;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
