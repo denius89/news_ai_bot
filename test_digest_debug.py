@@ -5,10 +5,9 @@ Debug script to test digest functionality
 
 import sys
 import os
+from services.digest_service import build_daily_digest
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from services.digest_service import build_daily_digest
 
 
 def test_digest():
@@ -16,7 +15,7 @@ def test_digest():
 
     try:
         digest_text, news_items = build_daily_digest(limit=5)
-        print(f"✅ Success!")
+        print("✅ Success!")
         print(f"Digest text: {digest_text[:100]}...")
         print(f"News items count: {len(news_items)}")
         print(f"News items type: {type(news_items)}")

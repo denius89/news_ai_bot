@@ -12,7 +12,6 @@ from database.db_models import get_user_notifications, get_user_by_telegram
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent
-from database.db_models import get_user_notifications, get_user_by_telegram
 
 
 def test_get_notifications():
