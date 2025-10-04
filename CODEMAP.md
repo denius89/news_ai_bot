@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 17:45:28 UTC_
+_Generated on 2025-10-04 19:32:34 UTC_
 
 ```
 ├── .github/
@@ -29,6 +29,8 @@ _Generated on 2025-10-04 17:45:28 UTC_
 ├── .runtime/
 │   ├── bot.pid
 │   └── webapp.pid
+├── .vscode/
+│   └── settings.json
 ├── ai_modules/
 │   ├── __init__.py
 │   ├── credibility.py
@@ -41,6 +43,7 @@ _Generated on 2025-10-04 17:45:28 UTC_
 │   └── sources.yaml
 ├── database/
 │   ├── migrations/
+│   │   ├── 2025_01_04_add_subcategory_field.sql
 │   │   ├── 2025_10_01_published_at_datetime.sql
 │   │   ├── 2025_10_02_add_missing_columns.sql
 │   │   ├── 2025_10_02_add_updated_at.sql
@@ -52,6 +55,7 @@ _Generated on 2025-10-04 17:45:28 UTC_
 │   ├── create_user_notifications_table.sql
 │   ├── db_models.py
 │   ├── init_tables.sql
+│   ├── MANUAL_MIGRATION_SUBCATEGORY.md
 │   ├── MIGRATION_INSTRUCTIONS.md
 │   └── seed_data.sql
 ├── digests/
@@ -174,14 +178,17 @@ _Generated on 2025-10-04 17:45:28 UTC_
 ├── tools/
 │   ├── add_notifications_correct.py
 │   ├── add_notifications_final.py
+│   ├── add_subcategory_field.py
 │   ├── add_test_notifications.py
 │   ├── apply_migration.py
+│   ├── apply_subcategory_migration.py
 │   ├── apply_user_notifications_migration.py
 │   ├── check_all_columns.py
 │   ├── check_all_notifications.py
 │   ├── check_database.py
 │   ├── check_notifications_schema.py
 │   ├── check_sources.py
+│   ├── check_subcategory_migration.py
 │   ├── check_users_table.py
 │   ├── cleanup_database.py
 │   ├── create_notifications_table.py
@@ -202,6 +209,7 @@ _Generated on 2025-10-04 17:45:28 UTC_
 │   ├── show_news.py
 │   ├── test_api_direct.py
 │   ├── test_daily_digests.py
+│   ├── test_digest_ai.py
 │   ├── test_get_notifications.py
 │   ├── test_notifications_api.py
 │   ├── test_notifications_webapp.py
