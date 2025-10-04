@@ -3,7 +3,6 @@
 Debug API issue by testing the exact same logic.
 """
 
-import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv

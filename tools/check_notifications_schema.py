@@ -53,7 +53,7 @@ def check_schema():
         try:
             result = supabase.table('user_notifications').select('*').limit(1).execute()
             if result.data:
-                print(f"\n📋 Current table structure:")
+                print("\n📋 Current table structure:")
                 print(f"Columns: {list(result.data[0].keys())}")
                 print(f"Sample data: {result.data[0]}")
             else:

@@ -34,7 +34,7 @@ def check_all_columns():
         try:
             result = supabase.table('user_notifications').select('*').limit(1).execute()
             if result.data:
-                print(f"📋 Current table structure:")
+                print("📋 Current table structure:")
                 print(f"Columns: {list(result.data[0].keys())}")
                 print(f"Sample data: {result.data[0]}")
             else:
@@ -70,11 +70,9 @@ def check_all_columns():
                             test_data_with_category['category'] = 'general'
 
                             try:
-                                test_result = (
-                                    supabase.table('user_notifications')
-                                    .insert(test_data_with_category)
-                                    .execute()
-                                )
+                                supabase.table('user_notifications')
+                                .insert(test_data_with_category)
+                                .execute()
                                 print("✅ Test insert with category successful")
                             except Exception as e2:
                                 print(f"❌ Test insert with category failed: {e2}")

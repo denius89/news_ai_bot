@@ -7,12 +7,8 @@
 
 import asyncio
 import logging
-import sys
-import os
 
 # Добавляем корневую директорию в путь
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from services.notification_delivery_service import notification_delivery_service
 from database.db_models import get_user_notifications
 
@@ -69,7 +65,7 @@ async def test_telegram_notifications():
                     break
 
             if test_notification:
-                logger.info(f"✅ Тестовое уведомление найдено в базе данных:")
+                logger.info("✅ Тестовое уведомление найдено в базе данных:")
                 logger.info(f"   - ID: {test_notification.get('id')}")
                 logger.info(f"   - Заголовок: {test_notification.get('title')}")
                 logger.info(f"   - Прочитано: {test_notification.get('read')}")

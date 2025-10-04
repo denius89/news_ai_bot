@@ -54,7 +54,7 @@ def debug_user_lookup():
             if user_data:
                 print(f"✅ Found user: {user_data}")
             else:
-                print(f"❌ User not found")
+                print("❌ User not found")
 
         # Test direct query
         print("\n3. Testing direct query...")
