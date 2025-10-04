@@ -63,92 +63,32 @@ const iconMap = {
     'global_risks': 'alert-circle'
 };
 
-// Cache for crypto icons
-const cryptoIconCache = new Map();
-
-// Function to get crypto icon URL from CoinGecko
-async function getCryptoIconUrl(cryptoId) {
-    if (cryptoIconCache.has(cryptoId)) {
-        return cryptoIconCache.get(cryptoId);
-    }
-    
-    try {
-        // CoinGecko API endpoint for coin data
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/${cryptoId}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`);
-        const data = await response.json();
-        
-        if (data.image && data.image.large) {
-            const iconUrl = data.image.large;
-            cryptoIconCache.set(cryptoId, iconUrl);
-            return iconUrl;
-        }
-    } catch (error) {
-        console.warn(`Failed to fetch icon for ${cryptoId}:`, error);
-    }
-    
-    // Fallback to direct CoinGecko CDN URLs
-    const fallbackUrls = {
-        'bitcoin': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
-        'ethereum': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
-        'litecoin': 'https://assets.coingecko.com/coins/images/2/large/litecoin.png',
-        'chainlink': 'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png'
-    };
-    
-    return fallbackUrls[cryptoId] || null;
-}
+// Removed CoinGecko API integration to avoid CORS issues
 
 // Function to create icon (crypto or Lucide)
-function createIcon(iconKey, className = 'w-5 h-5') {
-    // Crypto icons mapping - each gets unique icon
+function createIcon(iconKey, className = 'w-4 h-4') {
+    // Simple crypto icon mapping to Lucide icons
     const cryptoIconMap = {
         'btc': 'bitcoin',
         'eth': 'ethereum', 
         'bitcoin': 'bitcoin',
         'ethereum': 'ethereum',
-        'altcoins': 'litecoin',    // Different icon for altcoins
-        'defi': 'chainlink',       // Different icon for DeFi
-        'nft': 'ethereum',         // Keep Ethereum for NFT
-        'gamefi': 'ethereum',      // Keep Ethereum for GameFi
-        'exchanges': 'ethereum',   // Keep Ethereum for exchanges
-        'regulation': 'ethereum',  // Keep Ethereum for regulation
-        'security': 'ethereum',    // Keep Ethereum for security
-        'market_trends': 'ethereum', // Keep Ethereum for market trends
+        'altcoins': 'coins',        // Use coins for altcoins
+        'defi': 'trending-up',      // Use trending-up for DeFi
+        'nft': 'layers',            // Use layers for NFT
+        'gamefi': 'gamepad-2',      // Use gamepad for GameFi
+        'exchanges': 'building-2',  // Use building for exchanges
+        'regulation': 'shield',     // Use shield for regulation
+        'security': 'shield-check', // Use shield-check for security
+        'market_trends': 'trending-up', // Use trending-up for market trends
         // Add support for all icon keys from sources.yaml
-        'altcoin': 'litecoin',
-        'exchange': 'ethereum',
-        'gamefi': 'ethereum'
+        'altcoin': 'coins',
+        'exchange': 'building-2',
+        'gamefi': 'gamepad-2'
     };
     
-    const cryptoId = cryptoIconMap[iconKey.toLowerCase()];
-    
-    if (cryptoId) {
-        // Create a unique ID for this icon
-        const iconId = `crypto-icon-${cryptoId}-${Date.now()}`;
-        
-        // Start loading the icon asynchronously
-        getCryptoIconUrl(cryptoId).then(iconUrl => {
-            if (iconUrl) {
-                const img = document.getElementById(iconId);
-                if (img) {
-                    img.src = iconUrl;
-                    img.style.display = 'block';
-                    img.nextElementSibling.style.display = 'none';
-                }
-            }
-        });
-        
-        return `<img id="${iconId}" 
-                     src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMTAiIGZpbGw9IiNmMGYwZjAiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI0IiB5PSI0Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPgo8L3N2Zz4K" 
-                     alt="${iconKey}" 
-                     class="${className} rounded-full" 
-                     style="display:none;"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <i data-lucide="coins" class="${className}"></i>`;
-    } else {
-        // Use Lucide icons for everything else
-        const iconName = iconMap[iconKey] || 'activity';
-        return `<i data-lucide="${iconName}" class="${className}"></i>`;
-    }
+    const iconName = cryptoIconMap[iconKey.toLowerCase()] || iconMap[iconKey] || 'activity';
+    return `<i data-lucide="${iconName}" class="${className}"></i>`;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
