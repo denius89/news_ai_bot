@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 19:32:34 UTC_
+_Generated on 2025-10-04 19:38:42 UTC_
 
 ```
 ├── .github/
@@ -38,6 +38,7 @@ _Generated on 2025-10-04 19:32:34 UTC_
 ├── config/
 │   ├── __init__.py
 │   ├── constants.py
+│   ├── icons_map.json
 │   ├── logging.yaml
 │   ├── settings.py
 │   └── sources.yaml

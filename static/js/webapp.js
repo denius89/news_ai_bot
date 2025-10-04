@@ -1,4 +1,74 @@
 // PulseAI WebApp JavaScript
+
+// Icon mapping for categories and subcategories
+const iconMap = {
+    // Crypto
+    'btc': 'bitcoin',
+    'eth': 'ethereum', 
+    'altcoins': 'coins',
+    'defi': 'trending-up',
+    'nft': 'layers',
+    'gamefi': 'gamepad-2',
+    'exchanges': 'building-2',
+    'regulation': 'shield',
+    'security': 'shield-check',
+    'market_trends': 'trending-up',
+    
+    // Sports
+    'football': 'trophy',
+    'basketball': 'trophy',
+    'tennis': 'trophy',
+    'ufc_mma': 'zap',
+    'cricket': 'trophy',
+    'baseball': 'trophy',
+    'badminton': 'trophy',
+    'table_tennis': 'trophy',
+    'esports': 'gamepad-2',
+    'other': 'trophy',
+    
+    // Markets
+    'stocks': 'trending-up',
+    'commodities': 'package',
+    'forex': 'refresh-cw',
+    'bonds': 'receipt',
+    'central_banks': 'building',
+    'ipos': 'rocket',
+    'earnings': 'dollar-sign',
+    'economic_data': 'bar-chart-3',
+    'funds_etfs': 'package',
+    'trends': 'trending-up',
+    
+    // Tech
+    'ai': 'brain',
+    'bigtech': 'cpu',
+    'startups': 'rocket',
+    'hardware': 'cpu',
+    'software': 'code',
+    'cybersecurity': 'shield',
+    'gadgets': 'smartphone',
+    'blockchain_tech': 'link',
+    'conferences': 'users',
+    'space_robotics': 'rocket',
+    
+    // World
+    'elections': 'vote',
+    'geopolitics': 'globe',
+    'conflicts': 'alert-triangle',
+    'energy': 'zap',
+    'climate': 'leaf',
+    'diplomacy': 'handshake',
+    'organizations': 'building',
+    'sanctions': 'shield-x',
+    'migration': 'users',
+    'global_risks': 'alert-circle'
+};
+
+// Function to create Lucide icon
+function createIcon(iconKey, className = 'w-5 h-5') {
+    const iconName = iconMap[iconKey] || 'activity';
+    return `<i data-lucide="${iconName}" class="${className}"></i>`;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("WebApp JS loaded");
     
@@ -99,43 +169,89 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle browser back/forward buttons
     window.addEventListener('hashchange', initializeTab);
     
+    // Initialize categories loading
+    loadCategories().then(() => {
+        console.log('✅ Categories loaded, WebApp ready');
+    }).catch(error => {
+        console.error('❌ Failed to load categories:', error);
+    });
+    
     // === SUBSCRIPTIONS FUNCTIONALITY ===
     
     // Categories data
-    const categories = [
-        {
-            id: 'crypto',
-            name: '📊 Crypto',
-            description: 'Latest cryptocurrency news and market updates'
-        },
-        {
-            id: 'economy',
-            name: '💰 Economy',
-            description: 'Economic analysis and financial market insights'
-        },
-        {
-            id: 'world',
-            name: '🌍 World',
-            description: 'Global news and international developments'
-        },
-        {
-            id: 'technology',
-            name: '⚙️ Technology',
-            description: 'Technology innovations and industry updates'
-        },
-        {
-            id: 'politics',
-            name: '🏛️ Politics',
-            description: 'Political news and government developments'
-        }
-    ];
+    // Categories will be loaded dynamically from API
+    let categories = [];
+    let categoriesData = {};
+    let expandedCategories = new Set(); // Track which categories are expanded
     
     // Load user subscriptions (mock data for now)
     let userSubscriptions = ['crypto', 'economy']; // Default subscriptions
+
+    // Load categories from API
+    async function loadCategories() {
+        try {
+            console.log('🔄 Loading categories from API...');
+            const response = await fetch('/api/categories');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                categoriesData = data.data;
+                console.log('✅ API categories data loaded:', Object.keys(categoriesData));
+                
+                // Convert to legacy format for compatibility
+                categories = Object.entries(categoriesData).map(([id, categoryData]) => ({
+                    id: id,
+                    name: `${categoryData.emoji} ${categoryData.name}`,
+                    description: `${categoryData.name} news and updates`
+                }));
+                
+                console.log('✅ Categories loaded:', categories.length);
+                return true;
+            } else {
+                throw new Error(data.message || 'Failed to load categories');
+            }
+        } catch (error) {
+            console.error('❌ Error loading categories:', error);
+            
+            // Fallback to hardcoded categories
+            categories = [
+                {
+                    id: 'crypto',
+                    name: '📊 Crypto',
+                    description: 'Latest cryptocurrency news and market updates'
+                },
+                {
+                    id: 'economy',
+                    name: '💰 Economy',
+                    description: 'Economic analysis and financial market insights'
+                },
+                {
+                    id: 'world',
+                    name: '🌍 World',
+                    description: 'Global news and international developments'
+                },
+                {
+                    id: 'technology',
+                    name: '⚙️ Technology',
+                    description: 'Technology innovations and industry updates'
+                },
+                {
+                    id: 'politics',
+                    name: '🏛️ Politics',
+                    description: 'Political news and government developments'
+                }
+            ];
+            
+            console.log('⚠️ Using fallback categories');
+            return false;
+        }
+    }
     
     // Render subscriptions
     function renderSubscriptions() {
         console.log('🔧 renderSubscriptions called');
+        console.log('🔧 categoriesData keys:', Object.keys(categoriesData));
+        console.log('🔧 categories length:', categories.length);
         const subscriptionList = document.getElementById('subscription-list');
         if (!subscriptionList) {
             console.log('⚠️ subscription-list element not found');
@@ -143,24 +259,175 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         console.log('✅ subscription-list found, rendering...');
         
-        subscriptionList.innerHTML = categories.map(category => {
-            const isSubscribed = userSubscriptions.includes(category.id);
+        if (Object.keys(categoriesData).length === 0) {
+            // Fallback to simple categories if no API data
+            subscriptionList.innerHTML = categories.map(category => {
+                const isSubscribed = userSubscriptions.includes(category.id);
+                return `
+                    <div class="subscription-card ${isSubscribed ? 'active' : ''}" data-category="${category.id}">
+                        <div class="category-info">
+                            <div class="category-name">${category.name}</div>
+                            <div class="category-description">${category.description}</div>
+                        </div>
+                        <div class="category-toggle">
+                            <input type="checkbox" ${isSubscribed ? 'checked' : ''} 
+                                   onchange="toggleSubscription('${category.id}', this.checked)">
+                            <span class="category-toggle-slider"></span>
+                        </div>
+                    </div>
+                    `;
+            }).join('');
+            return;
+        }
+
+        // Render with subcategories
+        subscriptionList.innerHTML = Object.entries(categoriesData).map(([categoryId, categoryData]) => {
+            const isCategorySubscribed = userSubscriptions.includes(categoryId);
+            const subcategories = Object.entries(categoryData.subcategories || {});
+            
             return `
-                <div class="subscription-card ${isSubscribed ? 'active' : ''}" data-category="${category.id}">
-                    <div class="category-info">
-                        <div class="category-name">${category.name}</div>
-                        <div class="category-description">${category.description}</div>
+                <div class="subscription-category-group">
+                    <div class="category-header" onclick="toggleCategoryExpansion('${categoryId}')">
+                        <div class="category-info">
+                            <div class="category-name">
+                                <span class="expand-icon">▶</span>
+                                ${createIcon(categoryId)} ${categoryData.name}
+                            </div>
+                            <div class="category-description">${categoryData.name} news and updates</div>
+                        </div>
+                        <div class="category-toggle" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${isCategorySubscribed ? 'checked' : ''}
+                                   onchange="toggleCategorySubscription('${categoryId}', this.checked)">
+                            <span class="category-toggle-slider"></span>
+                        </div>
                     </div>
-                    <div class="category-toggle">
-                        <input type="checkbox" ${isSubscribed ? 'checked' : ''} 
-                               onchange="toggleSubscription('${category.id}', this.checked)">
-                        <span class="category-toggle-slider"></span>
-                    </div>
+                    
+                    ${subcategories.length > 0 ? `
+                        <div class="subcategories" id="subcategories-${categoryId}">
+                            ${subcategories.map(([subcategoryId, subcategoryData]) => {
+                                const isSubscribed = userSubscriptions.includes(`${categoryId}:${subcategoryId}`);
+                                return `
+                                    <div class="subscription-card subcategory-card ${isSubscribed ? 'active' : ''}" 
+                                         data-category="${categoryId}:${subcategoryId}">
+                                        <div class="category-info">
+                                            <div class="category-name">${createIcon(subcategoryId)} ${subcategoryData.name}</div>
+                                            <div class="category-description">${subcategoryData.sources_count} sources</div>
+                                        </div>
+                                        <div class="category-toggle">
+                                            <input type="checkbox" ${isSubscribed ? 'checked' : ''}
+                                                   onchange="toggleSubscription('${categoryId}:${subcategoryId}', this.checked)">
+                                            <span class="category-toggle-slider"></span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : ''}
                 </div>
-                `;
+            `;
         }).join('');
+        
+        // Apply expansion state after rendering
+        setTimeout(() => {
+            Object.keys(categoriesData).forEach(categoryId => {
+                const subcategoriesElement = document.getElementById(`subcategories-${categoryId}`);
+                const expandIcon = document.querySelector(`[onclick="toggleCategoryExpansion('${categoryId}')"] .expand-icon`);
+                
+                if (subcategoriesElement && expandIcon) {
+                    if (expandedCategories.has(categoryId)) {
+                        subcategoriesElement.classList.add('expanded');
+                        expandIcon.textContent = '▼';
+                    } else {
+                        subcategoriesElement.classList.remove('expanded');
+                        expandIcon.textContent = '▶';
+                    }
+                }
+            });
+        }, 0);
+        
+        // Initialize Lucide icons after rendering
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            lucide.createIcons();
+        }
     }
     
+    // Toggle category subscription (all subcategories)
+    window.toggleCategorySubscription = function(categoryId, isSubscribed) {
+        const categoryData = categoriesData[categoryId];
+        if (!categoryData) return;
+        
+        // Add/remove the main category itself
+        if (isSubscribed) {
+            if (!userSubscriptions.includes(categoryId)) {
+                userSubscriptions.push(categoryId);
+            }
+        } else {
+            const index = userSubscriptions.indexOf(categoryId);
+            if (index > -1) {
+                userSubscriptions.splice(index, 1);
+            }
+        }
+        
+        // Also handle subcategories if they exist
+        if (categoryData.subcategories) {
+            Object.keys(categoryData.subcategories).forEach(subcategoryId => {
+                const fullId = `${categoryId}:${subcategoryId}`;
+                if (isSubscribed) {
+                    if (!userSubscriptions.includes(fullId)) {
+                        userSubscriptions.push(fullId);
+                    }
+                } else {
+                    const index = userSubscriptions.indexOf(fullId);
+                    if (index > -1) {
+                        userSubscriptions.splice(index, 1);
+                    }
+                }
+            });
+        }
+        
+        renderSubscriptions();
+        updateSubscriptionStats();
+    };
+
+    // Update subscription statistics
+    function updateSubscriptionStats() {
+        const totalSubscriptions = userSubscriptions.length;
+        console.log('📊 Updated subscription stats:', { total: totalSubscriptions, subscriptions: userSubscriptions });
+        
+        // Update any subscription counters in UI if they exist
+        const subscriptionCounter = document.getElementById('subscription-counter');
+        if (subscriptionCounter) {
+            subscriptionCounter.textContent = totalSubscriptions;
+        }
+        
+        // Update any subscription badges if they exist
+        const subscriptionBadge = document.getElementById('subscription-badge');
+        if (subscriptionBadge) {
+            subscriptionBadge.textContent = totalSubscriptions;
+            subscriptionBadge.style.display = totalSubscriptions > 0 ? 'block' : 'none';
+        }
+    }
+
+    // Toggle category expansion/collapse
+    window.toggleCategoryExpansion = function(categoryId) {
+        const subcategoriesElement = document.getElementById(`subcategories-${categoryId}`);
+        const expandIcon = document.querySelector(`[onclick="toggleCategoryExpansion('${categoryId}')"] .expand-icon`);
+        
+        if (!subcategoriesElement) return;
+        
+        if (expandedCategories.has(categoryId)) {
+            // Collapse
+            expandedCategories.delete(categoryId);
+            subcategoriesElement.classList.remove('expanded');
+            if (expandIcon) expandIcon.textContent = '▶';
+        } else {
+            // Expand
+            expandedCategories.add(categoryId);
+            subcategoriesElement.classList.add('expanded');
+            if (expandIcon) expandIcon.textContent = '▼';
+        }
+    };
+
     // Export renderSubscriptions to global scope
     window.renderSubscriptions = renderSubscriptions;
     
@@ -237,6 +504,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } finally {
             // Hide loading state
             setSavingState(false);
+            // Update subscription statistics
+            updateSubscriptionStats();
         }
     };
     
@@ -569,8 +838,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const settingsList = document.getElementById('notification-settings-list');
         if (!settingsList) return;
         
-        settingsList.innerHTML = categories.map(category => {
-            const settings = notificationSettings[category.id];
+        // Use categoriesData if available, fallback to legacy categories
+        const categoriesToRender = Object.keys(categoriesData).length > 0 ? 
+            Object.entries(categoriesData).map(([id, data]) => ({
+                id: id,
+                name: `${data.emoji} ${data.name}`,
+                description: `${data.name} news and updates`
+            })) : categories;
+        
+        settingsList.innerHTML = categoriesToRender.map(category => {
+            const settings = notificationSettings[category.id] || { enabled: false, telegram: false, webapp: false };
             return `
                 <div class="notification-setting-card">
                     <div class="setting-header">
@@ -642,30 +919,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // Handle notification mode switching
-    const notificationTabs = document.querySelectorAll('.tab-btn[data-mode]');
-    notificationTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const mode = this.getAttribute('data-mode');
-            
-            // Update active tab
-            notificationTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Show/hide content
-            const viewMode = document.getElementById('notifications-view');
-            const settingsMode = document.getElementById('notifications-settings');
-            
-            if (mode === 'view') {
-                viewMode.classList.add('active');
-                settingsMode.classList.remove('active');
-            } else if (mode === 'settings') {
-                viewMode.classList.remove('active');
-                settingsMode.classList.add('active');
-                renderNotificationSettings();
-            }
+    // Handle notification mode switching (moved to DOMContentLoaded)
+    function setupNotificationModeSwitching() {
+        const notificationTabs = document.querySelectorAll('.tab-btn[data-mode]');
+        notificationTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const mode = this.getAttribute('data-mode');
+                
+                // Update active tab
+                notificationTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide content
+                const viewMode = document.getElementById('notifications-view');
+                const settingsMode = document.getElementById('notifications-settings');
+                
+                if (mode === 'view') {
+                    viewMode.classList.add('active');
+                    settingsMode.classList.remove('active');
+                } else if (mode === 'settings') {
+                    viewMode.classList.remove('active');
+                    settingsMode.classList.add('active');
+                    renderNotificationSettings();
+                }
+            });
         });
-    });
+    }
     
     // Format time
     function formatTime(timestamp) {
@@ -694,6 +973,11 @@ document.addEventListener('DOMContentLoaded', function() {
             renderSubscriptions();
         } else if (targetTab === 'notifications') {
             renderNotifications();
+            // Also ensure notification settings are rendered if in settings mode
+            const settingsMode = document.getElementById('notifications-settings');
+            if (settingsMode && settingsMode.classList.contains('active')) {
+                renderNotificationSettings();
+            }
         }
     };
     
@@ -701,6 +985,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         renderSubscriptions();
         renderNotifications();
+        setupNotificationModeSwitching(); // Setup notification mode switching
     }, 200);
     
     console.log('PulseAI WebApp initialized');
