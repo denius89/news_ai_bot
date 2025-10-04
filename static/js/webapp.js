@@ -165,83 +165,110 @@ function getCryptoIconUrl(iconKey) {
 // Function to create icon based on logical mapping
 function createIcon(iconKey, className = 'w-4 h-4') {
     const lowerKey = iconKey.toLowerCase();
+    const iconConfig = getLogicalIcon(lowerKey);
     
-    // First, try crypto icons for crypto-related items
-    const cryptoIconUrl = getCryptoIconUrl(lowerKey);
-    if (cryptoIconUrl) {
-        const iconId = `crypto-icon-${lowerKey}-${Date.now()}`;
-        return `<img id="${iconId}" 
-                     src="${cryptoIconUrl}" 
-                     alt="${iconKey}" 
-                     class="${className}" 
-                     style="width: 16px; height: 16px;"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <i data-lucide="${getLogicalLucideIcon(lowerKey)}" class="${className}" style="display:none;"></i>`;
+    switch (iconConfig.type) {
+        case 'crypto':
+            const cryptoIconUrl = getCryptoIconUrl(lowerKey);
+            if (cryptoIconUrl) {
+                const iconId = `crypto-icon-${lowerKey}-${Date.now()}`;
+                return `<img id="${iconId}" 
+                             src="${cryptoIconUrl}" 
+                             alt="${iconKey}" 
+                             class="${className}" 
+                             style="width: 16px; height: 16px;"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                        <span style="font-size: 16px;">🪙</span>`;
+            }
+            return `<span style="font-size: 16px;">🪙</span>`;
+            
+        case 'emoji':
+            return `<span style="font-size: 16px;">${iconConfig.emoji}</span>`;
+            
+        case 'lucide':
+        default:
+            return `<i data-lucide="${iconConfig.icon}" class="${className}"></i>`;
     }
-    
-    // Use logical Lucide icons for other categories
-    const lucideIcon = getLogicalLucideIcon(lowerKey);
-    return `<i data-lucide="${lucideIcon}" class="${className}"></i>`;
 }
 
-// Function to get logical Lucide icon based on category/subcategory name
-function getLogicalLucideIcon(iconKey) {
+// Function to get logical icon based on category/subcategory name
+function getLogicalIcon(iconKey) {
     const lowerKey = iconKey.toLowerCase();
     
-    // Crypto category - specific crypto icons
+    // === CRYPTO CATEGORY ===
+    // Main category
+    if (['crypto'].includes(lowerKey)) return { type: 'emoji', emoji: '🪙' };
+    
+    // Use crypto icons for crypto subcategories
     if (['btc', 'bitcoin', 'eth', 'ethereum', 'ltc', 'litecoin', 'altcoins', 'altcoin', 'defi', 'nft', 'gamefi', 'exchanges', 'regulation', 'security', 'market_trends'].includes(lowerKey)) {
-        return 'bitcoin';
+        return { type: 'crypto', symbol: cryptoSymbols[lowerKey] || 'btc' };
     }
     
-    // Sports category - specific sport icons
-    if (['football'].includes(lowerKey)) return 'trophy';
-    if (['basketball'].includes(lowerKey)) return 'trophy';
-    if (['tennis'].includes(lowerKey)) return 'trophy';
-    if (['ufc_mma'].includes(lowerKey)) return 'zap';
-    if (['cricket'].includes(lowerKey)) return 'trophy';
-    if (['baseball'].includes(lowerKey)) return 'trophy';
-    if (['badminton'].includes(lowerKey)) return 'trophy';
-    if (['table_tennis'].includes(lowerKey)) return 'trophy';
-    if (['esports'].includes(lowerKey)) return 'gamepad-2';
-    if (['other'].includes(lowerKey)) return 'trophy';
+    // === SPORTS CATEGORY ===
+    // Main category
+    if (['sports'].includes(lowerKey)) return { type: 'emoji', emoji: '⚽' };
     
-    // Markets category - financial icons
-    if (['stocks'].includes(lowerKey)) return 'trending-up';
-    if (['bonds'].includes(lowerKey)) return 'receipt';
-    if (['forex'].includes(lowerKey)) return 'refresh-cw';
-    if (['commodities'].includes(lowerKey)) return 'package';
-    if (['ipos'].includes(lowerKey)) return 'rocket';
-    if (['earnings'].includes(lowerKey)) return 'dollar-sign';
-    if (['funds_etfs'].includes(lowerKey)) return 'package';
-    if (['economic_data'].includes(lowerKey)) return 'bar-chart-3';
-    if (['central_banks'].includes(lowerKey)) return 'building';
-    if (['trends'].includes(lowerKey)) return 'trending-up';
+    // Use sport-specific emojis and icons
+    if (['football'].includes(lowerKey)) return { type: 'emoji', emoji: '⚽' };
+    if (['basketball'].includes(lowerKey)) return { type: 'emoji', emoji: '🏀' };
+    if (['tennis'].includes(lowerKey)) return { type: 'emoji', emoji: '🎾' };
+    if (['ufc_mma'].includes(lowerKey)) return { type: 'emoji', emoji: '🥊' };
+    if (['cricket'].includes(lowerKey)) return { type: 'emoji', emoji: '🏏' };
+    if (['baseball'].includes(lowerKey)) return { type: 'emoji', emoji: '⚾' };
+    if (['badminton'].includes(lowerKey)) return { type: 'emoji', emoji: '🏸' };
+    if (['table_tennis'].includes(lowerKey)) return { type: 'emoji', emoji: '🏓' };
+    if (['esports'].includes(lowerKey)) return { type: 'lucide', icon: 'gamepad-2' };
+    if (['other'].includes(lowerKey)) return { type: 'emoji', emoji: '🏆' };
     
-    // Tech category - technology icons
-    if (['ai'].includes(lowerKey)) return 'brain';
-    if (['bigtech'].includes(lowerKey)) return 'cpu';
-    if (['hardware'].includes(lowerKey)) return 'cpu';
-    if (['software'].includes(lowerKey)) return 'code';
-    if (['cybersecurity'].includes(lowerKey)) return 'shield';
-    if (['blockchain_tech'].includes(lowerKey)) return 'link';
-    if (['startups'].includes(lowerKey)) return 'rocket';
-    if (['conferences'].includes(lowerKey)) return 'users';
-    if (['space_robotics'].includes(lowerKey)) return 'rocket';
+    // === MARKETS CATEGORY ===
+    // Main category
+    if (['markets'].includes(lowerKey)) return { type: 'emoji', emoji: '📈' };
     
-    // World category - world/politics icons
-    if (['conflicts'].includes(lowerKey)) return 'alert-triangle';
-    if (['elections'].includes(lowerKey)) return 'vote';
-    if (['energy'].includes(lowerKey)) return 'zap';
-    if (['geopolitics'].includes(lowerKey)) return 'globe';
-    if (['climate'].includes(lowerKey)) return 'leaf';
-    if (['diplomacy'].includes(lowerKey)) return 'handshake';
-    if (['organizations'].includes(lowerKey)) return 'building';
-    if (['sanctions'].includes(lowerKey)) return 'shield-x';
-    if (['migration'].includes(lowerKey)) return 'users';
-    if (['global_risks'].includes(lowerKey)) return 'alert-circle';
+    // Use financial symbols and icons
+    if (['stocks'].includes(lowerKey)) return { type: 'emoji', emoji: '📈' };
+    if (['bonds'].includes(lowerKey)) return { type: 'emoji', emoji: '📋' };
+    if (['forex'].includes(lowerKey)) return { type: 'emoji', emoji: '💱' };
+    if (['commodities'].includes(lowerKey)) return { type: 'emoji', emoji: '🛢️' };
+    if (['ipos'].includes(lowerKey)) return { type: 'emoji', emoji: '🚀' };
+    if (['earnings'].includes(lowerKey)) return { type: 'emoji', emoji: '💰' };
+    if (['funds_etfs'].includes(lowerKey)) return { type: 'emoji', emoji: '📊' };
+    if (['economic_data'].includes(lowerKey)) return { type: 'emoji', emoji: '📊' };
+    if (['central_banks'].includes(lowerKey)) return { type: 'emoji', emoji: '🏛️' };
+    if (['trends'].includes(lowerKey)) return { type: 'emoji', emoji: '📈' };
     
-    // Fallback to existing iconMap or default
-    return iconMap[lowerKey] || 'activity';
+    // === TECH CATEGORY ===
+    // Main category
+    if (['tech'].includes(lowerKey)) return { type: 'emoji', emoji: '💻' };
+    
+    // Use technology-specific icons
+    if (['ai'].includes(lowerKey)) return { type: 'emoji', emoji: '🤖' };
+    if (['bigtech'].includes(lowerKey)) return { type: 'emoji', emoji: '🏢' };
+    if (['hardware'].includes(lowerKey)) return { type: 'emoji', emoji: '💻' };
+    if (['software'].includes(lowerKey)) return { type: 'emoji', emoji: '💾' };
+    if (['cybersecurity'].includes(lowerKey)) return { type: 'emoji', emoji: '🔒' };
+    if (['blockchain_tech'].includes(lowerKey)) return { type: 'emoji', emoji: '⛓️' };
+    if (['startups'].includes(lowerKey)) return { type: 'emoji', emoji: '🚀' };
+    if (['conferences'].includes(lowerKey)) return { type: 'emoji', emoji: '🎤' };
+    if (['space_robotics'].includes(lowerKey)) return { type: 'emoji', emoji: '🚀' };
+    
+    // === WORLD CATEGORY ===
+    // Main category
+    if (['world'].includes(lowerKey)) return { type: 'emoji', emoji: '🌍' };
+    
+    // Use world/politics emojis
+    if (['conflicts'].includes(lowerKey)) return { type: 'emoji', emoji: '⚔️' };
+    if (['elections'].includes(lowerKey)) return { type: 'emoji', emoji: '🗳️' };
+    if (['energy'].includes(lowerKey)) return { type: 'emoji', emoji: '⚡' };
+    if (['geopolitics'].includes(lowerKey)) return { type: 'emoji', emoji: '🌍' };
+    if (['climate'].includes(lowerKey)) return { type: 'emoji', emoji: '🌱' };
+    if (['diplomacy'].includes(lowerKey)) return { type: 'emoji', emoji: '🤝' };
+    if (['organizations'].includes(lowerKey)) return { type: 'emoji', emoji: '🏛️' };
+    if (['sanctions'].includes(lowerKey)) return { type: 'emoji', emoji: '🚫' };
+    if (['migration'].includes(lowerKey)) return { type: 'emoji', emoji: '🚶‍♂️' };
+    if (['global_risks'].includes(lowerKey)) return { type: 'emoji', emoji: '⚠️' };
+    
+    // Fallback to Lucide icons
+    return { type: 'lucide', icon: iconMap[lowerKey] || 'activity' };
 }
 
 document.addEventListener('DOMContentLoaded', function() {
