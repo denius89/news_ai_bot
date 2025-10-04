@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 16:50:50 UTC_
+_Generated on 2025-10-04 16:54:46 UTC_
 
 ```
 ├── .github/
@@ -65,6 +65,7 @@ _Generated on 2025-10-04 16:50:50 UTC_
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── COMMUNICATION.md
+│   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
 │   └── VISION.md
 ├── examples/
@@ -177,13 +178,16 @@ _Generated on 2025-10-04 16:50:50 UTC_
 │   ├── check_database.py
 │   ├── check_notifications_schema.py
 │   ├── check_users_table.py
+│   ├── cleanup_database.py
 │   ├── create_notifications_table.py
+│   ├── database_maintenance.py
 │   ├── debug_api_issue.py
 │   ├── debug_user_lookup.py
 │   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
 │   ├── fix_old_news.py
 │   ├── fix_user_notifications_schema.py
+│   ├── optimize_database.py
 │   ├── port_manager.py
 │   ├── proc_utils.py
 │   ├── README_daily_digests.md
