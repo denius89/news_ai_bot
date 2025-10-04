@@ -3,7 +3,7 @@ crypto:
     icon: btc
     sources:
       - name: Bitcoin Magazine
-        url: https://bitcoinmagazine.com/feed
+        url: https://www.bitcoinmagazine.com/.rss/full/
       - name: CoinTelegraph BTC
         url: https://cointelegraph.com/rss/tag/bitcoin
       - name: BTC Times
@@ -34,9 +34,9 @@ crypto:
     icon: defi
     sources:
       - name: DefiLlama
-        url: https://defillama.com/news/rss
+        url: https://feed.defillama.com/
       - name: Bankless
-        url: https://banklesshq.substack.com/feed
+        url: https://rsshub.app/substack/banklesshq
       - name: The Defiant
         url: https://thedefiant.io/feed
       - name: CoinDesk DeFi
@@ -45,18 +45,18 @@ crypto:
     icon: nft
     sources:
       - name: NFT Now
-        url: https://nftnow.com/feed
+        url: https://rsshub.app/nftnow/news
       - name: CoinTelegraph NFT
         url: https://cointelegraph.com/rss/tag/nft
       - name: Decrypt NFT
         url: https://decrypt.co/feed
       - name: OpenSea Blog
-        url: https://opensea.io/blog/rss
+        url: https://rsshub.app/opensea/blog
   gamefi:
     icon: gamefi
     sources:
       - name: PlayToEarn
-        url: https://playtoearn.net/rss
+        url: https://www.playtoearn.net/news/rss
       - name: Decrypt GameFi
         url: https://decrypt.co/feed
       - name: CoinTelegraph GameFi
@@ -67,9 +67,9 @@ crypto:
       - name: Binance Blog
         url: https://www.binance.com/en/blog/rss
       - name: OKX Blog
-        url: https://www.okx.com/rss
+        url: https://rsshub.app/okx/blog
       - name: Bybit Blog
-        url: https://blog.bybit.com/en-US/rss
+        url: https://blog.bybit.com/en-US/feed/
       - name: Coinbase Blog
         url: https://blog.coinbase.com/feed
   regulation:
@@ -85,18 +85,18 @@ crypto:
     icon: security
     sources:
       - name: PeckShield Blog
-        url: https://blog.peckshield.com/feed
+        url: https://rsshub.app/medium/peckshield
       - name: Rekt News
-        url: https://rekt.news/index.xml
+        url: https://rsshub.app/rekt/news
       - name: SlowMist
         url: https://slowmist.medium.com/feed
   market_trends:
     icon: market_trends
     sources:
       - name: Glassnode Blog
-        url: https://glassnode.com/rss
+        url: https://rsshub.app/glassnode/blog
       - name: CryptoQuant Blog
-        url: https://cryptoquant.com/rss
+        url: https://rsshub.app/cryptoquant/news
       - name: IntoTheBlock
         url: https://intotheblock.com/feed
 
@@ -109,18 +109,18 @@ sports:
       - name: FIFA
         url: https://www.fifa.com/rss-feeds/news
       - name: Goal.com
-        url: https://www.goal.com/feeds/en/news
+        url: https://rsshub.app/goal/latest-news
       - name: ESPN Soccer
         url: https://www.espn.com/espn/rss/soccer/news
   basketball:
     icon: basketball
     sources:
       - name: NBA
-        url: https://www.nba.com/rss/nba_rss.xml
+        url: https://www.espn.com/espn/rss/nba/news
       - name: Euroleague
-        url: https://www.euroleaguebasketball.net/rss
+        url: https://rsshub.app/euroleague/news
       - name: Bleacher Report NBA
-        url: https://bleacherreport.com/articles/nba.rss
+        url: https://rsshub.app/bleacherreport/nba
       - name: ESPN NBA
         url: https://www.espn.com/espn/rss/nba/news
   tennis:
@@ -136,9 +136,9 @@ sports:
     icon: ufc
     sources:
       - name: MMA Fighting
-        url: https://www.mmafighting.com/rss/current
+        url: https://rsshub.app/mmamania/news
       - name: Bloody Elbow
-        url: https://www.bloodyelbow.com/rss/current
+        url: https://rsshub.app/bloodyelbow/news
       - name: ESPN MMA
         url: https://www.espn.com/espn/rss/mma/news
   cricket:
@@ -147,7 +147,7 @@ sports:
       - name: Wisden
         url: https://wisden.com/feed
       - name: CricBuzz
-        url: https://www.cricbuzz.com/rss/news
+        url: https://rsshub.app/cricbuzz/news
       - name: ICC
         url: https://www.icc-cricket.com/rss/news
   baseball:
@@ -170,12 +170,12 @@ sports:
       - name: TableTennisDaily
         url: https://www.tabletennisdaily.com/rss.xml
       - name: ESPN Table Tennis
-        url: https://www.espn.com/espn/rss/tabletennis/news
+        url: https://rsshub.app/espn/tabletennis
   esports:
     icon: esports
     sources:
       - name: Liquipedia
-        url: https://liquipedia.net/rss
+        url: https://rsshub.app/liquipedia/dota2
       - name: ESPN Esports
         url: https://www.espn.com/espn/rss/esports/news
   other:
@@ -184,11 +184,11 @@ sports:
       - name: F1
         url: https://www.formula1.com/rss
       - name: MotoGP
-        url: https://www.motogp.com/en/news/rss
+        url: https://rsshub.app/motogp/news
       - name: Olympics
-        url: https://olympics.com/en/news/rss
+        url: https://rsshub.app/olympics/news
       - name: World Athletics
-        url: https://worldathletics.org/rss
+        url: https://rsshub.app/worldathletics/news
 
 markets:
   stocks:
@@ -206,25 +206,25 @@ markets:
     icon: bonds
     sources:
       - name: CNBC Bonds
-        url: https://www.cnbc.com/id/10000139/device/rss/rss.html
+        url: https://rsshub.app/cnbc/bonds
       - name: MarketWatch Bonds
         url: https://www.marketwatch.com/feeds/bonds
       - name: Reuters Bonds
-        url: https://feeds.reuters.com/news/bonds
+        url: https://feeds.reuters.com/reuters/bondsNews
   forex:
     icon: forex
     sources:
       - name: DailyFX
         url: https://www.dailyfx.com/feeds/market-news
       - name: Reuters FX
-        url: https://feeds.reuters.com/news/forex
+        url: https://feeds.reuters.com/reuters/forexNews
       - name: FXStreet
         url: https://www.fxstreet.com/rss
   commodities:
     icon: commodities
     sources:
       - name: Reuters Commodities
-        url: https://feeds.reuters.com/news/commodities
+        url: https://feeds.reuters.com/reuters/commoditiesNews
       - name: MarketWatch Commodities
         url: https://www.marketwatch.com/feeds/commodities
       - name: OilPrice
@@ -235,16 +235,16 @@ markets:
       - name: Nasdaq IPO Calendar
         url: https://api.nasdaq.com/api/ipo/calendar
       - name: Renaissance Capital
-        url: https://www.renaissancecapital.com/rss/ipo
+        url: https://rsshub.app/renaissancecapital/news
       - name: MarketWatch IPO
         url: https://www.marketwatch.com/rss/ipo
       - name: Yahoo IPO
-        url: https://finance.yahoo.com/calendar/ipo
+        url: https://rsshub.app/yahoo/ipo
   earnings:
     icon: earnings
     sources:
       - name: Zacks
-        url: https://www.zacks.com/rss/earnings_news.xml
+        url: https://rsshub.app/zacks/news
       - name: Yahoo Earnings
         url: https://finance.yahoo.com/calendar/earnings
       - name: MarketWatch Earnings
@@ -255,9 +255,9 @@ markets:
       - name: ETF.com
         url: https://www.etf.com/rss.xml
       - name: Yahoo ETFs
-        url: https://finance.yahoo.com/etfs/rss
+        url: https://rsshub.app/yahoo/etfs
       - name: Morningstar ETFs
-        url: https://www.morningstar.com/rss
+        url: https://rsshub.app/morningstar/etfs
   economic_data:
     icon: economic_data
     sources:
@@ -266,7 +266,7 @@ markets:
       - name: TradingEconomics
         url: https://tradingeconomics.com/rss
       - name: FRED
-        url: https://fred.stlouisfed.org/feeds
+        url: https://rsshub.app/fred/latest
       - name: IMF
         url: https://www.imf.org/external/rss/feeds.aspx
   central_banks:
@@ -282,9 +282,9 @@ tech:
     icon: ai
     sources:
       - name: VentureBeat AI
-        url: https://venturebeat.com/category/ai/feed
+        url: https://rsshub.app/venturebeat/ai
       - name: AI News
-        url: https://artificialintelligence-news.com/feed/
+        url: https://rsshub.app/artificialintelligence-news/latest
       - name: MIT Technology Review AI
         url: https://www.technologyreview.com/feed/
       - name: OpenAI Blog
@@ -344,7 +344,7 @@ tech:
     icon: startups
     sources:
       - name: Crunchbase
-        url: https://news.crunchbase.com/feed/
+        url: https://rsshub.app/crunchbase/news
       - name: TechCrunch Startups
         url: https://techcrunch.com/category/startups/feed/
       - name: VentureBeat
@@ -353,9 +353,9 @@ tech:
     icon: conferences
     sources:
       - name: WebSummit
-        url: https://websummit.com/feed
+        url: https://rsshub.app/websummit/news
       - name: CES Blog
-        url: https://www.ces.tech/rss.aspx
+        url: https://rsshub.app/ces/blog
       - name: Eventbrite Tech
         url: https://www.eventbrite.com/d/online/technology--events/rss/
 
@@ -375,7 +375,7 @@ world:
     icon: elections
     sources:
       - name: Politico Elections
-        url: https://www.politico.com/rss/politics08.xml
+        url: https://rsshub.app/politico/elections
       - name: BBC Politics
         url: http://feeds.bbci.co.uk/news/politics/rss.xml
       - name: Reuters Politics
@@ -386,7 +386,7 @@ world:
       - name: Reuters Energy
         url: https://feeds.reuters.com/reuters/energyNews
       - name: OilPrice Energy
-        url: https://oilprice.com/rss/energy
+        url: https://rsshub.app/oilprice/energy
       - name: IEA
         url: https://www.iea.org/rss/news.xml
       - name: Energy Post
@@ -395,9 +395,9 @@ world:
     icon: geopolitics
     sources:
       - name: Stratfor
-        url: https://worldview.stratfor.com/rss
+        url: https://rsshub.app/stratfor/worldview
       - name: CFR
-        url: https://www.cfr.org/rss/news
+        url: https://rsshub.app/cfr/news
       - name: Carnegie Endowment
         url: https://carnegieendowment.org/rss
       - name: Foreign Affairs
@@ -408,7 +408,7 @@ world:
       - name: US State Dept Press
         url: https://www.state.gov/feed/
       - name: EU External Action
-        url: https://www.eeas.europa.eu/eeas-news_en?format=rss
+        url: https://rsshub.app/eu/eeas
       - name: UN News
         url: https://news.un.org/en/rss
   sanctions:
@@ -417,9 +417,9 @@ world:
       - name: Reuters Sanctions
         url: https://www.reuters.com/news/archive/sanctionsNews?rpc=401&feedType=rss
       - name: BBC Sanctions
-        url: http://feeds.bbci.co.uk/news/topics/c40rjmqd4w7t/rss.xml
+        url: https://rsshub.app/bbc/topics/c40rjmqd4w7t
       - name: CFR Sanctions
-        url: https://www.cfr.org/taxonomy/term/1018/feed
+        url: https://rsshub.app/cfr/sanctions
   organizations:
     icon: organizations
     sources:
@@ -435,7 +435,7 @@ world:
     icon: migration
     sources:
       - name: IOM
-        url: https://www.iom.int/rss.xml
+        url: https://rsshub.app/iom/news
       - name: UNHCR
         url: https://www.unhcr.org/rss.xml
       - name: Migration Policy
@@ -453,8 +453,8 @@ world:
     icon: global_risks
     sources:
       - name: WEF Agenda
-        url: https://www.weforum.org/agenda/feed
+        url: https://rsshub.app/weforum/en
       - name: Chatham House
-        url: https://www.chathamhouse.org/rss.xml
+        url: https://rsshub.app/chathamhouse/news
       - name: World Bank Blogs (Dev)
-        url: https://blogs.worldbank.org/feed
+        url: https://rsshub.app/worldbank/blogs
