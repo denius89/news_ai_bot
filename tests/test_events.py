@@ -3,8 +3,6 @@ Unit tests for Events functionality.
 """
 
 import pytest
-from unittest.mock import patch
-from datetime import datetime, timezone
 
 from webapp import app
 

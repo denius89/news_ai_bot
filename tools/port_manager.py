@@ -8,9 +8,8 @@ import os
 import sys
 import time
 import socket
-import subprocess
 import psutil
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from pathlib import Path
 
 # Добавляем корневую директорию проекта в путь
@@ -222,13 +221,13 @@ class PortManager:
                 result['warnings'].append(f"Не удалось найти свободный порт для {service}")
 
         # 4. Итоговый отчет
-        print(f"\n📊 Итоговый отчет:")
+        print("\n📊 Итоговый отчет:")
         print(f"   Убито дублирующих процессов: {result['processes_killed']}")
         print(f"   Освобождено портов: {result['ports_freed']}")
         print(f"   Найдено свободных портов: {len(result['free_ports'])}")
 
         if result['warnings']:
-            print(f"\n⚠️ Предупреждения:")
+            print("\n⚠️ Предупреждения:")
             for warning in result['warnings']:
                 print(f"   - {warning}")
 
@@ -309,12 +308,12 @@ def main():
         if len(result['free_ports']) >= 3:  # webapp, api, test
             print(f"\n✅ Достаточно свободных портов найдено ({len(result['free_ports'])}/3)")
             if critical_warnings:
-                print(f"⚠️ Есть предупреждения, но они не критичны:")
+                print("⚠️ Есть предупреждения, но они не критичны:")
                 for warning in critical_warnings:
                     print(f"   - {warning}")
             sys.exit(0)  # Все хорошо
         elif critical_warnings:
-            print(f"\n❌ Критические предупреждения:")
+            print("\n❌ Критические предупреждения:")
             for warning in critical_warnings:
                 print(f"   - {warning}")
             sys.exit(1)  # Есть критические предупреждения

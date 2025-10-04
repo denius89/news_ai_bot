@@ -3,7 +3,7 @@ Unit tests for User Notifications API endpoints.
 """
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from datetime import datetime
 
 from webapp import app
@@ -262,7 +262,7 @@ class TestUserNotificationsAPI:
         assert response1.status_code == 200
         data1 = response1.get_json()
         assert data1['status'] == 'success'
-        assert data1['data']['notifications'][0]['read'] == False
+        assert data1['data']['notifications'][0]['read'] is False
 
         # Step 2: Mark as read
         response2 = client.post(
@@ -289,4 +289,4 @@ class TestUserNotificationsAPI:
         assert response3.status_code == 200
         data3 = response3.get_json()
         assert data3['status'] == 'success'
-        assert data3['data']['notifications'][0]['read'] == True
+        assert data3['data']['notifications'][0]['read'] is True
