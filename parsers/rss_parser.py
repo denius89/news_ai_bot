@@ -2,17 +2,16 @@ import hashlib
 import logging
 from datetime import timezone
 from pathlib import Path
+from typing import Dict, List, Optional
 
 import requests
 import feedparser
-import yaml
 from dateutil import parser as dtp
 
 from utils.clean_text import clean_text  # вынесено отдельно
+from services.categories import get_all_sources
 
 logger = logging.getLogger("parsers.rss")
-
-CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "sources.yaml"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; NewsBot/1.0; +https://example.com)"}
 
@@ -31,24 +30,88 @@ def normalize_date(date_str: str | None):
         return None
 
 
-def load_sources(category: str | None = None) -> dict[str, dict]:
-    """Загружает список RSS-источников из sources.yaml."""
-    with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        sources = yaml.safe_load(f)
-
-    urls: dict[str, dict] = {}
-    if category:
-        if category not in sources:
-            raise ValueError(f"Нет категории '{category}' в sources.yaml")
-        group = sources[category]
-        for item in group:
-            urls[item["name"]] = {**item, "category": category}
-    else:
-        for cat, group in sources.items():
-            for item in group:
-                urls[item["name"]] = {**item, "category": cat}
-
+def load_sources(category: Optional[str] = None, subcategory: Optional[str] = None) -> Dict[str, Dict]:
+    """Загружает список RSS-источников из services/categories."""
+    all_sources = get_all_sources()
+    urls: Dict[str, Dict] = {}
+    
+    for cat, subcat, name, url in all_sources:
+        # Фильтруем по категории и подкатегории если указаны
+        if category and cat != category:
+            continue
+        if subcategory and subcat != subcategory:
+            continue
+            
+        urls[name] = {
+            "name": name,
+            "url": url,
+            "category": cat,
+            "subcategory": subcat
+        }
+    
     return urls
+
+
+def parse_source(url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
+    """
+    Универсальная функция для парсинга одного источника RSS.
+    
+    Args:
+        url: URL RSS фида
+        category: Категория новости
+        subcategory: Подкатегория новости
+        source_name: Название источника
+        
+    Returns:
+        List[Dict]: Список новостей с полями category и subcategory
+    """
+    try:
+        feed = fetch_feed(url)
+        if not feed or not feed.entries:
+            logger.warning(f"Пустой фид: {source_name} ({url})")
+            return []
+        
+        news_items = []
+        for entry in feed.entries:
+            try:
+                # Очистка текста
+                title = clean_text(entry.get("title", ""))
+                content = clean_text(entry.get("summary", ""))
+                
+                if not title:
+                    continue
+                
+                # Парсинг даты
+                published_at = normalize_date(entry.get("published", entry.get("updated")))
+                if not published_at:
+                    published_at = normalize_date(str(entry.get("published_parsed")))
+                
+                # Создание уникального ID
+                uid = hashlib.md5(f"{entry.get('link', '')}{title}".encode()).hexdigest()
+                
+                news_item = {
+                    "uid": uid,
+                    "title": title,
+                    "content": content,
+                    "url": entry.get("link", ""),
+                    "source": source_name,
+                    "category": category,
+                    "subcategory": subcategory,
+                    "published_at": published_at.isoformat() if published_at else None,
+                }
+                
+                news_items.append(news_item)
+                
+            except Exception as e:
+                logger.warning(f"Ошибка парсинга записи из {source_name}: {e}")
+                continue
+        
+        logger.info(f"✅ Парсинг {source_name}: {len(news_items)} новостей")
+        return news_items
+        
+    except Exception as e:
+        logger.error(f"❌ Ошибка парсинга источника {source_name}: {e}")
+        return []
 
 
 def fetch_feed(url: str):
@@ -64,48 +127,33 @@ def fetch_feed(url: str):
         return None
 
 
-def fetch_rss(urls: dict[str, dict], per_source_limit: int | None = None) -> list[dict]:
-    """Загружает новости из RSS-источников."""
+def fetch_rss(urls: Dict[str, Dict], per_source_limit: Optional[int] = None) -> List[Dict]:
+    """Загружает новости из RSS-источников с поддержкой subcategory."""
     news_items = []
     seen = set()
 
     for meta in urls.values():
         logger.info(f"🔄 Загружаем источник: {meta['name']} ({meta['url']})")
-        feed = fetch_feed(meta["url"])
-        if not feed or feed.bozo:
-            logger.error(
-                f"❌ Ошибка при парсинге {meta['url']}: {getattr(feed, 'bozo_exception', '')}"
-            )
-            continue
+        
+        # Используем новую функцию parse_source
+        source_items = parse_source(
+            url=meta["url"],
+            category=meta.get("category", ""),
+            subcategory=meta.get("subcategory", ""),
+            source_name=meta["name"]
+        )
+        
+        # Применяем лимит если указан
+        if per_source_limit:
+            source_items = source_items[:per_source_limit]
+        
+        # Добавляем уникальные элементы
+        for item in source_items:
+            uid = item["uid"]
+            if uid not in seen:
+                seen.add(uid)
+                news_items.append(item)
 
-        items_before = len(news_items)
-        for entry in feed.entries[:per_source_limit]:
-            url = entry.get("link") or ""
-            title = clean_text(entry.get("title", ""))
-            summary = clean_text(entry.get("summary") or entry.get("description") or "")
-            published = normalize_date(entry.get("published") or entry.get("updated"))
-
-            uid = hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
-            if uid in seen:
-                continue
-            seen.add(uid)
-
-            news_items.append(
-                {
-                    "uid": uid,
-                    "title": title,
-                    "url": url,
-                    "summary": summary or title,
-                    "published_at": published,
-                    "source": meta["name"],
-                    "category": meta["category"],
-                }
-            )
-
-        items_added = len(news_items) - items_before
-        if items_added > 0:
-            logger.info(f"✅ {meta['name']}: {items_added} новостей добавлено")
-        else:
-            logger.warning(f"⚠️ {meta['name']}: новостей не найдено")
+        logger.info(f"✅ {meta['name']}: {len(source_items)} новостей добавлено")
 
     return news_items

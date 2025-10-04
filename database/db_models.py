@@ -160,6 +160,7 @@ def upsert_news(items: List[Dict]):
                 or datetime.now(timezone.utc).isoformat(),
                 "source": enriched.get("source"),
                 "category": (enriched.get("category") or "").lower() or None,
+                "subcategory": (enriched.get("subcategory") or "").lower() or None,
                 "credibility": enriched.get("credibility"),
                 "importance": enriched.get("importance"),
             }
@@ -283,7 +284,7 @@ def get_latest_news(
     query = (
         supabase.table("news")
         .select(
-            "id, uid, title, content, link, published_at, source, category, credibility, importance"
+            "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
         )
         .order("published_at", desc=True)
         .limit(limit)

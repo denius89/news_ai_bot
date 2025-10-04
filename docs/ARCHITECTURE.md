@@ -22,24 +22,37 @@ PulseAI transforms chaotic news and events streams into structured, AI-analyzed 
 
 ```mermaid
 flowchart TD
-    A["🌐 Data Sources<br/>RSS, Websites, Calendars"] --> B["⚙️ Data Parsers<br/>rss_parser, events_parser, utils"]
-    B --> C["🤖 AI Analysis Modules<br/>credibility, importance, summary"]
-    C --> D["🗄️ Supabase Database<br/>PostgreSQL"]
-    D --> E["📰 Digest Generation<br/>Morning/Evening, AI-texts"]
-    D --> F["📅 Events Calendar<br/>Macro + Crypto Events"]
-    D --> G["🌐 Web Application<br/>Flask + Templates"]
-    D --> H["🤖 Telegram Bot<br/>aiogram 3.x"]
-    D --> I["📱 API Endpoints<br/>REST API"]
+    A["📋 Sources Config<br/>config/sources.yaml<br/>Single Source of Truth"] --> B["🔧 Categories Service<br/>services/categories.py<br/>Centralized Access"]
     
-    J["🔧 Services Layer<br/>DigestAIService, DigestService"] --> E
-    K["📊 Repositories Layer<br/>NewsRepository, EventsRepository"] --> D
-    L["🎨 Utils Layer<br/>Formatters, Cleaners"] --> B
+    B --> C["⚙️ Data Parsers<br/>rss_parser, events_parser"]
+    B --> D["🤖 Telegram Bot<br/>Dynamic Keyboards"]
+    B --> E["🌐 WebApp API<br/>/api/categories"]
+    
+    C --> F["🤖 AI Analysis<br/>credibility, importance"]
+    F --> G["🗄️ Supabase Database<br/>PostgreSQL + subcategory"]
+    G --> H["📰 Digest Generation<br/>AI-enhanced content"]
+    G --> I["📅 Events Calendar<br/>Categorized events"]
+    G --> J["🌐 Web Application<br/>Dynamic UI rendering"]
+    G --> K["🤖 Telegram Bot<br/>Category-based menus"]
+    
+    L["🔧 Services Layer<br/>DigestAIService, DigestService"] --> H
+    M["📊 Repositories Layer<br/>NewsRepository, EventsRepository"] --> G
+    N["🎨 Utils Layer<br/>Formatters, Cleaners"] --> C
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
 ```
 
 ## Core Components
 
+### Categories Management System
+- **Single Source of Truth** — `config/sources.yaml` contains all categories, subcategories, and RSS sources
+- **Centralized Service** — `services/categories.py` provides unified access to category data
+- **Dynamic Integration** — All components (bot, WebApp, parsers) automatically use updated categories
+- **Icon System** — Each subcategory has a unique icon key mapped to emoji for UI consistency
+
 ### Data Sources
-- **RSS Feeds** — News from crypto, economy, world, tech categories
+- **RSS Feeds** — News from crypto, economy, world, tech categories (198+ sources)
 - **Economic Calendars** — Investing.com events parsing
 - **News Websites** — Direct scraping capabilities
 
@@ -82,7 +95,10 @@ flowchart TD
 ## Data Flow Diagram
 
 **Поток данных:**
-Telegram → Handlers → Services (DigestAIService, SubscriptionService, NotificationService) → Repositories → Supabase
+Sources Config → Categories Service → Parsers/Bot/WebApp → AI Analysis → Database → User Interfaces
+
+**Categories Integration:**
+config/sources.yaml → services/categories.py → All Components (Dynamic Updates)
 
 ```mermaid
 flowchart TD
@@ -225,7 +241,8 @@ CREATE TABLE news (
     credibility NUMERIC,            -- AI credibility score
     importance NUMERIC,             -- AI importance score
     source TEXT,                    -- Source name
-    category TEXT                   -- News category
+    category TEXT,                  -- News category (crypto, sports, etc.)
+    subcategory TEXT                -- News subcategory (bitcoin, football, etc.)
 );
 ```
 
@@ -236,6 +253,8 @@ CREATE TABLE events (
     title TEXT NOT NULL,            -- Event name
     country TEXT,                   -- Country code
     currency TEXT,                  -- Currency code
+    category TEXT,                  -- Event category (markets, world, etc.)
+    subcategory TEXT,               -- Event subcategory (stocks, conflicts, etc.)
     importance INTEGER,             -- Priority (1-3)
     event_time TIMESTAMPTZ,         -- Event time (UTC)
     fact TEXT,                      -- Actual value
@@ -250,6 +269,8 @@ CREATE TABLE events (
 ### REST Endpoints
 - `GET /api/news` — Retrieve news articles
 - `GET /api/events` — Retrieve events
+- `GET /api/categories` — Get full category structure with icons
+- `GET /api/categories/validate` — Validate sources.yaml structure
 - `POST /api/digest` — Generate digest
 - `GET /api/digest/{id}` — Get specific digest
 

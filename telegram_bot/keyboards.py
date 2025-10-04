@@ -1,5 +1,6 @@
 # telegram_bot/keyboards.py
 from aiogram import types
+from services.categories import get_categories, get_subcategories, get_emoji_icon
 
 
 def start_inline_keyboard() -> types.InlineKeyboardMarkup:
@@ -65,13 +66,69 @@ def notifications_inline_keyboard() -> types.InlineKeyboardMarkup:
 
 
 def categories_inline_keyboard(action: str = "subscribe") -> types.InlineKeyboardMarkup:
-    """Клавиатура для выбора категорий (для подписок/отписок)"""
-    from digests.configs import CATEGORIES
+    """Динамическая клавиатура категорий для подписок"""
+    categories = get_categories()
+    
+    buttons = []
+    for category in categories:
+        emoji = get_emoji_icon(category, "")  # Базовый emoji для категории
+        buttons.append([
+            types.InlineKeyboardButton(
+                text=f"{emoji} {category.title()}", 
+                callback_data=f"{action}:{category}"
+            )
+        ])
+    
+    # Добавляем кнопку "Назад"
+    buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
+    
+    return types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
-    keyboard = []
-    for key, label in CATEGORIES.items():
-        keyboard.append([types.InlineKeyboardButton(text=label, callback_data=f"{action}:{key}")])
 
-    keyboard.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
+def subcategories_inline_keyboard(category: str, action: str = "subscribe") -> types.InlineKeyboardMarkup:
+    """Динамическая клавиатура подкатегорий для выбранной категории"""
+    subcategories = get_subcategories(category)
+    
+    buttons = []
+    for subcategory in subcategories:
+        emoji = get_emoji_icon(category, subcategory)
+        buttons.append([
+            types.InlineKeyboardButton(
+                text=f"{emoji} {subcategory.title()}", 
+                callback_data=f"{action}:{category}:{subcategory}"
+            )
+        ])
+    
+    # Добавляем кнопку "Назад"
+    buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
+    
+    return types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
-    return types.InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def digest_categories_inline_keyboard() -> types.InlineKeyboardMarkup:
+    """Клавиатура категорий для дайджеста"""
+    categories = get_categories()
+    
+    buttons = []
+    # Кнопка "Все категории"
+    buttons.append([
+        types.InlineKeyboardButton(
+            text="📰 Все категории", 
+            callback_data="digest:all"
+        )
+    ])
+    
+    # Кнопки по категориям
+    for category in categories:
+        emoji = get_emoji_icon(category, "")
+        buttons.append([
+            types.InlineKeyboardButton(
+                text=f"{emoji} {category.title()}", 
+                callback_data=f"digest:{category}"
+            )
+        ])
+    
+    # Добавляем кнопку "Назад"
+    buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
+    
+    return types.InlineKeyboardMarkup(inline_keyboard=buttons)
