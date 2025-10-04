@@ -188,3 +188,17 @@ db-check:
 	$(PY) tools/check_all_columns.py
 	$(PY) tools/check_users_table.py
 
+# === Проверка источников RSS ===
+
+# 27) Проверка всех RSS источников
+check-sources:
+	@echo "🔍 Проверка RSS источников..."
+	$(PY) tools/check_sources.py
+
+# 28) Показать отчеты источников
+sources-report:
+	@echo "📊 Отчеты источников:"
+	@echo "   📄 CSV: logs/sources_check.csv"
+	@echo "   📄 Markdown: logs/sources_check.md"
+	@echo "   📄 JSON: logs/sources_check.json"
+
