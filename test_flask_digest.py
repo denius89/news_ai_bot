@@ -5,11 +5,10 @@ Test Flask digest route
 
 import sys
 import os
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 from flask import Flask
 from routes.news_routes import news_bp
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
 app.register_blueprint(news_bp)
