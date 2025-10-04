@@ -70,9 +70,9 @@ def check_all_columns():
                             test_data_with_category['category'] = 'general'
 
                             try:
-                                supabase.table('user_notifications')
-                                .insert(test_data_with_category)
-                                .execute()
+                                supabase.table('user_notifications').insert(
+                                    test_data_with_category
+                                ).execute()
                                 print("✅ Test insert with category successful")
                             except Exception as e2:
                                 print(f"❌ Test insert with category failed: {e2}")

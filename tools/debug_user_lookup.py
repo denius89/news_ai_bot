@@ -15,7 +15,6 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 
-
 def debug_user_lookup():
     """Debug user lookup."""
     load_dotenv()
