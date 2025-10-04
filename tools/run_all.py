@@ -63,8 +63,6 @@ class ProcessManager:
 
         if success:
             print("✅ Все процессы запущены успешно!")
-        print("🔍 Running pre-push checks: black             print(f"📋 Логи бота: logs/bot.log") flake8...")
-        print("All done! ✨ 🍰 ✨")
             print("\nДля просмотра логов: make logs")
             print("Для остановки: make stop-all")
         else:
@@ -187,7 +185,7 @@ class ProcessManager:
 
             # Пытаемся освободить порт
             if cleanup_pid_file('webapp'):
-            print("❌ Black check failed. Please run: black .")
+                print(f"✅ Процесс WebApp остановлен")
                 time.sleep(2)  # Даем время порту освободиться
 
                 # Проверяем еще раз
