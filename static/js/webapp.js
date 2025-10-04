@@ -66,7 +66,74 @@ const iconMap = {
 // Cryptocurrency Icons integration using jsDelivr CDN
 const cryptoIconCache = new Map();
 
-// Crypto symbol mapping for cryptocurrency-icons - each category gets unique icon
+// Logical icon mapping based on category/subcategory names
+const iconMapping = {
+    // === CRYPTO CATEGORY ===
+    'btc': 'crypto',
+    'bitcoin': 'crypto',
+    'eth': 'crypto', 
+    'ethereum': 'crypto',
+    'ltc': 'crypto',
+    'litecoin': 'crypto',
+    'altcoins': 'crypto',
+    'altcoin': 'crypto',
+    'defi': 'crypto',
+    'nft': 'crypto',
+    'gamefi': 'crypto',
+    'exchanges': 'crypto',
+    'regulation': 'crypto',
+    'security': 'crypto',
+    'market_trends': 'crypto',
+    
+    // === SPORTS CATEGORY ===
+    'football': 'sports',
+    'basketball': 'sports',
+    'tennis': 'sports',
+    'ufc_mma': 'sports',
+    'cricket': 'sports',
+    'baseball': 'sports',
+    'badminton': 'sports',
+    'table_tennis': 'sports',
+    'esports': 'sports',
+    'other': 'sports',
+    
+    // === MARKETS CATEGORY ===
+    'stocks': 'markets',
+    'bonds': 'markets',
+    'forex': 'markets',
+    'commodities': 'markets',
+    'ipos': 'markets',
+    'earnings': 'markets',
+    'funds_etfs': 'markets',
+    'economic_data': 'markets',
+    'central_banks': 'markets',
+    'trends': 'markets',
+    
+    // === TECH CATEGORY ===
+    'ai': 'tech',
+    'bigtech': 'tech',
+    'hardware': 'tech',
+    'software': 'tech',
+    'cybersecurity': 'tech',
+    'blockchain_tech': 'tech',
+    'startups': 'tech',
+    'conferences': 'tech',
+    'space_robotics': 'tech',
+    
+    // === WORLD CATEGORY ===
+    'conflicts': 'world',
+    'elections': 'world',
+    'energy': 'world',
+    'geopolitics': 'world',
+    'climate': 'world',
+    'diplomacy': 'world',
+    'organizations': 'world',
+    'sanctions': 'world',
+    'migration': 'world',
+    'global_risks': 'world'
+};
+
+// Crypto-specific symbols for cryptocurrency-icons
 const cryptoSymbols = {
     'btc': 'btc',
     'bitcoin': 'btc',
@@ -74,15 +141,15 @@ const cryptoSymbols = {
     'ethereum': 'eth',
     'ltc': 'ltc',
     'litecoin': 'ltc',
-    'altcoins': 'ltc', // Litecoin for altcoins
+    'altcoins': 'ltc',
     'altcoin': 'ltc',
-    'defi': 'link', // Chainlink for DeFi
-    'nft': 'mana',  // Decentraland (MANA) for NFT
-    'gamefi': 'sand', // The Sandbox for GameFi (AXS not available)
-    'exchanges': 'bnb', // Binance Coin for exchanges
-    'regulation': 'usdt', // USDT for regulation (stablecoin)
-    'security': 'usdc', // USDC for security (stablecoin)
-    'market_trends': 'ada' // Cardano for market trends
+    'defi': 'link',
+    'nft': 'mana',
+    'gamefi': 'sand',
+    'exchanges': 'bnb',
+    'regulation': 'usdt',
+    'security': 'usdc',
+    'market_trends': 'ada'
 };
 
 // Function to get crypto icon from cryptocurrency-icons CDN
@@ -95,26 +162,86 @@ function getCryptoIconUrl(iconKey) {
     return null;
 }
 
-// Function to create icon (crypto or Lucide)
+// Function to create icon based on logical mapping
 function createIcon(iconKey, className = 'w-4 h-4') {
-    const cryptoIconUrl = getCryptoIconUrl(iconKey);
+    const lowerKey = iconKey.toLowerCase();
     
+    // First, try crypto icons for crypto-related items
+    const cryptoIconUrl = getCryptoIconUrl(lowerKey);
     if (cryptoIconUrl) {
-        // Create a unique ID for this icon
-        const iconId = `crypto-icon-${iconKey}-${Date.now()}`;
-        
+        const iconId = `crypto-icon-${lowerKey}-${Date.now()}`;
         return `<img id="${iconId}" 
                      src="${cryptoIconUrl}" 
                      alt="${iconKey}" 
                      class="${className}" 
                      style="width: 16px; height: 16px;"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <i data-lucide="coins" class="${className}" style="display:none;"></i>`;
-    } else {
-        // Fallback to Lucide icons for non-crypto items
-        const iconName = iconMap[iconKey] || 'activity';
-        return `<i data-lucide="${iconName}" class="${className}"></i>`;
+                <i data-lucide="${getLogicalLucideIcon(lowerKey)}" class="${className}" style="display:none;"></i>`;
     }
+    
+    // Use logical Lucide icons for other categories
+    const lucideIcon = getLogicalLucideIcon(lowerKey);
+    return `<i data-lucide="${lucideIcon}" class="${className}"></i>`;
+}
+
+// Function to get logical Lucide icon based on category/subcategory name
+function getLogicalLucideIcon(iconKey) {
+    const lowerKey = iconKey.toLowerCase();
+    
+    // Crypto category - specific crypto icons
+    if (['btc', 'bitcoin', 'eth', 'ethereum', 'ltc', 'litecoin', 'altcoins', 'altcoin', 'defi', 'nft', 'gamefi', 'exchanges', 'regulation', 'security', 'market_trends'].includes(lowerKey)) {
+        return 'bitcoin';
+    }
+    
+    // Sports category - specific sport icons
+    if (['football'].includes(lowerKey)) return 'trophy';
+    if (['basketball'].includes(lowerKey)) return 'trophy';
+    if (['tennis'].includes(lowerKey)) return 'trophy';
+    if (['ufc_mma'].includes(lowerKey)) return 'zap';
+    if (['cricket'].includes(lowerKey)) return 'trophy';
+    if (['baseball'].includes(lowerKey)) return 'trophy';
+    if (['badminton'].includes(lowerKey)) return 'trophy';
+    if (['table_tennis'].includes(lowerKey)) return 'trophy';
+    if (['esports'].includes(lowerKey)) return 'gamepad-2';
+    if (['other'].includes(lowerKey)) return 'trophy';
+    
+    // Markets category - financial icons
+    if (['stocks'].includes(lowerKey)) return 'trending-up';
+    if (['bonds'].includes(lowerKey)) return 'receipt';
+    if (['forex'].includes(lowerKey)) return 'refresh-cw';
+    if (['commodities'].includes(lowerKey)) return 'package';
+    if (['ipos'].includes(lowerKey)) return 'rocket';
+    if (['earnings'].includes(lowerKey)) return 'dollar-sign';
+    if (['funds_etfs'].includes(lowerKey)) return 'package';
+    if (['economic_data'].includes(lowerKey)) return 'bar-chart-3';
+    if (['central_banks'].includes(lowerKey)) return 'building';
+    if (['trends'].includes(lowerKey)) return 'trending-up';
+    
+    // Tech category - technology icons
+    if (['ai'].includes(lowerKey)) return 'brain';
+    if (['bigtech'].includes(lowerKey)) return 'cpu';
+    if (['hardware'].includes(lowerKey)) return 'cpu';
+    if (['software'].includes(lowerKey)) return 'code';
+    if (['cybersecurity'].includes(lowerKey)) return 'shield';
+    if (['blockchain_tech'].includes(lowerKey)) return 'link';
+    if (['startups'].includes(lowerKey)) return 'rocket';
+    if (['conferences'].includes(lowerKey)) return 'users';
+    if (['space_robotics'].includes(lowerKey)) return 'rocket';
+    
+    // World category - world/politics icons
+    if (['conflicts'].includes(lowerKey)) return 'alert-triangle';
+    if (['elections'].includes(lowerKey)) return 'vote';
+    if (['energy'].includes(lowerKey)) return 'zap';
+    if (['geopolitics'].includes(lowerKey)) return 'globe';
+    if (['climate'].includes(lowerKey)) return 'leaf';
+    if (['diplomacy'].includes(lowerKey)) return 'handshake';
+    if (['organizations'].includes(lowerKey)) return 'building';
+    if (['sanctions'].includes(lowerKey)) return 'shield-x';
+    if (['migration'].includes(lowerKey)) return 'users';
+    if (['global_risks'].includes(lowerKey)) return 'alert-circle';
+    
+    // Fallback to existing iconMap or default
+    return iconMap[lowerKey] || 'activity';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
