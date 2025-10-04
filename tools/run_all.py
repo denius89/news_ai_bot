@@ -246,7 +246,7 @@ def main():
         epilog="""
 Примеры использования:
   python tools/run_all.py start     # Запустить все
-  python tools/run_all.py stop      # Остановить все  
+  python tools/run_all.py stop      # Остановить все
   python tools/run_all.py restart   # Перезапустить все
   python tools/run_all.py status    # Показать статус
   python tools/run_all.py logs      # Показать логи
