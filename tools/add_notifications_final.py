@@ -79,9 +79,7 @@ def add_test_notifications():
 
                 # Show added notifications
                 for notification in result.data:
-                    print(
-                "telegram_id": 123456789
-                    )
+                    print("telegram_id: 123456789")
 
                 return True
             else:
