@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 17:31:34 UTC_
+_Generated on 2025-10-04 17:45:28 UTC_
 
 ```
 ├── .github/
@@ -67,6 +67,7 @@ _Generated on 2025-10-04 17:31:34 UTC_
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
+│   ├── SOURCES.md
 │   ├── SOURCES_CHECKER.md
 │   └── VISION.md
 ├── examples/
@@ -90,6 +91,7 @@ _Generated on 2025-10-04 17:31:34 UTC_
 │   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
+│   ├── categories.py
 │   ├── digest_ai_service.py
 │   ├── digest_service.py
 │   ├── notification_delivery_service.py
@@ -162,6 +164,7 @@ _Generated on 2025-10-04 17:31:34 UTC_
 │   ├── test_parsers.py
 │   ├── test_progress_animation.py
 │   ├── test_routes.py
+│   ├── test_sources.py
 │   ├── test_subscriptions.py
 │   ├── test_supabase.py
 │   ├── test_telegram_keyboards.py

@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS news (
   link         text,                                       -- исходная ссылка
   source       text NOT NULL,
   category     text,
+  subcategory  text,
   published_at timestamptz NOT NULL,
   credibility  numeric CHECK (credibility >= 0 AND credibility <= 1),
   importance   numeric CHECK (importance  >= 0 AND importance  <= 1),
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS news (
 ALTER TABLE news ADD COLUMN IF NOT EXISTS uid        text;
 ALTER TABLE news ADD COLUMN IF NOT EXISTS link       text;
 ALTER TABLE news ADD COLUMN IF NOT EXISTS category   text;
+ALTER TABLE news ADD COLUMN IF NOT EXISTS subcategory text;
 ALTER TABLE news ADD COLUMN IF NOT EXISTS credibility numeric;
 ALTER TABLE news ADD COLUMN IF NOT EXISTS importance  numeric;
 
@@ -68,6 +70,8 @@ CREATE TABLE IF NOT EXISTS events (
   country      text,                                       -- например: US, EU, CN
   country_code text,                                       -- нормализованный ISO-код (2–3 символа)
   currency     text,                                       -- USD, EUR, BTC и т.д.
+  category     text,                                       -- категория события
+  subcategory  text,                                       -- подкатегория события
   title        text NOT NULL,
   importance   int  CHECK (importance BETWEEN 1 AND 3),    -- 1..3 звезды
   priority     text,                                       -- low / medium / high (оригинальная градация парсера)
@@ -81,6 +85,8 @@ CREATE TABLE IF NOT EXISTS events (
 -- На случай, если таблица events уже была создана раньше — дублирующие ADD IF NOT EXISTS
 ALTER TABLE events ADD COLUMN IF NOT EXISTS event_id     text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS country_code text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS category     text;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS subcategory  text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS priority     text;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS importance   int;
 
