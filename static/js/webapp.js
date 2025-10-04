@@ -63,41 +63,77 @@ const iconMap = {
     'global_risks': 'alert-circle'
 };
 
-// Function to create icon (crypto or Lucide)
-function createIcon(iconKey, className = 'w-5 h-5') {
-    // Crypto icons mapping with inline SVG
-    const cryptoIcons = {
-        'btc': `<svg viewBox="0 0 32 32" class="${className}">
-                  <circle cx="16" cy="16" r="16" fill="#F7931A"/>
-                  <path fill="white" d="M20.315 13.312c-.314-2.1-2.2-3.05-4.7-3.3V6.5h-1.8v3.6h-1.4V6.5h-1.8v3.5c-.4 0-.8 0-1.2.1v-3.6H8.5v3.6c-.3 0-.6.1-.8.2L7 10.2l.8 1.2c.2.1.4.1.7.1v9.4c-.1 0-.2 0-.3 0l-.8 1.2-.8-1.2c-.2-.1-.4-.2-.7-.2v3.6h1.8v-3.6c.4 0 .8 0 1.2.1v3.5h1.8v-3.6h1.4v3.6h1.8v-3.6c2.5-.3 4.4-1.2 4.7-3.3.3-1.8-.5-2.8-1.3-3.3 1-.5 1.6-1.2 1.6-2.5zm-2.7 3.3c0 1.8-1.4 2.7-3.7 2.9v-5.8c2.3.2 3.7 1 3.7 2.9zm-3.7-4.5c-2.3-.2-3.7-1-3.7-2.8 0-1.8 1.4-2.7 3.7-2.9v5.7z"/>
-                </svg>`,
-        'eth': `<svg viewBox="0 0 32 32" class="${className}">
-                  <circle cx="16" cy="16" r="16" fill="#627EEA"/>
-                  <path fill="white" d="M16.498 4v8.87l7.497 3.35-7.497-12.22z"/>
-                  <path fill="white" d="M16.498 4L9 16.22l7.498-3.35V4z"/>
-                  <path fill="white" d="M16.498 21.968v6.027L24 17.616l-7.502 4.352z"/>
-                  <path fill="white" d="M16.498 27.995v-6.028L9 17.616l7.498 10.38z"/>
-                  <path fill="white" d="M16.498 20.573l7.497-4.353-7.497-3.348v7.701z"/>
-                  <path fill="white" d="M9 16.22l7.498 4.353v-7.701L9 16.22z"/>
-                </svg>`,
-        'bitcoin': `<svg viewBox="0 0 32 32" class="${className}">
-                      <circle cx="16" cy="16" r="16" fill="#F7931A"/>
-                      <path fill="white" d="M20.315 13.312c-.314-2.1-2.2-3.05-4.7-3.3V6.5h-1.8v3.6h-1.4V6.5h-1.8v3.5c-.4 0-.8 0-1.2.1v-3.6H8.5v3.6c-.3 0-.6.1-.8.2L7 10.2l.8 1.2c.2.1.4.1.7.1v9.4c-.1 0-.2 0-.3 0l-.8 1.2-.8-1.2c-.2-.1-.4-.2-.7-.2v3.6h1.8v-3.6c.4 0 .8 0 1.2.1v3.5h1.8v-3.6h1.4v3.6h1.8v-3.6c2.5-.3 4.4-1.2 4.7-3.3.3-1.8-.5-2.8-1.3-3.3 1-.5 1.6-1.2 1.6-2.5zm-2.7 3.3c0 1.8-1.4 2.7-3.7 2.9v-5.8c2.3.2 3.7 1 3.7 2.9zm-3.7-4.5c-2.3-.2-3.7-1-3.7-2.8 0-1.8 1.4-2.7 3.7-2.9v5.7z"/>
-                    </svg>`,
-        'ethereum': `<svg viewBox="0 0 32 32" class="${className}">
-                       <circle cx="16" cy="16" r="16" fill="#627EEA"/>
-                       <path fill="white" d="M16.498 4v8.87l7.497 3.35-7.497-12.22z"/>
-                       <path fill="white" d="M16.498 4L9 16.22l7.498-3.35V4z"/>
-                       <path fill="white" d="M16.498 21.968v6.027L24 17.616l-7.502 4.352z"/>
-                       <path fill="white" d="M16.498 27.995v-6.028L9 17.616l7.498 10.38z"/>
-                       <path fill="white" d="M16.498 20.573l7.497-4.353-7.497-3.348v7.701z"/>
-                       <path fill="white" d="M9 16.22l7.498 4.353v-7.701L9 16.22z"/>
-                     </svg>`
+// Cache for crypto icons
+const cryptoIconCache = new Map();
+
+// Function to get crypto icon URL from CoinGecko
+async function getCryptoIconUrl(cryptoId) {
+    if (cryptoIconCache.has(cryptoId)) {
+        return cryptoIconCache.get(cryptoId);
+    }
+    
+    try {
+        // CoinGecko API endpoint for coin data
+        const response = await fetch(`https://api.coingecko.com/api/v3/coins/${cryptoId}?localization=false&tickers=false&market_data=false&community_data=false&developer_data=false&sparkline=false`);
+        const data = await response.json();
+        
+        if (data.image && data.image.large) {
+            const iconUrl = data.image.large;
+            cryptoIconCache.set(cryptoId, iconUrl);
+            return iconUrl;
+        }
+    } catch (error) {
+        console.warn(`Failed to fetch icon for ${cryptoId}:`, error);
+    }
+    
+    // Fallback to direct CoinGecko CDN URLs
+    const fallbackUrls = {
+        'bitcoin': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+        'ethereum': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png'
     };
     
-    if (cryptoIcons[iconKey.toLowerCase()]) {
-        // Use inline SVG crypto icons
-        return cryptoIcons[iconKey.toLowerCase()];
+    return fallbackUrls[cryptoId] || null;
+}
+
+// Function to create icon (crypto or Lucide)
+function createIcon(iconKey, className = 'w-5 h-5') {
+    // Crypto icons mapping
+    const cryptoIconMap = {
+        'btc': 'bitcoin',
+        'eth': 'ethereum',
+        'bitcoin': 'bitcoin',
+        'ethereum': 'ethereum',
+        'altcoins': 'ethereum', // Fallback for altcoins
+        'defi': 'ethereum',     // Fallback for DeFi
+        'nft': 'ethereum',      // Fallback for NFT
+        'gamefi': 'ethereum'    // Fallback for GameFi
+    };
+    
+    const cryptoId = cryptoIconMap[iconKey.toLowerCase()];
+    
+    if (cryptoId) {
+        // Create a unique ID for this icon
+        const iconId = `crypto-icon-${cryptoId}-${Date.now()}`;
+        
+        // Start loading the icon asynchronously
+        getCryptoIconUrl(cryptoId).then(iconUrl => {
+            if (iconUrl) {
+                const img = document.getElementById(iconId);
+                if (img) {
+                    img.src = iconUrl;
+                    img.style.display = 'block';
+                    img.nextElementSibling.style.display = 'none';
+                }
+            }
+        });
+        
+        return `<img id="${iconId}" 
+                     src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNmMGYwZjAiLz4KPHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSI4IiB5PSI4Ij4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPgo8L3N2Zz4K" 
+                     alt="${iconKey}" 
+                     class="${className} rounded-full" 
+                     style="display:none;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <i data-lucide="coins" class="${className}"></i>`;
     } else {
         // Use Lucide icons for everything else
         const iconName = iconMap[iconKey] || 'activity';
@@ -382,8 +418,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 0);
         
         // Initialize Lucide icons after rendering
-        if (typeof lucide !== 'undefined' && lucide.createIcons) {
-            lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
         }
     }
     
