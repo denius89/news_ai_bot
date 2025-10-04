@@ -185,7 +185,7 @@ class ProcessManager:
 
             # Пытаемся освободить порт
             if cleanup_pid_file('webapp'):
-                print(f"✅ Процесс WebApp остановлен")
+                print("✅ Процесс WebApp остановлен")
                 time.sleep(2)  # Даем время порту освободиться
 
                 # Проверяем еще раз
