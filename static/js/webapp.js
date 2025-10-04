@@ -157,7 +157,7 @@ function getCryptoIconUrl(iconKey) {
     const symbol = cryptoSymbols[iconKey.toLowerCase()];
     if (symbol) {
         // Use jsDelivr CDN for cryptocurrency-icons
-        return `https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.0/svg/color/${symbol}.svg`;
+        return `https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.17.2/svg/color/${symbol}.svg`;
     }
     return null;
 }
