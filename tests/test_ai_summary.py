@@ -101,7 +101,11 @@ def test_generate_summary_why_important_json_structure():
             "choices": [
                 {
                     "message": {
-                        "content": '{"title": "Тестовая новость", "why_important": ["Важно для тестирования", "Проверяет структуру"]}'
+                        "content": (
+                            "{\"title\": \"Тестовая новость\", "
+                            "\"why_important\": [\"Важно для тестирования\", "
+                            "\"Проверяет структуру\"]}"
+                        )
                     }
                 }
             ]
@@ -155,7 +159,10 @@ def test_generate_summary_why_important_json_with_keys():
             "choices": [
                 {
                     "message": {
-                        "content": '{"title": "Bitcoin Price Surge", "why_important": ["Market impact", "Investment implications"]}'
+                        "content": (
+                            '{"title": "Bitcoin Price Surge", '
+                            '"why_important": ["Market impact", "Investment implications"]}'
+                        )
                     }
                 }
             ]
@@ -192,7 +199,10 @@ def test_generate_batch_summary_structure():
             "choices": [
                 {
                     "message": {
-                        "content": "📰 Дайджест новостей:\n\n1. News 1\n2. News 2\n\n<b>Почему это важно:</b>\n1. Важно для рынка\n2. Влияет на инвестиции"
+                        "content": (
+                            "📰 Дайджест новостей:\n\n1. News 1\n2. News 2\n\n"
+                            "<b>Почему это важно:</b>\n1. Важно для рынка\n2. Влияет на инвестиции"
+                        )
                     }
                 }
             ]

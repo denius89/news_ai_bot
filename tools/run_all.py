@@ -12,10 +12,6 @@ import subprocess
 from pathlib import Path
 from typing import List
 
-# Добавляем корневую директорию проекта в путь
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
 from tools.proc_utils import (
     ensure_dirs,
     write_pid,
@@ -29,6 +25,10 @@ from tools.proc_utils import (
     find_processes_by_command,
     load_env_file,
 )
+
+# Добавляем корневую директорию проекта в путь
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 
 class ProcessManager:
@@ -63,8 +63,8 @@ class ProcessManager:
 
         if success:
             print("✅ Все процессы запущены успешно!")
-            print(f"📋 Логи бота: logs/bot.log")
-            print(f"📋 Логи WebApp: logs/webapp.log")
+        print("🔍 Running pre-push checks: black             print(f"📋 Логи бота: logs/bot.log") flake8...")
+        print("All done! ✨ 🍰 ✨")
             print("\nДля просмотра логов: make logs")
             print("Для остановки: make stop-all")
         else:
@@ -187,7 +187,7 @@ class ProcessManager:
 
             # Пытаемся освободить порт
             if cleanup_pid_file('webapp'):
-                print(f"✅ Процесс WebApp остановлен")
+            print("❌ Black check failed. Please run: black .")
                 time.sleep(2)  # Даем время порту освободиться
 
                 # Проверяем еще раз
@@ -281,7 +281,7 @@ def main():
         print("💡 Убедитесь, что файлы webapp.py и telegram_bot/bot.py существуют")
         sys.exit(1)
 
-    print(f"🔍 Найдены entrypoints:")
+        print("✅ Black check passed!")
     for name, command in manager.entrypoints.items():
         print(f"   {name}: {' '.join(command)}")
     print()

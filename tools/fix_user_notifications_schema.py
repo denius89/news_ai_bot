@@ -83,7 +83,7 @@ def fix_schema():
 
         # Add test data using first user
         try:
-            users_  # result = supabase.table('users').select('id').limit(1).execute()
+            users_result = supabase.table('users').select('id').limit(1).execute()
             if users_result.data:
                 user_id = users_result.data[0]['id']
                 print(f"Using user_id: {user_id}")
@@ -107,7 +107,7 @@ def fix_schema():
                 print(f"✅ Added {len(test_notifications)} test notifications")
 
                 # Verify data
-                verify_  # result = supabase.table('user_notifications').select('*').execute()
+                verify_result = supabase.table('user_notifications').select('*').execute()
                 print(f"✅ Verification: {len(verify_result.data)} notifications in table")
                 for notification in verify_result.data:
                     print(f"  - {notification['title']} (read: {notification['read']})")
