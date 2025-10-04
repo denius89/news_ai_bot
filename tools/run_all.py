@@ -9,7 +9,6 @@ import sys
 import time
 import argparse
 import subprocess
-import socket
 from pathlib import Path
 from typing import List
 
