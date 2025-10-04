@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 17:04:37 UTC_
+_Generated on 2025-10-04 17:31:34 UTC_
 
 ```
 ├── .github/
@@ -67,6 +67,7 @@ _Generated on 2025-10-04 17:04:37 UTC_
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
+│   ├── SOURCES_CHECKER.md
 │   └── VISION.md
 ├── examples/
 │   └── telegram_sender_example.py
@@ -177,6 +178,7 @@ _Generated on 2025-10-04 17:04:37 UTC_
 │   ├── check_all_notifications.py
 │   ├── check_database.py
 │   ├── check_notifications_schema.py
+│   ├── check_sources.py
 │   ├── check_users_table.py
 │   ├── cleanup_database.py
 │   ├── create_notifications_table.py
