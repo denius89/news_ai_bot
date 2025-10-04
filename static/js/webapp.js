@@ -176,10 +176,9 @@ function createIcon(iconKey, className = 'w-4 h-4') {
                              src="${cryptoIconUrl}" 
                              alt="${iconKey}" 
                              class="${className}" 
-                             style="width: 16px; height: 16px;"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                        <span style="font-size: 16px;">🪙</span>`;
+                             style="width: 16px; height: 16px;">`;
             }
+            // Fallback to emoji if crypto icon fails
             return `<span style="font-size: 16px;">🪙</span>`;
             
         case 'emoji':
@@ -199,10 +198,17 @@ function getLogicalIcon(iconKey) {
     // Main category
     if (['crypto'].includes(lowerKey)) return { type: 'emoji', emoji: '🪙' };
     
-    // Use crypto icons for crypto subcategories
-    if (['btc', 'bitcoin', 'eth', 'ethereum', 'ltc', 'litecoin', 'altcoins', 'altcoin', 'defi', 'nft', 'gamefi', 'exchanges', 'regulation', 'security', 'market_trends'].includes(lowerKey)) {
-        return { type: 'crypto', symbol: cryptoSymbols[lowerKey] || 'btc' };
-    }
+    // Use mix of crypto icons and thematic emojis for crypto subcategories
+    if (['btc', 'bitcoin'].includes(lowerKey)) return { type: 'crypto', symbol: 'btc' };
+    if (['eth', 'ethereum'].includes(lowerKey)) return { type: 'crypto', symbol: 'eth' };
+    if (['ltc', 'litecoin', 'altcoins', 'altcoin'].includes(lowerKey)) return { type: 'crypto', symbol: 'ltc' };
+    if (['defi'].includes(lowerKey)) return { type: 'crypto', symbol: 'link' };
+    if (['nft'].includes(lowerKey)) return { type: 'emoji', emoji: '🎨' };
+    if (['gamefi'].includes(lowerKey)) return { type: 'emoji', emoji: '🎮' };
+    if (['exchanges'].includes(lowerKey)) return { type: 'emoji', emoji: '🏦' };
+    if (['regulation'].includes(lowerKey)) return { type: 'emoji', emoji: '⚖️' };
+    if (['security'].includes(lowerKey)) return { type: 'emoji', emoji: '🔒' };
+    if (['market_trends'].includes(lowerKey)) return { type: 'emoji', emoji: '📊' };
     
     // === SPORTS CATEGORY ===
     // Main category
