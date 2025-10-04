@@ -3,8 +3,8 @@
 // Icon mapping for categories and subcategories
 const iconMap = {
     // Crypto
-    'btc': 'bitcoin',
-    'eth': 'ethereum', 
+    'bitcoin': 'bitcoin',  // Will use crypto icon
+    'ethereum': 'ethereum',  // Will use crypto icon
     'altcoins': 'coins',
     'defi': 'trending-up',
     'nft': 'layers',
@@ -63,10 +63,28 @@ const iconMap = {
     'global_risks': 'alert-circle'
 };
 
-// Function to create Lucide icon
+// Function to create icon (crypto or Lucide)
 function createIcon(iconKey, className = 'w-5 h-5') {
-    const iconName = iconMap[iconKey] || 'activity';
-    return `<i data-lucide="${iconName}" class="${className}"></i>`;
+    // Crypto icons mapping
+    const cryptoIconMap = {
+        'btc': 'bitcoin',
+        'eth': 'ethereum',
+        'bitcoin': 'bitcoin',
+        'ethereum': 'ethereum'
+    };
+    
+    if (cryptoIconMap[iconKey.toLowerCase()]) {
+        // Use crypto icons for specific cryptocurrencies
+        const cryptoIconName = cryptoIconMap[iconKey.toLowerCase()];
+        return `<img src="https://cryptocurrency-icons.s3.us-east-2.amazonaws.com/32/color/${cryptoIconName}.png" 
+                     alt="${iconKey}" class="${className} rounded-full" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                <i data-lucide="coins" class="${className}" style="display:none;"></i>`;
+    } else {
+        // Use Lucide icons for everything else
+        const iconName = iconMap[iconKey] || 'activity';
+        return `<i data-lucide="${iconName}" class="${className}"></i>`;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {

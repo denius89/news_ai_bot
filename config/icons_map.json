@@ -1,6 +1,6 @@
 {
-  "btc": "bitcoin",
-  "eth": "ethereum", 
+  "bitcoin": "bitcoin",
+  "ethereum": "ethereum", 
   "altcoins": "coins",
   "defi": "trending-up",
   "nft": "layers",
