@@ -504,9 +504,9 @@ class TestSubscriptionsAPI:
     def test_get_user_subscriptions(self, mock_get_subscriptions, client):
         """Test GET /api/subscriptions."""
         mock_subscriptions = [
-            {'category': 'crypto'}, 
-            {'category': 'economy'}, 
-            {'category': 'technology'}
+            {'category': 'crypto'},
+            {'category': 'economy'},
+            {'category': 'technology'},
         ]
         mock_get_subscriptions.return_value = mock_subscriptions
 

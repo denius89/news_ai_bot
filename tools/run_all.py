@@ -185,12 +185,12 @@ class ProcessManager:
         if port and not check_port_available(port):
             print(f"⚠️  Порт {port} занят!")
             print("🛑 Пытаемся освободить порт...")
-            
+
             # Пытаемся освободить порт
             if cleanup_pid_file('webapp'):
                 print(f"✅ Процесс WebApp остановлен")
                 time.sleep(2)  # Даем время порту освободиться
-                
+
                 # Проверяем еще раз
                 if check_port_available(port):
                     print(f"✅ Порт {port} освобожден")
