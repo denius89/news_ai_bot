@@ -80,7 +80,7 @@ def add_test_notifications():
                 # Show added notifications
                 for notification in result.data:
                     print(
-                        f"  - {notification['title']} (read: {notification['read']}, category: {notification['category']})"
+                "telegram_id": 123456789
                     )
 
                 return True

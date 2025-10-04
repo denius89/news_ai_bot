@@ -73,10 +73,10 @@ def main():
     print("=" * 50)
     if success:
         print("✅ Test completed!")
-        sys.exit(0)
+        exit(0)
     else:
         print("❌ Test failed!")
-        sys.exit(1)
+        exit(1)
 
 
 if __name__ == "__main__":
