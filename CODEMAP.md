@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 15:05:11 UTC_
+_Generated on 2025-10-05 15:32:35 UTC_
 
 ```
 ├── .github/
@@ -84,8 +84,10 @@ _Generated on 2025-10-05 15:05:11 UTC_
 │   └── news.py
 ├── parsers/
 │   ├── __init__.py
+│   ├── advanced_parser.py
 │   ├── async_rss_parser.py
 │   ├── events_parser.py
+│   ├── README_ADVANCED_PARSER.md
 │   ├── rss_parser.py
 │   └── universal_rss_parser.py
 ├── repositories/
@@ -149,6 +151,7 @@ _Generated on 2025-10-05 15:05:11 UTC_
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
+│   ├── test_advanced_parser.py
 │   ├── test_ai_modules.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
@@ -185,6 +188,7 @@ _Generated on 2025-10-05 15:05:11 UTC_
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
+│   ├── fetch_and_store_news.py
 │   ├── fill_ai_analysis_all.py
 │   ├── port_manager.py
 │   ├── README_daily_digests.md
@@ -209,6 +213,7 @@ _Generated on 2025-10-05 15:05:11 UTC_
 ├── .flake8
 ├── .gitignore
 ├── .pre-commit-config.yaml
+├── ADVANCED_PARSER_REPORT.md
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
