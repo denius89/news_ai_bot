@@ -104,7 +104,7 @@ jobs:
           pip install safety bandit
 
       - name: Security check (Safety)
-        run: safety check
+        run: safety scan
         continue-on-error: true
 
       - name: Security check (Bandit)
