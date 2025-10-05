@@ -5,19 +5,16 @@
 import asyncio
 import hashlib
 import logging
-from datetime import timezone
+import sys
+import aiohttp
+import feedparser
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import sys
-from pathlib import Path
+from dateutil import parser as dtp
 
 sys.path.append(str(Path(__file__).parent.parent))
-
-import aiohttp
-import feedparser
-from dateutil import parser as dtp
-from datetime import datetime, timezone
 
 from utils.clean_text import clean_text
 from services.categories import get_all_sources
@@ -189,7 +186,6 @@ async def async_parse_and_save():
 async def compare_sync_vs_async():
     """Сравнивает производительность синхронного и асинхронного парсинга."""
     import time
-    from parsers.rss_parser import parse_all_sources
 
     # Тест асинхронного парсинга
     logger.info("🔄 Тестируем асинхронный парсинг...")
@@ -197,7 +193,7 @@ async def compare_sync_vs_async():
     async_news = await parse_all_sources_async(per_source_limit=3)
     async_time = time.time() - start_time
 
-    logger.info(f"📊 Результаты асинхронного парсинга:")
+    logger.info("📊 Результаты асинхронного парсинга:")
     logger.info(f"  Async: {len(async_news)} новостей за {async_time:.2f}с")
 
 

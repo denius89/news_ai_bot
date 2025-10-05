@@ -1,7 +1,6 @@
 import hashlib
 import logging
 from datetime import timezone
-from pathlib import Path
 from typing import Dict, List, Optional
 
 import requests

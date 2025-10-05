@@ -1,10 +1,7 @@
 import logging
-import asyncio
 from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
-
-from services.digest_service import build_daily_digest
 from services.async_digest_service import async_digest_service
 from services.categories import get_categories
 from utils.clean_text import clean_for_telegram
