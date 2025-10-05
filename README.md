@@ -375,4 +375,4 @@ MVP в активной разработке. Фокус — минимальн�
 ## Contacts
 
 Автор: [@denius89](https://github.com/denius89)  
-Лицензия: [MIT](https://github.com/denius89/news_ai_bot/blob/main/LICENSE)
+Лицензия: [MIT](https://github.com/denius89/news_ai_bot/blob/main/LICENSE)# GitHub Actions test
