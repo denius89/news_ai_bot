@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:43:20 UTC_
+_Generated on 2025-10-05 09:58:38 UTC_
 
 ```
 ├── .github/
@@ -109,7 +109,9 @@ _Generated on 2025-10-05 09:43:20 UTC_
 │   ├── notification_delivery_service.py
 │   ├── notification_service.py
 │   ├── subscription_service.py
-│   └── telegram_notification_service.py
+│   ├── telegram_notification_service.py
+│   ├── unified_digest_service.py
+│   └── unified_user_service.py
 ├── static/
 │   ├── assets/
 │   │   └── logo/
@@ -182,6 +184,7 @@ _Generated on 2025-10-05 09:43:20 UTC_
 │   ├── test_supabase.py
 │   ├── test_telegram_keyboards.py
 │   ├── test_telegram_sender.py
+│   ├── test_unified_services.py
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/

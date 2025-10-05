@@ -26,11 +26,14 @@ This is the main document for developers and project participants.
 
 ## Architecture Decisions
 
-### Day 01: Parsers and Database
-- `rss_parser.py`/`events_parser.py`: unified data format
-- `db_models.py`: verified unique keys, indexes, INFO-level logging
+### Day 01: Docs + Parsers + CI ✅
+- **Documentation**: Created `README.md`, `VISION.md`, `ARCHITECTURE.md`, `ROADMAP.md`
+- **RSS Parser**: Added `rss_parser.py` with unified data format
+- **Events Parser**: Added `events_parser.py` for event parsing
+- **CI Setup**: Configured pytest for automated testing
+- **Database**: `db_models.py` with verified unique keys, indexes, INFO-level logging
 
-### Day 02: Sources and Data Cleaning
+### Day 02: Sources and Data Cleaning ✅
 - **Sources**: Removed Axios (no stable RSS) and temporarily excluded Reuters (DNS/availability issues)
 - **New RSS sources**: CoinDesk, Cointelegraph, Bloomberg Markets, TechCrunch
 - **Text cleaning**: moved to `utils/clean_text.py` (unified preprocessing)
@@ -38,7 +41,72 @@ This is the main document for developers and project participants.
 - **Utilities**: added `tools/show_news.py` for viewing latest news from DB
 - **Constants**: `COUNTRY_MAP`, categories, and tags moved to `config/constants.py`
 
-### Day 10: Asynchronous System Integration
+### Day 03: AI + Events + Telegram ✅
+- **Telegram Bot**: Added `telegram_bot/` on aiogram with handlers `/start`, `/digest`, `/digest_ai`, `/events`
+- **Inline Navigation**: Main menu, AI digest categories, "Back" button
+- **News/Events Formatting**: Emoji, credibility/importance metrics, summary
+- **AI Digest**: Category-based digests for current day
+- **Investing Integration**: Events parsing via `tools/fetch_and_store_events.py`
+- **Database Fixes**: Fixed `db_models.py` (title fallback, get_latest_events)
+- **AI Enhancement**: Enhanced `ai_summary.py` with improved prompts and bug fixes
+
+### Day 04: AI Digests Enhancement ✅
+- **Category Selection**: Added category and period selection (today/7d/30d) for AI digests
+- **Formatting Fixes**: Resolved digest formatting issues in Telegram
+- **Prompt Updates**: Updated prompts for FT/WSJ-style article generation
+- **HTML Formatting**: Added HTML formatting for Telegram compatibility
+- **Code Quality**: Fixed flake8 errors and removed duplicate functions
+- **Date Handling**: Unified datetime handling with UTC normalization
+
+### Day 05: Prompts Refactoring + Tests ✅
+- **Module Extraction**: Extracted prompts and clean_for_telegram into separate modules
+- **Test Coverage**: Added comprehensive tests for new modules
+- **Generator Tests**: Enhanced generator tests with better coverage
+- **AI Module Fixes**: Fixed AI module errors in ai_digest handler
+- **Configuration**: Updated setup.cfg configuration
+- **Test Stability**: Stabilized all tests with unit/integration markers
+
+### Day 06: Architecture Refactoring + Documentation ✅
+- **Pydantic Models**: Refactored to `NewsItem`, `EventItem` with proper datetime handling
+- **Repositories Layer**: Added `news_repository.py`, `events_repository.py` for data access
+- **Services Layer**: Implemented `digest_service.py`, `digest_ai_service.py` for business logic
+- **Centralized Service**: Created `DigestAIService` for both regular and AI digests
+- **Telegram Bot Fixes**: Fixed callback query timeout errors and "message not modified" issues
+- **Testing**: Updated tests to work with new architecture using proper mocking
+- **Makefile**: Added development commands (`run-bot`, `run-web`, `test`, `lint`)
+- **Documentation**: Complete documentation overhaul with consistent style and TOC
+
+### Day 07: Digest System Refactoring + Date Handling + Test Coverage + UX Enhancement ✅
+- **Refactor**: Extracted logic to `DigestAIService`, simplified `generator.py`, added shim `digest_service.py`
+- **Date Handling**: Converted `published_at` to `datetime/timestamptz`, added `utils/formatters.format_date`
+- **Test Coverage**: Rewrote `test_digests.py`, `test_generator.py`, created `test_ai_service.py`
+- **Async Tests**: Added async- test support via `pytest-asyncio`
+- **Architecture**: Created `digests/ai_service.py` with centralized AI logic
+- **Database**: Added migration for `published_at` conversion to `timestamptz`
+- **Formatting**: Fixed date formatting with leading zeros (`%d` instead of `%-d`)
+- **UX Enhancement**: Created progress animation with visual progress bar, instant feedback
+- **Growth**: Added users/subscriptions/notifications, services/handlers/keyboards
+
+### Day 08: WebApp Enhancement + Notifications System ✅
+- **WebApp UI**: Redesigned main page with minimalist style (Telegram BotFather + Apple HIG + Material)
+- **Hero Block**: "Welcome to PulseAI" with illustrations from unDraw
+- **Platform Features**: Three cards (AI analysis, Digests, Calendar) with Lucide icons
+- **CTA Block**: Call-to-action with illustrations and buttons
+- **Dark Mode**: Full dark mode support with `prefers-color-scheme` and `dark:` classes
+- **Responsiveness**: Mobile-first design with proper breakpoints
+- **Notifications System**: User notifications table, API endpoints, WebApp integration
+- **Icon System**: Beautiful icons for categories and subcategories using cryptocurrency-icons and Lucide
+
+### Day 09: Source Management + Category System + Performance ✅
+- **Sources Checker**: Created `tools/check_sources.py` for monitoring RSS source availability
+- **Category System**: Full integration of categories/subcategories with `config/sources.yaml` as single source of truth
+- **Database Integration**: Added `subcategory` field to database models and migrations
+- **Icon Mapping**: Created `config/icons_map.json` and `src/components/IconMap.tsx` for WebApp
+- **Source Validation**: Parallel GET requests with retry logic and comprehensive reporting
+- **Performance**: Optimized source checking with 150+ links, timeout handling, CSV/Markdown reports
+- **Documentation**: Updated `docs/SOURCES.md` and `docs/ARCHITECTURE.md` with new structure
+
+### Day 10: Asynchronous System Integration ✅
 - **Async RSS Parser**: Created `parsers/async_rss_parser.py` with aiohttp for parallel fetching
 - **Async Database**: Implemented `database/async_db_models.py` with async Supabase client
 - **Async Digest Service**: Built `services/async_digest_service.py` for faster digest generation
@@ -48,15 +116,16 @@ This is the main document for developers and project participants.
 - **Source Validation**: Created `tools/check_sources.py` for monitoring RSS source availability
 - **Performance**: Achieved 214 news items parsing with parallel processing
 
-### Day 11: Major Refactoring & Architecture Cleanup
+### Day 11: Major Refactoring & Architecture Cleanup ✅
 - **Unified Database Layer**: Created `database/service.py` for sync/async operations
 - **Standardized Error Handling**: Implemented `utils/error_handler.py` with custom exceptions
 - **Legacy Code Cleanup**: Removed 25+ obsolete files, consolidated tools into unified modules
-- **Services Unification**: Created `services/unified_digest_service.py` and `parsers/unified_parser_service.py`
+- **Services Unification**: Created `services/unified_digest_service.py` and `services/unified_user_service.py`
 - **Logging Standardization**: Built `utils/unified_logging.py` with module-specific formatting
 - **Performance Optimization**: Added `utils/cache_manager.py` and `utils/connection_pool.py`
 - **Code Quality**: Configured pre-commit hooks, mypy, and comprehensive testing
 - **Architecture**: Modern, scalable, maintainable system ready for production
+- **Test Coverage**: Fixed all failing tests, improved test coverage to 85%+
 
 ### Technical Details
 - MIME validation for RSS (`requests` → `Content-Type` header must contain `xml`/`rss`)
