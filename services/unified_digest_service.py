@@ -20,7 +20,7 @@ logger = logging.getLogger("unified_digest_service")
 class UnifiedDigestService:
     """
     Unified digest service for both sync and async operations.
-    
+
     This class provides a clean interface for generating both regular and AI digests,
     automatically choosing between sync and async implementations based on the method called.
     """
@@ -57,9 +57,7 @@ class UnifiedDigestService:
         """
         try:
             news_items = self.db_service.get_latest_news(
-                source=source,
-                categories=categories,
-                limit=limit
+                source=source, categories=categories, limit=limit
             )
 
             if not news_items:
@@ -91,9 +89,7 @@ class UnifiedDigestService:
         """
         try:
             news_items = await self.db_service.async_get_latest_news(
-                source=source,
-                categories=categories,
-                limit=limit
+                source=source, categories=categories, limit=limit
             )
 
             if not news_items:
@@ -132,10 +128,7 @@ class UnifiedDigestService:
             if categories is None and category is not None:
                 categories = [category]
 
-            news_items = self.db_service.get_latest_news(
-                categories=categories,
-                limit=limit
-            )
+            news_items = self.db_service.get_latest_news(categories=categories, limit=limit)
 
             if not news_items:
                 cat_display = categories[0] if categories else category or "all"
@@ -145,10 +138,7 @@ class UnifiedDigestService:
             cat_display = categories[0] if categories else category or "all"
             ai_service = DigestAIService()
             ai_digest = ai_service.generate_ai_digest(
-                news_items=news_items,
-                category=cat_display,
-                style=style,
-                period=period
+                news_items=news_items, category=cat_display, style=style, period=period
             )
 
             return clean_for_telegram(ai_digest)
@@ -184,8 +174,7 @@ class UnifiedDigestService:
                 categories = [category]
 
             news_items = await self.db_service.async_get_latest_news(
-                categories=categories,
-                limit=limit
+                categories=categories, limit=limit
             )
 
             if not news_items:
@@ -196,10 +185,7 @@ class UnifiedDigestService:
             cat_display = categories[0] if categories else category or "all"
             ai_service = DigestAIService()
             ai_digest = ai_service.generate_ai_digest(
-                news_items=news_items,
-                category=cat_display,
-                style=style,
-                period=period
+                news_items=news_items, category=cat_display, style=style, period=period
             )
 
             return clean_for_telegram(ai_digest)
@@ -227,14 +213,12 @@ class UnifiedDigestService:
         """
         try:
             news_items = self.db_service.get_latest_news(
-                categories=categories,
-                limit=limit * 2  # Get more to filter by importance
+                categories=categories, limit=limit * 2  # Get more to filter by importance
             )
 
             # Filter by importance
             filtered_items = [
-                item for item in news_items
-                if item.get('importance', 0) >= min_importance
+                item for item in news_items if item.get('importance', 0) >= min_importance
             ]
 
             return filtered_items[:limit]
@@ -262,14 +246,12 @@ class UnifiedDigestService:
         """
         try:
             news_items = await self.db_service.async_get_latest_news(
-                categories=categories,
-                limit=limit * 2  # Get more to filter by importance
+                categories=categories, limit=limit * 2  # Get more to filter by importance
             )
 
             # Filter by importance
             filtered_items = [
-                item for item in news_items
-                if item.get('importance', 0) >= min_importance
+                item for item in news_items if item.get('importance', 0) >= min_importance
             ]
 
             return filtered_items[:limit]

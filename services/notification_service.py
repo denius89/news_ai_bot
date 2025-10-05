@@ -65,7 +65,9 @@ class NotificationService:
             logger.error("❌ Error getting user notifications: %s", e)
             return []
 
-    async def create_notification(self, user_id: int, title: str, text: str, notification_type: str = "info") -> bool:
+    async def create_notification(
+        self, user_id: int, title: str, text: str, notification_type: str = "info"
+    ) -> bool:
         """
         Create a new notification for user.
 
@@ -85,7 +87,7 @@ class NotificationService:
                 "message": text,
                 "category": notification_type,
                 "read": False,
-                "timestamp": datetime.now(timezone.utc).isoformat()
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
 
             if self.async_mode:
@@ -95,7 +97,9 @@ class NotificationService:
                 )
             else:
                 self.db_service.safe_execute(
-                    self.db_service.sync_client.table("user_notifications").insert(notification_data)
+                    self.db_service.sync_client.table("user_notifications").insert(
+                        notification_data
+                    )
                 )
 
             logger.info("✅ Created notification for user %d: %s", user_id, title)
@@ -219,8 +223,10 @@ class NotificationService:
             Number of deleted notifications
         """
         try:
-            cutoff_date = datetime.now(timezone.utc).replace(day=datetime.now(timezone.utc).day - days_old)
-            
+            cutoff_date = datetime.now(timezone.utc).replace(
+                day=datetime.now(timezone.utc).day - days_old
+            )
+
             if self.async_mode:
                 client = await self.db_service._get_async_client()
                 result = await self.db_service.async_safe_execute(
@@ -260,7 +266,7 @@ class NotificationService:
             settings_data = {
                 "user_id": user_id,
                 "auto_digest_enabled": enabled,
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "updated_at": datetime.now(timezone.utc).isoformat(),
             }
 
             if self.async_mode:
@@ -270,7 +276,9 @@ class NotificationService:
                 )
             else:
                 self.db_service.safe_execute(
-                    self.db_service.sync_client.table("user_settings").upsert(settings_data, on_conflict="user_id")
+                    self.db_service.sync_client.table("user_settings").upsert(
+                        settings_data, on_conflict="user_id"
+                    )
                 )
 
             status = "enabled" if enabled else "disabled"
@@ -345,7 +353,9 @@ async def enable_auto_digest(user_id: int, enabled: bool = True) -> bool:
     return await service.enable_auto_digest(user_id, enabled)
 
 
-async def create_notification(user_id: int, title: str, text: str, notification_type: str = "info") -> bool:
+async def create_notification(
+    user_id: int, title: str, text: str, notification_type: str = "info"
+) -> bool:
     """Backward compatibility function for creating notifications."""
     service = get_async_notification_service()
     return await service.create_notification(user_id, title, text, notification_type)

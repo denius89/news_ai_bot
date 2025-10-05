@@ -1,11 +1,11 @@
 # Этот файл устарел. Используйте parsers/unified_parser.py
 # Импортируем новый унифицированный парсер для обратной совместимости
 from parsers.unified_parser import (
-    UnifiedParser, 
-    parse_source, 
+    UnifiedParser,
+    parse_source,
     parse_all_sources,
     get_sync_parser,
-    get_async_parser
+    get_async_parser,
 )
 
 import logging

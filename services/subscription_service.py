@@ -43,9 +43,7 @@ class SubscriptionService:
             if self.async_mode:
                 client = await self.db_service._get_async_client()
                 result = await self.db_service.async_safe_execute(
-                    client.table("subscriptions")
-                    .select("category")
-                    .eq("user_id", user_id)
+                    client.table("subscriptions").select("category").eq("user_id", user_id)
                 )
             else:
                 result = self.db_service.safe_execute(
@@ -55,17 +53,17 @@ class SubscriptionService:
                 )
 
             subscriptions = result.data or []
-            
+
             # Group by categories
             categories = set()
-            
+
             for sub in subscriptions:
                 if sub.get("category"):
                     categories.add(sub["category"])
 
             return {
                 "categories": list(categories),
-                "subcategories": []  # Not implemented in current schema
+                "subcategories": [],  # Not implemented in current schema
             }
 
         except Exception as e:
@@ -87,19 +85,25 @@ class SubscriptionService:
             if self.async_mode:
                 client = await self.db_service._get_async_client()
                 await self.db_service.async_safe_execute(
-                    client.table("subscriptions").upsert({
-                        "user_id": user_id,
-                        "category": category,
-                        "created_at": datetime.now(timezone.utc).isoformat()
-                    }, on_conflict="user_id,category")
+                    client.table("subscriptions").upsert(
+                        {
+                            "user_id": user_id,
+                            "category": category,
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                        },
+                        on_conflict="user_id,category",
+                    )
                 )
             else:
                 self.db_service.safe_execute(
-                    self.db_service.sync_client.table("subscriptions").upsert({
-                        "user_id": user_id,
-                        "category": category,
-                        "created_at": datetime.now(timezone.utc).isoformat()
-                    }, on_conflict="user_id,category")
+                    self.db_service.sync_client.table("subscriptions").upsert(
+                        {
+                            "user_id": user_id,
+                            "category": category,
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                        },
+                        on_conflict="user_id,category",
+                    )
                 )
 
             logger.info("✅ User %d subscribed to category %s", user_id, category)
@@ -125,24 +129,32 @@ class SubscriptionService:
             if self.async_mode:
                 client = await self.db_service._get_async_client()
                 await self.db_service.async_safe_execute(
-                    client.table("user_subscriptions").upsert({
-                        "user_id": user_id,
-                        "category": category,
-                        "subcategory": subcategory,
-                        "created_at": datetime.now(timezone.utc).isoformat()
-                    }, on_conflict="user_id,category,subcategory")
+                    client.table("user_subscriptions").upsert(
+                        {
+                            "user_id": user_id,
+                            "category": category,
+                            "subcategory": subcategory,
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                        },
+                        on_conflict="user_id,category,subcategory",
+                    )
                 )
             else:
                 self.db_service.safe_execute(
-                    self.db_service.sync_client.table("user_subscriptions").upsert({
-                        "user_id": user_id,
-                        "category": category,
-                        "subcategory": subcategory,
-                        "created_at": datetime.now(timezone.utc).isoformat()
-                    }, on_conflict="user_id,category,subcategory")
+                    self.db_service.sync_client.table("user_subscriptions").upsert(
+                        {
+                            "user_id": user_id,
+                            "category": category,
+                            "subcategory": subcategory,
+                            "created_at": datetime.now(timezone.utc).isoformat(),
+                        },
+                        on_conflict="user_id,category,subcategory",
+                    )
                 )
 
-            logger.info("✅ User %d subscribed to subcategory %s/%s", user_id, category, subcategory)
+            logger.info(
+                "✅ User %d subscribed to subcategory %s/%s", user_id, category, subcategory
+            )
             return True
 
         except Exception as e:
@@ -184,7 +196,9 @@ class SubscriptionService:
             logger.error("❌ Error unsubscribing from category: %s", e)
             return False
 
-    async def unsubscribe_from_subcategory(self, user_id: int, category: str, subcategory: str) -> bool:
+    async def unsubscribe_from_subcategory(
+        self, user_id: int, category: str, subcategory: str
+    ) -> bool:
         """
         Unsubscribe user from a subcategory.
 
@@ -215,14 +229,18 @@ class SubscriptionService:
                     .eq("subcategory", subcategory)
                 )
 
-            logger.info("✅ User %d unsubscribed from subcategory %s/%s", user_id, category, subcategory)
+            logger.info(
+                "✅ User %d unsubscribed from subcategory %s/%s", user_id, category, subcategory
+            )
             return True
 
         except Exception as e:
             logger.error("❌ Error unsubscribing from subcategory: %s", e)
             return False
 
-    async def is_subscribed(self, user_id: int, category: str, subcategory: Optional[str] = None) -> bool:
+    async def is_subscribed(
+        self, user_id: int, category: str, subcategory: Optional[str] = None
+    ) -> bool:
         """
         Check if user is subscribed to category or subcategory.
 
@@ -243,7 +261,7 @@ class SubscriptionService:
                     .eq("user_id", user_id)
                     .eq("category", category)
                 )
-                
+
                 result = await self.db_service.async_safe_execute(query)
             else:
                 query = (
@@ -252,7 +270,7 @@ class SubscriptionService:
                     .eq("user_id", user_id)
                     .eq("category", category)
                 )
-                
+
                 result = self.db_service.safe_execute(query)
 
             return len(result.data or []) > 0

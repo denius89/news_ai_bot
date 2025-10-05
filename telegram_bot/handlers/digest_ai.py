@@ -237,7 +237,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
         # Subscribe user to category
         subscription_service = get_async_subscription_service()
         success = await subscription_service.subscribe_to_category(user_id, category)
-        
+
         if success:
             await query.answer(f"✅ Подписка на {category_name} активирована!", show_alert=True)
         else:
@@ -263,10 +263,11 @@ async def cb_enable_auto_digest(query: types.CallbackQuery):
         # Enable auto-digest notifications
         notification_service = get_async_notification_service()
         success = await notification_service.enable_auto_digest(user_id, enabled=True)
-        
+
         if success:
             await query.answer(
-                "✅ Авто-дайджест включен! Буду присылать дайджесты каждый день в 9:00", show_alert=True
+                "✅ Авто-дайджест включен! Буду присылать дайджесты каждый день в 9:00",
+                show_alert=True,
             )
         else:
             await query.answer("❌ Ошибка при включении авто-дайджеста", show_alert=True)

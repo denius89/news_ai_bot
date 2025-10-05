@@ -1,7 +1,7 @@
 """
 Simplified Unified Database Service for PulseAI.
 
-This module provides a clean, simplified interface for both synchronous 
+This module provides a clean, simplified interface for both synchronous
 and asynchronous database operations without complex coroutine handling.
 """
 
@@ -36,7 +36,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 class DatabaseService:
     """
     Simplified unified database service for both sync and async operations.
-    
+
     This class provides a clean interface without complex coroutine handling.
     Separate instances should be used for sync and async operations.
     """
@@ -51,7 +51,7 @@ class DatabaseService:
         self.async_mode = async_mode
         self.sync_client: Optional[Client] = None
         self.async_client: Optional[AsyncClient] = None
-        
+
         if async_mode:
             self._init_async_client()
         else:
@@ -62,7 +62,7 @@ class DatabaseService:
         if not SUPABASE_URL or not SUPABASE_KEY:
             logger.warning("⚠️ Supabase credentials not found")
             return
-            
+
         try:
             self.sync_client = create_client(SUPABASE_URL, SUPABASE_KEY)
             logger.info("✅ Sync Supabase client initialized")
@@ -74,7 +74,7 @@ class DatabaseService:
         if not SUPABASE_URL or not SUPABASE_KEY:
             logger.warning("⚠️ Supabase credentials not found")
             return
-            
+
         try:
             # For async client, we'll initialize it in the async context
             self.async_client = None
@@ -109,7 +109,7 @@ class DatabaseService:
             except (httpx.RemoteProtocolError, httpx.ConnectError, httpx.TimeoutException) as e:
                 logger.warning("⚠️ Attempt %d/%d: connection error %s", attempt + 1, retries, e)
                 if attempt < retries - 1:
-                    time.sleep(delay * (2 ** attempt))  # Exponential backoff
+                    time.sleep(delay * (2**attempt))  # Exponential backoff
                 else:
                     raise
             except Exception as e:
@@ -132,9 +132,11 @@ class DatabaseService:
             try:
                 return await query.execute()
             except (httpx.RemoteProtocolError, httpx.ConnectError, httpx.TimeoutException) as e:
-                logger.warning("⚠️ Attempt %d/%d: async connection error %s", attempt + 1, retries, e)
+                logger.warning(
+                    "⚠️ Attempt %d/%d: async connection error %s", attempt + 1, retries, e
+                )
                 if attempt < retries - 1:
-                    await asyncio.sleep(delay * (2 ** attempt))  # Exponential backoff
+                    await asyncio.sleep(delay * (2**attempt))  # Exponential backoff
                 else:
                     raise
             except Exception as e:
@@ -164,7 +166,9 @@ class DatabaseService:
             logger.warning("⚠️ Sync Supabase client not available")
             return []
 
-        logger.debug("get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+        logger.debug(
+            "get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit
+        )
 
         query = (
             self.sync_client.table("news")
@@ -189,6 +193,7 @@ class DatabaseService:
             for item in news_items:
                 if item.get("published_at"):
                     from utils.dates import format_datetime
+
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
             logger.info("✅ Retrieved %d news items", len(news_items))
@@ -258,7 +263,9 @@ class DatabaseService:
             logger.error("❌ Failed to get async client: %s", e)
             return []
 
-        logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+        logger.debug(
+            "async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit
+        )
 
         query = (
             client.table("news")
@@ -283,6 +290,7 @@ class DatabaseService:
             for item in news_items:
                 if item.get("published_at"):
                     from utils.dates import format_datetime
+
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
             logger.info("✅ Async: retrieved %d news items", len(news_items))
@@ -423,6 +431,7 @@ class DatabaseService:
             SHA256 hash as UID
         """
         import hashlib
+
         return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
 
     def close(self):
