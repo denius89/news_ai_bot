@@ -1,13 +1,12 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 20:15:22 UTC_
+_Generated on 2025-10-05 20:16:41 UTC_
 
 ```
 ├── .github/
 │   └── workflows/
 │       ├── daily-digest.yml
-│       ├── integration.yml
-│       └── tests.yml
+│       └── integration.yml
 ├── .ruff_cache/
 │   ├── 0.13.2/
 │   │   ├── 10116034348768675673
