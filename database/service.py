@@ -73,12 +73,23 @@ class DatabaseService:
         """Initialize asynchronous Supabase client."""
         if SUPABASE_URL and SUPABASE_KEY:
             try:
-                self.async_client = create_async_client(SUPABASE_URL, SUPABASE_KEY)
-                logger.info("✅ Async Supabase client initialized")
+                # create_async_client возвращает корутину, которую нужно await'ить
+                # Но поскольку это синхронный метод, мы откладываем инициализацию
+                # до первого использования в асинхронном контексте
+                self._async_client_coroutine = create_async_client(SUPABASE_URL, SUPABASE_KEY)
+                self.async_client = None  # Будет инициализирован при первом использовании
+                logger.info("✅ Async Supabase client coroutine created")
             except Exception as e:
                 logger.error("❌ Ошибка инициализации Async Supabase: %s", e)
         else:
             logger.warning("⚠️ Async Supabase не инициализирован (нет ключей)")
+
+    async def _ensure_async_client(self):
+        """Ensure async client is initialized."""
+        if self.async_client is None and hasattr(self, '_async_client_coroutine'):
+            self.async_client = await self._async_client_coroutine
+            logger.info("✅ Async Supabase client initialized")
+        return self.async_client
 
     def safe_execute(self, query, retries: int = 3, delay: int = 2):
         """
@@ -171,6 +182,13 @@ class DatabaseService:
         try:
             result = self.safe_execute(query)
             news_items = result.data or []
+            
+            # Добавляем форматированные даты для обратной совместимости
+            for item in news_items:
+                if item.get("published_at"):
+                    from utils.dates import format_datetime
+                    item["published_at_fmt"] = format_datetime(item["published_at"])
+            
             logger.info("✅ Получено %d новостей", len(news_items))
             return news_items
         except Exception as e:
@@ -194,6 +212,8 @@ class DatabaseService:
         Returns:
             List of news dictionaries
         """
+        # Обеспечиваем инициализацию асинхронного клиента
+        await self._ensure_async_client()
         if not self.async_client:
             logger.warning("⚠️ Async Supabase не подключён")
             return []
@@ -220,6 +240,13 @@ class DatabaseService:
         try:
             result = await self.async_safe_execute(query)
             news_items = result.data or []
+            
+            # Добавляем форматированные даты для обратной совместимости
+            for item in news_items:
+                if item.get("published_at"):
+                    from utils.dates import format_datetime
+                    item["published_at_fmt"] = format_datetime(item["published_at"])
+            
             logger.info("✅ Async: получено %d новостей", len(news_items))
             return news_items
         except Exception as e:

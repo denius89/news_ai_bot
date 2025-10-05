@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 16:09:04 UTC_
+_Generated on 2025-10-05 17:41:25 UTC_
 
 ```
 ├── .github/
@@ -42,6 +42,9 @@ _Generated on 2025-10-05 16:09:04 UTC_
 │   ├── logging.yaml
 │   ├── settings.py
 │   ├── sources.backup.20251005.yaml
+│   ├── sources.backup.before_distribute.20251005_182653.yaml
+│   ├── sources.backup.merged.yaml
+│   ├── sources.backup.smart_distribute.20251005_182824.yaml
 │   └── sources.yaml
 ├── database/
 │   ├── migrations/
@@ -189,14 +192,19 @@ _Generated on 2025-10-05 16:09:04 UTC_
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
+│   ├── clean_old_news.py
+│   ├── distribute_sources.py
 │   ├── fetch_and_store_news.py
 │   ├── fill_ai_analysis_all.py
+│   ├── load_fresh_news.py
+│   ├── merge_sources.py
 │   ├── port_manager.py
 │   ├── README_daily_digests.md
 │   ├── refresh_news.py
 │   ├── repo_map.py
 │   ├── run_all.py
 │   ├── send_daily_digests.py
+│   ├── smart_distribute_sources.py
 │   ├── test_advanced_parser.py
 │   ├── update_news_with_universal_parser.py
 │   ├── update_rss_sources.py
@@ -220,6 +228,7 @@ _Generated on 2025-10-05 16:09:04 UTC_
 ├── ADVANCED_PARSER_TEST_RESULTS.md
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
+├── FINAL_REPORT_DAY11.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -230,6 +239,7 @@ _Generated on 2025-10-05 16:09:04 UTC_
 ├── README.md
 ├── requirements.txt
 ├── RSS_PARSER_ANALYSIS_REPORT.md
+├── RSS_UPDATE_FINAL_REPORT.md
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md

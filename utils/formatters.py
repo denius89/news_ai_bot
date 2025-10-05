@@ -66,60 +66,43 @@ def format_digest_output(data: Union[str, Dict[str, Any]], style: str = "analyti
 
 def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int] = None) -> str:
     """
-    HTML-блок одной новости с метриками, датой и ссылкой.
-    Поддерживает как объекты NewsItem, так и словари.
+    Современный формат новости для Telegram в стиле BBC/Bloomberg.
+    Чистый, структурный, легко читаемый.
     """
     # Поддерживаем как объекты, так и словари
     if isinstance(item, dict):
         title_raw = (item.get('title') or item.get('source') or "Untitled").strip()
         link = item.get('link') or ""
         source = escape(item.get('source') or "—")
-        published = format_date(item.get('published_at'))
+        published = item.get('published_at_fmt') or format_date(item.get('published_at')) or "—"
         cred = float(item.get('credibility') or 0.0)
         imp = float(item.get('importance') or 0.0)
     else:
         title_raw = (item.title or item.source or "Untitled").strip()
         link = item.link or ""
         source = escape(item.source or "—")
-        published = format_date(item.published_at)
+        published = getattr(item, 'published_at_fmt', None) or format_date(item.published_at) or "—"
         cred = float(item.credibility or 0.0)
         imp = float(item.importance or 0.0)
 
     title = escape(title_raw)
-    cred_icon = "✅" if cred > 0.7 else "⚠️" if cred > 0.4 else "❌"
-    imp_icon = "🔥" if imp > 0.7 else "⚡" if imp > 0.4 else "💤"
-
-    # Получаем контент
-    if isinstance(item, dict):
-        content = item.get('content') or ""
-    else:
-        content = item.content or ""
-
-    summary = content.strip()
-    if len(summary) > 260:
-        summary = summary[:259] + "…"
-    summary = escape(summary)
-
-    prefix = f"{index}. " if index is not None else ""
-    title_line = (
-        f"<b>{prefix}<a href=\"{escape(link)}\">{title}</a></b>"
-        if link
-        else f"<b>{prefix}{title}</b>"
-    )
-
-    if summary:
-        return (
-            f"\n{title_line}\n"
-            f"{source} · {published}\n"
-            f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
-            f"{imp_icon} <b>Importance:</b> {imp:.2f}\n"
-            f"— {summary}"
-        )
+    
+    # Новые эмодзи и форматирование
+    cred_icon = "✅" if cred > 0.7 else "⚖️" if cred > 0.4 else "⚖️"
+    imp_icon = "⚡"  # Унифицированная иконка для Trend
+    
+    # Очищаем URL от трекинговых параметров
+    clean_link = link
+    if clean_link and "?" in clean_link:
+        clean_link = clean_link.split("?")[0]
+    
+    # Новый современный формат в две строки
     return (
-        f"\n{title_line}\n"
-        f"{source} · {published}\n"
-        f"{cred_icon} <b>Credibility:</b> {cred:.2f} · "
-        f"{imp_icon} <b>Importance:</b> {imp:.2f}"
+        f"📰 <b>{title}</b>\n"
+        f"🗞️ {source}\n"
+        f"📅 {published}\n"
+        f"⚡ Trend: {imp:.1f}  {cred_icon} Relevance: {cred:.1f}\n"
+        f"🔗 <a href=\"{escape(clean_link)}\">{clean_link}</a>"
     )
 
 
@@ -127,16 +110,24 @@ def format_news(
     news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True
 ) -> str:
     """
-    Полный HTML-дайджест: заголовок и нумерованный список новостей.
+    Современный дайджест в стиле BBC/Bloomberg с разделителями между новостями.
     """
     if not news_list:
         if with_header:
-            return "📰 <b>Дайджест новостей:</b>\n\nСегодня новостей нет."
+            return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
         return "Сегодня новостей нет."
+    
     items = news_list[:limit] if limit else news_list
-    lines: List[str] = ["📰 <b>Дайджест новостей:</b>"] if with_header else []
-    for idx, it in enumerate(items, start=1):
-        lines.append(format_news_item(it, index=idx))
+    lines: List[str] = ["📰 <b>Дайджест новостей</b>\n"] if with_header else []
+    
+    for i, item in enumerate(items):
+        # Добавляем новость без нумерации
+        lines.append(format_news_item(item))
+        
+        # Добавляем разделитель между новостями (кроме последней)
+        if i < len(items) - 1:
+            lines.append("───────────────")
+    
     text = "\n".join(lines)
     return text if len(text) <= 4000 else text[:3999] + "…"
 

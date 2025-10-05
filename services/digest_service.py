@@ -35,29 +35,11 @@ class DigestService:
             # Используем совместимый вызов, чтобы позволить тестам подменять поведение через monkeypatch
             news = get_latest_news(limit=limit, categories=categories)
             if not news:
-                return "DIGEST: Сегодня новостей нет.", []
+                return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет.", []
 
-            # простой список новостей
-            lines = []
-            for i, item in enumerate(news, 1):
-                # Поддерживаем как объекты, так и словари
-                if isinstance(item, dict):
-                    title = item.get('title') or "Без заголовка"
-                    date = item.get('published_at_fmt') or "—"
-                    link = item.get('link')
-                else:
-                    title = item.title or "Без заголовка"
-                    date = item.published_at_fmt or "—"
-                    link = item.link
-
-                if link:
-                    lines.append(f'{i}. <b>{title}</b> [{date}] — <a href="{link}">Подробнее</a>')
-                else:
-                    lines.append(f"{i}. <b>{title}</b> [{date}]")
-
-            # Используем единый форматтер новостей
+            # Используем новый современный форматтер новостей
             body = format_news(news, limit=len(news), with_header=True)
-            digest_text = f"DIGEST: {body}"
+            digest_text = body  # Убираем префикс "DIGEST:"
             return digest_text, news
 
         except Exception as e:
