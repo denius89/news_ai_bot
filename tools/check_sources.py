@@ -139,10 +139,16 @@ class SourceChecker:
         total_sources = 0
         
         for category, subcategories in sources_data.items():
-            for subcategory, sources in subcategories.items():
+            for subcategory, subcategory_data in subcategories.items():
+                if isinstance(subcategory_data, dict) and 'sources' in subcategory_data:
+                    sources = subcategory_data['sources']
+                else:
+                    sources = subcategory_data
+                
                 for source in sources:
-                    tasks.append((category, subcategory, source['name'], source['url']))
-                    total_sources += 1
+                    if isinstance(source, dict) and 'name' in source and 'url' in source:
+                        tasks.append((category, subcategory, source['name'], source['url']))
+                        total_sources += 1
 
         print(f"🔍 Начинаем проверку {total_sources} источников с {self.max_workers} потоками...")
         

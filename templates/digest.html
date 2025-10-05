@@ -14,9 +14,7 @@
 
             <a href="/digest?{% for c in new_categories %}category={{ c }}&{% endfor %}"
                class="chip-filter {{ cat }} {% if is_active %}active{% endif %}">
-                {% if cat == "crypto" %}📊{% elif cat == "economy" %}💰
-                {% elif cat == "world" %}🌍{% elif cat == "technology" %}⚙️
-                {% elif cat == "politics" %}🏛️{% endif %}
+                <!-- Используем emoji из новой системы категорий -->
                 <span>{{ cat.capitalize() }}</span>
             </a>
         {% endfor %}
@@ -44,7 +42,10 @@
         <!-- Футер -->
         <div class="card-footer">
             <span class="source-link">{{ item.source }}</span> ·
-            <span class="card-category">{{ item.category or "—" }}</span> ·
+            <span class="card-category">{{ item.category or "—" }}</span>
+            {% if item.subcategory and item.subcategory != 'general' %}
+                <span class="card-subcategory"> → {{ item.subcategory }}</span>
+            {% endif %} ·
 
             {% set cred = item.get('credibility', 0) %}
             <span class="credibility-value

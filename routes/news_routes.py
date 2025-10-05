@@ -6,6 +6,7 @@ import logging
 from flask import Blueprint, render_template, request
 
 from services.digest_service import build_daily_digest
+from services.categories import get_categories
 from database.db_models import (
     get_latest_events,
 )  # пока оставим здесь (можно позже вынести в EventsService)
@@ -42,7 +43,7 @@ def digest():
     return render_template(
         "digest.html",
         news=news_items,
-        all_categories=["crypto", "economy", "world", "technology", "politics"],
+        all_categories=get_categories(),  # Используем новую систему категорий
         active_categories=categories,
         digest_text=digest_text,
         active_page="digest",

@@ -5,7 +5,8 @@ from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
 
 from services.digest_service import build_daily_digest
-from digests.configs import CATEGORIES
+from services.async_digest_service import async_digest_service
+from services.categories import get_categories
 from utils.clean_text import clean_for_telegram
 from models.news import NewsItem
 
@@ -29,9 +30,10 @@ def select_news_by_importance(news_list: list[NewsItem], limit: int) -> list[New
 
 def categories_keyboard() -> types.InlineKeyboardMarkup:
     """Формируем inline-клавиатуру для выбора категории"""
+    categories = get_categories()
     keyboard = [
-        [types.InlineKeyboardButton(text=label, callback_data=f"digest:{key}")]
-        for key, label in CATEGORIES.items()
+        [types.InlineKeyboardButton(text=cat.title(), callback_data=f"digest:{cat}")]
+        for cat in categories
     ]
     keyboard.append(
         [types.InlineKeyboardButton(text="🌐 Все категории", callback_data="digest:all")]
@@ -48,9 +50,10 @@ async def send_digest(
     """Формирует дайджест для выбранной категории (или общего потока)."""
     cats = None if (category is None or category == "all") else [category]
 
-    # ⚡️ переносим в threadpool чтобы не блокировать event loop
-    # Используем переданный limit вместо фиксированного значения 50
-    digest_text, news = await asyncio.to_thread(build_daily_digest, limit, "analytical", cats)
+    # ⚡️ используем асинхронный сервис дайджестов
+    digest_text, news = await async_digest_service.build_daily_digest(
+        limit=limit, style="analytical", categories=cats
+    )
 
     # Используем готовый текст из сервиса, чтобы сохранить метрики важности/актуальности
     text = digest_text

@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/Users/denisfedko/news_ai_bot/telegram_bot/bot.py", line 17, in <module>
-    raise RuntimeError("❌ TELEGRAM_BOT_TOKEN is not set in environment")
-RuntimeError: ❌ TELEGRAM_BOT_TOKEN is not set in environment

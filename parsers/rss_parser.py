@@ -93,7 +93,7 @@ def parse_source(url: str, category: str, subcategory: str, source_name: str) ->
                     "uid": uid,
                     "title": title,
                     "content": content,
-                    "url": entry.get("link", ""),
+                    "link": entry.get("link", ""),  # Исправлено: url -> link
                     "source": source_name,
                     "category": category,
                     "subcategory": subcategory,

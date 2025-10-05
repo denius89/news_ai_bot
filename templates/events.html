@@ -33,7 +33,12 @@
                     {% endif %}
                     {{ ev.currency or "" }}
                 </td>
-                <td>{{ ev.title or "—" }}</td>
+                <td>
+                    {{ ev.title or "—" }}
+                    {% if ev.subcategory and ev.subcategory != 'general' %}
+                        <br><small class="text-muted">{{ ev.category }} → {{ ev.subcategory }}</small>
+                    {% endif %}
+                </td>
                 <td>
                     {% if ev.importance == 1 %}
                         <span class="importance-low">⭐ Low</span>
@@ -81,6 +86,9 @@
         </div>
 
         <div class="event-title">{{ ev.title or "—" }}</div>
+        {% if ev.subcategory and ev.subcategory != 'general' %}
+            <div class="event-category">{{ ev.category }} → {{ ev.subcategory }}</div>
+        {% endif %}
 
         <div class="event-meta">
             {% if ev.importance == 1 %}

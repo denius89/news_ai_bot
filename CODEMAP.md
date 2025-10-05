@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-04 19:55:05 UTC_
+_Generated on 2025-10-05 08:28:53 UTC_
 
 ```
 ├── .github/
@@ -45,6 +45,7 @@ _Generated on 2025-10-04 19:55:05 UTC_
 ├── database/
 │   ├── migrations/
 │   │   ├── 2025_01_04_add_subcategory_field.sql
+│   │   ├── 2025_01_05_add_published_at_fmt.sql
 │   │   ├── 2025_10_01_published_at_datetime.sql
 │   │   ├── 2025_10_02_add_missing_columns.sql
 │   │   ├── 2025_10_02_add_updated_at.sql
@@ -53,6 +54,7 @@ _Generated on 2025-10-04 19:55:05 UTC_
 │   │   ├── 2025_10_02_subscriptions_notifications.sql
 │   │   └── 2025_10_03_user_notifications.sql
 │   ├── __init__.py
+│   ├── async_db_models.py
 │   ├── create_user_notifications_table.sql
 │   ├── db_models.py
 │   ├── init_tables.sql
@@ -83,6 +85,7 @@ _Generated on 2025-10-04 19:55:05 UTC_
 │   └── news.py
 ├── parsers/
 │   ├── __init__.py
+│   ├── async_rss_parser.py
 │   ├── events_parser.py
 │   └── rss_parser.py
 ├── repositories/
@@ -96,6 +99,7 @@ _Generated on 2025-10-04 19:55:05 UTC_
 │   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
+│   ├── async_digest_service.py
 │   ├── categories.py
 │   ├── digest_ai_service.py
 │   ├── digest_service.py
@@ -198,12 +202,15 @@ _Generated on 2025-10-04 19:55:05 UTC_
 │   ├── debug_user_lookup.py
 │   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
+│   ├── fill_ai_analysis.py
+│   ├── fill_ai_analysis_all.py
 │   ├── fix_old_news.py
 │   ├── fix_user_notifications_schema.py
 │   ├── optimize_database.py
 │   ├── port_manager.py
 │   ├── proc_utils.py
 │   ├── README_daily_digests.md
+│   ├── refresh_news.py
 │   ├── repo_map.py
 │   ├── run_all.py
 │   ├── send_daily_digests.py
@@ -228,14 +235,6 @@ _Generated on 2025-10-04 19:55:05 UTC_
 ├── .env.example
 ├── .flake8
 ├── .gitignore
-├── =2025.1
-├── =6.1.0
-├── bot_clean.log
-├── bot_correct.log
-├── bot_final.log
-├── bot_fixed.log
-├── bot_new.log
-├── bot_working.log
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -249,11 +248,5 @@ _Generated on 2025-10-04 19:55:05 UTC_
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md
-├── test_digest_debug.py
-├── test_flask_digest.py
-├── test_webapp_debug.html
-├── test_webapp_demo.html
-├── webapp.py
-├── webapp_fresh.log
-└── webapp_new.log
+└── webapp.py
 ```

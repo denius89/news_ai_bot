@@ -115,7 +115,8 @@ def fetch_investing_events(limit_days: int = 2):
                             "forecast": clean_text(row.find("td", class_="forecast")),
                             "previous": clean_text(row.find("td", class_="previous")),
                             "source": "investing",
-                            "category": "macro",
+                            "category": "markets",
+                            "subcategory": "macro",
                         }
                     )
                 except Exception as e:

@@ -40,9 +40,16 @@ class DigestService:
             # простой список новостей
             lines = []
             for i, item in enumerate(news, 1):
-                title = item.title or "Без заголовка"
-                date = item.published_at_fmt or "—"
-                link = item.link
+                # Поддерживаем как объекты, так и словари
+                if isinstance(item, dict):
+                    title = item.get('title') or "Без заголовка"
+                    date = item.get('published_at_fmt') or "—"
+                    link = item.get('link')
+                else:
+                    title = item.title or "Без заголовка"
+                    date = item.published_at_fmt or "—"
+                    link = item.link
+                
                 if link:
                     lines.append(f'{i}. <b>{title}</b> [{date}] — <a href="{link}">Подробнее</a>')
                 else:
@@ -59,23 +66,31 @@ class DigestService:
 
     def build_ai_digest(
         self,
-        category: Optional[str],
-        period: str,
-        style: str,
+        categories: Optional[List[str]] = None,
+        category: Optional[str] = None,  # Backward compatibility
+        period: str = "daily",
+        style: str = "analytical",
         limit: int = 20,
     ) -> str:
         """
-        Формирует AI-дайджест для выбранной категории и периода.
-        Пока period не используется (заготовка для будущих фильтров).
+        Формирует AI-дайджест для выбранных категорий/подкатегорий и периода.
+        Поддерживает как новую систему (categories), так и старую (category).
         """
         try:
+            # Поддержка обратной совместимости
+            if categories is None and category is not None:
+                categories = [category]
+            
             news_items = self.news_repo.get_recent_news(
-                limit=limit, categories=[category] if category else None
+                limit=limit, categories=categories
             )
             if not news_items:
-                return f"AI DIGEST (cat={category}): Сегодня новостей нет."
+                cat_display = categories[0] if categories else category or "all"
+                return f"AI DIGEST (cat={cat_display}): Сегодня новостей нет."
+            
             # Используем AI сервис для генерации
-            return self.ai_service.generate_ai_digest(news_items, style=style, category=category)
+            cat_display = categories[0] if categories else category or "all"
+            return self.ai_service.generate_ai_digest(news_items, style=style, category=cat_display)
         except Exception as e:
             logger.error("Ошибка при формировании AI-дайджеста: %s", e, exc_info=True)
             return "⚠️ Ошибка при генерации AI-дайджеста."

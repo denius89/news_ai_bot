@@ -56,5 +56,26 @@
     <main class="page-content">
         {% block content %}{% endblock %}
     </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Интерактивность для табов (chip-filter)
+        document.addEventListener('DOMContentLoaded', function() {
+            const chipFilters = document.querySelectorAll('.chip-filter');
+            
+            chipFilters.forEach(chip => {
+                chip.addEventListener('click', function(e) {
+                    // Плавная анимация
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                    
+                    // НЕ перехватываем клик - позволяем браузеру перейти по ссылке
+                    // Визуальное состояние будет обновлено после загрузки новой страницы
+                });
+            });
+        });
+    </script>
 </body>
 </html>
