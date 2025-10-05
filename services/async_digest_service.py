@@ -30,40 +30,12 @@ class AsyncDigestService:
             # Используем асинхронный вызов
             news = await async_get_latest_news(limit=limit, categories=categories)
             if not news:
-                return "DIGEST: Сегодня новостей нет.", []
+                return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет.", []
 
-            # простой список новостей
-            lines = []
-            for i, item in enumerate(news, 1):
-                title = item.get('title') or "Без заголовка"
-                date = item.get('published_at_fmt') or "—"
-                link = item.get('link')
-
-                # Добавляем важность и достоверность
-                importance = item.get('importance', 0)
-                credibility = item.get('credibility', 0)
-
-                # Форматируем строку с метриками
-                metrics = ""
-                if importance > 0:
-                    importance_icon = (
-                        "🔥" if importance > 0.7 else "⚠️" if importance > 0.4 else "📰"
-                    )
-                    credibility_icon = (
-                        "✅" if credibility > 0.7 else "⚠️" if credibility > 0.4 else "❌"
-                    )
-                    metrics = (
-                        f" {importance_icon}{importance:.2f} {credibility_icon}{credibility:.2f}"
-                    )
-
-                line = f"{i}. {title}{metrics}"
-                if link:
-                    line += f"\n   🔗 {link}"
-                line += f"\n   📅 {date}"
-                lines.append(line)
-
-            digest_text = "\n\n".join(lines)
-            return digest_text, news
+            # Используем новый современный форматтер новостей
+            from utils.formatters import format_news
+            body = format_news(news, limit=len(news), with_header=True)
+            return body, news
 
         except Exception as e:
             logger.error(f"Ошибка при формировании дайджеста: {e}")

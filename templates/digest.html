@@ -25,49 +25,64 @@
 {% block content %}
 <div class="container">
     {% for item in news %}
-    <div class="card">
+    <div class="news-card">
+        <!-- Источник и дата -->
+        <div class="news-card__meta">
+            <div class="news-card__source">
+                <span class="news-card__source-icon">🗞️</span>
+                <span class="news-card__source-name">{{ item.source }}</span>
+            </div>
+            <div class="news-card__date">{{ item.published_at_fmt or "—" }}</div>
+        </div>
+
         <!-- Заголовок -->
-        <h2 class="card-title card-title--calm">
-            <a href="{{ item.link }}" target="_blank" class="card-link">
+        <h2 class="news-card__title">
+            <a href="{{ item.link }}" target="_blank" class="news-card__link">
                 {{ item.title }}
             </a>
         </h2>
 
-        <!-- Дата -->
-        <div class="card-date">{{ item.published_at_fmt or "—" }}</div>
+        <!-- Описание -->
+        <p class="news-card__description">{{ item.content or "Нет текста" }}</p>
 
-        <!-- Краткое содержание -->
-        <p class="card-summary">{{ item.content or "Нет текста" }}</p>
-
-        <!-- Футер -->
-        <div class="card-footer">
-            <span class="source-link">{{ item.source }}</span> ·
-            <span class="card-category">{{ item.category or "—" }}</span>
-            {% if item.subcategory and item.subcategory != 'general' %}
-                <span class="card-subcategory"> → {{ item.subcategory }}</span>
-            {% endif %} ·
-
-            {% set cred = item.get('credibility', 0) %}
-            <span class="credibility-value
-                {% if cred > 0.7 %}high
-                {% elif cred > 0.4 %}medium
-                {% else %}low{% endif %}">
-                {% if cred > 0.7 %}
-                    ✅ {{ "%.2f"|format(cred) }}
-                {% elif cred > 0.4 %}
-                    ⚠️ {{ "%.2f"|format(cred) }}
-                {% else %}
-                    ❌ {{ "%.2f"|format(cred) }}
+        <!-- Категории и метрики -->
+        <div class="news-card__footer">
+            <!-- Категории -->
+            <div class="news-card__categories">
+                <span class="news-card__category news-card__category--{{ item.category }}">
+                    {{ item.category.capitalize() }}
+                </span>
+                {% if item.subcategory and item.subcategory != 'general' %}
+                    <span class="news-card__subcategory">{{ item.subcategory }}</span>
                 {% endif %}
-            </span> ·
+            </div>
 
-            {% set imp = item.get('importance', 0) %}
-            <span class="importance-value
-                {% if imp > 0.7 %}high
-                {% elif imp > 0.4 %}medium
-                {% else %}low{% endif %}">
-                🔥 {{ "%.2f"|format(imp) }}
-            </span>
+            <!-- Метрики -->
+            <div class="news-card__metrics">
+                {% set cred = item.get('credibility', 0) %}
+                <div class="news-card__metric">
+                    <span class="news-card__metric-icon">📊</span>
+                    <span class="news-card__metric-label">Relevance</span>
+                    <div class="news-card__progress-bar">
+                        <div class="news-card__progress-fill news-card__progress-fill--credibility
+                            {% if cred > 0.7 %}high{% elif cred > 0.4 %}medium{% else %}low{% endif %}"
+                            style="width: {{ (cred * 100)|round }}%"></div>
+                    </div>
+                    <span class="news-card__metric-value">{{ (cred * 100)|round }}%</span>
+                </div>
+
+                {% set imp = item.get('importance', 0) %}
+                <div class="news-card__metric">
+                    <span class="news-card__metric-icon">📈</span>
+                    <span class="news-card__metric-label">Trend</span>
+                    <div class="news-card__progress-bar">
+                        <div class="news-card__progress-fill news-card__progress-fill--importance
+                            {% if imp > 0.7 %}high{% elif imp > 0.4 %}medium{% else %}low{% endif %}"
+                            style="width: {{ (imp * 100)|round }}%"></div>
+                    </div>
+                    <span class="news-card__metric-value">{{ (imp * 100)|round }}%</span>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}

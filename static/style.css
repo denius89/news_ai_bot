@@ -183,8 +183,8 @@ body {
   
   /* Active states for dark theme */
   .chip-filter.crypto.active {
-    background: rgba(0,122,255,0.25);
-    color: #007AFF;
+    background: rgba(255,193,7,0.25);
+    color: #FFC107;
     border-color: transparent;
   }
   .chip-filter.sports.active {
@@ -203,8 +203,8 @@ body {
     border-color: transparent;
   }
   .chip-filter.world.active {
-    background: rgba(10,132,255,0.25);
-    color: #0A84FF;
+    background: rgba(156,39,176,0.25);
+    color: #9C27B0;
     border-color: transparent;
   }
 }
@@ -214,8 +214,8 @@ body {
 }
 /* Chips color variants */
 .chip-filter.crypto.active, .chip-filter.crypto:hover {
-  background: rgba(0,122,255,0.15);
-  color: var(--color-primary);
+  background: rgba(255,193,7,0.15);
+  color: #FFC107;
   border-color: transparent;
 }
 .chip-filter.sports.active, .chip-filter.sports:hover {
@@ -234,8 +234,8 @@ body {
   border-color: transparent;
 }
 .chip-filter.world.active, .chip-filter.world:hover {
-  background: rgba(10,132,255,0.15);
-  color: var(--color-info);
+  background: rgba(156,39,176,0.15);
+  color: #9C27B0;
   border-color: transparent;
 }
 
@@ -243,7 +243,7 @@ body {
 .container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  gap: 16px;
   margin-top: 20px;
 }
 .card {
@@ -262,6 +262,216 @@ body {
   box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
+/* === Modern News Card Design === */
+.news-card {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #e8e8e8;
+}
+
+.news-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border-color: #d0d0d0;
+}
+
+.news-card:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Мета-информация */
+.news-card__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+.news-card__source {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.news-card__source-icon {
+  font-size: 14px;
+}
+
+.news-card__source-name {
+  color: #444;
+}
+
+.news-card__date {
+  color: #888;
+  font-size: 12px;
+}
+
+/* Заголовок */
+.news-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 12px 0;
+  color: #1a1a1a;
+}
+
+.news-card__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.news-card__link:hover {
+  color: #007AFF;
+}
+
+/* Описание */
+.news-card__description {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #555;
+  margin: 0 0 16px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Футер */
+.news-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Категории */
+.news-card__categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.news-card__category {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.news-card__category--crypto {
+  background: rgba(255,193,7,0.15);
+  color: #B8860B;
+}
+
+.news-card__category--markets {
+  background: rgba(255,149,0,0.15);
+  color: #CC6600;
+}
+
+.news-card__category--sports {
+  background: rgba(76,217,100,0.15);
+  color: #2E7D32;
+}
+
+.news-card__category--tech {
+  background: rgba(255,59,48,0.15);
+  color: #C62828;
+}
+
+.news-card__category--world {
+  background: rgba(156,39,176,0.15);
+  color: #7B1FA2;
+}
+
+.news-card__subcategory {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: rgba(0,0,0,0.05);
+  color: #666;
+}
+
+/* Метрики */
+.news-card__metrics {
+  display: flex;
+  gap: 16px;
+}
+
+.news-card__metric {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  flex: 1;
+}
+
+.news-card__metric-icon {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.news-card__metric-label {
+  color: #666;
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.news-card__progress-bar {
+  flex: 1;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 6px;
+}
+
+.news-card__progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.news-card__progress-fill--credibility.high {
+  background: linear-gradient(90deg, #4CAF50, #66BB6A);
+}
+
+.news-card__progress-fill--credibility.medium {
+  background: linear-gradient(90deg, #FF9800, #FFB74D);
+}
+
+.news-card__progress-fill--credibility.low {
+  background: linear-gradient(90deg, #F44336, #EF5350);
+}
+
+.news-card__progress-fill--importance.high {
+  background: linear-gradient(90deg, #2196F3, #42A5F5);
+}
+
+.news-card__progress-fill--importance.medium {
+  background: linear-gradient(90deg, #FF9800, #FFB74D);
+}
+
+.news-card__progress-fill--importance.low {
+  background: linear-gradient(90deg, #9E9E9E, #BDBDBD);
+}
+
+.news-card__metric-value {
+  color: #333;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+}
+
+
 @media (prefers-color-scheme: dark) {
   .card {
     background: #1A1A1A;
@@ -274,6 +484,50 @@ body {
   
   .card-summary {
     color: #C0C0C0;
+  }
+
+  /* Dark theme for news cards */
+  .news-card {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .news-card:hover {
+    border-color: #444;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+
+  .news-card__source-name {
+    color: #e0e0e0;
+  }
+
+  .news-card__date {
+    color: #aaa;
+  }
+
+  .news-card__title {
+    color: #f0f0f0;
+  }
+
+  .news-card__description {
+    color: #bbb;
+  }
+
+  .news-card__subcategory {
+    background: rgba(255,255,255,0.1);
+    color: #ccc;
+  }
+
+  .news-card__metric-label {
+    color: #aaa;
+  }
+
+  .news-card__progress-bar {
+    background: #333;
+  }
+
+  .news-card__metric-value {
+    color: #e0e0e0;
   }
 }
 .card-title {
@@ -469,13 +723,48 @@ body {
 /* === Mobile adaptation === */
 @media (max-width: 768px) {
   .page-content { padding: 16px 12px; }
-  .container { display: flex; flex-direction: column; gap: 14px; }
-  .card {
+  .container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    grid-template-columns: 1fr;
+  }
+  
+  .news-card {
+    max-width: none;
     padding: 16px;
+  }
+  
+  .news-card__metrics {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .news-card__metric {
+    gap: 8px;
+  }
+  .card {
     border-radius: 12px;
     box-shadow: none;
     border: 1px solid #EAEAEA;
     min-height: unset;
+  }
+  
+  .card-header {
+    padding: 16px;
+  }
+  
+  .card-metrics {
+    padding: 12px 16px;
+  }
+  
+  .card-content {
+    padding: 12px 16px 16px;
+  }
+  
+  .card-scores {
+    flex-direction: column;
+    gap: 8px;
   }
   .card-date { font-size: 12px; color: #999; margin-bottom: 6px; }
   .card-summary { font-size: 13px; -webkit-line-clamp: 2; display: -webkit-box; overflow: hidden; margin-bottom: 8px; }
@@ -707,12 +996,28 @@ img.illustration {
   
   .container {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
+  }
+  
+  .news-card {
+    max-width: none;
+    padding: 18px;
   }
   
   .card {
-    padding: 16px;
-    min-height: 200px;
+    min-height: 240px;
+  }
+  
+  .card-header {
+    padding: 18px 18px 14px;
+  }
+  
+  .card-metrics {
+    padding: 14px 18px;
+  }
+  
+  .card-content {
+    padding: 14px 18px 18px;
   }
   
   .card-title {
@@ -744,9 +1049,32 @@ img.illustration {
     padding: 12px 8px;
   }
   
+  .news-card {
+    padding: 14px;
+  }
+  
+  .news-card__title {
+    font-size: 16px;
+  }
+  
+  .news-card__description {
+    font-size: 13px;
+  }
+  
   .card {
-    padding: 12px;
-    min-height: 180px;
+    min-height: 200px;
+  }
+  
+  .card-header {
+    padding: 14px 14px 12px;
+  }
+  
+  .card-metrics {
+    padding: 12px 14px;
+  }
+  
+  .card-content {
+    padding: 12px 14px 14px;
   }
   
   .card-title {

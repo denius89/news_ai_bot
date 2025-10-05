@@ -159,6 +159,10 @@ markets:
       url: https://sharedsecurity.net/feed
       category: crypto
       subcategory: regulation
+misc:
+  uncategorized:
+    icon: ''
+    sources: []
 sports:
   badminton:
     icon: badminton

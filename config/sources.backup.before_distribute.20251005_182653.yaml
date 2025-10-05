@@ -1,0 +1,857 @@
+crypto:
+  altcoins:
+    icon: altcoin
+    sources:
+    - name: thecryptobasic.com
+      url: https://thecryptobasic.com/feed
+    - name: cryptocurrencynewscast.online
+      url: https://www.cryptocurrencynewscast.online/feed
+    - name: blog.coinjar.com
+      url: https://blog.coinjar.com/feed
+    - name: financemagnates.com
+      url: https://www.financemagnates.com/cryptocurrency/feed
+    - name: blog.luke.lol
+      url: https://blog.luke.lol/category/cryptocurrency/feed
+    - name: coinstats.app
+      url: https://coinstats.app/blog/feed
+    - name: coinworldstory.com
+      url: https://coinworldstory.com/feed
+    - name: cryptoinfos.eu
+      url: https://cryptoinfos.eu/feed
+    - name: mycryptopedia.com
+      url: https://www.mycryptopedia.com/feed
+    - name: blog.coinspectator.com
+      url: https://blog.coinspectator.com/feed
+    - name: coinotizia.com
+      url: https://coinotizia.com/feed
+    - name: bitemycoin.com
+      url: https://bitemycoin.com/feed
+    - name: cryptobriefing.com
+      url: https://cryptobriefing.com/feed
+    - name: coincheckup.com
+      url: https://coincheckup.com/blog/feed
+    - name: coinscribble.com
+      url: https://coinscribble.com/feed
+    - name: cryptonewsz.com
+      url: https://www.cryptonewsz.com/feed
+    - name: cryptobreaking.com
+      url: https://cryptobreaking.com/feed
+    - name: e-cryptonews.com
+      url: https://e-cryptonews.com/feed
+    - name: coinfunda.com
+      url: https://coinfunda.com/feed
+    - name: cointelegraph.com
+      url: https://cointelegraph.com/feed
+    - name: cryptodaily.co.uk
+      url: https://cryptodaily.co.uk/feed
+    - name: coinspeaker.com
+      url: https://www.coinspeaker.com/feed
+    - name: blog.cryptographyengineering.com
+      url: https://blog.cryptographyengineering.com/feed
+    - name: kanalcoin.com
+      url: https://www.kanalcoin.com/feed
+    - name: coinwink.com
+      url: https://coinwink.com/blog/feed
+    - name: blog.localcoinswap.com
+      url: https://blog.localcoinswap.com/rss
+    - name: e-cryptonews.com
+      url: https://e-cryptonews.com/index.php/feed
+    - name: coindoo.com
+      url: https://coindoo.com/feed
+    - name: cryptopotato.com
+      url: https://cryptopotato.com/feed
+    - name: platinumcryptoacademy.com
+      url: https://www.platinumcryptoacademy.com/feed
+    - name: bravenewcoin.com
+      url: https://bravenewcoin.com/news/rss
+    - name: cryptoslate.com
+      url: https://cryptoslate.com/feed
+    - name: thecoinspost.com
+      url: https://www.thecoinspost.com/feed
+    - name: cryptoverze.com
+      url: https://cryptoverze.com/feed
+    - name: coinjournal.net
+      url: https://coinjournal.net/feed
+    - name: cryptoticker.io
+      url: https://cryptoticker.io/en/feed
+    - name: cryptogeek.info
+      url: https://cryptogeek.info/en/rss.xml
+    - name: coingape.com
+      url: https://coingape.com/feed
+    - name: coinpedia.org
+      url: https://coinpedia.org/feed
+    - name: cryptoninjas.net
+      url: https://www.cryptoninjas.net/feed
+    - name: cryptocurrencynews.com
+      url: https://cryptocurrencynews.com/feed
+    - name: buyucoin.com
+      url: https://www.buyucoin.com/crypto-labs/feed
+    - name: zycrypto.com
+      url: https://zycrypto.com/feed
+    - name: cryptocynews.com
+      url: https://www.cryptocynews.com/feed
+    - name: cryptomaton.org
+      url: https://www.cryptomaton.org/feed
+    - name: coincentral.com
+      url: https://coincentral.com/news/feed
+  bitcoin:
+    icon: btc
+    sources:
+    - name: newsbtc.com
+      url: https://www.newsbtc.com/feed
+    - name: news.bitcoin.com
+      url: https://news.bitcoin.com/feed
+    - name: bitcoin4youweb.wordpress.com
+      url: https://bitcoin4youweb.wordpress.com/feed
+    - name: infoonbitcoin.com
+      url: http://infoonbitcoin.com/feed
+    - name: bitcoincore.org
+      url: https://bitcoincore.org/en/rss.xml
+    - name: blog.bitcoinbrains.com
+      url: https://blog.bitcoinbrains.com/feed
+    - name: bitcoinist.com
+      url: https://bitcoinist.com/feed
+    - name: insidebitcoins.com
+      url: https://insidebitcoins.com/feed
+    - name: ukbitcoinblog.com
+      url: https://www.ukbitcoinblog.com/feed
+    - name: bitcoinbazis.hu
+      url: http://www.bitcoinbazis.hu/feed
+    - name: bitcoinethereumnews.com
+      url: https://bitcoinethereumnews.com/feed
+    - name: btctrading.wordpress.com
+      url: https://btctrading.wordpress.com/feed
+    - name: bitcoinik.com
+      url: https://bitcoinik.com/feed
+    - name: bitcoinexchangeguide.com
+      url: https://bitcoinexchangeguide.com/feed
+    - name: thebitcoinnews.com
+      url: https://thebitcoinnews.com/feed
+    - name: bitcoinzar.co.za
+      url: https://www.bitcoinzar.co.za/blog/feed
+    - name: bitcoinmagazine.com
+      url: https://bitcoinmagazine.com/feed
+    - name: bitcoinwarrior.net
+      url: https://bitcoinwarrior.net/feed
+    - name: usethebitcoin.com
+      url: https://usethebitcoin.com/feed
+    - name: 99bitcoins.com
+      url: https://99bitcoins.com/feed
+    - name: bitcoinchaser.com
+      url: https://bitcoinchaser.com/feed
+  defi:
+    icon: defi
+    sources: []
+  ethereum:
+    icon: eth
+    sources: []
+  exchanges:
+    icon: exchange
+    sources: []
+  gamefi:
+    icon: gamefi
+    sources: []
+  market_trends:
+    icon: market_trends
+    sources: []
+  nft:
+    icon: nft
+    sources: []
+  regulation:
+    icon: regulation
+    sources:
+    - name: tech.eu
+      url: https://tech.eu/category/cybersecurity/feed
+    - name: legitsecurity.com
+      url: https://www.legitsecurity.com/blog/rss.xml
+    - name: nist.gov
+      url: https://www.nist.gov/blogs/cybersecurity-insights/rss.xml
+    - name: cybersecuritypulse.net
+      url: https://www.cybersecuritypulse.net/feed
+    - name: blog.pcisecuritystandards.org
+      url: https://blog.pcisecuritystandards.org/rss.xml
+    - name: dayzerosec.com
+      url: https://dayzerosec.com/feed.xml
+    - name: microsoft.com
+      url: https://www.microsoft.com/security/blog/feed
+    - name: nytimes.com
+      url: https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/spotlight/cybersecurity/rss.xml
+    - name: blackhillsinfosec.com
+      url: https://www.blackhillsinfosec.com/feed
+    - name: aws.amazon.com
+      url: https://aws.amazon.com/security/security-bulletins/rss/feed
+    - name: blog.securityinnovation.com
+      url: https://blog.securityinnovation.com/rss.xml
+    - name: blog.mozilla.org
+      url: https://blog.mozilla.org/security/feed
+    - name: theguardian.com
+      url: https://www.theguardian.com/technology/data-computer-security/rss
+    - name: zdnet.com
+      url: https://www.zdnet.com/topic/security/rss.xml
+    - name: cloudsecurityalliance.org
+      url: https://cloudsecurityalliance.org/blog/feed
+    - name: defensivesecurity.org
+      url: https://defensivesecurity.org/feed
+    - name: ddosecrets.substack.com
+      url: https://ddosecrets.substack.com/feed
+    - name: tripwire.com
+      url: https://www.tripwire.com/state-of-security/feed
+    - name: esecurityplanet.com
+      url: https://www.esecurityplanet.com/feed
+    - name: securitylabs.datadoghq.com
+      url: https://securitylabs.datadoghq.com/rss/feed.xml
+    - name: opalsec.substack.com
+      url: https://opalsec.substack.com/feed
+    - name: strategyofsecurity.com
+      url: https://strategyofsecurity.com/rss
+    - name: absoluteappsec.com
+      url: https://absoluteappsec.com/rss
+    - name: trustedsec.com
+      url: http://www.trustedsec.com/feed
+    - name: resecurity.com
+      url: https://www.resecurity.com/feed
+    - name: github.blog
+      url: https://github.blog/category/security/feed
+    - name: welivesecurity.com
+      url: https://www.welivesecurity.com/feed
+    - name: wired.com
+      url: https://www.wired.com/feed/category/security/latest/rss
+    - name: aws.amazon.com
+      url: https://aws.amazon.com/blogs/security/feed
+    - name: cybersecuritynews.com
+      url: https://cybersecuritynews.com/feed
+    - name: tenable.com
+      url: https://www.tenable.com/security/research/feed
+    - name: krebsonsecurity.com
+      url: https://krebsonsecurity.com/feed
+    - name: cisecurity.org
+      url: https://www.cisecurity.org/feed
+    - name: blog.compass-security.com
+      url: https://blog.compass-security.com/feed
+    - name: securityaffairs.co
+      url: http://securityaffairs.co/wordpress/feed
+    - name: cloudblogs.microsoft.com
+      url: https://cloudblogs.microsoft.com/microsoftsecure/feed
+    - name: hackernoon.com
+      url: https://hackernoon.com/tagged/cybersecurity/feed
+    - name: arstechnica.com
+      url: https://arstechnica.com/tag/security/feed
+    - name: cloudsecurityalliance.org
+      url: https://cloudsecurityalliance.org/feed
+    - name: siliconangle.com
+      url: https://siliconangle.com/category/security/feed
+    - name: ubuntu.com
+      url: https://ubuntu.com/security/notices/rss.xml
+    - name: cybersecurityventures.com
+      url: https://cybersecurityventures.com/feed
+    - name: ventureinsecurity.net
+      url: https://ventureinsecurity.net/feed
+    - name: heimdalsecurity.com
+      url: https://heimdalsecurity.com/blog/feed
+    - name: infosecwriteups.com
+      url: https://infosecwriteups.com/feed
+    - name: positive.security
+      url: https://positive.security/blog/rss.xml
+    - name: wesecureapp.com
+      url: https://wesecureapp.com/feed
+    - name: securityledger.com
+      url: https://securityledger.com/feed
+    - name: omeronsecurity.com
+      url: https://www.omeronsecurity.com/feed
+    - name: absoluteappsec.com
+      url: https://absoluteappsec.com/rss.xml
+    - name: helpnetsecurity.com
+      url: https://www.helpnetsecurity.com/feed
+    - name: rcesecurity.com
+      url: https://www.rcesecurity.com/feed
+    - name: asec.ahnlab.com
+      url: https://asec.ahnlab.com/en/feed
+    - name: sharedsecurity.net
+      url: https://sharedsecurity.net/feed
+    - name: smashingsecurity.com
+      url: http://www.smashingsecurity.com/rss
+  security:
+    icon: security
+    sources:
+    - name: hackaday.com
+      url: https://hackaday.com/feed
+    - name: exploit-db.com
+      url: https://www.exploit-db.com/rss.xml
+    - name: hackread.com
+      url: https://www.hackread.com/feed
+markets:
+  bonds:
+    icon: bonds
+    sources: []
+  central_banks:
+    icon: central_banks
+    sources: []
+  commodities:
+    icon: commodities
+    sources: []
+  earnings:
+    icon: earnings
+    sources: []
+  economic_data:
+    icon: economic_data
+    sources: []
+  forex:
+    icon: forex
+    sources: []
+  funds_etfs:
+    icon: etf
+    sources: []
+  ipos:
+    icon: ipos
+    sources: []
+  stocks:
+    icon: stocks
+    sources: []
+misc:
+  uncategorized:
+    sources:
+    - name: praetorian.com
+      url: https://www.praetorian.com/blog/feed
+    - name: blog.criminalip.io
+      url: https://blog.criminalip.io/feed
+    - name: this-week-in-rust.org
+      url: https://this-week-in-rust.org/rss.xml
+    - name: overreacted.io
+      url: https://overreacted.io/rss.xml
+    - name: freakonomics.blogs.nytimes.com
+      url: http://freakonomics.blogs.nytimes.com/feed
+    - name: dropbox.tech
+      url: https://dropbox.tech/feed
+    - name: cloudvulndb.org
+      url: https://www.cloudvulndb.org/rss/feed.xml
+    - name: signal.org
+      url: https://signal.org/blog/rss.xml
+    - name: freecodecamp.org
+      url: https://www.freecodecamp.org/news/rss
+    - name: css-tricks.com
+      url: https://css-tricks.com/feed
+    - name: slack.engineering
+      url: https://slack.engineering/feed
+    - name: elastic.co
+      url: https://www.elastic.co/blog/feed
+    - name: globalencryption.org
+      url: https://www.globalencryption.org/feed
+    - name: labs.spotify.com
+      url: http://labs.spotify.com/feed
+    - name: csoonline.com
+      url: https://www.csoonline.com/feed
+    - name: samcurry.net
+      url: https://samcurry.net/feed.rss
+    - name: blog.phylum.io
+      url: https://blog.phylum.io/rss
+    - name: grahamcluley.com
+      url: https://www.grahamcluley.com/feed
+    - name: wired.com
+      url: https://www.wired.com/feed
+    - name: objective-see.org
+      url: https://objective-see.org/rss.xml
+    - name: singularityhub.com
+      url: https://singularityhub.com/feed
+    - name: sentinelone.com
+      url: https://www.sentinelone.com/feed
+    - name: tecmint.com
+      url: https://www.tecmint.com/feed
+    - name: netskope.com
+      url: https://www.netskope.com/blog/category/netskope-threat-labs/feed
+    - name: lilianweng.github.io
+      url: https://lilianweng.github.io/lil-log/feed.xml
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/112258/rss
+    - name: portswigger.net
+      url: https://portswigger.net/blog/rss
+    - name: reddit.com
+      url: http://www.reddit.com/r/MachineLearning/.rss
+    - name: hntvaudio.swsgtv.libsynpro.com
+      url: http://hntvaudio.swsgtv.libsynpro.com/rss
+    - name: helpmewithhipaa.com
+      url: https://helpmewithhipaa.com/feed
+    - name: portswigger.net
+      url: https://portswigger.net/research/rss
+    - name: nautil.us
+      url: http://nautil.us/rss
+    - name: jacknaglieri.substack.com
+      url: https://jacknaglieri.substack.com/feed
+    - name: blockonomi.com
+      url: https://blockonomi.com/feed
+    - name: ericcole.libsyn.com
+      url: https://ericcole.libsyn.com/rss
+    - name: jalammar.github.io
+      url: https://jalammar.github.io/feed.xml
+    - name: greynoise.io
+      url: https://www.greynoise.io/blog/rss.xml
+    - name: dcforecasts.com
+      url: https://www.dcforecasts.com/feed
+    - name: labs.watchtowr.com
+      url: https://labs.watchtowr.com/rss
+    - name: blog.rootshell.be
+      url: https://blog.rootshell.be/feed
+    - name: makeuseof.com
+      url: https://www.makeuseof.com/feed
+    - name: nesslabs.com
+      url: https://nesslabs.com/feed
+    - name: kali.org
+      url: https://www.kali.org/rss.xml
+    - name: anchor.fm
+      url: https://anchor.fm/s/435c0d58/podcast/rss
+    - name: blog-eu.bitflyer.com
+      url: https://blog-eu.bitflyer.com/rss
+    - name: bitpinas.com
+      url: https://bitpinas.com/feed
+    - name: ahrefs.com
+      url: https://ahrefs.com/blog/feed
+    - name: lansweeper.com
+      url: https://www.lansweeper.com/feed
+    - name: distill.pub
+      url: http://distill.pub/rss.xml
+    - name: citizenlab.ca
+      url: https://citizenlab.ca/feed
+    - name: pentestpartners.com
+      url: https://www.pentestpartners.com/feed
+    - name: quantamagazine.org
+      url: http://www.quantamagazine.org/feed
+    - name: grammarly.com
+      url: https://www.grammarly.com/blog/feed
+    - name: digitalforensicsurvivalpodcast.libsyn.com
+      url: https://digitalforensicsurvivalpodcast.libsyn.com/rss
+    - name: digitaljournal.com
+      url: https://www.digitaljournal.com/feed
+    - name: tecadmin.net
+      url: https://tecadmin.net/feed
+    - name: feed.podbean.com
+      url: https://feed.podbean.com/whattheshell/feed.xml
+    - name: linuxhandbook.com
+      url: https://linuxhandbook.com/rss
+    - name: nulltx.com
+      url: https://nulltx.com/feed
+    - name: engineering.grab.com
+      url: https://engineering.grab.com/feed.xml
+    - name: threatpost.com
+      url: https://threatpost.com/feed
+    - name: anchor.fm
+      url: https://anchor.fm/s/532bea14/podcast/rss
+    - name: 404media.co
+      url: https://www.404media.co/rss
+    - name: netblocks.org
+      url: https://netblocks.org/feed
+    - name: osintnewsletter.com
+      url: https://osintnewsletter.com/feed
+    - name: this-week-in-rust.org
+      url: https://this-week-in-rust.org/rss
+    - name: uxplanet.org
+      url: https://uxplanet.org/feed
+    - name: research.checkpoint.com
+      url: https://research.checkpoint.com/feed
+    - name: blog.kraken.com
+      url: https://blog.kraken.com/feed
+    - name: blog.trezor.io
+      url: https://blog.trezor.io/feed
+    - name: feeds.libsyn.com
+      url: https://feeds.libsyn.com/127181/rss
+    - name: blog.cloudflare.com
+      url: https://blog.cloudflare.com/rss
+    - name: quicksprout.com
+      url: http://www.quicksprout.com/feed
+    - name: thedfirreport.com
+      url: https://thedfirreport.com/feed
+    - name: browser.engineering
+      url: https://browser.engineering/rss.xml
+    - name: bitsight.com
+      url: https://www.bitsight.com/blog/rss.xml
+    - name: letsencrypt.org
+      url: https://letsencrypt.org/feed.xml
+    - name: 0xsoros.substack.com
+      url: https://0xsoros.substack.com/feed
+    - name: web.dev
+      url: https://web.dev/feed.xml
+    - name: inteltechniques.com
+      url: https://inteltechniques.com/blog/feed
+    - name: pulse.latio.tech
+      url: https://pulse.latio.tech/feed
+    - name: synack.com
+      url: https://www.synack.com/feed
+    - name: magenta.tensorflow.org
+      url: http://magenta.tensorflow.org/feed.xml
+    - name: engineering.grab.com
+      url: http://engineering.grab.com/feed.xml
+    - name: proofpoint.com
+      url: https://www.proofpoint.com/us/rss.xml
+    - name: techmeme.com
+      url: https://www.techmeme.com/feed.xml
+    - name: jwegan.com
+      url: http://jwegan.com/feed
+    - name: joshwcomeau.com
+      url: https://joshwcomeau.com/rss.xml
+    - name: blog.bitfinex.com
+      url: https://blog.bitfinex.com/feed
+    - name: linuxhint.com
+      url: https://linuxhint.com/feed
+    - name: tech.ebayinc.com
+      url: https://tech.ebayinc.com/rss
+    - name: nngroup.com
+      url: https://www.nngroup.com/feed/rss
+    - name: restoreprivacy.com
+      url: https://restoreprivacy.com/feed
+    - name: rekt.news
+      url: https://rekt.news/rss/feed.xml
+    - name: blog.sonatype.com
+      url: https://blog.sonatype.com/rss.xml
+    - name: palant.info
+      url: https://palant.info/rss
+    - name: engineering.atspotify.com
+      url: https://engineering.atspotify.com/feed
+    - name: linuxconfig.org
+      url: https://linuxconfig.org/feed
+    - name: andrewchen.co
+      url: http://andrewchen.co/feed
+    - name: thegradient.pub
+      url: https://thegradient.pub/rss
+    - name: media.rss.com
+      url: https://media.rss.com/ctbbpodcast/feed.xml
+    - name: backlinko.com
+      url: http://backlinko.com/feed
+    - name: fs.blog
+      url: https://fs.blog/feed
+    - name: newscientist.com
+      url: https://www.newscientist.com/subject/technology/feed
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/118065/rss
+    - name: restofworld.org
+      url: https://restofworld.org/feed
+    - name: redcanary.com
+      url: https://redcanary.com/blog/feed
+    - name: spreaker.com
+      url: https://www.spreaker.com/show/3246578/episodes/feed
+    - name: daniel.haxx.se
+      url: https://daniel.haxx.se/blog/feed
+    - name: steveblank.com
+      url: http://steveblank.com/feed
+    - name: herbertrsim.com
+      url: https://herbertrsim.com/feed
+    - name: mashable.com
+      url: https://mashable.com/feed
+    - name: rosehosting.com
+      url: https://www.rosehosting.com/blog/feed
+    - name: feeds.buzzsprout.com
+      url: https://feeds.buzzsprout.com/2154459.rss
+    - name: objective-see.org
+      url: https://objective-see.org/rss
+    - name: forensicfocus.com
+      url: https://www.forensicfocus.com/feed
+    - name: geohot.github.io
+      url: https://geohot.github.io/blog/feed
+    - name: protos.com
+      url: https://protos.com/feed
+    - name: etoro.com
+      url: https://www.etoro.com/news-and-analysis/feed
+    - name: scotthelme.co.uk
+      url: https://scotthelme.co.uk/rss
+    - name: blog.fox-it.com
+      url: https://blog.fox-it.com/feed
+    - name: crowdstrike.com
+      url: https://www.crowdstrike.com/blog/feed
+    - name: semrush.com
+      url: https://www.semrush.com/blog/feed
+    - name: feeds.bloomberg.com
+      url: https://feeds.bloomberg.com/technology/news.rss
+    - name: thenewstack.io
+      url: https://thenewstack.io/feed
+    - name: joeytrend.com
+      url: https://joeytrend.com/feed
+    - name: decrypt.co
+      url: https://decrypt.co/feed
+    - name: cylab.be
+      url: https://cylab.be/rss
+    - name: commoncog.com
+      url: https://commoncog.com/blog/rss
+    - name: labnol.org
+      url: https://www.labnol.org/rss.xml
+    - name: nautil.us
+      url: https://nautil.us/rss
+    - name: newsletter.blockthreat.io
+      url: https://newsletter.blockthreat.io/feed
+    - name: feeds.buzzsprout.com
+      url: https://feeds.buzzsprout.com/1822302.rss
+    - name: siliconrepublic.com
+      url: https://www.siliconrepublic.com/feed
+    - name: joshghent.com
+      url: https://joshghent.com/rss.xml
+    - name: ebaytechblog.com
+      url: http://www.ebaytechblog.com/feed
+    - name: blog.pragmaticengineer.com
+      url: https://blog.pragmaticengineer.com/rss
+    - name: vice.com
+      url: https://www.vice.com/en/rss
+    - name: engineering.grab.com
+      url: https://engineering.grab.com/feed
+    - name: dev.to
+      url: https://dev.to/feed
+    - name: blog.sucuri.net
+      url: https://blog.sucuri.net/feed
+    - name: cisoseries.libsyn.com
+      url: https://cisoseries.libsyn.com/rss
+    - name: lightbluetouchpaper.org
+      url: https://www.lightbluetouchpaper.org/feed
+    - name: deepinstinct.com
+      url: https://www.deepinstinct.com/blog/feed
+    - name: schneier.com
+      url: https://www.schneier.com/feed
+    - name: feeds.feedburner.com
+      url: https://feeds.feedburner.com/feed
+    - name: phppot.com
+      url: https://phppot.com/feed
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/134669/rss
+    - name: therecord.media
+      url: https://therecord.media/feed
+    - name: jalammar.github.io
+      url: https://jalammar.github.io/feed
+    - name: changelly.com
+      url: https://changelly.com/blog/feed
+    - name: systemweakness.com
+      url: https://systemweakness.com/feed
+    - name: blog.nviso.eu
+      url: https://blog.nviso.eu/feed
+    - name: fingerprint.com
+      url: https://fingerprint.com/rss.xml
+    - name: cofense.com
+      url: https://cofense.com/feed
+    - name: sciencealert.com
+      url: https://www.sciencealert.com/rss
+    - name: uxdesign.cc
+      url: https://uxdesign.cc/feed
+    - name: slack.design
+      url: https://slack.design/feed
+    - name: palant.info
+      url: https://palant.info/rss.xml
+    - name: feed.podbean.com
+      url: https://feed.podbean.com/errorcode/feed.xml
+    - name: blog.cloudflare.com
+      url: http://blog.cloudflare.com/rss
+    - name: bishopfox.com
+      url: https://bishopfox.com/feeds/blog.rss
+    - name: imperva.com
+      url: https://www.imperva.com/blog/feed
+    - name: blog.ml.cmu.edu
+      url: https://blog.ml.cmu.edu/feed
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/81245/rss
+    - name: engineering.fb.com
+      url: https://engineering.fb.com/feed
+    - name: aboutdfir.com
+      url: https://aboutdfir.com/feed
+    - name: smashingmagazine.com
+      url: https://www.smashingmagazine.com/feed
+    - name: geohot.github.io
+      url: https://geohot.github.io/blog/feed.xml
+    - name: tronweekly.com
+      url: https://www.tronweekly.com/feed
+    - name: socialpsychology.org
+      url: http://www.socialpsychology.org/headlines.rss
+    - name: evjang.com
+      url: https://evjang.com/feed
+    - name: social-engineer.org
+      url: https://www.social-engineer.org/podcasts/feed
+    - name: blog.cex.io
+      url: https://blog.cex.io/feed
+    - name: blog.latoken.com
+      url: https://blog.latoken.com/feed
+    - name: engineering.grab.com
+      url: http://engineering.grab.com/feed
+    - name: jwegan.com
+      url: http://jwegan.com/feed/rss
+    - name: wecode.wepay.com
+      url: https://wecode.wepay.com/feed.xml
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/200150/rss
+    - name: bluepurple.substack.com
+      url: https://bluepurple.substack.com/feed
+    - name: iacr.org
+      url: https://iacr.org/news/rss
+    - name: lilianweng.github.io
+      url: https://lilianweng.github.io/lil-log/feed
+    - name: stripe.com
+      url: https://stripe.com/blog/feed.rss
+    - name: amasad.me
+      url: https://amasad.me/rss
+    - name: spectrum.ieee.org
+      url: https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss
+    - name: themarketscompass.substack.com
+      url: https://themarketscompass.substack.com/feed
+    - name: feeds.libsyn.com
+      url: http://feeds.libsyn.com/81244/rss
+    - name: kirbyidau.com
+      url: https://kirbyidau.com/feed
+    - name: proton.me
+      url: https://proton.me/blog/feed
+sports:
+  badminton:
+    icon: badminton
+    sources: []
+  baseball:
+    icon: baseball
+    sources: []
+  basketball:
+    icon: basketball
+    sources: []
+  cricket:
+    icon: cricket
+    sources: []
+  esports:
+    icon: esports
+    sources: []
+  football:
+    icon: football
+    sources: []
+  other:
+    icon: sports_other
+    sources: []
+  table_tennis:
+    icon: table_tennis
+    sources: []
+  tennis:
+    icon: tennis
+    sources: []
+  ufc_mma:
+    icon: ufc
+    sources: []
+tech:
+  ai:
+    icon: ai
+    sources:
+    - name: blog.chainalysis.com
+      url: https://blog.chainalysis.com/feed
+    - name: blog.trailofbits.com
+      url: https://blog.trailofbits.com/feed
+    - name: blog.bitmain.com
+      url: https://blog.bitmain.com/en/feed
+    - name: bair.berkeley.edu
+      url: http://bair.berkeley.edu/blog/feed.xml
+    - name: techmonitor.ai
+      url: https://techmonitor.ai/feed
+    - name: sciencedaily.com
+      url: https://sciencedaily.com/rss
+    - name: sciencedaily.com
+      url: https://www.sciencedaily.com/rss
+    - name: bair.berkeley.edu
+      url: http://bair.berkeley.edu/blog/feed
+    - name: blockchain.news
+      url: https://blockchain.news/rss
+  bigtech:
+    icon: bigtech
+    sources:
+    - name: msrc-blog.microsoft.com
+      url: https://msrc-blog.microsoft.com/feed
+    - name: amazon.science
+      url: https://www.amazon.science/index.rss
+    - name: cloudblog.withgoogle.com
+      url: https://cloudblog.withgoogle.com/topics/threat-intelligence/rss
+    - name: blog.google
+      url: https://blog.google/threat-analysis-group/rss
+  blockchain_tech:
+    icon: blockchain
+    sources: []
+  conferences:
+    icon: conferences
+    sources: []
+  cybersecurity:
+    icon: cybersecurity
+    sources:
+    - name: industrialcyber.co
+      url: https://industrialcyber.co/feed
+    - name: tenable.com
+      url: https://www.tenable.com/blog/cyber-exposure-alerts/feed
+    - name: cyberscoop.com
+      url: https://www.cyberscoop.com/feed
+    - name: steptoe.com
+      url: http://www.steptoe.com/feed-Cyberlaw.rss
+    - name: cyberciti.com
+      url: https://www.cyberciti.com/feed
+  hardware:
+    icon: hardware
+    sources: []
+  software:
+    icon: software
+    sources: []
+  startups:
+    icon: startups
+    sources:
+    - name: venturebeat.com
+      url: http://venturebeat.com/feed
+    - name: techcrunch.com
+      url: https://techcrunch.com/startups/feed
+world:
+  climate:
+    icon: climate
+    sources: []
+  conflicts:
+    icon: conflicts
+    sources:
+    - name: malwaretech.com
+      url: https://malwaretech.com/feed.xml
+    - name: defenseindepth.libsyn.com
+      url: https://defenseindepth.libsyn.com/rss
+    - name: towardsdatascience.com
+      url: https://towardsdatascience.com/feed
+    - name: blog.malwarebytes.com
+      url: https://blog.malwarebytes.com/feed
+    - name: joelonsoftware.com
+      url: https://www.joelonsoftware.com/feed
+    - name: malwarebytes.com
+      url: https://www.malwarebytes.com/blog/feed
+    - name: malwaretech.com
+      url: https://malwaretech.com/feed
+    - name: malware.news
+      url: https://malware.news/latest.rss
+  diplomacy:
+    icon: diplomacy
+    sources:
+    - name: omny.fm
+      url: https://omny.fm/shows/troy-hunt-weekly-update/playlists/podcast.rss
+    - name: unconfirmed.libsyn.com
+      url: https://unconfirmed.libsyn.com/rss
+    - name: foundation.mozilla.org
+      url: https://foundation.mozilla.org/en/blog/rss
+    - name: coffeeandjunk.substack.com
+      url: https://coffeeandjunk.substack.com/feed
+    - name: news.ycombinator.com
+      url: http://news.ycombinator.com/rss
+    - name: unit42.paloaltonetworks.com
+      url: https://unit42.paloaltonetworks.com/feed
+    - name: omgubuntu.co.uk
+      url: https://www.omgubuntu.co.uk/feed
+    - name: c4isrnet.com
+      url: https://www.c4isrnet.com/arc/outboundfeeds/rss
+    - name: techcrunch.com
+      url: https://techcrunch.com/feed
+    - name: wunderbit.co
+      url: https://wunderbit.co/en/rss
+    - name: news.crunchbase.com
+      url: https://news.crunchbase.com/feed
+    - name: fortunez.com
+      url: https://fortunez.com/feed
+  elections:
+    icon: elections
+    sources: []
+  energy:
+    icon: energy
+    sources: []
+  geopolitics:
+    icon: geopolitics
+    sources: []
+  global_risks:
+    icon: global_risks
+    sources: []
+  migration:
+    icon: migration
+    sources: []
+  organizations:
+    icon: organizations
+    sources: []
+  sanctions:
+    icon: sanctions
+    sources: []

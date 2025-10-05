@@ -21,8 +21,8 @@ if not TELEGRAM_BOT_TOKEN:
 async def main():
     # Инициализируем асинхронную базу данных
     async_service = get_async_service()
-    await async_service._init_async_client()
-    if not async_service.async_client:
+    # Проверяем, что у нас есть корутина для инициализации
+    if not hasattr(async_service, '_async_client_coroutine'):
         logger.error("❌ Не удалось инициализировать асинхронную базу данных")
         return
 
