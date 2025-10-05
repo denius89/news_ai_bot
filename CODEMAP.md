@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:10:47 UTC_
+_Generated on 2025-10-05 09:14:12 UTC_
 
 ```
 ├── .github/
@@ -186,47 +186,15 @@ _Generated on 2025-10-05 09:10:47 UTC_
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
-│   ├── add_notifications_correct.py
-│   ├── add_notifications_final.py
-│   ├── add_subcategory_field.py
-│   ├── add_test_notifications.py
-│   ├── apply_migration.py
-│   ├── apply_subcategory_migration.py
-│   ├── apply_user_notifications_migration.py
-│   ├── check_all_columns.py
-│   ├── check_all_notifications.py
-│   ├── check_database.py
-│   ├── check_notifications_schema.py
-│   ├── check_sources.py
-│   ├── check_subcategory_migration.py
-│   ├── check_users_table.py
-│   ├── cleanup_database.py
-│   ├── create_notifications_table.py
-│   ├── database_maintenance.py
-│   ├── debug_api_issue.py
-│   ├── debug_user_lookup.py
-│   ├── fetch_and_store_events.py
-│   ├── fetch_and_store_news.py
-│   ├── fill_ai_analysis.py
+│   ├── database_inspector.py
 │   ├── fill_ai_analysis_all.py
-│   ├── fix_old_news.py
-│   ├── fix_user_notifications_schema.py
-│   ├── optimize_database.py
+│   ├── LEGACY_CLEANUP_PLAN.md
+│   ├── migrations.py
 │   ├── port_manager.py
-│   ├── proc_utils.py
 │   ├── README_daily_digests.md
 │   ├── refresh_news.py
 │   ├── repo_map.py
-│   ├── run_all.py
-│   ├── send_daily_digests.py
-│   ├── show_news.py
-│   ├── test_api_direct.py
-│   ├── test_daily_digests.py
-│   ├── test_digest_ai.py
-│   ├── test_get_notifications.py
-│   ├── test_notifications_api.py
-│   ├── test_notifications_webapp.py
-│   └── test_telegram_notifications.py
+│   └── send_daily_digests.py
 ├── webapp/
 │   ├── index.html
 │   ├── package.json
