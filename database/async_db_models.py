@@ -15,7 +15,7 @@ from supabase import create_async_client, AsyncClient
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.dates import format_datetime
+from utils.dates import format_datetime  # noqa: E402
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database.async")

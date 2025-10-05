@@ -16,9 +16,9 @@ from dateutil import parser as dtp
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.clean_text import clean_text
-from services.categories import get_all_sources
-from database.async_db_models import async_insert_news_batch, init_async_supabase
+from utils.clean_text import clean_text  # noqa: E402
+from services.categories import get_all_sources  # noqa: E402
+from database.async_db_models import async_insert_news_batch, init_async_supabase  # noqa: E402
 
 logger = logging.getLogger("parsers.async_rss")
 
