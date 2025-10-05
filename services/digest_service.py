@@ -97,6 +97,7 @@ class DigestService:
 # --- Singleton для простого использования ---
 try:
     from database.service import get_sync_service
+
     sync_service = get_sync_service()
     _default_service = DigestService(NewsRepository(sync_service.sync_client))
 except Exception as e:
