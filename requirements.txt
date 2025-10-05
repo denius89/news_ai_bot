@@ -70,5 +70,11 @@ psutil>=6.1.0            # Управление процессами и порт
 # Telegram bot
 aiogram>=3.22.0
 
+# Advanced Parser dependencies
+aiohttp>=3.12.15           # Асинхронные HTTP запросы
+news-please>=1.6.16        # Машинное обучение для извлечения контента
+trafilatura>=2.0.0         # Надежное извлечение текста
+autoscraper>=1.1.14        # Обученные шаблоны извлечения
+
 # ORM (опционально)
 SQLAlchemy>=2.0.35
