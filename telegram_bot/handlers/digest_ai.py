@@ -26,7 +26,11 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
     categories = get_categories()
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text=cat.title(), callback_data=f"digest_ai_category:{cat}")]
+            [
+                types.InlineKeyboardButton(
+                    text=cat.title(), callback_data=f"digest_ai_category:{cat}"
+                )
+            ]
             for cat in categories
         ]
         + [
@@ -138,10 +142,7 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
         # Generate AI digest using async service
         categories_list = None if category == "all" else [category]
-        text = await async_digest_service.build_ai_digest(
-            limit=20,
-            categories=categories_list
-        )
+        text = await async_digest_service.build_ai_digest(limit=20, categories=categories_list)
 
         # Stop animation
         animation.stop()

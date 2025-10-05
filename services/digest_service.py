@@ -49,7 +49,7 @@ class DigestService:
                     title = item.title or "Без заголовка"
                     date = item.published_at_fmt or "—"
                     link = item.link
-                
+
                 if link:
                     lines.append(f'{i}. <b>{title}</b> [{date}] — <a href="{link}">Подробнее</a>')
                 else:
@@ -80,14 +80,12 @@ class DigestService:
             # Поддержка обратной совместимости
             if categories is None and category is not None:
                 categories = [category]
-            
-            news_items = self.news_repo.get_recent_news(
-                limit=limit, categories=categories
-            )
+
+            news_items = self.news_repo.get_recent_news(limit=limit, categories=categories)
             if not news_items:
                 cat_display = categories[0] if categories else category or "all"
                 return f"AI DIGEST (cat={cat_display}): Сегодня новостей нет."
-            
+
             # Используем AI сервис для генерации
             cat_display = categories[0] if categories else category or "all"
             return self.ai_service.generate_ai_digest(news_items, style=style, category=cat_display)

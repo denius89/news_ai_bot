@@ -15,6 +15,7 @@ from supabase import create_async_client, AsyncClient
 
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.dates import format_datetime, ensure_utc_iso
@@ -29,6 +30,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 async_supabase: Optional[AsyncClient] = None
 
+
 async def init_async_supabase():
     """Инициализирует асинхронный клиент Supabase."""
     global async_supabase
@@ -38,7 +40,7 @@ async def init_async_supabase():
             if async_supabase:
                 await async_supabase.aclose()
                 async_supabase = None
-            
+
             # Создаем новый клиент
             async_supabase = await create_async_client(SUPABASE_URL, SUPABASE_KEY)
             logger.info("✅ Async Supabase client initialized (fresh)")
@@ -80,7 +82,9 @@ async def async_get_latest_news(
         logger.warning("⚠️ Async Supabase не подключён, async_get_latest_news не работает.")
         return []
 
-    logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+    logger.debug(
+        "async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit
+    )
 
     query = (
         async_supabase.table("news")
@@ -129,19 +133,17 @@ async def async_insert_news_batch(news_items: List[Dict]) -> int:
 
         # Используем синхронный клиент для вставки
         from database.db_models import supabase, safe_execute
-        
+
         if not supabase:
             logger.warning("⚠️ Синхронный Supabase не подключён")
             return 0
-            
-        result = safe_execute(
-            supabase.table("news").upsert(clean_items, on_conflict="uid")
-        )
-        
+
+        result = safe_execute(supabase.table("news").upsert(clean_items, on_conflict="uid"))
+
         inserted_count = len(clean_items)
         logger.info("✅ Async: вставлено %s новостей", inserted_count)
         return inserted_count
-        
+
     except Exception as e:
         logger.error("❌ Ошибка async_insert_news_batch: %s", e)
         return 0
@@ -154,10 +156,10 @@ async def async_get_news_count(categories: Optional[List[str]] = None) -> int:
 
     try:
         query = async_supabase.table("news").select("id", count="exact")
-        
+
         if categories:
             query = query.in_("category", categories)
-            
+
         result = await async_safe_execute(query)
         return result.count or 0
     except Exception as e:
@@ -174,21 +176,18 @@ async def async_get_latest_events(limit: int = 50) -> List[Dict]:
 
     try:
         result = await async_safe_execute(
-            async_supabase.table("events")
-            .select("*")
-            .order("event_time", desc=True)
-            .limit(limit)
+            async_supabase.table("events").select("*").order("event_time", desc=True).limit(limit)
         )
-        
+
         events = result.data or []
-        
+
         # Форматируем даты
         for event in events:
             if event.get("event_time"):
                 event["event_time_fmt"] = format_datetime(event["event_time"])
-                
+
         return events
-        
+
     except Exception as e:
         logger.error("❌ Ошибка async_get_latest_events: %s", e)
         return []
@@ -202,44 +201,44 @@ async def async_get_user_subscriptions(user_id: int) -> Dict:
 
     try:
         result = await async_safe_execute(
-            async_supabase.table("users")
-            .select("categories, sources")
-            .eq("id", user_id)
-            .single()
+            async_supabase.table("users").select("categories, sources").eq("id", user_id).single()
         )
-        
+
         if result.data:
             return {
                 "categories": result.data.get("categories", []),
-                "sources": result.data.get("sources", [])
+                "sources": result.data.get("sources", []),
             }
         else:
             return {"categories": [], "sources": []}
-            
+
     except Exception as e:
         logger.error("❌ Ошибка async_get_user_subscriptions: %s", e)
         return {"categories": [], "sources": []}
 
 
-async def async_update_user_subscriptions(user_id: int, categories: List[str], sources: List[str]) -> bool:
+async def async_update_user_subscriptions(
+    user_id: int, categories: List[str], sources: List[str]
+) -> bool:
     """Асинхронно обновляет подписки пользователя."""
     if not async_supabase:
         return False
 
     try:
         await async_safe_execute(
-            async_supabase.table("users")
-            .upsert({
-                "id": user_id,
-                "categories": categories,
-                "sources": sources,
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            })
+            async_supabase.table("users").upsert(
+                {
+                    "id": user_id,
+                    "categories": categories,
+                    "sources": sources,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
         )
-        
+
         logger.info("✅ Async: обновлены подписки пользователя %s", user_id)
         return True
-        
+
     except Exception as e:
         logger.error("❌ Ошибка async_update_user_subscriptions: %s", e)
         return False
@@ -251,12 +250,10 @@ async def test_async_connection():
     if not async_supabase:
         print("❌ Async Supabase не инициализирован")
         return False
-    
+
     try:
         # Простой запрос для проверки подключения
-        result = await async_safe_execute(
-            async_supabase.table("news").select("id").limit(1)
-        )
+        result = await async_safe_execute(async_supabase.table("news").select("id").limit(1))
         print(f"✅ Async подключение работает: {len(result.data)} записей")
         return True
     except Exception as e:
@@ -271,15 +268,15 @@ if __name__ == "__main__":
         if not await init_async_supabase():
             print("❌ Не удалось инициализировать Async Supabase")
             return
-            
+
         await test_async_connection()
-        
+
         # Тест получения новостей
         news = await async_get_latest_news(limit=3)
         print(f"📰 Получено {len(news)} новостей асинхронно")
-        
+
         # Тест получения событий
         events = await async_get_latest_events(limit=3)
         print(f"📅 Получено {len(events)} событий асинхронно")
-    
+
     asyncio.run(main())

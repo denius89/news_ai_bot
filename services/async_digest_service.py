@@ -37,18 +37,24 @@ class AsyncDigestService:
                 title = item.get('title') or "Без заголовка"
                 date = item.get('published_at_fmt') or "—"
                 link = item.get('link')
-                
+
                 # Добавляем важность и достоверность
                 importance = item.get('importance', 0)
                 credibility = item.get('credibility', 0)
-                
+
                 # Форматируем строку с метриками
                 metrics = ""
                 if importance > 0:
-                    importance_icon = "🔥" if importance > 0.7 else "⚠️" if importance > 0.4 else "📰"
-                    credibility_icon = "✅" if credibility > 0.7 else "⚠️" if credibility > 0.4 else "❌"
-                    metrics = f" {importance_icon}{importance:.2f} {credibility_icon}{credibility:.2f}"
-                
+                    importance_icon = (
+                        "🔥" if importance > 0.7 else "⚠️" if importance > 0.4 else "📰"
+                    )
+                    credibility_icon = (
+                        "✅" if credibility > 0.7 else "⚠️" if credibility > 0.4 else "❌"
+                    )
+                    metrics = (
+                        f" {importance_icon}{importance:.2f} {credibility_icon}{credibility:.2f}"
+                    )
+
                 line = f"{i}. {title}{metrics}"
                 if link:
                     line += f"\n   🔗 {link}"
@@ -77,10 +83,9 @@ class AsyncDigestService:
                 return "🤖 AI Дайджест: Сегодня новостей нет."
 
             # Фильтруем по важности
-            important_news = [
-                item for item in news 
-                if float(item.get('importance', 0)) >= 0.4
-            ][:limit]
+            important_news = [item for item in news if float(item.get('importance', 0)) >= 0.4][
+                :limit
+            ]
 
             if not important_news:
                 # Если нет важных новостей, берем обычные
@@ -88,12 +93,12 @@ class AsyncDigestService:
 
             # Формируем AI-анализ
             lines = ["🤖 <b>AI Дайджест</b>\n"]
-            
+
             for i, item in enumerate(important_news, 1):
                 title = item.get('title') or "Без заголовка"
                 importance = float(item.get('importance', 0))
                 credibility = float(item.get('credibility', 0))
-                
+
                 # AI-анализ важности
                 if importance > 0.7:
                     analysis = "🔥 <b>КРИТИЧНО</b>"
@@ -101,7 +106,7 @@ class AsyncDigestService:
                     analysis = "⚠️ <b>ВАЖНО</b>"
                 else:
                     analysis = "📰 Обычная новость"
-                
+
                 # AI-анализ достоверности
                 if credibility > 0.7:
                     trust = "✅ Высокая достоверность"
@@ -109,7 +114,7 @@ class AsyncDigestService:
                     trust = "⚠️ Средняя достоверность"
                 else:
                     trust = "❌ Низкая достоверность"
-                
+
                 line = f"{i}. {analysis}: {title}\n   {trust} (важность: {importance:.2f}, достоверность: {credibility:.2f})"
                 lines.append(line)
 
