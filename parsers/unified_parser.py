@@ -31,7 +31,7 @@ logger = logging.getLogger("unified_parser")
 class UnifiedParser:
     """
     Unified parser for RSS feeds and events.
-    
+
     This class provides a clean interface for parsing various content types,
     with automatic retry logic, content extraction, and AI analysis.
     """
@@ -49,14 +49,9 @@ class UnifiedParser:
         else:
             self.db_service = get_sync_service()
 
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"
-        }
+        self.headers = {"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"}
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=1, max=10)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
     async def _fetch_url_async(self, session: aiohttp.ClientSession, url: str) -> Optional[str]:
         """Fetch URL content asynchronously with retry logic."""
         try:
@@ -70,10 +65,7 @@ class UnifiedParser:
             logger.warning(f"Error fetching {url}: {e}")
             raise
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=1, max=10)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
     def _fetch_url_sync(self, url: str) -> Optional[str]:
         """Fetch URL content synchronously with retry logic."""
         try:
@@ -108,7 +100,7 @@ class UnifiedParser:
         """Parse RSS feed content."""
         try:
             feed = feedparser.parse(content)
-            
+
             if not feed.entries:
                 logger.warning(f"Empty feed: {source_name}")
                 return []
@@ -118,16 +110,18 @@ class UnifiedParser:
                 try:
                     # Clean text
                     title = clean_text(entry.get("title", ""))
-                    content_text = clean_text(entry.get("summary", "") or entry.get("description", ""))
+                    content_text = clean_text(
+                        entry.get("summary", "") or entry.get("description", "")
+                    )
 
                     if not title:
                         continue
 
                     # Parse date
                     published_at = self.normalize_date(
-                        entry.get("published") or 
-                        entry.get("updated") or 
-                        str(entry.get("published_parsed", ""))
+                        entry.get("published")
+                        or entry.get("updated")
+                        or str(entry.get("published_parsed", ""))
                     )
 
                     if not published_at:
@@ -165,17 +159,19 @@ class UnifiedParser:
             logger.error(f"❌ Error parsing RSS feed {source_name}: {e}")
             return []
 
-    async def parse_source_async(self, url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
+    async def parse_source_async(
+        self, url: str, category: str, subcategory: str, source_name: str
+    ) -> List[Dict]:
         """Parse single RSS source asynchronously."""
         try:
             async with aiohttp.ClientSession() as session:
                 content = await self._fetch_url_async(session, url)
-                
+
                 if not content:
                     return []
 
                 news_items = self.parse_rss_feed(content, source_name)
-                
+
                 # Add category and subcategory
                 for item in news_items:
                     item["category"] = category
@@ -187,16 +183,18 @@ class UnifiedParser:
             logger.error(f"❌ Error parsing source {source_name}: {e}")
             return []
 
-    def parse_source_sync(self, url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
+    def parse_source_sync(
+        self, url: str, category: str, subcategory: str, source_name: str
+    ) -> List[Dict]:
         """Parse single RSS source synchronously."""
         try:
             content = self._fetch_url_sync(url)
-            
+
             if not content:
                 return []
 
             news_items = self.parse_rss_feed(content, source_name)
-            
+
             # Add category and subcategory
             for item in news_items:
                 item["category"] = category
@@ -208,14 +206,17 @@ class UnifiedParser:
             logger.error(f"❌ Error parsing source {source_name}: {e}")
             return []
 
-    async def parse_all_sources_async(self, categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
+    async def parse_all_sources_async(
+        self, categories: Optional[List[str]] = None, limit_per_source: int = 5
+    ) -> List[Dict]:
         """Parse all RSS sources asynchronously."""
         all_sources = get_all_sources()
-        
+
         # Filter by categories if specified
         if categories:
             all_sources = [
-                (cat, subcat, name, url) for cat, subcat, name, url in all_sources
+                (cat, subcat, name, url)
+                for cat, subcat, name, url in all_sources
                 if cat in categories
             ]
 
@@ -240,14 +241,17 @@ class UnifiedParser:
         logger.info(f"✅ Async parsing completed: {len(all_news)} total news items")
         return all_news
 
-    def parse_all_sources_sync(self, categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
+    def parse_all_sources_sync(
+        self, categories: Optional[List[str]] = None, limit_per_source: int = 5
+    ) -> List[Dict]:
         """Parse all RSS sources synchronously."""
         all_sources = get_all_sources()
-        
+
         # Filter by categories if specified
         if categories:
             all_sources = [
-                (cat, subcat, name, url) for cat, subcat, name, url in all_sources
+                (cat, subcat, name, url)
+                for cat, subcat, name, url in all_sources
                 if cat in categories
             ]
 
@@ -270,9 +274,9 @@ class UnifiedParser:
             # Calculate date range
             start_date = datetime.now(timezone.utc)
             end_date = start_date + timedelta(days=days_ahead)
-            
+
             url = f"https://www.investing.com/economic-calendar/"
-            
+
             content = self._fetch_url_sync(url)
             if not content:
                 return []
@@ -282,12 +286,12 @@ class UnifiedParser:
 
             # Parse events from the calendar
             event_rows = soup.find_all('tr', {'data-event-datetime': True})
-            
+
             for row in event_rows:
                 try:
                     event_time_str = row.get('data-event-datetime')
                     event_time = self.normalize_date(event_time_str)
-                    
+
                     if not event_time or event_time > end_date:
                         continue
 
@@ -299,7 +303,7 @@ class UnifiedParser:
                     country = cells[0].get_text(strip=True)
                     title = cells[3].get_text(strip=True)
                     importance_cell = cells[4]
-                    
+
                     # Parse importance
                     importance = 1
                     priority = "low"
@@ -328,7 +332,7 @@ class UnifiedParser:
                         "previous": previous,
                         "source": "investing.com",
                         "category": "economy",
-                        "subcategory": "events"
+                        "subcategory": "events",
                     }
 
                     events.append(event_item)
@@ -397,19 +401,25 @@ def parse_source(url: str, category: str, subcategory: str, source_name: str) ->
     return parser.parse_source_sync(url, category, subcategory, source_name)
 
 
-async def async_parse_source(url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
+async def async_parse_source(
+    url: str, category: str, subcategory: str, source_name: str
+) -> List[Dict]:
     """Backward compatibility function for async parsing single source."""
     parser = get_async_parser()
     return await parser.parse_source_async(url, category, subcategory, source_name)
 
 
-def parse_all_sources(categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
+def parse_all_sources(
+    categories: Optional[List[str]] = None, limit_per_source: int = 5
+) -> List[Dict]:
     """Backward compatibility function for parsing all sources."""
     parser = get_sync_parser()
     return parser.parse_all_sources_sync(categories, limit_per_source)
 
 
-async def async_parse_all_sources(categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
+async def async_parse_all_sources(
+    categories: Optional[List[str]] = None, limit_per_source: int = 5
+) -> List[Dict]:
     """Backward compatibility function for async parsing all sources."""
     parser = get_async_parser()
     return await parser.async_parse_all_sources_async(categories, limit_per_source)
