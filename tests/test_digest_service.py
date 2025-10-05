@@ -46,4 +46,4 @@ def test_build_ai_digest_no_category(monkeypatch):
 
     digest_text = digest_service.build_ai_digest(category=None, period="week", style="meme")
     assert "AI DIGEST" in digest_text
-    assert "cat=None" in digest_text
+    assert "cat=all" in digest_text  # None преобразуется в "all"

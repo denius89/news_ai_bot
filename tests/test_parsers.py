@@ -105,7 +105,7 @@ def test_fetch_rss_dedup(monkeypatch):
     items = fetch_rss(urls)
     assert len(items) == 1  # дубль должен быть отфильтрован
     assert items[0]["title"] == "Same News"
-    assert items[0]["summary"] == "Summary"
+    assert items[0]["content"] == "Summary"
 
 
 @pytest.mark.unit
