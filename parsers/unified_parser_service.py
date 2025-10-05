@@ -1,3 +1,10 @@
+"""
+Unified Parser Service for PulseAI.
+
+This service consolidates both sync and async RSS parsing into a single interface,
+eliminating code duplication and providing consistent behavior across all modes.
+"""
+
 import asyncio
 import hashlib
 import logging
@@ -5,20 +12,25 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import sys
-import requests
+
+import aiohttp
 import feedparser
+import requests
 from dateutil import parser as dtp
+
+# Module-level imports (after sys.path modification)
 from utils.clean_text import clean_text  # noqa: E402
 from services.categories import get_all_sources  # noqa: E402
 from database.service import (
+    get_sync_service,
+    get_async_service,
+    upsert_news,
+    async_upsert_news,
+)  # noqa: E402
 from utils.error_handler import (
-            import aiohttp
-"""
-Unified Parser Service for PulseAI.
-
-This service consolidates both sync and async RSS parsing into a single interface,
-eliminating code duplication and providing consistent behavior across all modes.
-"""
+    handle_parsing_error,
+    ParsingError,
+)  # noqa: E402
 
 
 
