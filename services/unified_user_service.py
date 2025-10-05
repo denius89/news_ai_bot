@@ -5,7 +5,6 @@ This service consolidates user management, subscriptions, and notifications
 into a single interface, eliminating code duplication.
 """
 
-import asyncio
 import logging
 from typing import List, Dict, Optional
 

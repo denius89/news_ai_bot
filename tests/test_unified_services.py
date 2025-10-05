@@ -4,7 +4,6 @@ Tests for unified services.
 
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
-import asyncio
 
 from services.unified_digest_service import (
     UnifiedDigestService,
