@@ -69,16 +69,11 @@ class DatabaseService:
         else:
             logger.warning("⚠️ Supabase не инициализирован (нет ключей)")
 
-    async def _init_async_client(self):
+    def _init_async_client(self):
         """Initialize asynchronous Supabase client."""
         if SUPABASE_URL and SUPABASE_KEY:
             try:
-                # Close existing client if any
-                if self.async_client:
-                    await self.async_client.aclose()
-                    self.async_client = None
-
-                self.async_client = await create_async_client(SUPABASE_URL, SUPABASE_KEY)
+                self.async_client = create_async_client(SUPABASE_URL, SUPABASE_KEY)
                 logger.info("✅ Async Supabase client initialized")
             except Exception as e:
                 logger.error("❌ Ошибка инициализации Async Supabase: %s", e)
