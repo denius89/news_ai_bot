@@ -84,7 +84,7 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
         published = format_date(item.published_at)
         cred = float(item.credibility or 0.0)
         imp = float(item.importance or 0.0)
-    
+
     title = escape(title_raw)
     cred_icon = "✅" if cred > 0.7 else "⚠️" if cred > 0.4 else "❌"
     imp_icon = "🔥" if imp > 0.7 else "⚡" if imp > 0.4 else "💤"
@@ -94,7 +94,7 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
         content = item.get('content') or ""
     else:
         content = item.content or ""
-    
+
     summary = content.strip()
     if len(summary) > 260:
         summary = summary[:259] + "…"

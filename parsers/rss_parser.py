@@ -30,38 +30,35 @@ def normalize_date(date_str: str | None):
         return None
 
 
-def load_sources(category: Optional[str] = None, subcategory: Optional[str] = None) -> Dict[str, Dict]:
+def load_sources(
+    category: Optional[str] = None, subcategory: Optional[str] = None
+) -> Dict[str, Dict]:
     """Загружает список RSS-источников из services/categories."""
     all_sources = get_all_sources()
     urls: Dict[str, Dict] = {}
-    
+
     for cat, subcat, name, url in all_sources:
         # Фильтруем по категории и подкатегории если указаны
         if category and cat != category:
             continue
         if subcategory and subcat != subcategory:
             continue
-            
-        urls[name] = {
-            "name": name,
-            "url": url,
-            "category": cat,
-            "subcategory": subcat
-        }
-    
+
+        urls[name] = {"name": name, "url": url, "category": cat, "subcategory": subcat}
+
     return urls
 
 
 def parse_source(url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
     """
     Универсальная функция для парсинга одного источника RSS.
-    
+
     Args:
         url: URL RSS фида
         category: Категория новости
         subcategory: Подкатегория новости
         source_name: Название источника
-        
+
     Returns:
         List[Dict]: Список новостей с полями category и subcategory
     """
@@ -70,25 +67,25 @@ def parse_source(url: str, category: str, subcategory: str, source_name: str) ->
         if not feed or not feed.entries:
             logger.warning(f"Пустой фид: {source_name} ({url})")
             return []
-        
+
         news_items = []
         for entry in feed.entries:
             try:
                 # Очистка текста
                 title = clean_text(entry.get("title", ""))
                 content = clean_text(entry.get("summary", ""))
-                
+
                 if not title:
                     continue
-                
+
                 # Парсинг даты
                 published_at = normalize_date(entry.get("published", entry.get("updated")))
                 if not published_at:
                     published_at = normalize_date(str(entry.get("published_parsed")))
-                
+
                 # Создание уникального ID
                 uid = hashlib.md5(f"{entry.get('link', '')}{title}".encode()).hexdigest()
-                
+
                 news_item = {
                     "uid": uid,
                     "title": title,
@@ -99,16 +96,16 @@ def parse_source(url: str, category: str, subcategory: str, source_name: str) ->
                     "subcategory": subcategory,
                     "published_at": published_at.isoformat() if published_at else None,
                 }
-                
+
                 news_items.append(news_item)
-                
+
             except Exception as e:
                 logger.warning(f"Ошибка парсинга записи из {source_name}: {e}")
                 continue
-        
+
         logger.info(f"✅ Парсинг {source_name}: {len(news_items)} новостей")
         return news_items
-        
+
     except Exception as e:
         logger.error(f"❌ Ошибка парсинга источника {source_name}: {e}")
         return []
@@ -134,19 +131,19 @@ def fetch_rss(urls: Dict[str, Dict], per_source_limit: Optional[int] = None) -> 
 
     for meta in urls.values():
         logger.info(f"🔄 Загружаем источник: {meta['name']} ({meta['url']})")
-        
+
         # Используем новую функцию parse_source
         source_items = parse_source(
             url=meta["url"],
             category=meta.get("category", ""),
             subcategory=meta.get("subcategory", ""),
-            source_name=meta["name"]
+            source_name=meta["name"],
         )
-        
+
         # Применяем лимит если указан
         if per_source_limit:
             source_items = source_items[:per_source_limit]
-        
+
         # Добавляем уникальные элементы
         for item in source_items:
             uid = item["uid"]

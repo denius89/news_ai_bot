@@ -52,8 +52,9 @@ def get_subscription_categories():
 
     # Используем новую систему категорий
     from services.categories import get_categories
+
     categories = get_categories()
-    
+
     return [
         {
             'id': category_id,
@@ -500,13 +501,13 @@ def health_check():
 def get_categories_api():
     """
     API endpoint для получения полной структуры категорий с иконками.
-    
+
     Returns:
         JSON с категориями, подкатегориями и их иконками
     """
     try:
         structure = get_category_structure()
-        
+
         # Преобразуем в формат для WebApp
         categories_data = {}
         for category, subcategories in structure.items():
@@ -514,59 +515,56 @@ def get_categories_api():
                 'name': category.title(),
                 'icon': get_emoji_icon(category, ''),
                 'emoji': get_emoji_icon(category, ''),  # Добавляем emoji для удобства
-                'subcategories': {}
+                'subcategories': {},
             }
-            
+
             for subcategory, data in subcategories.items():
                 categories_data[category]['subcategories'][subcategory] = {
                     'name': subcategory.title(),
                     'icon': data.get('icon', ''),
                     'emoji': get_emoji_icon(category, subcategory),
-                    'sources_count': len(data.get('sources', []))
+                    'sources_count': len(data.get('sources', [])),
                 }
-        
-        return jsonify({
-            'status': 'success',
-            'data': categories_data,
-            'total_categories': len(categories_data),
-            'total_subcategories': sum(
-                len(cat['subcategories']) 
-                for cat in categories_data.values()
-            )
-        })
-        
+
+        return jsonify(
+            {
+                'status': 'success',
+                'data': categories_data,
+                'total_categories': len(categories_data),
+                'total_subcategories': sum(
+                    len(cat['subcategories']) for cat in categories_data.values()
+                ),
+            }
+        )
+
     except Exception as e:
         logger.error(f"Ошибка получения категорий: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': 'Ошибка получения категорий'
-        }), 500
+        return jsonify({'status': 'error', 'message': 'Ошибка получения категорий'}), 500
 
 
 @api_bp.route("/categories/validate", methods=["GET"])
 def validate_categories_api():
     """
     API endpoint для валидации структуры категорий.
-    
+
     Returns:
         JSON с результатами валидации
     """
     try:
         is_valid, errors = validate_sources()
-        
-        return jsonify({
-            'status': 'success',
-            'valid': is_valid,
-            'errors': errors,
-            'message': 'Валидация завершена' if is_valid else 'Найдены ошибки в структуре'
-        })
-        
+
+        return jsonify(
+            {
+                'status': 'success',
+                'valid': is_valid,
+                'errors': errors,
+                'message': 'Валидация завершена' if is_valid else 'Найдены ошибки в структуре',
+            }
+        )
+
     except Exception as e:
         logger.error(f"Ошибка валидации категорий: {e}")
-        return jsonify({
-            'status': 'error',
-            'message': 'Ошибка валидации категорий'
-        }), 500
+        return jsonify({'status': 'error', 'message': 'Ошибка валидации категорий'}), 500
 
 
 __all__ = ['api_bp']

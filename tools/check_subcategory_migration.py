@@ -12,25 +12,26 @@ sys.path.insert(0, str(project_root))
 
 from database.db_models import supabase
 
+
 def check_migration():
     """Проверяет, что миграция subcategory прошла успешно."""
-    
+
     print("🔍 Проверяем миграцию subcategory...")
-    
+
     if not supabase:
         print("❌ Supabase не инициализирован")
         return False
-    
+
     try:
         # Проверяем таблицу news
         print("\n📋 Проверяем таблицу news...")
         result = supabase.table('news').select('*').limit(1).execute()
-        
+
         if result.data:
             sample = result.data[0]
             fields = list(sample.keys())
             print(f"   Поля в таблице news: {', '.join(fields)}")
-            
+
             if 'subcategory' in sample:
                 print("   ✅ Поле subcategory: ПРИСУТСТВУЕТ")
             else:
@@ -38,16 +39,16 @@ def check_migration():
                 return False
         else:
             print("   ⚠️ Таблица news пуста")
-        
+
         # Проверяем таблицу events
         print("\n📅 Проверяем таблицу events...")
         result = supabase.table('events').select('*').limit(1).execute()
-        
+
         if result.data:
             sample = result.data[0]
             fields = list(sample.keys())
             print(f"   Поля в таблице events: {', '.join(fields)}")
-            
+
             if 'subcategory' in sample:
                 print("   ✅ Поле subcategory: ПРИСУТСТВУЕТ")
             else:
@@ -55,7 +56,7 @@ def check_migration():
                 return False
         else:
             print("   ⚠️ Таблица events пуста")
-        
+
         # Тестируем вставку с subcategory
         print("\n🧪 Тестируем вставку с subcategory...")
         test_data = {
@@ -64,25 +65,25 @@ def check_migration():
             'source': 'Test Source',
             'published_at': '2025-01-01T00:00:00Z',
             'category': 'crypto',
-            'subcategory': 'bitcoin'
+            'subcategory': 'bitcoin',
         }
-        
+
         result = supabase.table('news').insert(test_data).execute()
-        
+
         if result.data:
             print("   ✅ Вставка с subcategory: РАБОТАЕТ")
-            
+
             # Удаляем тестовую запись
             supabase.table('news').delete().eq('title', 'Test Migration Check').execute()
             print("   🧹 Тестовая запись удалена")
         else:
             print("   ❌ Вставка с subcategory: НЕ РАБОТАЕТ")
             return False
-        
+
         # Тестируем выборку с subcategory
         print("\n🔍 Тестируем выборку с subcategory...")
         result = supabase.table('news').select('category, subcategory').limit(5).execute()
-        
+
         if result.data:
             print("   ✅ Выборка с subcategory: РАБОТАЕТ")
             for item in result.data:
@@ -90,16 +91,17 @@ def check_migration():
         else:
             print("   ❌ Выборка с subcategory: НЕ РАБОТАЕТ")
             return False
-        
+
         return True
-        
+
     except Exception as e:
         print(f"❌ Ошибка при проверке: {e}")
         return False
 
+
 if __name__ == "__main__":
     success = check_migration()
-    
+
     if success:
         print("\n🎉 МИГРАЦИЯ ПРОЙДЕНА УСПЕШНО!")
         print("✅ Поле subcategory добавлено в обе таблицы")
