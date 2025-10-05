@@ -8,7 +8,7 @@ from typing import List, Tuple, Optional
 from repositories.news_repository import NewsRepository
 from models.news import NewsItem
 from services.digest_ai_service import DigestAIService
-from database.db_models import supabase, get_latest_news
+from database.service import get_latest_news, get_sync_service
 from utils.formatters import format_news
 
 logger = logging.getLogger(__name__)
@@ -96,7 +96,9 @@ class DigestService:
 
 # --- Singleton для простого использования ---
 try:
-    _default_service = DigestService(NewsRepository(supabase))
+    from database.service import get_sync_service
+    sync_service = get_sync_service()
+    _default_service = DigestService(NewsRepository(sync_service.sync_client))
 except Exception as e:
     logger.error("Не удалось инициализировать DigestService с Supabase: %s", e)
     _default_service = None

@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 08:51:07 UTC_
+_Generated on 2025-10-05 09:02:00 UTC_
 
 ```
 ├── .github/
@@ -60,7 +60,9 @@ _Generated on 2025-10-05 08:51:07 UTC_
 │   ├── init_tables.sql
 │   ├── MANUAL_MIGRATION_SUBCATEGORY.md
 │   ├── MIGRATION_INSTRUCTIONS.md
-│   └── seed_data.sql
+│   ├── MIGRATION_TO_UNIFIED_SERVICE.md
+│   ├── seed_data.sql
+│   └── service.py
 ├── digests/
 │   ├── __init__.py
 │   ├── ai_service.py
@@ -155,6 +157,7 @@ _Generated on 2025-10-05 08:51:07 UTC_
 │   ├── test_bot_routers.py
 │   ├── test_clean_text.py
 │   ├── test_dashboard_webapp.py
+│   ├── test_database_service.py
 │   ├── test_db_content.py
 │   ├── test_db_insert.py
 │   ├── test_db_models.py

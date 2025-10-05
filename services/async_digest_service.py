@@ -5,7 +5,7 @@
 import logging
 from typing import List, Tuple, Optional
 
-from database.async_db_models import async_get_latest_news
+from database.service import async_get_latest_news
 
 logger = logging.getLogger(__name__)
 

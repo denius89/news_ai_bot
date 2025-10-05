@@ -18,7 +18,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from utils.clean_text import clean_text  # noqa: E402
 from services.categories import get_all_sources  # noqa: E402
-from database.async_db_models import async_insert_news_batch, init_async_supabase  # noqa: E402
+from database.service import async_upsert_news, get_async_service  # noqa: E402
 
 logger = logging.getLogger("parsers.async_rss")
 
@@ -165,7 +165,9 @@ async def parse_all_sources_async(per_source_limit: Optional[int] = None) -> Lis
 async def async_parse_and_save():
     """Асинхронно парсит новости и сохраняет их в базу данных."""
     # Инициализируем подключение к БД
-    if not await init_async_supabase():
+    async_service = get_async_service()
+    await async_service._init_async_client()
+    if not async_service.async_client:
         logger.error("Не удалось инициализировать Async Supabase")
         return 0
 
@@ -177,7 +179,7 @@ async def async_parse_and_save():
         return 0
 
     # Сохраняем в базу данных
-    saved_count = await async_insert_news_batch(news_items)
+    saved_count = await async_upsert_news(news_items)
 
     logger.info(f"🎉 Async парсинг и сохранение завершены: {saved_count} новостей")
     return saved_count
