@@ -5,8 +5,10 @@ from aiogram import types, Router, F
 from aiogram.filters import Command
 
 from services.digest_ai_service import DigestAIService
+from services.async_digest_service import async_digest_service
 from telegram_bot.keyboards import back_inline_keyboard
-from digests.configs import CATEGORIES, PERIODS, STYLES
+from services.categories import get_categories
+from digests.configs import PERIODS, STYLES
 from utils.clean_text import clean_for_telegram
 from utils.progress_animation import (
     show_generation_progress,
@@ -21,10 +23,11 @@ LOCAL_TZ = pytz.timezone("Europe/Kyiv")
 
 
 def build_category_keyboard() -> types.InlineKeyboardMarkup:
+    categories = get_categories()
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_category:{cat}")]
-            for cat, label in CATEGORIES.items()
+            [types.InlineKeyboardButton(text=cat.title(), callback_data=f"digest_ai_category:{cat}")]
+            for cat in categories
         ]
         + [
             [
@@ -133,14 +136,11 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         # Start animated progress
         animation = await show_generation_progress(query)
 
-        # Generate digest in background
-        service = DigestAIService()
-        text = await asyncio.to_thread(
-            service.generate_digest,
-            20,  # limit
-            category,
-            True,  # ai
-            style,
+        # Generate AI digest using async service
+        categories_list = None if category == "all" else [category]
+        text = await async_digest_service.build_ai_digest(
+            limit=20,
+            categories=categories_list
         )
 
         # Stop animation

@@ -513,6 +513,7 @@ def get_categories_api():
             categories_data[category] = {
                 'name': category.title(),
                 'icon': get_emoji_icon(category, ''),
+                'emoji': get_emoji_icon(category, ''),  # Добавляем emoji для удобства
                 'subcategories': {}
             }
             

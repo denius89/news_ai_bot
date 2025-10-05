@@ -23,7 +23,8 @@ class DigestAIService:
     def generate_digest(
         self,
         limit: int = 10,
-        category: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+        category: Optional[str] = None,  # Backward compatibility
         ai: bool = False,
         style: str = "analytical",
     ) -> str:
@@ -32,7 +33,8 @@ class DigestAIService:
 
         Args:
             limit: maximum number of news items
-            category: filter by category (None for all)
+            categories: list of categories/subcategories to filter (None for all)
+            category: single category for backward compatibility
             ai: if True, generate AI digest, else normal HTML digest
             style: style for AI generation
 
@@ -40,24 +42,28 @@ class DigestAIService:
             Formatted digest text
         """
         try:
-            # Get news items
-            categories = [category] if category else None
+            # Get news items - support both new and old API
+            if categories is None and category is not None:
+                categories = [category]  # Backward compatibility
             news_items = self.news_repo.get_recent_news(limit=limit, categories=categories)
 
             if not news_items:
                 if ai:
-                    return f"AI DIGEST (cat={category}): Сегодня новостей нет."
+                    cat_display = categories[0] if categories else category or "all"
+                    return f"AI DIGEST (cat={cat_display}): Сегодня новостей нет."
                 return format_news([], limit=None, with_header=True)
 
             if ai:
-                return self.generate_ai_digest(news_items, style=style, category=category)
+                cat_display = categories[0] if categories else category or "all"
+                return self.generate_ai_digest(news_items, style=style, category=cat_display)
             else:
                 return format_news(news_items, limit=limit, with_header=True)
 
         except Exception as e:
             logger.error("Ошибка при генерации дайджеста: %s", e, exc_info=True)
             if ai:
-                return f"AI DIGEST (cat={category}): ⚠️ Ошибка при генерации дайджеста."
+                cat_display = categories[0] if categories else category or "all"
+                return f"AI DIGEST (cat={cat_display}): ⚠️ Ошибка при генерации дайджеста."
             return "⚠️ Ошибка при генерации дайджеста."
 
     def generate_ai_digest(

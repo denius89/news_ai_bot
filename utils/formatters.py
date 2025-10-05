@@ -64,22 +64,38 @@ def format_digest_output(data: Union[str, Dict[str, Any]], style: str = "analyti
     return str(data).strip()
 
 
-def format_news_item(item: NewsItem, index: Optional[int] = None) -> str:
+def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int] = None) -> str:
     """
     HTML-блок одной новости с метриками, датой и ссылкой.
+    Поддерживает как объекты NewsItem, так и словари.
     """
-    title_raw = (item.title or item.source or "Untitled").strip()
+    # Поддерживаем как объекты, так и словари
+    if isinstance(item, dict):
+        title_raw = (item.get('title') or item.get('source') or "Untitled").strip()
+        link = item.get('link') or ""
+        source = escape(item.get('source') or "—")
+        published = format_date(item.get('published_at'))
+        cred = float(item.get('credibility') or 0.0)
+        imp = float(item.get('importance') or 0.0)
+    else:
+        title_raw = (item.title or item.source or "Untitled").strip()
+        link = item.link or ""
+        source = escape(item.source or "—")
+        published = format_date(item.published_at)
+        cred = float(item.credibility or 0.0)
+        imp = float(item.importance or 0.0)
+    
     title = escape(title_raw)
-    link = item.link or ""
-    source = escape(item.source or "—")
-    published = format_date(item.published_at)
-
-    cred = float(item.credibility or 0.0)
-    imp = float(item.importance or 0.0)
     cred_icon = "✅" if cred > 0.7 else "⚠️" if cred > 0.4 else "❌"
     imp_icon = "🔥" if imp > 0.7 else "⚡" if imp > 0.4 else "💤"
 
-    summary = (item.content or "").strip()
+    # Получаем контент
+    if isinstance(item, dict):
+        content = item.get('content') or ""
+    else:
+        content = item.content or ""
+    
+    summary = content.strip()
     if len(summary) > 260:
         summary = summary[:259] + "…"
     summary = escape(summary)

@@ -11,7 +11,7 @@ from aiogram.filters import Command
 
 from services.subscription_service import SubscriptionService
 from services.notification_service import NotificationService
-from config.constants import CATEGORIES
+from services.categories import get_categories
 from telegram_bot.keyboards import (
     subscriptions_inline_keyboard,
     notifications_inline_keyboard,
@@ -44,15 +44,15 @@ async def cmd_subscribe(message: types.Message):
         if len(args) < 2:
             await message.answer(
                 "❌ Использование: /subscribe <category>\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
         category = args[1].strip().lower()
-        if category not in CATEGORIES:
+        if category not in get_categories():
             await message.answer(
                 f"❌ Неизвестная категория: {category}\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
@@ -87,15 +87,15 @@ async def cmd_unsubscribe(message: types.Message):
         if len(args) < 2:
             await message.answer(
                 "❌ Использование: /unsubscribe <category>\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
         category = args[1].strip().lower()
-        if category not in CATEGORIES:
+        if category not in get_categories():
             await message.answer(
                 f"❌ Неизвестная категория: {category}\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
@@ -141,7 +141,7 @@ async def cmd_my_subs(message: types.Message):
             await message.answer(
                 "📋 У вас пока нет подписок.\n"
                 f"Добавьте: /subscribe <category>\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
         else:
             # Format subscriptions list
@@ -160,7 +160,7 @@ async def cmd_my_subs(message: types.Message):
 @router.message(Command("categories"))
 async def cmd_categories(message: types.Message):
     """Handle /categories command to show available categories."""
-    categories_text = ", ".join(sorted(CATEGORIES))
+    categories_text = ", ".join(sorted(get_categories()))
     await message.answer(f"📋 Доступные категории:\n\n{categories_text}")
 
 
@@ -186,7 +186,7 @@ async def cmd_help_subs(message: types.Message):
 /notify_on digest
 /notify_off events
 """.format(
-        ', '.join(CATEGORIES), ', '.join(NOTIFICATION_TYPES)
+        ', '.join(get_categories()), ', '.join(NOTIFICATION_TYPES)
     )
 
     await message.answer(help_text, parse_mode="HTML")
@@ -236,7 +236,7 @@ async def cb_my_subs(query: types.CallbackQuery):
                 "📋 <b>Ваши подписки</b>\n\n"
                 "У вас пока нет подписок.\n"
                 "Добавьте: /subscribe <category>\n"
-                f"Доступные категории: {', '.join(CATEGORIES)}"
+                f"Доступные категории: {', '.join(get_categories())}"
             )
         else:
             # Format subscriptions list

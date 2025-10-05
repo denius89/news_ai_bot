@@ -1,13 +1,13 @@
 # utils/ai_client.py
 import logging
 import asyncio
-import openai
+from openai import OpenAI
 from config.settings import OPENAI_API_KEY, AI_MODEL_SUMMARY, AI_MAX_TOKENS
 
 logger = logging.getLogger("ai_client")
 
-# Настройка ключа
-openai.api_key = OPENAI_API_KEY
+# Настройка клиента OpenAI (новая версия API)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def ask(prompt: str, model: str = None, max_tokens: int = None) -> str:
@@ -21,12 +21,12 @@ def ask(prompt: str, model: str = None, max_tokens: int = None) -> str:
     max_tokens = max_tokens or AI_MAX_TOKENS
 
     try:
-        resp = openai.ChatCompletion.create(
+        resp = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             max_tokens=max_tokens,
         )
-        content = resp["choices"][0]["message"]["content"].strip()
+        content = resp.choices[0].message.content.strip()
         logger.debug("AI response (model=%s): %s", model, content[:200])
         return content
     except Exception as e:
@@ -55,14 +55,14 @@ async def ask_async(
         loop = asyncio.get_event_loop()
         response = await loop.run_in_executor(
             None,
-            lambda: openai.ChatCompletion.create(
+            lambda: client.chat.completions.create(
                 model=model,
                 messages=[{"role": "user", "content": prompt}],
                 max_tokens=max_tokens,
                 temperature=temperature,
             ),
         )
-        content = response["choices"][0]["message"]["content"].strip()
+        content = response.choices[0].message.content.strip()
         logger.debug("AI response (model=%s, style=%s): %s", model, style, content[:200])
         return content
     except Exception as e:

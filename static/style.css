@@ -180,6 +180,33 @@ body {
     border-color: #3A3A3A;
     color: #F5F5F5;
   }
+  
+  /* Active states for dark theme */
+  .chip-filter.crypto.active {
+    background: rgba(0,122,255,0.25);
+    color: #007AFF;
+    border-color: transparent;
+  }
+  .chip-filter.sports.active {
+    background: rgba(76,217,100,0.25);
+    color: #34C759;
+    border-color: transparent;
+  }
+  .chip-filter.markets.active {
+    background: rgba(255,149,0,0.25);
+    color: #FF9500;
+    border-color: transparent;
+  }
+  .chip-filter.tech.active {
+    background: rgba(255,59,48,0.25);
+    color: #FF3B30;
+    border-color: transparent;
+  }
+  .chip-filter.world.active {
+    background: rgba(10,132,255,0.25);
+    color: #0A84FF;
+    border-color: transparent;
+  }
 }
 .chip-filter:focus-visible {
   outline: none;
@@ -191,24 +218,24 @@ body {
   color: var(--color-primary);
   border-color: transparent;
 }
-.chip-filter.economy.active, .chip-filter.economy:hover {
+.chip-filter.sports.active, .chip-filter.sports:hover {
   background: rgba(76,217,100,0.15);
   color: var(--color-success);
+  border-color: transparent;
+}
+.chip-filter.markets.active, .chip-filter.markets:hover {
+  background: rgba(255,149,0,0.15);
+  color: var(--color-warning);
+  border-color: transparent;
+}
+.chip-filter.tech.active, .chip-filter.tech:hover {
+  background: rgba(255,59,48,0.15);
+  color: var(--color-danger);
   border-color: transparent;
 }
 .chip-filter.world.active, .chip-filter.world:hover {
   background: rgba(10,132,255,0.15);
   color: var(--color-info);
-  border-color: transparent;
-}
-.chip-filter.technology.active, .chip-filter.technology:hover {
-  background: rgba(255,149,0,0.15);
-  color: var(--color-warning);
-  border-color: transparent;
-}
-.chip-filter.politics.active, .chip-filter.politics:hover {
-  background: rgba(255,59,48,0.15);
-  color: var(--color-danger);
   border-color: transparent;
 }
 
