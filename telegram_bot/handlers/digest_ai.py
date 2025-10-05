@@ -259,8 +259,9 @@ async def cb_subscribe_category(query: types.CallbackQuery):
 async def cb_enable_auto_digest(query: types.CallbackQuery):
     """Handle enabling auto-digest notifications."""
     try:
-        user_id = query.from_user.id
+        # user_id = query.from_user.id
         # Enable auto-digest notifications
+        user_id = query.from_user.id
         notification_service = get_async_notification_service()
         success = await notification_service.enable_auto_digest(user_id, enabled=True)
 
