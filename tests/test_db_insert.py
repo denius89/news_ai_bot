@@ -1,7 +1,7 @@
 import pytest
 
 from database.db_models import upsert_news
-from parsers.rss_parser import fetch_rss
+from parsers.unified_parser import parse_source
 
 
 @pytest.mark.integration
@@ -22,7 +22,20 @@ def test_insert_news():
     }
 
     # берём максимум по 2 новости на источник
-    items = fetch_rss(sources, per_source_limit=2)
+    items = []
+    for source_name, source_info in sources.items():
+        try:
+            parsed_items = parse_source(
+                source_info["url"], 
+                source_info["category"], 
+                "general", 
+                source_info["name"]
+            )
+            if parsed_items:
+                items.extend(parsed_items[:2])  # максимум 2 новости на источник
+        except Exception as e:
+            print(f"Ошибка парсинга {source_name}: {e}")
+            continue
     assert isinstance(items, list)
     assert len(items) > 0
 

@@ -64,6 +64,10 @@ lint:
 		--ignore=E402,E501,W293,F401,F841,F541,E722 \
 		--select=F821,F811
 
+# 11.1) Lint полный (все ошибки)
+lint-full:
+	flake8 . --exclude=venv,__pycache__,.git
+
 # 12) Format (black)
 format:
 	black .

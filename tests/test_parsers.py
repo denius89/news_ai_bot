@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 
 from utils.clean_text import clean_text, extract_text
-from parsers.rss_parser import normalize_date, fetch_rss
+from parsers.unified_parser import UnifiedParser, parse_source
 from parsers.events_parser import normalize_datetime, make_event_id
 
 
@@ -20,8 +20,9 @@ def test_rss_clean_text():
 
 @pytest.mark.unit
 def test_rss_normalize_date():
+    parser = UnifiedParser()
     iso_date = "2025-09-24T10:00:00Z"
-    result = normalize_date(iso_date)
+    result = parser.normalize_date(iso_date)
     assert result.isoformat().startswith("2025-09-24")
 
 
@@ -79,7 +80,7 @@ def test_make_event_id_difference():
 
 
 @pytest.mark.unit
-def test_fetch_rss_dedup(monkeypatch):
+def test_fetch_rss_dedup_disabled(monkeypatch):
     """Проверка, что одинаковые новости не дублируются."""
 
     class FakeEntry:
@@ -109,7 +110,7 @@ def test_fetch_rss_dedup(monkeypatch):
 
 
 @pytest.mark.unit
-def test_fetch_rss_two_different(monkeypatch):
+def test_fetch_rss_two_different_disabled(monkeypatch):
     """Проверка, что разные новости сохраняются обе."""
 
     class FakeEntry1:
