@@ -7,6 +7,7 @@ and asynchronous database operations without complex coroutine handling.
 
 import asyncio
 import logging
+import os
 import time
 from datetime import datetime, timezone
 from typing import List, Dict, Optional, Union
@@ -14,6 +15,7 @@ from pathlib import Path
 import sys
 
 import httpx
+from dotenv import load_dotenv
 from supabase import create_client, create_async_client, Client, AsyncClient
 
 # Add project root to path
@@ -22,10 +24,13 @@ sys.path.append(str(Path(__file__).parent.parent))
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
 from utils.dates import ensure_utc_iso  # noqa: E402
-from utils.cache import get_news_cache, cached  # noqa: E402
-from config.settings import SUPABASE_URL, SUPABASE_KEY  # noqa: E402
 
 logger = logging.getLogger("database.service")
+
+# Load environment variables
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 
 class DatabaseService:

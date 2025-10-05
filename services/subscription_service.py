@@ -1,194 +1,296 @@
 """
-Subscription Service - async wrapper for user subscription management.
+Subscription Service for PulseAI.
 
-This service provides async methods for managing user subscriptions,
-wrapping the synchronous database functions from db_models.
+This module provides subscription management functionality for users.
 """
 
-import asyncio
 import logging
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Set
+from datetime import datetime, timezone
 
-from database import db_models
+from database.service import get_sync_service, get_async_service
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("subscription_service")
 
 
 class SubscriptionService:
-    """Service for managing user subscriptions and notifications."""
+    """Service for managing user subscriptions to categories and subcategories."""
 
-    async def get_or_create_user(
-        self, telegram_id: int, username: str | None = None, locale: str = "ru"
-    ) -> str:
+    def __init__(self, async_mode: bool = False):
         """
-        Get existing user or create new one by Telegram ID.
+        Initialize subscription service.
 
         Args:
-            telegram_id: Telegram user ID
-            username: Telegram username (optional)
-            locale: User locale (default: 'ru')
-
-        Returns:
-            User ID (UUID string) from database
+            async_mode: If True, uses async database operations
         """
-        try:
-            # First try to find existing user
-            user = await asyncio.to_thread(db_models.get_user_by_telegram, telegram_id)
-            if user:
-                logger.debug("Found existing user: ID=%s", user["id"])
-                return user["id"]
+        self.async_mode = async_mode
+        if async_mode:
+            self.db_service = get_async_service()
+        else:
+            self.db_service = get_sync_service()
 
-            # Create new user if not found
-            user_id = await asyncio.to_thread(
-                db_models.upsert_user_by_telegram, telegram_id, username, locale
-            )
-            logger.info("Created new user: ID=%s, telegram_id=%s", user_id, telegram_id)
-            return user_id
-
-        except Exception as e:
-            logger.error("Error in get_or_create_user: %s", e)
-            return ""
-
-    async def add(self, user_id: str, category: str) -> bool:
+    async def get_user_subscriptions(self, user_id: int) -> Dict[str, List[str]]:
         """
-        Add subscription for user to category.
+        Get user's subscriptions to categories and subcategories.
 
         Args:
-            user_id: User ID
-            category: News category
+            user_id: Telegram user ID
 
         Returns:
-            True if subscription was added, False if already exists
+            Dictionary with 'categories' and 'subcategories' lists
         """
         try:
-            result = await asyncio.to_thread(db_models.add_subscription, user_id, category)
-            logger.info(
-                "Subscription add result: user_id=%s, category=%s, added=%s",
-                user_id,
-                category,
-                result,
-            )
-            return result
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                result = await self.db_service.async_safe_execute(
+                    client.table("subscriptions")
+                    .select("category")
+                    .eq("user_id", user_id)
+                )
+            else:
+                result = self.db_service.safe_execute(
+                    self.db_service.sync_client.table("subscriptions")
+                    .select("category")
+                    .eq("user_id", user_id)
+                )
+
+            subscriptions = result.data or []
+            
+            # Group by categories
+            categories = set()
+            
+            for sub in subscriptions:
+                if sub.get("category"):
+                    categories.add(sub["category"])
+
+            return {
+                "categories": list(categories),
+                "subcategories": []  # Not implemented in current schema
+            }
 
         except Exception as e:
-            logger.error("Error adding subscription: %s", e)
+            logger.error("❌ Error getting user subscriptions: %s", e)
+            return {"categories": [], "subcategories": []}
+
+    async def subscribe_to_category(self, user_id: int, category: str) -> bool:
+        """
+        Subscribe user to a category.
+
+        Args:
+            user_id: Telegram user ID
+            category: Category name
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                await self.db_service.async_safe_execute(
+                    client.table("subscriptions").upsert({
+                        "user_id": user_id,
+                        "category": category,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }, on_conflict="user_id,category")
+                )
+            else:
+                self.db_service.safe_execute(
+                    self.db_service.sync_client.table("subscriptions").upsert({
+                        "user_id": user_id,
+                        "category": category,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }, on_conflict="user_id,category")
+                )
+
+            logger.info("✅ User %d subscribed to category %s", user_id, category)
+            return True
+
+        except Exception as e:
+            logger.error("❌ Error subscribing to category: %s", e)
             return False
 
-    async def remove(self, user_id: str, category: str) -> int:
+    async def subscribe_to_subcategory(self, user_id: int, category: str, subcategory: str) -> bool:
         """
-        Remove subscription for user from category.
+        Subscribe user to a subcategory.
 
         Args:
-            user_id: User ID
-            category: News category
+            user_id: Telegram user ID
+            category: Category name
+            subcategory: Subcategory name
 
         Returns:
-            Number of subscriptions removed (0 or 1)
+            True if successful, False otherwise
         """
         try:
-            result = await asyncio.to_thread(db_models.remove_subscription, user_id, category)
-            logger.info(
-                "Subscription remove result: user_id=%s, category=%s, removed=%d",
-                user_id,
-                category,
-                result,
-            )
-            return result
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                await self.db_service.async_safe_execute(
+                    client.table("user_subscriptions").upsert({
+                        "user_id": user_id,
+                        "category": category,
+                        "subcategory": subcategory,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }, on_conflict="user_id,category,subcategory")
+                )
+            else:
+                self.db_service.safe_execute(
+                    self.db_service.sync_client.table("user_subscriptions").upsert({
+                        "user_id": user_id,
+                        "category": category,
+                        "subcategory": subcategory,
+                        "created_at": datetime.now(timezone.utc).isoformat()
+                    }, on_conflict="user_id,category,subcategory")
+                )
+
+            logger.info("✅ User %d subscribed to subcategory %s/%s", user_id, category, subcategory)
+            return True
 
         except Exception as e:
-            logger.error("Error removing subscription: %s", e)
-            return 0
+            logger.error("❌ Error subscribing to subcategory: %s", e)
+            return False
 
-    async def list(self, user_id: str) -> List[Dict]:
+    async def unsubscribe_from_category(self, user_id: int, category: str) -> bool:
         """
-        Get list of user subscriptions.
+        Unsubscribe user from a category.
 
         Args:
-            user_id: User ID
+            user_id: Telegram user ID
+            category: Category name
 
         Returns:
-            List of subscription dictionaries
+            True if successful, False otherwise
         """
         try:
-            subscriptions = await asyncio.to_thread(db_models.list_subscriptions, user_id)
-            logger.debug("Retrieved %d subscriptions for user_id=%s", len(subscriptions), user_id)
-            return subscriptions
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                await self.db_service.async_safe_execute(
+                    client.table("subscriptions")
+                    .delete()
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                )
+            else:
+                self.db_service.safe_execute(
+                    self.db_service.sync_client.table("subscriptions")
+                    .delete()
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                )
+
+            logger.info("✅ User %d unsubscribed from category %s", user_id, category)
+            return True
 
         except Exception as e:
-            logger.error("Error listing subscriptions: %s", e)
-            return []
+            logger.error("❌ Error unsubscribing from category: %s", e)
+            return False
 
-    async def get_user_by_telegram(self, telegram_id: int) -> Optional[Dict]:
+    async def unsubscribe_from_subcategory(self, user_id: int, category: str, subcategory: str) -> bool:
         """
-        Get user data by Telegram ID.
+        Unsubscribe user from a subcategory.
 
         Args:
-            telegram_id: Telegram user ID
+            user_id: Telegram user ID
+            category: Category name
+            subcategory: Subcategory name
 
         Returns:
-            User data dict or None if not found
+            True if successful, False otherwise
         """
         try:
-            user = await asyncio.to_thread(db_models.get_user_by_telegram, telegram_id)
-            return user
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                await self.db_service.async_safe_execute(
+                    client.table("user_subscriptions")
+                    .delete()
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                    .eq("subcategory", subcategory)
+                )
+            else:
+                self.db_service.safe_execute(
+                    self.db_service.sync_client.table("user_subscriptions")
+                    .delete()
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                    .eq("subcategory", subcategory)
+                )
+
+            logger.info("✅ User %d unsubscribed from subcategory %s/%s", user_id, category, subcategory)
+            return True
 
         except Exception as e:
-            logger.error("Error getting user by telegram_id: %s", e)
-            return None
+            logger.error("❌ Error unsubscribing from subcategory: %s", e)
+            return False
 
-    async def upsert_notification(
-        self,
-        user_id: int,
-        type_: str = "digest",
-        frequency: str = "daily",
-        enabled: bool = True,
-        preferred_hour: int = 9,
-    ) -> None:
+    async def is_subscribed(self, user_id: int, category: str, subcategory: Optional[str] = None) -> bool:
         """
-        Create or update notification settings for user.
+        Check if user is subscribed to category or subcategory.
 
         Args:
-            user_id: User ID
-            type_: Notification type ('digest', 'events', 'breaking')
-            frequency: Notification frequency ('daily', 'weekly', 'instant')
-            enabled: Whether notification is enabled
-            preferred_hour: Preferred hour for daily notifications (0-23)
-        """
-        try:
-            await asyncio.to_thread(
-                db_models.upsert_notification,
-                user_id,
-                type_,
-                frequency,
-                enabled,
-                preferred_hour,
-            )
-            logger.info("Updated notification settings: user_id=%s, type=%s", user_id, type_)
-
-        except Exception as e:
-            logger.error("Error updating notification settings: %s", e)
-
-    async def list_notifications(self, user_id: int) -> List[Dict]:
-        """
-        Get list of user notification settings.
-
-        Args:
-            user_id: User ID
+            user_id: Telegram user ID
+            category: Category name
+            subcategory: Optional subcategory name
 
         Returns:
-            List of notification setting dictionaries
+            True if subscribed, False otherwise
         """
         try:
-            notifications = await asyncio.to_thread(db_models.list_notifications, user_id)
-            logger.debug("Retrieved %d notifications for user_id=%s", len(notifications), user_id)
-            return notifications
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                query = (
+                    client.table("subscriptions")
+                    .select("id")
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                )
+                
+                result = await self.db_service.async_safe_execute(query)
+            else:
+                query = (
+                    self.db_service.sync_client.table("subscriptions")
+                    .select("id")
+                    .eq("user_id", user_id)
+                    .eq("category", category)
+                )
+                
+                result = self.db_service.safe_execute(query)
+
+            return len(result.data or []) > 0
 
         except Exception as e:
-            logger.error("Error listing notifications: %s", e)
-            return []
+            logger.error("❌ Error checking subscription: %s", e)
+            return False
 
 
-# Global instance for easy import
-subscription_service = SubscriptionService()
+# Global service instances
+_sync_subscription_service: Optional[SubscriptionService] = None
+_async_subscription_service: Optional[SubscriptionService] = None
 
-__all__ = ["SubscriptionService", "subscription_service"]
+
+def get_sync_subscription_service() -> SubscriptionService:
+    """Get or create sync subscription service instance."""
+    global _sync_subscription_service
+    if _sync_subscription_service is None:
+        _sync_subscription_service = SubscriptionService(async_mode=False)
+    return _sync_subscription_service
+
+
+def get_async_subscription_service() -> SubscriptionService:
+    """Get or create async subscription service instance."""
+    global _async_subscription_service
+    if _async_subscription_service is None:
+        _async_subscription_service = SubscriptionService(async_mode=True)
+    return _async_subscription_service
+
+
+# Backward compatibility functions
+async def subscribe_to_category(user_id: int, category: str) -> bool:
+    """Backward compatibility function for subscribing to category."""
+    service = get_async_subscription_service()
+    return await service.subscribe_to_category(user_id, category)
+
+
+async def get_user_subscriptions(user_id: int) -> Dict[str, List[str]]:
+    """Backward compatibility function for getting user subscriptions."""
+    service = get_async_subscription_service()
+    return await service.get_user_subscriptions(user_id)

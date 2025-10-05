@@ -9,7 +9,7 @@ import logging
 from aiogram import Router, types, F
 from aiogram.filters import Command
 
-from services.telegram_notification_service import telegram_notification_service
+from services.notification_service import get_async_notification_service
 from telegram_bot.keyboards import notifications_inline_keyboard, back_inline_keyboard
 
 router = Router()
@@ -111,8 +111,9 @@ async def cb_mark_read(query: types.CallbackQuery):
         notification_id = query.data.split(":", 1)[1]
 
         # Обрабатываем через сервис
-        success = await telegram_notification_service.handle_mark_read_callback(
-            query=query, notification_id=notification_id
+        notification_service = get_async_notification_service()
+        success = await notification_service.mark_notification_read(
+            user_id=query.from_user.id, notification_id=int(notification_id)
         )
 
         if not success:
