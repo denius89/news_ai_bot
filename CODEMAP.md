@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:43:07 UTC_
+_Generated on 2025-10-05 09:43:20 UTC_
 
 ```
 ├── .github/
@@ -165,7 +165,6 @@ _Generated on 2025-10-05 09:43:07 UTC_
 │   ├── test_deepl.py
 │   ├── test_digest_service.py
 │   ├── test_digests.py
-│   ├── test_error_handler.py
 │   ├── test_events.py
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
@@ -176,7 +175,6 @@ _Generated on 2025-10-05 09:43:07 UTC_
 │   ├── test_news_repository.py
 │   ├── test_openai.py
 │   ├── test_parsers.py
-│   ├── test_performance_optimization.py
 │   ├── test_progress_animation.py
 │   ├── test_routes.py
 │   ├── test_sources.py
@@ -187,10 +185,8 @@ _Generated on 2025-10-05 09:43:07 UTC_
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
-│   ├── database_inspector.py
 │   ├── fill_ai_analysis_all.py
 │   ├── LEGACY_CLEANUP_PLAN.md
-│   ├── migrations.py
 │   ├── port_manager.py
 │   ├── README_daily_digests.md
 │   ├── refresh_news.py
