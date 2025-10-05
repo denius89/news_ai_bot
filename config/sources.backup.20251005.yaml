@@ -1,0 +1,146 @@
+crypto:
+  altcoins:
+    icon: altcoin
+    sources: []
+  bitcoin:
+    icon: btc
+    sources: []
+  defi:
+    icon: defi
+    sources: []
+  ethereum:
+    icon: eth
+    sources: []
+  exchanges:
+    icon: exchange
+    sources: []
+  gamefi:
+    icon: gamefi
+    sources: []
+  market_trends:
+    icon: market_trends
+    sources: []
+  nft:
+    icon: nft
+    sources: []
+  regulation:
+    icon: regulation
+    sources: []
+  security:
+    icon: security
+    sources: []
+markets:
+  bonds:
+    icon: bonds
+    sources: []
+  central_banks:
+    icon: central_banks
+    sources: []
+  commodities:
+    icon: commodities
+    sources: []
+  earnings:
+    icon: earnings
+    sources: []
+  economic_data:
+    icon: economic_data
+    sources: []
+  forex:
+    icon: forex
+    sources: []
+  funds_etfs:
+    icon: etf
+    sources: []
+  ipos:
+    icon: ipos
+    sources: []
+  stocks:
+    icon: stocks
+    sources: []
+sports:
+  badminton:
+    icon: badminton
+    sources: []
+  baseball:
+    icon: baseball
+    sources: []
+  basketball:
+    icon: basketball
+    sources: []
+  cricket:
+    icon: cricket
+    sources: []
+  esports:
+    icon: esports
+    sources: []
+  football:
+    icon: football
+    sources: []
+  other:
+    icon: sports_other
+    sources: []
+  table_tennis:
+    icon: table_tennis
+    sources: []
+  tennis:
+    icon: tennis
+    sources: []
+  ufc_mma:
+    icon: ufc
+    sources: []
+tech:
+  ai:
+    icon: ai
+    sources: []
+  bigtech:
+    icon: bigtech
+    sources: []
+  blockchain_tech:
+    icon: blockchain
+    sources: []
+  conferences:
+    icon: conferences
+    sources: []
+  cybersecurity:
+    icon: cybersecurity
+    sources: []
+  hardware:
+    icon: hardware
+    sources: []
+  software:
+    icon: software
+    sources: []
+  startups:
+    icon: startups
+    sources: []
+world:
+  climate:
+    icon: climate
+    sources: []
+  conflicts:
+    icon: conflicts
+    sources: []
+  diplomacy:
+    icon: diplomacy
+    sources: []
+  elections:
+    icon: elections
+    sources: []
+  energy:
+    icon: energy
+    sources: []
+  geopolitics:
+    icon: geopolitics
+    sources: []
+  global_risks:
+    icon: global_risks
+    sources: []
+  migration:
+    icon: migration
+    sources: []
+  organizations:
+    icon: organizations
+    sources: []
+  sanctions:
+    icon: sanctions
+    sources: []

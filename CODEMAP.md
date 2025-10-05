@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 15:46:38 UTC_
+_Generated on 2025-10-05 16:09:04 UTC_
 
 ```
 ├── .github/
@@ -41,6 +41,7 @@ _Generated on 2025-10-05 15:46:38 UTC_
 │   ├── icons_map.json
 │   ├── logging.yaml
 │   ├── settings.py
+│   ├── sources.backup.20251005.yaml
 │   └── sources.yaml
 ├── database/
 │   ├── migrations/
@@ -198,6 +199,7 @@ _Generated on 2025-10-05 15:46:38 UTC_
 │   ├── send_daily_digests.py
 │   ├── test_advanced_parser.py
 │   ├── update_news_with_universal_parser.py
+│   ├── update_rss_sources.py
 │   └── validate_rss_sources.py
 ├── webapp/
 │   ├── index.html
