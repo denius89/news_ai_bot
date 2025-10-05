@@ -2,9 +2,11 @@ import logging
 import pytz
 from aiogram import types, Router, F
 from aiogram.filters import Command
-from services.async_digest_service import async_digest_service
+from services.unified_digest_service import get_async_digest_service
 from telegram_bot.keyboards import back_inline_keyboard
 from services.categories import get_categories
+from services.subscription_service import get_async_subscription_service
+from services.notification_service import get_async_notification_service
 from digests.configs import PERIODS, STYLES
 from utils.clean_text import clean_for_telegram
 from utils.progress_animation import (
@@ -145,7 +147,8 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
         # Generate AI digest using async service
         categories_list = None if category == "all" else [category]
-        text = await async_digest_service.build_ai_digest(
+        digest_service = get_async_digest_service()
+        text = await digest_service.async_build_ai_digest(
             limit=20, categories=categories_list, style=style
         )
 
@@ -231,8 +234,14 @@ async def cb_subscribe_category(query: types.CallbackQuery):
         category = query.data.split(":", 1)[1]
         category_name = get_categories().get(category, {}).get('name', category)
 
-        # TODO: Implement actual subscription logic
-        await query.answer(f"✅ Подписка на {category_name} активирована!", show_alert=True)
+        # Subscribe user to category
+        subscription_service = get_async_subscription_service()
+        success = await subscription_service.subscribe_to_category(user_id, category)
+        
+        if success:
+            await query.answer(f"✅ Подписка на {category_name} активирована!", show_alert=True)
+        else:
+            await query.answer("❌ Ошибка при активации подписки", show_alert=True)
 
         # Update message to show subscription success
         await query.message.edit_reply_markup(
@@ -250,10 +259,17 @@ async def cb_subscribe_category(query: types.CallbackQuery):
 async def cb_enable_auto_digest(query: types.CallbackQuery):
     """Handle enabling auto-digest notifications."""
     try:
-        # TODO: Implement actual notification enabling logic
-        await query.answer(
-            "✅ Авто-дайджест включен! Буду присылать дайджесты каждый день в 9:00", show_alert=True
-        )
+        user_id = query.from_user.id
+        # Enable auto-digest notifications
+        notification_service = get_async_notification_service()
+        success = await notification_service.enable_auto_digest(user_id, enabled=True)
+        
+        if success:
+            await query.answer(
+                "✅ Авто-дайджест включен! Буду присылать дайджесты каждый день в 9:00", show_alert=True
+            )
+        else:
+            await query.answer("❌ Ошибка при включении авто-дайджеста", show_alert=True)
 
     except Exception as e:
         logger.error(f"Error in enable auto digest: {e}")

@@ -2,7 +2,7 @@ import logging
 from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
-from services.async_digest_service import async_digest_service
+from services.unified_digest_service import get_async_digest_service
 from services.categories import get_categories
 from utils.clean_text import clean_for_telegram
 from models.news import NewsItem
@@ -54,7 +54,8 @@ async def send_digest(
     cats = None if (category is None or category == "all") else [category]
 
     # ⚡️ используем асинхронный сервис дайджестов
-    digest_text, news = await async_digest_service.build_daily_digest(
+    digest_service = get_async_digest_service()
+    digest_text = await digest_service.async_build_daily_digest(
         limit=limit, style="analytical", categories=cats
     )
 

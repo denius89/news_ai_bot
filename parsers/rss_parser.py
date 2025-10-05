@@ -1,6 +1,12 @@
-# Этот файл устарел. Используйте parsers/universal_rss_parser.py
-# Импортируем новый парсер для обратной совместимости
-from parsers.universal_rss_parser import UniversalRSSParser, parse_source, fetch_rss, load_sources
+# Этот файл устарел. Используйте parsers/unified_parser.py
+# Импортируем новый унифицированный парсер для обратной совместимости
+from parsers.unified_parser import (
+    UnifiedParser, 
+    parse_source, 
+    parse_all_sources,
+    get_sync_parser,
+    get_async_parser
+)
 
 import logging
 from typing import Dict, List, Optional

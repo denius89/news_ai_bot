@@ -13,6 +13,7 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 from telegram_bot.keyboards import back_inline_keyboard
+from config.settings import WEBAPP_URL
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -26,8 +27,7 @@ async def open_dashboard(message: types.Message):
     """
     logger.info("📱 Dashboard command received from user %s", message.from_user.id)
 
-    # TODO: Move WebApp URL to config.py
-    webapp_url = "https://associate-ins-der-clusters.trycloudflare.com/webapp"
+    webapp_url = f"{WEBAPP_URL}/webapp"
 
     # Создаем inline клавиатуру с WebApp кнопкой и кнопкой "Назад"
     keyboard = InlineKeyboardMarkup(
@@ -60,8 +60,7 @@ async def open_dashboard_callback(callback_query: types.CallbackQuery):
     """
     logger.info("📱 Dashboard callback received from user %s", callback_query.from_user.id)
 
-    # TODO: Move WebApp URL to config.py
-    webapp_url = "https://associate-ins-der-clusters.trycloudflare.com/webapp"
+    webapp_url = f"{WEBAPP_URL}/webapp"
 
     # Создаем inline клавиатуру с WebApp кнопкой и кнопкой "Назад"
     keyboard = InlineKeyboardMarkup(

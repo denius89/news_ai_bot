@@ -20,6 +20,11 @@ VERSION = os.getenv("VERSION", "0.1.0")
 # Настройки webapp
 WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8001"))
+WEBAPP_URL = os.getenv("WEBAPP_URL", f"http://localhost:{WEBAPP_PORT}")
+
+# Supabase настройки
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
 # ---- БД ----
 # Пример: postgres://user:pass@host:5432/dbname
@@ -45,6 +50,11 @@ class _C:
     APP_ENV = APP_ENV
     DEBUG = DEBUG
     TIMEZONE = TIMEZONE
+    WEBAPP_HOST = WEBAPP_HOST
+    WEBAPP_PORT = WEBAPP_PORT
+    WEBAPP_URL = WEBAPP_URL
+    SUPABASE_URL = SUPABASE_URL
+    SUPABASE_KEY = SUPABASE_KEY
     DATABASE_URL = DATABASE_URL
     OPENAI_API_KEY = OPENAI_API_KEY
     TELEGRAM_BOT_TOKEN = TELEGRAM_BOT_TOKEN

@@ -5,7 +5,7 @@ Flask-маршруты для отображения новостей и соб�
 import logging
 from flask import Blueprint, render_template, request
 
-from services.digest_service import build_daily_digest
+from services.unified_digest_service import get_sync_digest_service
 from services.categories import get_categories
 from database.db_models import (
     get_latest_events,
@@ -21,7 +21,8 @@ news_bp = Blueprint("news", __name__)
 def digest():
     categories = request.args.getlist("category")
 
-    digest_text, news_items = build_daily_digest(limit=10, categories=categories)
+    digest_service = get_sync_digest_service()
+    digest_text, news_items = digest_service.build_daily_digest(limit=10, categories=categories)
 
     # Обогащаем данными для шаблона
     enriched_items = []

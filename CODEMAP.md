@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 17:55:39 UTC_
+_Generated on 2025-10-05 19:08:45 UTC_
 
 ```
 ├── .github/
@@ -64,7 +64,8 @@ _Generated on 2025-10-05 17:55:39 UTC_
 │   ├── init_tables.sql
 │   ├── MIGRATION_INSTRUCTIONS.md
 │   ├── seed_data.sql
-│   └── service.py
+│   ├── service.py
+│   └── service_v2.py
 ├── digests/
 │   ├── __init__.py
 │   ├── ai_service.py
@@ -91,10 +92,9 @@ _Generated on 2025-10-05 17:55:39 UTC_
 ├── parsers/
 │   ├── __init__.py
 │   ├── advanced_parser.py
-│   ├── async_rss_parser.py
 │   ├── events_parser.py
 │   ├── rss_parser.py
-│   └── universal_rss_parser.py
+│   └── unified_parser.py
 ├── repositories/
 │   ├── events_repository.py
 │   └── news_repository.py
@@ -106,16 +106,10 @@ _Generated on 2025-10-05 17:55:39 UTC_
 │   └── webapp_routes.py
 ├── services/
 │   ├── __init__.py
-│   ├── async_digest_service.py
 │   ├── categories.py
-│   ├── digest_ai_service.py
-│   ├── digest_service.py
-│   ├── notification_delivery_service.py
 │   ├── notification_service.py
 │   ├── subscription_service.py
-│   ├── telegram_notification_service.py
-│   ├── unified_digest_service.py
-│   └── unified_user_service.py
+│   └── unified_digest_service.py
 ├── static/
 │   ├── assets/
 │   │   └── logo/
@@ -163,6 +157,7 @@ _Generated on 2025-10-05 17:55:39 UTC_
 │   ├── test_api_notifications.py
 │   ├── test_api_subscriptions.py
 │   ├── test_bot_routers.py
+│   ├── test_cache.py
 │   ├── test_clean_text.py
 │   ├── test_dashboard_webapp.py
 │   ├── test_database_service.py
@@ -176,6 +171,7 @@ _Generated on 2025-10-05 17:55:39 UTC_
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
 │   ├── test_generator.py
+│   ├── test_http_client.py
 │   ├── test_keyboards_subscriptions.py
 │   ├── test_main.py
 │   ├── test_main_import.py
@@ -234,9 +230,11 @@ _Generated on 2025-10-05 17:55:39 UTC_
 ├── pyproject.toml
 ├── pytest.ini
 ├── README.md
+├── REFACTORING_FINAL_REPORT.md
 ├── requirements.txt
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md
+├── test_global_system.py
 └── webapp.py
 ```
