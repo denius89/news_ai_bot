@@ -7,12 +7,11 @@ eliminating code duplication and providing consistent behavior.
 
 import asyncio
 import logging
-from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone
+from typing import List, Optional
 
 from repositories.news_repository import NewsRepository
 from models.news import NewsItem
-from utils.formatters import format_news, format_ai_fallback
+from utils.formatters import format_news
 from digests.ai_summary import generate_batch_summary
 from database.service import get_sync_service, get_async_service
 
