@@ -10,8 +10,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from services.digest_service import DigestService
-from services.categories import get_categories, get_subcategories
+from services.digest_service import DigestService  # noqa: E402
+from services.categories import get_categories, get_subcategories  # noqa: E402
 
 
 def test_digest_ai():
@@ -65,7 +65,7 @@ def test_digest_ai():
                 print(f"   ❌ Ошибка для {category}: {e}")
 
         # Тестируем общий дайджест
-        print(f"\n🌍 Тестируем общий дайджест...")
+        print("\n🌍 Тестируем общий дайджест...")
         try:
             digest_text, general_digest = digest_service.build_daily_digest(
                 categories=None, limit=5  # Все категории

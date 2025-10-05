@@ -4,21 +4,19 @@
 """
 
 import sys
-import os
 import logging
+import random
 from pathlib import Path
 
 # Добавляем корневую директорию в путь
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-from database.db_models import supabase, safe_execute
-from parsers.rss_parser import parse_source
-from services.categories import get_all_sources
-from ai_modules.credibility import evaluate_credibility
-from ai_modules.importance import evaluate_importance
-import random
-from datetime import datetime, timezone
+from database.db_models import supabase, safe_execute  # noqa: E402
+from parsers.rss_parser import parse_source  # noqa: E402
+from services.categories import get_all_sources  # noqa: E402
+from ai_modules.credibility import evaluate_credibility  # noqa: E402
+from ai_modules.importance import evaluate_importance  # noqa: E402
 
 # Настройка логирования
 logging.basicConfig(
