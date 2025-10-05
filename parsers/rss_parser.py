@@ -16,7 +16,7 @@ from parsers.unified_parser import (
 # Экспортируем функции для обратной совместимости
 __all__ = [
     "UnifiedParser",
-    "parse_source", 
+    "parse_source",
     "parse_all_sources",
     "get_sync_parser",
     "get_async_parser",
