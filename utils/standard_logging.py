@@ -8,7 +8,7 @@ for consistent logging across the application.
 import functools
 import logging
 import time
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Callable, Dict, Optional, Union
 
 logger = logging.getLogger("performance")
 

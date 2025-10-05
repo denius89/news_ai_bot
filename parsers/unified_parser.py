@@ -9,8 +9,7 @@ import asyncio
 import hashlib
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Union
-from pathlib import Path
+from typing import Dict, List, Optional
 
 import aiohttp
 import requests
@@ -20,7 +19,7 @@ from dateutil import parser as date_parser
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from services.categories import get_all_sources
-from utils.clean_text import clean_text, extract_text
+from utils.clean_text import clean_text
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
 from database.service import get_sync_service, get_async_service
@@ -222,7 +221,7 @@ class UnifiedParser:
 
         logger.info(f"Starting async parsing of {len(all_sources)} sources")
 
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession():
             tasks = []
             for category, subcategory, name, url in all_sources:
                 task = self.parse_source_async(url, category, subcategory, name)
@@ -275,7 +274,7 @@ class UnifiedParser:
             start_date = datetime.now(timezone.utc)
             end_date = start_date + timedelta(days=days_ahead)
 
-            url = f"https://www.investing.com/economic-calendar/"
+            url = "https://www.investing.com/economic-calendar/"
 
             content = self._fetch_url_sync(url)
             if not content:

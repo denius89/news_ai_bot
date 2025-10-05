@@ -114,12 +114,7 @@ async def cb_digest_ai_category(query: types.CallbackQuery):
     await query.answer()
 
 
-@router.callback_query(F.data.startswith("digest_ai_period:"))
-async def cb_digest_ai_period(query: types.CallbackQuery):
-    _, period, raw_category = query.data.split(":")
-    kb = build_style_keyboard(raw_category, period)
-    await query.message.edit_text("✍️ Выберите стиль дайджеста:", reply_markup=kb)
-    await query.answer()
+# First definition removed - using the more complete one below
 
 
 @router.callback_query(F.data.startswith("digest_ai_style:"))
@@ -235,6 +230,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
         category_name = get_categories().get(category, {}).get('name', category)
 
         # Subscribe user to category
+        user_id = query.from_user.id
         subscription_service = get_async_subscription_service()
         success = await subscription_service.subscribe_to_category(user_id, category)
 
@@ -259,7 +255,6 @@ async def cb_subscribe_category(query: types.CallbackQuery):
 async def cb_enable_auto_digest(query: types.CallbackQuery):
     """Handle enabling auto-digest notifications."""
     try:
-        # user_id = query.from_user.id
         # Enable auto-digest notifications
         user_id = query.from_user.id
         notification_service = get_async_notification_service()
@@ -276,22 +271,6 @@ async def cb_enable_auto_digest(query: types.CallbackQuery):
     except Exception as e:
         logger.error(f"Error in enable auto digest: {e}")
         await query.answer("❌ Ошибка при включении авто-дайджеста", show_alert=True)
-
-
-@router.callback_query(F.data.startswith("digest_ai_category:"))
-async def cb_digest_ai_category(query: types.CallbackQuery):
-    """Обработчик выбора категории для AI дайджеста"""
-    try:
-        category = query.data.split(":", 1)[1]
-        await query.message.edit_text(
-            f"📚 <b>AI-дайджест: {category.title()}</b>\n\n" "Выберите период для анализа:",
-            parse_mode="HTML",
-            reply_markup=build_period_keyboard(category),
-        )
-        await query.answer()
-    except Exception as e:
-        logger.error(f"Error in digest_ai_category: {e}")
-        await query.answer("❌ Ошибка при выборе категории")
 
 
 @router.callback_query(F.data.startswith("digest_ai_period:"))

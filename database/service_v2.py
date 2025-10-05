@@ -10,7 +10,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional
 from pathlib import Path
 import sys
 

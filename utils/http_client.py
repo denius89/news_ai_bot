@@ -7,7 +7,7 @@ for better performance and resource management.
 
 import asyncio
 import logging
-from typing import Dict, Optional, Any
+from typing import Dict, Optional
 from contextlib import asynccontextmanager
 
 import aiohttp
