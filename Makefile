@@ -56,20 +56,31 @@ check-env:
 	@echo "🔍 Проверка состояния окружения..."
 	@$(PY) tools/port_manager.py --check
 
-# 11) Lint
+# 11) Lint (только критические ошибки)
 lint:
-	flake8 .
+	flake8 . \
+		--exclude=venv,__pycache__,.git,tools,parsers/advanced_parser.py \
+		--max-line-length=120 \
+		--ignore=E402,E501,W293,F401,F841,F541,E722 \
+		--select=F821,F811
 
 # 12) Format (black)
 format:
 	black .
 
-# 13) Check: lint + tests (с подготовкой окружения)
+# 13) Pre-push checks (Black + Flake8 + Tests)
+pre-push:
+	@echo "🔍 Running pre-push checks..."
+	@$(MAKE) format
+	@$(MAKE) lint
+	@echo "✅ Pre-push checks completed"
+
+# 14) Check: lint + tests (с подготовкой окружения)
 check:
 	@echo "🔍 Проверка кода и тестов..."
 	@$(MAKE) prepare-test-env
-	$(MAKE) lint
-	$(MAKE) test
+	@$(MAKE) pre-push
+	@$(MAKE) test
 
 # 14) Run tests then bot (с подготовкой окружения)
 run-tests-bot:

@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 19:19:45 UTC_
+_Generated on 2025-10-05 19:31:45 UTC_
 
 ```
 ├── .github/
@@ -104,6 +104,10 @@ _Generated on 2025-10-05 19:19:45 UTC_
 │   ├── news_routes.py
 │   ├── subscriptions.py
 │   └── webapp_routes.py
+├── scripts/
+│   ├── dev-push.sh
+│   ├── pre-push.sh
+│   └── README.md
 ├── services/
 │   ├── __init__.py
 │   ├── categories.py
