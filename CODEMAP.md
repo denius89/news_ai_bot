@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:14:12 UTC_
+_Generated on 2025-10-05 09:40:24 UTC_
 
 ```
 ├── .github/
@@ -90,7 +90,8 @@ _Generated on 2025-10-05 09:14:12 UTC_
 │   ├── __init__.py
 │   ├── async_rss_parser.py
 │   ├── events_parser.py
-│   └── rss_parser.py
+│   ├── rss_parser.py
+│   └── unified_parser_service.py
 ├── repositories/
 │   ├── events_repository.py
 │   └── news_repository.py
@@ -109,7 +110,8 @@ _Generated on 2025-10-05 09:14:12 UTC_
 │   ├── notification_delivery_service.py
 │   ├── notification_service.py
 │   ├── subscription_service.py
-│   └── telegram_notification_service.py
+│   ├── telegram_notification_service.py
+│   └── unified_digest_service.py
 ├── static/
 │   ├── assets/
 │   │   └── logo/
@@ -176,6 +178,7 @@ _Generated on 2025-10-05 09:14:12 UTC_
 │   ├── test_news_repository.py
 │   ├── test_openai.py
 │   ├── test_parsers.py
+│   ├── test_performance_optimization.py
 │   ├── test_progress_animation.py
 │   ├── test_routes.py
 │   ├── test_sources.py
@@ -183,6 +186,8 @@ _Generated on 2025-10-05 09:14:12 UTC_
 │   ├── test_supabase.py
 │   ├── test_telegram_keyboards.py
 │   ├── test_telegram_sender.py
+│   ├── test_unified_digest_service.py
+│   ├── test_unified_parser_service.py
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
@@ -209,15 +214,18 @@ _Generated on 2025-10-05 09:14:12 UTC_
 ├── .env.example
 ├── .flake8
 ├── .gitignore
+├── .pre-commit-config.yaml
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
 ├── MASTER_FILE.md
+├── mypy.ini
 ├── pyproject.toml
 ├── pytest.ini
 ├── README.md
+├── REFACTORING_FINAL_REPORT.md
 ├── requirements.txt
 ├── setup.cfg
 ├── start_bot.sh
