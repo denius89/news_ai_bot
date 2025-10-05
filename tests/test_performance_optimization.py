@@ -3,10 +3,7 @@ Tests for performance optimization components.
 """
 
 import pytest
-import asyncio
 import time
-import json
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
 from utils.cache_manager import (
     CacheManager,
     get_cache_manager,

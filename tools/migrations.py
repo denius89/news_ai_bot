@@ -9,8 +9,6 @@ Replaces multiple add_*.py and apply_*.py scripts.
 import argparse
 import logging
 import sys
-from pathlib import Path
-from typing import List, Optional
 
 # Add project root to Python path
 sys.path.append(str(Path(__file__).parent.parent))

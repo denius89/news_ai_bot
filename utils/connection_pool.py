@@ -5,7 +5,6 @@ This module provides connection pooling for HTTP requests, database connections,
 and other network resources to improve performance and resource utilization.
 """
 
-import asyncio
 import logging
 import time
 from typing import Dict, List, Optional, Any, Tuple
