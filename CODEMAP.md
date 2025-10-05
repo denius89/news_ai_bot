@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 17:45:47 UTC_
+_Generated on 2025-10-05 17:55:39 UTC_
 
 ```
 ├── .github/
@@ -78,6 +78,8 @@ _Generated on 2025-10-05 17:45:47 UTC_
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
+│   ├── DIGESTS.md
+│   ├── PARSERS.md
 │   ├── SOURCES.md
 │   └── VISION.md
 ├── examples/
@@ -91,7 +93,6 @@ _Generated on 2025-10-05 17:45:47 UTC_
 │   ├── advanced_parser.py
 │   ├── async_rss_parser.py
 │   ├── events_parser.py
-│   ├── README_ADVANCED_PARSER.md
 │   ├── rss_parser.py
 │   └── universal_rss_parser.py
 ├── repositories/
@@ -199,7 +200,6 @@ _Generated on 2025-10-05 17:45:47 UTC_
 │   ├── load_fresh_news.py
 │   ├── merge_sources.py
 │   ├── port_manager.py
-│   ├── README_daily_digests.md
 │   ├── refresh_news.py
 │   ├── repo_map.py
 │   ├── run_all.py
@@ -224,12 +224,8 @@ _Generated on 2025-10-05 17:45:47 UTC_
 ├── .flake8
 ├── .gitignore
 ├── .pre-commit-config.yaml
-├── ADVANCED_PARSER_REPORT.md
-├── ADVANCED_PARSER_TEST_RESULTS.md
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
-├── FINAL_REPORT_DAY11.md
-├── FINAL_REPORT_DAY12.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -239,8 +235,6 @@ _Generated on 2025-10-05 17:45:47 UTC_
 ├── pytest.ini
 ├── README.md
 ├── requirements.txt
-├── RSS_PARSER_ANALYSIS_REPORT.md
-├── RSS_UPDATE_FINAL_REPORT.md
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md
