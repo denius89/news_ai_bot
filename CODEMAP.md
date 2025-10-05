@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:04:10 UTC_
+_Generated on 2025-10-05 09:10:47 UTC_
 
 ```
 ├── .github/
@@ -76,6 +76,7 @@ _Generated on 2025-10-05 09:04:10 UTC_
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
+│   ├── ERROR_HANDLING.md
 │   ├── SOURCES.md
 │   ├── SOURCES_CHECKER.md
 │   └── VISION.md
@@ -164,6 +165,7 @@ _Generated on 2025-10-05 09:04:10 UTC_
 │   ├── test_deepl.py
 │   ├── test_digest_service.py
 │   ├── test_digests.py
+│   ├── test_error_handler.py
 │   ├── test_events.py
 │   ├── test_events_parser.py
 │   ├── test_events_repository.py
@@ -234,6 +236,7 @@ _Generated on 2025-10-05 09:04:10 UTC_
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── .cursorignore
 ├── .editorconfig
 ├── .env.example
 ├── .flake8
