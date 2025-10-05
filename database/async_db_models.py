@@ -5,20 +5,17 @@
 import asyncio
 import logging
 import os
-import time
 from datetime import datetime, timezone
 from typing import List, Dict, Optional
 from pathlib import Path
+import sys
 
 from dotenv import load_dotenv
 from supabase import create_async_client, AsyncClient
 
-import sys
-from pathlib import Path
-
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.dates import format_datetime, ensure_utc_iso
+from utils.dates import format_datetime
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database.async")
@@ -138,7 +135,7 @@ async def async_insert_news_batch(news_items: List[Dict]) -> int:
             logger.warning("⚠️ Синхронный Supabase не подключён")
             return 0
 
-        result = safe_execute(supabase.table("news").upsert(clean_items, on_conflict="uid"))
+        safe_execute(supabase.table("news").upsert(clean_items, on_conflict="uid"))
 
         inserted_count = len(clean_items)
         logger.info("✅ Async: вставлено %s новостей", inserted_count)

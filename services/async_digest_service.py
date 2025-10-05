@@ -6,8 +6,6 @@ import logging
 from typing import List, Tuple, Optional
 
 from database.async_db_models import async_get_latest_news
-from models.news import NewsItem
-from utils.formatters import format_news
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +113,10 @@ class AsyncDigestService:
                 else:
                     trust = "❌ Низкая достоверность"
 
-                line = f"{i}. {analysis}: {title}\n   {trust} (важность: {importance:.2f}, достоверность: {credibility:.2f})"
+                line = (
+                    f"{i}. {analysis}: {title}\n   {trust} "
+                    f"(важность: {importance:.2f}, достоверность: {credibility:.2f})"
+                )
                 lines.append(line)
 
             return "\n\n".join(lines)

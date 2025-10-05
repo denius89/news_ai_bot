@@ -1,10 +1,7 @@
 import logging
 import pytz
-import asyncio
 from aiogram import types, Router, F
 from aiogram.filters import Command
-
-from services.digest_ai_service import DigestAIService
 from services.async_digest_service import async_digest_service
 from telegram_bot.keyboards import back_inline_keyboard
 from services.categories import get_categories
@@ -160,7 +157,7 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         username = query.from_user.username or query.from_user.first_name or "друг"
         header = f"📰 Дайджест дня для @{username}"
         if category and category != "all":
-            category_name = CATEGORIES.get(category, category)
+            category_name = get_categories().get(category, {}).get('name', category)
             header += f" • {category_name}"
 
         # Prepare final message
@@ -219,7 +216,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
     """Handle subscription to category from digest actions."""
     try:
         category = query.data.split(":", 1)[1]
-        category_name = CATEGORIES.get(category, category)
+        category_name = get_categories().get(category, {}).get('name', category)
 
         # TODO: Implement actual subscription logic
         await query.answer(f"✅ Подписка на {category_name} активирована!", show_alert=True)
