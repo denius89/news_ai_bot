@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 19:31:45 UTC_
+_Generated on 2025-10-05 20:14:20 UTC_
 
 ```
 ├── .github/
@@ -107,7 +107,8 @@ _Generated on 2025-10-05 19:31:45 UTC_
 ├── scripts/
 │   ├── dev-push.sh
 │   ├── pre-push.sh
-│   └── README.md
+│   ├── README.md
+│   └── setup-aliases.sh
 ├── services/
 │   ├── __init__.py
 │   ├── categories.py
@@ -189,7 +190,6 @@ _Generated on 2025-10-05 19:31:45 UTC_
 │   ├── test_supabase.py
 │   ├── test_telegram_keyboards.py
 │   ├── test_telegram_sender.py
-│   ├── test_unified_services.py
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
@@ -224,6 +224,7 @@ _Generated on 2025-10-05 19:31:45 UTC_
 ├── .flake8
 ├── .gitignore
 ├── .pre-commit-config.yaml
+├── .safety-ignore
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
 ├── LICENSE
