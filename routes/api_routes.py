@@ -34,10 +34,13 @@ def convert_to_uuid(user_id_input):
             return user_id_input
         # For demo users, create a consistent UUID from the input
         import hashlib
+
         hash_obj = hashlib.md5(f"demo-{user_id_input}".encode())
         hex_dig = hash_obj.hexdigest()
         # Format as UUID
-        uuid_str = f"{hex_dig[:8]}-{hex_dig[8:12]}-{hex_dig[12:16]}-{hex_dig[16:20]}-{hex_dig[20:32]}"
+        uuid_str = (
+            f"{hex_dig[:8]}-{hex_dig[8:12]}-{hex_dig[12:16]}-{hex_dig[16:20]}-{hex_dig[20:32]}"
+        )
         return uuid_str
     else:
         # Assume it's already a UUID (for direct API calls)
@@ -177,8 +180,10 @@ def update_subscription():
         if enabled:
             # For demo users, create user with a fake telegram_id
             demo_telegram_id = 999999999
-            created_user_id = run_async(subscription_service.get_or_create_user(demo_telegram_id, "demo-user", "en"))
-            
+            created_user_id = run_async(
+                subscription_service.get_or_create_user(demo_telegram_id, "demo-user", "en")
+            )
+
             # Add subscription using the created user_id
             success = run_async(subscription_service.add(created_user_id, category))
             if success:

@@ -28,13 +28,14 @@ def select_news_by_importance(news_list: list[NewsItem], limit: int) -> list[New
 def categories_keyboard() -> types.InlineKeyboardMarkup:
     """Формируем inline-клавиатуру для выбора категории"""
     from services.categories import get_emoji_icon
-    
+
     categories = get_categories()
     keyboard = [
-        [types.InlineKeyboardButton(
-            text=f"{get_emoji_icon(cat, '')} {cat.title()}", 
-            callback_data=f"digest:{cat}"
-        )]
+        [
+            types.InlineKeyboardButton(
+                text=f"{get_emoji_icon(cat, '')} {cat.title()}", callback_data=f"digest:{cat}"
+            )
+        ]
         for cat in categories
     ]
     keyboard.append(

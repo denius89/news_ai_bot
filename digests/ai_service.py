@@ -43,12 +43,15 @@ class DigestAIService:
         """Check if OpenAI API is available."""
         try:
             import os
+
             api_key = os.getenv("OPENAI_API_KEY")
             return bool(api_key)
         except Exception:
             return False
 
-    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "world") -> str:
+    async def build_digest(
+        self, news_items: List[NewsItem], style: str = "analytical", category: str = "world"
+    ) -> str:
         """
         Build AI-powered digest from news items.
 
@@ -76,7 +79,9 @@ class DigestAIService:
             logger.info("OpenAI API not available, using fallback digest")
             return self._build_fallback_digest(limited_news)
 
-    async def _llm_summarize(self, news_items: List[NewsItem], style: str, category: str = "world") -> str:
+    async def _llm_summarize(
+        self, news_items: List[NewsItem], style: str, category: str = "world"
+    ) -> str:
         """
         Generate AI-powered summary using OpenAI.
 
@@ -109,21 +114,26 @@ class DigestAIService:
 
         # Call OpenAI API
         response = await ask_async(prompt=prompt, style=style, max_tokens=1000)
-        
+
         logger.info(f"AI response length: {len(response) if response else 0}")
         logger.info(f"AI response preview: {response[:200] if response else 'EMPTY'}")
 
         # Clean HTML containers if AI generated them despite instructions
         if response:
             import re
+
             # Remove HTML document structure
             response = re.sub(r'<!DOCTYPE[^>]*>', '', response, flags=re.IGNORECASE)
             response = re.sub(r'<html[^>]*>', '', response, flags=re.IGNORECASE)
             response = re.sub(r'</html>', '', response, flags=re.IGNORECASE)
-            response = re.sub(r'<head[^>]*>.*?</head>', '', response, flags=re.DOTALL | re.IGNORECASE)
+            response = re.sub(
+                r'<head[^>]*>.*?</head>', '', response, flags=re.DOTALL | re.IGNORECASE
+            )
             response = re.sub(r'<body[^>]*>', '', response, flags=re.IGNORECASE)
             response = re.sub(r'</body>', '', response, flags=re.IGNORECASE)
-            response = re.sub(r'<style[^>]*>.*?</style>', '', response, flags=re.DOTALL | re.IGNORECASE)
+            response = re.sub(
+                r'<style[^>]*>.*?</style>', '', response, flags=re.DOTALL | re.IGNORECASE
+            )
             # Remove problematic containers
             response = re.sub(r'<div[^>]*>', '', response, flags=re.IGNORECASE)
             response = re.sub(r'</div>', '', response, flags=re.IGNORECASE)
@@ -137,7 +147,9 @@ class DigestAIService:
 
         return response
 
-    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str, category: str = "world") -> str:
+    def _create_prompt(
+        self, news_data: List[Dict[str, Any]], style: str, category: str = "world"
+    ) -> str:
         """Create AI prompt based on news data, style and category."""
 
         news_text = "\n\n".join(
@@ -156,13 +168,18 @@ class DigestAIService:
 
         # Используем новую функцию для получения промпта с экспертами
         from digests.prompts import get_prompt_for_category
+
         formatted_prompt = get_prompt_for_category(style, category)
-        
+
         # Создаем блок ссылок
-        links_block = "\n".join([f"- {item['source']}: {item.get('link', 'No link')}" for item in news_data])
-        
+        links_block = "\n".join(
+            [f"- {item['source']}: {item.get('link', 'No link')}" for item in news_data]
+        )
+
         # Форматируем финальный промт с данными (двойные скобки становятся одинарными)
-        return formatted_prompt.replace("{{text_block}}", news_text).replace("{{links_block}}", links_block)
+        return formatted_prompt.replace("{{text_block}}", news_text).replace(
+            "{{links_block}}", links_block
+        )
 
     def _build_fallback_digest(self, news_items: List[NewsItem]) -> str:
         """
