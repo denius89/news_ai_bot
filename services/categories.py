@@ -142,6 +142,20 @@ def get_emoji_icon(category: str, subcategory: str) -> str:
     Returns:
         str: Emoji иконка
     """
+    # Маппинг для основных категорий
+    category_icons = {
+        'crypto': '₿',
+        'sports': '⚽',
+        'markets': '📈',
+        'tech': '🤖',
+        'world': '🌍',
+    }
+    
+    # Если запрашивается только категория (подкатегория пустая)
+    if not subcategory:
+        return category_icons.get(category, '📰')
+    
+    # Маппинг для подкатегорий
     icon_map = {
         # Crypto
         'btc': '₿',
@@ -198,7 +212,7 @@ def get_emoji_icon(category: str, subcategory: str) -> str:
     }
 
     icon_key = get_icon(category, subcategory)
-    return icon_map.get(icon_key, '📰')
+    return icon_map.get(icon_key, category_icons.get(category, '📰'))
 
 
 def validate_sources() -> Tuple[bool, List[str]]:

@@ -20,12 +20,15 @@ LOCAL_TZ = pytz.timezone("Europe/Kyiv")
 
 
 def build_category_keyboard() -> types.InlineKeyboardMarkup:
+    from services.categories import get_emoji_icon
+    
     categories = get_categories()
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 types.InlineKeyboardButton(
-                    text=cat.title(), callback_data=f"digest_ai_category:{cat}"
+                    text=f"{get_emoji_icon(cat, '')} {cat.title()}", 
+                    callback_data=f"digest_ai_category:{cat}"
                 )
             ]
             for cat in categories
@@ -128,6 +131,9 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
     _, style, raw_category, period = query.data.split(":")
     category = None if raw_category == "all" else raw_category
+    
+    # Используем стиль, выбранный пользователем в клавиатуре
+    
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
     # Show immediate feedback
@@ -139,12 +145,17 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
         # Generate AI digest using async service
         categories_list = None if category == "all" else [category]
-        text = await async_digest_service.build_ai_digest(limit=20, categories=categories_list)
+        text = await async_digest_service.build_ai_digest(limit=20, categories=categories_list, style=style)
 
         # Stop animation
         animation.stop()
 
-        text = clean_for_telegram(text)
+        # Проверяем тип результата
+        if hasattr(text, '__await__'):
+            logger.error(f"Got coroutine instead of string: {type(text)}")
+            text = "❌ Ошибка: получена корутина вместо строки"
+        else:
+            text = clean_for_telegram(text)
 
         if not text.strip():
             await query.message.edit_text(
@@ -157,8 +168,8 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         username = query.from_user.username or query.from_user.first_name or "друг"
         header = f"📰 Дайджест дня для @{username}"
         if category and category != "all":
-            category_name = get_categories().get(category, {}).get('name', category)
-            header += f" • {category_name}"
+            # Просто используем название категории как есть
+            header += f" • {category.title()}"
 
         # Prepare final message
         full_text = f"{header}\n\n{text}"
@@ -245,3 +256,48 @@ async def cb_enable_auto_digest(query: types.CallbackQuery):
     except Exception as e:
         logger.error(f"Error in enable auto digest: {e}")
         await query.answer("❌ Ошибка при включении авто-дайджеста", show_alert=True)
+
+
+@router.callback_query(F.data.startswith("digest_ai_category:"))
+async def cb_digest_ai_category(query: types.CallbackQuery):
+    """Обработчик выбора категории для AI дайджеста"""
+    try:
+        category = query.data.split(":", 1)[1]
+        await query.message.edit_text(
+            f"📚 <b>AI-дайджест: {category.title()}</b>\n\n"
+            "Выберите период для анализа:",
+            parse_mode="HTML",
+            reply_markup=build_period_keyboard(category)
+        )
+        await query.answer()
+    except Exception as e:
+        logger.error(f"Error in digest_ai_category: {e}")
+        await query.answer("❌ Ошибка при выборе категории")
+
+
+@router.callback_query(F.data.startswith("digest_ai_period:"))
+async def cb_digest_ai_period(query: types.CallbackQuery):
+    """Обработчик выбора периода для AI дайджеста"""
+    try:
+        # Формат: digest_ai_period:period:category
+        parts = query.data.split(":", 2)
+        if len(parts) >= 3:
+            period = parts[1]
+            category = parts[2]
+            
+            # Показываем выбор стиля
+            kb = build_style_keyboard(category, period)
+            await query.message.edit_text(
+                f"📚 <b>AI-дайджест: {category.title()}</b>\n\n"
+                f"Период: {period}\n"
+                "Выберите стиль дайджеста:",
+                parse_mode="HTML",
+                reply_markup=kb
+            )
+            await query.answer()
+        else:
+            await query.answer("❌ Неверный формат данных")
+            
+    except Exception as e:
+        logger.error(f"Error in digest_ai_period: {e}")
+        await query.answer("❌ Ошибка при выборе периода")

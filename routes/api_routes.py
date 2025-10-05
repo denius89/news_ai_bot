@@ -32,8 +32,13 @@ def convert_to_uuid(user_id_input):
         # If it looks like a UUID, return as-is
         if len(user_id_input) == 36 and user_id_input.count("-") == 4:
             return user_id_input
-        # Otherwise assume it's a Telegram ID (for demo users)
-        return f"demo-user-{user_id_input}"
+        # For demo users, create a consistent UUID from the input
+        import hashlib
+        hash_obj = hashlib.md5(f"demo-{user_id_input}".encode())
+        hex_dig = hash_obj.hexdigest()
+        # Format as UUID
+        uuid_str = f"{hex_dig[:8]}-{hex_dig[8:12]}-{hex_dig[12:16]}-{hex_dig[16:20]}-{hex_dig[20:32]}"
+        return uuid_str
     else:
         # Assume it's already a UUID (for direct API calls)
         return user_id_input
@@ -170,8 +175,12 @@ def update_subscription():
         user_id = convert_to_uuid(user_id)
 
         if enabled:
-            # Add subscription
-            success = run_async(subscription_service.add(user_id, category))
+            # For demo users, create user with a fake telegram_id
+            demo_telegram_id = 999999999
+            created_user_id = run_async(subscription_service.get_or_create_user(demo_telegram_id, "demo-user", "en"))
+            
+            # Add subscription using the created user_id
+            success = run_async(subscription_service.add(created_user_id, category))
             if success:
                 return jsonify(
                     {

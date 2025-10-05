@@ -811,14 +811,6 @@ input:checked + .setting-toggle-slider:before {
   height: 20px;
 }
 
-.nav-btn.back-to-bot {
-  color: var(--warning);
-}
-
-.nav-btn.back-to-bot:hover {
-  background: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
-}
 
 .notification-badge {
   position: absolute;

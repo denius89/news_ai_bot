@@ -1,13 +1,10 @@
-import hashlib
+# Этот файл устарел. Используйте parsers/universal_rss_parser.py
+# Импортируем новый парсер для обратной совместимости
+from parsers.universal_rss_parser import UniversalRSSParser, parse_source, fetch_rss, load_sources
+
 import logging
-from datetime import timezone
 from typing import Dict, List, Optional
 
-import requests
-import feedparser
-from dateutil import parser as dtp
-
-from utils.clean_text import clean_text  # вынесено отдельно
 from services.categories import get_all_sources
 
 logger = logging.getLogger("parsers.rss")
