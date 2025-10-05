@@ -10,7 +10,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional
 from pathlib import Path
 import sys
 
@@ -23,8 +23,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
-from config.settings import COUNTRY_MAP  # noqa: E402
-from utils.dates import format_datetime, ensure_utc_iso  # noqa: E402
+from utils.dates import ensure_utc_iso  # noqa: E402
 
 logger = logging.getLogger("database.service")
 
@@ -263,7 +262,7 @@ class DatabaseService:
                 return 0
 
             # Upsert with conflict resolution
-            result = self.safe_execute(
+            self.safe_execute(
                 self.sync_client.table("news").upsert(rows, on_conflict="uid")
             )
 
@@ -301,7 +300,7 @@ class DatabaseService:
                 return 0
 
             # Upsert with conflict resolution
-            result = await self.async_safe_execute(
+            await self.async_safe_execute(
                 self.async_client.table("news").upsert(rows, on_conflict="uid")
             )
 
