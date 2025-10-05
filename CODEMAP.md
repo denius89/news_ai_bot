@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 19:10:06 UTC_
+_Generated on 2025-10-05 19:10:44 UTC_
 
 ```
 ├── .github/
@@ -230,7 +230,6 @@ _Generated on 2025-10-05 19:10:06 UTC_
 ├── pyproject.toml
 ├── pytest.ini
 ├── README.md
-├── REFACTORING_FINAL_REPORT.md
 ├── requirements.txt
 ├── setup.cfg
 ├── start_bot.sh
