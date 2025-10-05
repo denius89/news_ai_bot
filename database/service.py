@@ -262,9 +262,7 @@ class DatabaseService:
                 return 0
 
             # Upsert with conflict resolution
-            self.safe_execute(
-                self.sync_client.table("news").upsert(rows, on_conflict="uid")
-            )
+            self.safe_execute(self.sync_client.table("news").upsert(rows, on_conflict="uid"))
 
             logger.info("✅ Upsert: обработано %d новостей", len(rows))
             return len(rows)
