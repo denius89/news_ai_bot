@@ -167,7 +167,6 @@ class DigestAIService:
         )
 
         # Используем новую функцию для получения промпта с экспертами
-        from digests.prompts import get_prompt_for_category
 
         formatted_prompt = get_prompt_for_category(style, category)
 

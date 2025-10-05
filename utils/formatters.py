@@ -89,7 +89,6 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
 
     # Новые эмодзи и форматирование
     cred_icon = "✅" if cred > 0.7 else "⚖️" if cred > 0.4 else "⚖️"
-    imp_icon = "⚡"  # Унифицированная иконка для Trend
 
     # Очищаем URL от трекинговых параметров
     clean_link = link
