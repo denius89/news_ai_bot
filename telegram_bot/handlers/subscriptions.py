@@ -407,7 +407,7 @@ async def cb_notify_on_digest(query: types.CallbackQuery):
 
         # Return to notifications menu (with error handling)
         try:
-            await cb_notifications_menu(query)
+            await cb_my_notifications(query)
         except Exception as menu_error:
             if "message is not modified" in str(menu_error):
                 logger.debug("Menu update skipped (same content): %s", menu_error)
@@ -438,7 +438,7 @@ async def cb_notify_off_digest(query: types.CallbackQuery):
 
         # Return to notifications menu (with error handling)
         try:
-            await cb_notifications_menu(query)
+            await cb_my_notifications(query)
         except Exception as menu_error:
             if "message is not modified" in str(menu_error):
                 logger.debug("Menu update skipped (same content): %s", menu_error)
