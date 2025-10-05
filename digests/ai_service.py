@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from models.news import NewsItem
 from utils.formatters import format_date
 from utils.ai_client import ask_async
+from digests.prompts import get_prompt_for_category
 
 logger = logging.getLogger(__name__)
 
@@ -41,19 +42,20 @@ class DigestAIService:
     def _check_openai_availability(self) -> bool:
         """Check if OpenAI API is available."""
         try:
-            import openai
-
-            return bool(openai.api_key)
-        except (ImportError, AttributeError):
+            import os
+            api_key = os.getenv("OPENAI_API_KEY")
+            return bool(api_key)
+        except Exception:
             return False
 
-    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical") -> str:
+    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "world") -> str:
         """
         Build AI-powered digest from news items.
 
         Args:
             news_items: List of NewsItem objects
             style: Digest style (analytical, business, meme)
+            category: News category (crypto, sports, markets, tech, world)
 
         Returns:
             Formatted digest string
@@ -66,7 +68,7 @@ class DigestAIService:
 
         if self._openai_available:
             try:
-                return await self._llm_summarize(limited_news, style)
+                return await self._llm_summarize(limited_news, style, category)
             except Exception as e:
                 logger.warning(f"AI summarization failed, using fallback: {e}")
                 return self._build_fallback_digest(limited_news)
@@ -74,13 +76,14 @@ class DigestAIService:
             logger.info("OpenAI API not available, using fallback digest")
             return self._build_fallback_digest(limited_news)
 
-    async def _llm_summarize(self, news_items: List[NewsItem], style: str) -> str:
+    async def _llm_summarize(self, news_items: List[NewsItem], style: str, category: str = "world") -> str:
         """
         Generate AI-powered summary using OpenAI.
 
         Args:
             news_items: List of news items to summarize
             style: Summary style
+            category: News category for context
 
         Returns:
             AI-generated digest text
@@ -99,20 +102,43 @@ class DigestAIService:
                 }
             )
 
-        # Create prompt based on style
-        prompt = self._create_prompt(news_data, style)
+        # Create prompt based on style and category
+        prompt = self._create_prompt(news_data, style, category)
+        logger.info(f"Created prompt length: {len(prompt)}")
+        logger.info(f"News data count: {len(news_data)}")
 
         # Call OpenAI API
         response = await ask_async(prompt=prompt, style=style, max_tokens=1000)
+        
+        logger.info(f"AI response length: {len(response) if response else 0}")
+        logger.info(f"AI response preview: {response[:200] if response else 'EMPTY'}")
 
-        # Add fallback section if not present
-        if self.config.include_fallback and "<b>Почему это важно" not in response:
-            response += self._get_fallback_section()
+        # Clean HTML containers if AI generated them despite instructions
+        if response:
+            import re
+            # Remove HTML document structure
+            response = re.sub(r'<!DOCTYPE[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'<html[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'</html>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'<head[^>]*>.*?</head>', '', response, flags=re.DOTALL | re.IGNORECASE)
+            response = re.sub(r'<body[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'</body>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'<style[^>]*>.*?</style>', '', response, flags=re.DOTALL | re.IGNORECASE)
+            # Remove problematic containers
+            response = re.sub(r'<div[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'</div>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'<p[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'</p>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'<span[^>]*>', '', response, flags=re.IGNORECASE)
+            response = re.sub(r'</span>', '', response, flags=re.IGNORECASE)
+            response = response.strip()
+
+        # Don't add fallback section - let AI handle it naturally
 
         return response
 
-    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str) -> str:
-        """Create AI prompt based on news data and style."""
+    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str, category: str = "world") -> str:
+        """Create AI prompt based on news data, style and category."""
 
         news_text = "\n\n".join(
             [
@@ -128,23 +154,15 @@ class DigestAIService:
             ]
         )
 
-        style_instructions = {
-            "analytical": "Проанализируй новости и объясни их значение для рынка",
-            "business": "Сосредоточься на бизнес-аспектах и инвестиционных возможностях",
-            "meme": "Пиши в легком, юмористическом стиле с эмодзи",
-        }
-
-        instruction = style_instructions.get(style, style_instructions["analytical"])
-
-        return f"""
-{instruction}
-
-Новости:
-{news_text}
-
-Создай краткий дайджест (до 500 слов) с анализом и объяснением важности событий.
-Используй HTML-разметку для форматирования.
-"""
+        # Используем новую функцию для получения промпта с экспертами
+        from digests.prompts import get_prompt_for_category
+        formatted_prompt = get_prompt_for_category(style, category)
+        
+        # Создаем блок ссылок
+        links_block = "\n".join([f"- {item['source']}: {item.get('link', 'No link')}" for item in news_data])
+        
+        # Форматируем финальный промт с данными (двойные скобки становятся одинарными)
+        return formatted_prompt.replace("{{text_block}}", news_text).replace("{{links_block}}", links_block)
 
     def _build_fallback_digest(self, news_items: List[NewsItem]) -> str:
         """

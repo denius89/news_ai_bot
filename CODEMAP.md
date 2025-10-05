@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 09:59:39 UTC_
+_Generated on 2025-10-05 15:05:11 UTC_
 
 ```
 ├── .github/
@@ -58,9 +58,7 @@ _Generated on 2025-10-05 09:59:39 UTC_
 │   ├── create_user_notifications_table.sql
 │   ├── db_models.py
 │   ├── init_tables.sql
-│   ├── MANUAL_MIGRATION_SUBCATEGORY.md
 │   ├── MIGRATION_INSTRUCTIONS.md
-│   ├── MIGRATION_TO_UNIFIED_SERVICE.md
 │   ├── seed_data.sql
 │   └── service.py
 ├── digests/
@@ -76,9 +74,7 @@ _Generated on 2025-10-05 09:59:39 UTC_
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
 │   ├── DEPLOY.md
-│   ├── ERROR_HANDLING.md
 │   ├── SOURCES.md
-│   ├── SOURCES_CHECKER.md
 │   └── VISION.md
 ├── examples/
 │   └── telegram_sender_example.py
@@ -90,7 +86,8 @@ _Generated on 2025-10-05 09:59:39 UTC_
 │   ├── __init__.py
 │   ├── async_rss_parser.py
 │   ├── events_parser.py
-│   └── rss_parser.py
+│   ├── rss_parser.py
+│   └── universal_rss_parser.py
 ├── repositories/
 │   ├── events_repository.py
 │   └── news_repository.py
@@ -189,12 +186,14 @@ _Generated on 2025-10-05 09:59:39 UTC_
 │   └── test_webapp.py
 ├── tools/
 │   ├── fill_ai_analysis_all.py
-│   ├── LEGACY_CLEANUP_PLAN.md
 │   ├── port_manager.py
 │   ├── README_daily_digests.md
 │   ├── refresh_news.py
 │   ├── repo_map.py
-│   └── send_daily_digests.py
+│   ├── run_all.py
+│   ├── send_daily_digests.py
+│   ├── update_news_with_universal_parser.py
+│   └── validate_rss_sources.py
 ├── webapp/
 │   ├── index.html
 │   ├── package.json
@@ -220,8 +219,8 @@ _Generated on 2025-10-05 09:59:39 UTC_
 ├── pyproject.toml
 ├── pytest.ini
 ├── README.md
-├── REFACTORING_FINAL_REPORT.md
 ├── requirements.txt
+├── RSS_PARSER_ANALYSIS_REPORT.md
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md

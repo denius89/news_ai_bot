@@ -4,8 +4,11 @@
 
 import logging
 from typing import List, Tuple, Optional
+import asyncio
 
 from database.service import async_get_latest_news
+from digests.generator import generate_digest
+from models.news import NewsItem
 
 logger = logging.getLogger(__name__)
 
@@ -70,56 +73,27 @@ class AsyncDigestService:
         self,
         limit: int = 5,
         categories: Optional[List[str]] = None,
+        style: str = "analytical",
     ) -> str:
         """
-        Асинхронно создает AI-дайджест с анализом важности.
+        Асинхронно создает AI-дайджест с использованием промтов.
         """
         try:
-            # Получаем новости с высоким приоритетом
-            news = await async_get_latest_news(limit=limit * 2, categories=categories)
-            if not news:
-                return "🤖 AI Дайджест: Сегодня новостей нет."
+            # Определяем категорию для generate_digest
+            category = None
+            if categories and len(categories) == 1 and categories[0] != "all":
+                category = categories[0]
 
-            # Фильтруем по важности
-            important_news = [item for item in news if float(item.get('importance', 0)) >= 0.4][
-                :limit
-            ]
+            # Используем существующий generate_digest с AI=True
+            digest_text = await generate_digest(
+                limit=limit,
+                category=category,
+                ai=True,  # Включаем AI-анализ
+                style=style
+            )
 
-            if not important_news:
-                # Если нет важных новостей, берем обычные
-                important_news = news[:limit]
-
-            # Формируем AI-анализ
-            lines = ["🤖 <b>AI Дайджест</b>\n"]
-
-            for i, item in enumerate(important_news, 1):
-                title = item.get('title') or "Без заголовка"
-                importance = float(item.get('importance', 0))
-                credibility = float(item.get('credibility', 0))
-
-                # AI-анализ важности
-                if importance > 0.7:
-                    analysis = "🔥 <b>КРИТИЧНО</b>"
-                elif importance > 0.4:
-                    analysis = "⚠️ <b>ВАЖНО</b>"
-                else:
-                    analysis = "📰 Обычная новость"
-
-                # AI-анализ достоверности
-                if credibility > 0.7:
-                    trust = "✅ Высокая достоверность"
-                elif credibility > 0.4:
-                    trust = "⚠️ Средняя достоверность"
-                else:
-                    trust = "❌ Низкая достоверность"
-
-                line = (
-                    f"{i}. {analysis}: {title}\n   {trust} "
-                    f"(важность: {importance:.2f}, достоверность: {credibility:.2f})"
-                )
-                lines.append(line)
-
-            return "\n\n".join(lines)
+            logger.info(f"Generated digest type: {type(digest_text)}")
+            return digest_text
 
         except Exception as e:
             logger.error(f"Ошибка при формировании AI дайджеста: {e}")

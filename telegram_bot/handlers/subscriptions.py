@@ -204,13 +204,7 @@ async def cb_subscriptions_menu(query: types.CallbackQuery):
     )
 
 
-@router.callback_query(F.data == "notifications")
-async def cb_notifications_menu(query: types.CallbackQuery):
-    """Показать меню уведомлений"""
-    text = "🔔 <b>Управление уведомлениями</b>\n\nВыберите действие:"
-    await query.message.edit_text(
-        text, parse_mode="HTML", reply_markup=notifications_inline_keyboard()
-    )
+# Удален дублирующий обработчик - теперь используется в notifications.py
 
 
 @router.callback_query(F.data == "my_subs")

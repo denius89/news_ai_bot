@@ -26,8 +26,15 @@ def clean_for_telegram(text: str) -> str:
     if not text:
         return ""
 
-    # убираем <!doctype> до парсинга
+    # убираем <!doctype> и другие проблемные теги до парсинга
     text = re.sub(r"(?i)<!doctype.*?>", "", text)
+    text = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<script[^>]*>.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<html[^>]*>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"</html>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"<head[^>]*>.*?</head>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<body[^>]*>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"</body>", "", text, flags=re.IGNORECASE)
     text = html.unescape(text)
 
     soup = BeautifulSoup(text, "html.parser")
@@ -54,8 +61,8 @@ def clean_for_telegram(text: str) -> str:
         tag.unwrap()
 
     # Удаляем ненужные контейнеры
-    for tag in soup.find_all(["html", "head", "body", "meta", "title", "div", "span", "script"]):
-        tag.unwrap()
+    for tag in soup.find_all(["html", "head", "body", "meta", "title", "div", "span", "script", "style"]):
+        tag.decompose()  # используем decompose() вместо unwrap() для полного удаления
 
     # Чистим атрибуты, кроме href у <a>
     for tag in soup.find_all(True):

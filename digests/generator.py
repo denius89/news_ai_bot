@@ -107,7 +107,9 @@ async def generate_digest(
     service = DigestAIService(config)
 
     if ai:
-        return await service.build_digest(news_items, style)
+        # Определяем категорию для контекста промта
+        digest_category = category or "world"
+        return await service.build_digest(news_items, style, digest_category)
     else:
         return service._build_fallback_digest(news_items)
 
