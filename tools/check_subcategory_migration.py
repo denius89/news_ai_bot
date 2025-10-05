@@ -10,7 +10,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from database.db_models import supabase
+from database.db_models import supabase  # noqa: E402
 
 
 def check_migration():

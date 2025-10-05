@@ -10,9 +10,9 @@ from pathlib import Path
 # Добавляем корневую папку в путь
 sys.path.append(str(Path(__file__).parent.parent))
 
-from database.db_models import supabase, safe_execute
-from ai_modules.importance import evaluate_importance
-from ai_modules.credibility import evaluate_credibility
+from database.db_models import supabase, safe_execute  # noqa: E402
+from ai_modules.importance import evaluate_importance  # noqa: E402
+from ai_modules.credibility import evaluate_credibility  # noqa: E402
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

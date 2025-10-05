@@ -4,7 +4,6 @@
 """
 
 import sys
-import os
 import logging
 from pathlib import Path
 
@@ -12,9 +11,9 @@ from pathlib import Path
 root_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(root_dir))
 
-from database.db_models import supabase, safe_execute
-from ai_modules.credibility import evaluate_credibility
-from ai_modules.importance import evaluate_importance
+from database.db_models import supabase, safe_execute  # noqa: E402
+from ai_modules.credibility import evaluate_credibility  # noqa: E402
+from ai_modules.importance import evaluate_importance  # noqa: E402
 
 # Настройка логирования
 logging.basicConfig(
@@ -125,7 +124,7 @@ def main():
     processed, errors = process_news_batch(news_list)
 
     # Итоги
-    logger.info(f"🎯 Результаты:")
+    logger.info("🎯 Результаты:")
     logger.info(f"   ✅ Успешно обработано: {processed}")
     logger.info(f"   ❌ Ошибок: {errors}")
     logger.info(f"   📊 Всего новостей: {len(news_list)}")

@@ -3,7 +3,6 @@
 Скрипт для добавления поля subcategory в таблицы news и events.
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -11,7 +10,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from database.db_models import supabase
+from database.db_models import supabase  # noqa: E402
 
 
 def add_subcategory_field():
@@ -25,7 +24,7 @@ def add_subcategory_field():
         print("🔧 Добавляем поле subcategory в таблицу news...")
 
         # Добавляем поле subcategory в таблицу news
-        result = supabase.rpc(
+        supabase.rpc(
             'exec_sql', {'sql': 'ALTER TABLE news ADD COLUMN IF NOT EXISTS subcategory TEXT;'}
         ).execute()
 
@@ -34,7 +33,7 @@ def add_subcategory_field():
         print("🔧 Добавляем поле subcategory в таблицу events...")
 
         # Добавляем поле subcategory в таблицу events
-        result = supabase.rpc(
+        supabase.rpc(
             'exec_sql', {'sql': 'ALTER TABLE events ADD COLUMN IF NOT EXISTS subcategory TEXT;'}
         ).execute()
 

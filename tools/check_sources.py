@@ -13,7 +13,6 @@ import json
 import csv
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from urllib.parse import urljoin, urlparse
 from datetime import datetime
 import requests
 from requests.adapters import HTTPAdapter
@@ -46,7 +45,9 @@ class SourceChecker:
         # User-Agent для избежания блокировок
         self.session.headers.update(
             {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                'User-Agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                               'AppleWebKit/537.36 (KHTML, like Gecko) '
+                               'Chrome/91.0.4472.124 Safari/537.36')
             }
         )
 
@@ -263,7 +264,7 @@ class SourceChecker:
         error_sources.sort(key=lambda x: x['status'])
 
         with open(output_file, 'w', encoding='utf-8') as md_file:
-            md_file.write(f"# Отчет проверки RSS источников\n\n")
+            md_file.write("# Отчет проверки RSS источников\n\n")
             md_file.write(f"**Дата:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
             # Сводка
@@ -288,7 +289,8 @@ class SourceChecker:
 
                 for source in error_sources[:20]:  # Показываем топ 20
                     md_file.write(
-                        f"| {source['category']} | {source['subcategory']} | {source['name']} | {source['status']} | {source['url']} |\n"
+                        f"| {source['category']} | {source['subcategory']} | "
+                        f"{source['name']} | {source['status']} | {source['url']} |\n"
                     )
 
                 if len(error_sources) > 20:
@@ -341,7 +343,7 @@ class SourceChecker:
 
         # Показываем краткую сводку
         summary = self.get_summary()
-        print(f"\n📈 Итоговая сводка:")
+        print("\n📈 Итоговая сводка:")
         print(f"   Всего источников: {summary['total']}")
         print(f"   ✅ OK: {summary['ok']}")
         print(f"   🔄 Redirect: {summary['redirect']}")
