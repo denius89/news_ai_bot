@@ -15,6 +15,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Testing](#testing)
+- [Documentation](#documentation)
 - [Telegram Bot](#telegram-bot)
 - [Events](#events)
 - [Digests](#digests)
@@ -152,11 +153,29 @@ pytest -m "not integration"
 
 # интеграционные тесты (работа с БД и API)
 pytest -m integration
-
-# форматирование и проверка стиля
-black .
-flake8 .
 ```
+
+## Documentation
+
+### 📚 Основная документация
+- **[MASTER_FILE.md](MASTER_FILE.md)** - Полная история разработки (12 дней)
+- **[TASKS.md](TASKS.md)** - Управление задачами и их статус
+- **[CODEMAP.md](CODEMAP.md)** - Автогенерируемая карта кода
+
+### 🏗️ Архитектура и разработка
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Архитектура системы
+- **[docs/VISION.md](docs/VISION.md)** - Видение проекта
+- **[docs/COMMUNICATION.md](docs/COMMUNICATION.md)** - Принципы коммуникации
+- **[docs/DEPLOY.md](docs/DEPLOY.md)** - Развертывание и конфигурация
+
+### 🔧 Техническая документация
+- **[docs/PARSERS.md](docs/PARSERS.md)** - Документация по парсерам (UniversalRSSParser, AdvancedParser)
+- **[docs/DIGESTS.md](docs/DIGESTS.md)** - Система дайджестов и автоматическая рассылка
+- **[docs/SOURCES.md](docs/SOURCES.md)** - Источники новостей и их структура
+- **[database/MIGRATION_INSTRUCTIONS.md](database/MIGRATION_INSTRUCTIONS.md)** - Инструкции по миграциям БД
+
+### 🌐 WebApp
+- **[webapp/README.md](webapp/README.md)** - Документация WebApp
 
 ## Telegram Bot
 
