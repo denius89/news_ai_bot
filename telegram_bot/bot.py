@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from config.settings import TELEGRAM_BOT_TOKEN
 from telegram_bot.handlers import routers
 from utils.logging_setup import setup_logging
-from database.async_db_models import init_async_supabase
+from database.service import get_async_service
 
 # --- ЛОГИРОВАНИЕ ---
 setup_logging()
@@ -20,7 +20,9 @@ if not TELEGRAM_BOT_TOKEN:
 
 async def main():
     # Инициализируем асинхронную базу данных
-    if not await init_async_supabase():
+    async_service = get_async_service()
+    await async_service._init_async_client()
+    if not async_service.async_client:
         logger.error("❌ Не удалось инициализировать асинхронную базу данных")
         return
 

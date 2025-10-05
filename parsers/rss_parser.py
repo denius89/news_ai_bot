@@ -9,6 +9,7 @@ from dateutil import parser as dtp
 
 from utils.clean_text import clean_text  # вынесено отдельно
 from services.categories import get_all_sources
+from database.service import upsert_news  # Новый unified service
 
 logger = logging.getLogger("parsers.rss")
 
