@@ -104,7 +104,7 @@ async def send_digest(
             )
             await target.answer(cache_time=0)
 
-    logger.info("✅ Digest sent: category=%s, count=%d", category, len(news))
+    logger.info("✅ Digest sent: category=%s, count=%d", category, len(digest_text.split('\n')))
 
 
 @router.message(Command("digest"))

@@ -6,8 +6,7 @@ digest generation, eliminating code duplication between sync and async versions.
 """
 
 import logging
-from typing import List, Dict, Optional, Tuple, Union
-from datetime import datetime, timezone
+from typing import List, Dict, Optional
 
 from database.service import get_sync_service, get_async_service
 from digests.ai_service import DigestAIService

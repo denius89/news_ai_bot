@@ -4,7 +4,6 @@ Tests for caching utilities.
 
 import asyncio
 import pytest
-import time
 
 from utils.cache import MemoryCache, CacheManager, cached
 

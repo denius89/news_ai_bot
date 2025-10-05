@@ -10,8 +10,7 @@ import hashlib
 import json
 import logging
 import time
-from typing import Any, Dict, List, Optional, Union
-from datetime import datetime, timedelta
+from typing import Any, Dict, Optional, Union
 
 logger = logging.getLogger("cache")
 

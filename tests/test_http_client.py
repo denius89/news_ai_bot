@@ -3,7 +3,6 @@ Tests for HTTP client utilities.
 """
 
 import pytest
-import asyncio
 from unittest.mock import AsyncMock, Mock, patch
 
 from utils.http_client import (

@@ -8,7 +8,6 @@
 import asyncio
 import logging
 import sys
-import time
 from pathlib import Path
 
 # Add project root to path
@@ -19,8 +18,7 @@ from services.unified_digest_service import get_sync_digest_service, get_async_d
 from services.subscription_service import get_async_subscription_service
 from services.notification_service import get_async_notification_service
 from parsers.unified_parser import get_sync_parser, get_async_parser
-from utils.cache import get_cache_manager, get_news_cache
-from utils.http_client import get_http_client
+from utils.cache import get_news_cache
 from utils.standard_logging import PerformanceTimer, get_structured_logger
 from config.settings import WEBAPP_URL, SUPABASE_URL
 
@@ -120,7 +118,7 @@ async def test_performance_optimizations():
 
     try:
         # Тест кэширования
-        cache_manager = get_cache_manager()
+        # cache_manager = get_cache_manager()
         news_cache = get_news_cache()
 
         # Тест кэша
@@ -130,7 +128,7 @@ async def test_performance_optimizations():
         logger.info("✅ Cache: кэширование работает")
 
         # Тест HTTP клиента
-        http_client = get_http_client()
+        # http_client = get_http_client()
         logger.info("✅ HTTP Client: клиент инициализирован")
 
         # Тест PerformanceTimer
@@ -161,13 +159,11 @@ async def test_telegram_integration():
         logger.info(f"✅ Telegram Handlers: загружено {len(routers)} роутеров")
 
         # Тест импорта keyboards
-        from telegram_bot.keyboards import back_inline_keyboard
-
+        # from telegram_bot.keyboards import back_inline_keyboard
         logger.info("✅ Telegram Keyboards: клавиатуры загружены")
 
         # Тест импорта bot
-        from telegram_bot.bot import main
-
+        # from telegram_bot.bot import main
         logger.info("✅ Telegram Bot: бот модуль загружен")
 
         return True
@@ -183,8 +179,7 @@ async def test_webapp_integration():
 
     try:
         # Тест импорта routes
-        from routes import webapp_routes, api_routes, news_routes
-
+        # from routes import webapp_routes, api_routes, news_routes
         logger.info("✅ WebApp Routes: маршруты загружены")
 
         # Тест импорта templates

@@ -5,7 +5,7 @@ This module provides subscription management functionality for users.
 """
 
 import logging
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional
 from datetime import datetime, timezone
 
 from database.service import get_sync_service, get_async_service
