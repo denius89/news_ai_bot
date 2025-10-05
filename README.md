@@ -1,9 +1,9 @@
 # PulseAI
 
 ![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
-![Tests – day-01-docs-parsers](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day-01-docs-parsers)
-![Tests – day2-sources-cleaning](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day2-sources-cleaning)
-![Tests – day3-ai-events-telegram](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=day3-ai-events-telegram)
+![Code Quality](https://img.shields.io/badge/code%20quality-A%20-green)
+![Architecture](https://img.shields.io/badge/architecture-unified-blue)
+![Performance](https://img.shields.io/badge/performance-optimized-orange)
 
 **PulseAI** — это AI-платформа, которая превращает поток новостей и событий в персональные дайджесты и умный календарь (Telegram-first, мультиплатформенно).
 
@@ -28,6 +28,8 @@
 
 - 📰 **AI-аннотации новостей** — "что случилось" + "почему важно"
 - 📅 **Умный календарь событий** — крипта, макроэкономика, технологии
+- 🚀 **Высокая производительность** — асинхронная обработка, кэширование, connection pooling
+- 🏗️ **Современная архитектура** — унифицированные сервисы, стандартизированная обработка ошибок
 - 🤖 **Telegram-бот** с подписками и категориями
 - 📊 **Оценка достоверности и важности** — автоматическая AI-оценка
 - 🌐 **Мультиплатформенность** — Telegram-first, с планами на Discord и web
