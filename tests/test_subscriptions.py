@@ -436,7 +436,7 @@ class TestSubscriptionsAPI:
 
         response = client.post(
             '/api/subscriptions/update',
-            json={'user_id': 'test-user-123', 'category': 'economy', 'enabled': False},
+            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': False},
         )
         assert response.status_code == 200
         data = response.get_json()

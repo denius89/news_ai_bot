@@ -124,7 +124,7 @@ class TestSubscriptionKeyboards:
 
         # Check keyboard structure
         assert hasattr(keyboard, 'inline_keyboard')
-        assert len(keyboard.inline_keyboard) == 4  # 3 categories + back button
+        assert len(keyboard.inline_keyboard) == 6  # 5 categories + back button
 
         # Check callback data format
         for row in keyboard.inline_keyboard:
@@ -132,7 +132,7 @@ class TestSubscriptionKeyboards:
                 if button.callback_data != "back":
                     assert button.callback_data.startswith("subscribe:")
                     category = button.callback_data.split(":", 1)[1]
-                    assert category in ['crypto', 'economy', 'tech']
+                    assert category in ['crypto', 'sports', 'markets', 'tech', 'world']
 
     @pytest.mark.unit
     @patch(
@@ -145,7 +145,7 @@ class TestSubscriptionKeyboards:
 
         # Check keyboard structure
         assert hasattr(keyboard, 'inline_keyboard')
-        assert len(keyboard.inline_keyboard) == 4  # 3 categories + back button
+        assert len(keyboard.inline_keyboard) == 6  # 5 categories + back button
 
         # Check callback data format
         for row in keyboard.inline_keyboard:
@@ -153,7 +153,7 @@ class TestSubscriptionKeyboards:
                 if button.callback_data != "back":
                     assert button.callback_data.startswith("unsubscribe:")
                     category = button.callback_data.split(":", 1)[1]
-                    assert category in ['crypto', 'economy', 'tech']
+                    assert category in ['crypto', 'sports', 'markets', 'tech', 'world']
 
     @pytest.mark.unit
     def test_main_keyboard_has_subscription_buttons(self):
