@@ -3,8 +3,6 @@ Tests for standardized error handling system.
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch
 from utils.error_handler import (
     PulseAIError,
     DatabaseError,

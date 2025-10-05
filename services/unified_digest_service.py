@@ -5,10 +5,7 @@ This service consolidates both sync and async digest generation into a single in
 eliminating code duplication and providing consistent behavior across all modes.
 """
 
-import asyncio
 import logging
-from typing import List, Tuple, Optional, Dict, Any
-from datetime import datetime
 
 from database.service import get_sync_service, get_async_service
 from utils.error_handler import handle_database_error, handle_parsing_error

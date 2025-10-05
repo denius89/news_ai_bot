@@ -5,14 +5,10 @@ This module provides a unified caching system with Redis support,
 memory cache fallback, and intelligent cache invalidation.
 """
 
-import json
 import time
 import hashlib
 import logging
-from typing import Any, Dict, List, Optional, Union, Callable
 from functools import wraps
-from datetime import datetime, timedelta
-from pathlib import Path
 
 try:
     import redis

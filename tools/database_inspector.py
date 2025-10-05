@@ -9,7 +9,6 @@ Replaces multiple check_*.py scripts.
 import argparse
 import logging
 import sys
-from pathlib import Path
 from typing import Dict, List, Optional
 
 # Add project root to Python path
@@ -205,7 +204,6 @@ class DatabaseInspector:
         }
 
         # Import datetime here to avoid issues
-        from datetime import datetime
 
         health_report["timestamp"] = datetime.now().isoformat()
 
@@ -379,7 +377,6 @@ def main():
 
         # Generate report if requested
         if args.output:
-            from datetime import datetime
 
             report = inspector.generate_report(args.check)
             with open(args.output, 'w', encoding='utf-8') as f:

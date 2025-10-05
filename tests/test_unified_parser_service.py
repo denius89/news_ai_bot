@@ -3,8 +3,6 @@ Tests for unified parser service.
 """
 
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
-import asyncio
 from parsers.unified_parser_service import (
     UnifiedParserService,
     get_sync_parser_service,

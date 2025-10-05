@@ -1,10 +1,3 @@
-"""
-Unified Parser Service for PulseAI.
-
-This service consolidates both sync and async RSS parsing into a single interface,
-eliminating code duplication and providing consistent behavior across all modes.
-"""
-
 import asyncio
 import hashlib
 import logging
@@ -12,23 +5,31 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import sys
-
 import requests
 import feedparser
 from dateutil import parser as dtp
+from utils.clean_text import clean_text  # noqa: E402
+from services.categories import get_all_sources  # noqa: E402
+from database.service import (
+from utils.error_handler import (
+            import aiohttp
+"""
+Unified Parser Service for PulseAI.
+
+This service consolidates both sync and async RSS parsing into a single interface,
+eliminating code duplication and providing consistent behavior across all modes.
+"""
+
+
 
 # Add project root to Python path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.clean_text import clean_text  # noqa: E402
-from services.categories import get_all_sources  # noqa: E402
-from database.service import (
     upsert_news,
     async_upsert_news,
     get_sync_service,
     get_async_service,
 )  # noqa: E402
-from utils.error_handler import (
     handle_network_error,
     handle_parsing_error,
     NetworkError,
@@ -191,7 +192,7 @@ class UnifiedParserService:
             sources = get_all_sources()
             all_news = []
 
-            logger.info(f"🔄 Парсинг {len(sources)} источников (sync)...")
+            logger.info("🔄 Парсинг {len(sources)} источников (sync)...")
 
             for source_info in sources:
                 try:
@@ -203,23 +204,23 @@ class UnifiedParserService:
                         limit=per_source_limit,
                     )
                     all_news.extend(news_items)
-                    logger.debug(f"✅ {source_info['name']}: {len(news_items)} новостей")
+                    logger.debug("✅ {source_info['name']}: {len(news_items)} новостей")
 
                 except Exception as e:
-                    logger.warning(f"⚠️ Ошибка парсинга {source_info['name']}: {e}")
+                    logger.warning("⚠️ Ошибка парсинга {source_info['name']}: {e}")
                     continue
 
-            logger.info(f"📊 Всего получено: {len(all_news)} новостей")
+            logger.info("📊 Всего получено: {len(all_news)} новостей")
 
             # Save to database if requested
             if save_to_db and all_news:
                 saved_count = upsert_news(all_news)
-                logger.info(f"💾 Сохранено в БД: {saved_count} новостей")
+                logger.info("💾 Сохранено в БД: {saved_count} новостей")
 
             return all_news
 
         except Exception as e:
-            logger.error(f"❌ Ошибка парсинга всех источников: {e}")
+            logger.error("❌ Ошибка парсинга всех источников: {e}")
             return []
 
     @handle_parsing_error("all sources")
@@ -231,7 +232,7 @@ class UnifiedParserService:
             sources = get_all_sources()
             all_news = []
 
-            logger.info(f"🔄 Парсинг {len(sources)} источников (async)...")
+            logger.info("🔄 Парсинг {len(sources)} источников (async)...")
 
             # Parse sources concurrently
             tasks = []
@@ -252,22 +253,22 @@ class UnifiedParserService:
             for i, result in enumerate(results):
                 source_name = sources[i]["name"]
                 if isinstance(result, Exception):
-                    logger.warning(f"⚠️ Ошибка парсинга {source_name}: {result}")
+                    logger.warning("⚠️ Ошибка парсинга {source_name}: {result}")
                 else:
                     all_news.extend(result)
-                    logger.debug(f"✅ {source_name}: {len(result)} новостей")
+                    logger.debug("✅ {source_name}: {len(result)} новостей")
 
-            logger.info(f"📊 Всего получено: {len(all_news)} новостей")
+            logger.info("📊 Всего получено: {len(all_news)} новостей")
 
             # Save to database if requested
             if save_to_db and all_news:
                 saved_count = await async_upsert_news(all_news)
-                logger.info(f"💾 Сохранено в БД: {saved_count} новостей")
+                logger.info("💾 Сохранено в БД: {saved_count} новостей")
 
             return all_news
 
         except Exception as e:
-            logger.error(f"❌ Ошибка async парсинга всех источников: {e}")
+            logger.error("❌ Ошибка async парсинга всех источников: {e}")
             return []
 
     @handle_parsing_error("single source")
@@ -294,15 +295,15 @@ class UnifiedParserService:
                     if news_item:
                         news_items.append(news_item)
                 except Exception as e:
-                    logger.warning(f"⚠️ Ошибка парсинга записи из {source_name}: {e}")
+                    logger.warning("⚠️ Ошибка парсинга записи из {source_name}: {e}")
                     continue
 
             return news_items
 
         except Exception as e:
-            logger.error(f"❌ Ошибка парсинга источника {source_name}: {e}")
+            logger.error("❌ Ошибка парсинга источника {source_name}: {e}")
             raise ParsingError(
-                f"Failed to parse {source_name}", source=source_name, url=url, cause=e
+                "Failed to parse {source_name}", source=source_name, url=url, cause=e
             )
 
     @handle_parsing_error("single source")
@@ -329,15 +330,15 @@ class UnifiedParserService:
                     if news_item:
                         news_items.append(news_item)
                 except Exception as e:
-                    logger.warning(f"⚠️ Ошибка парсинга записи из {source_name}: {e}")
+                    logger.warning("⚠️ Ошибка парсинга записи из {source_name}: {e}")
                     continue
 
             return news_items
 
         except Exception as e:
-            logger.error(f"❌ Ошибка парсинга источника {source_name}: {e}")
+            logger.error("❌ Ошибка парсинга источника {source_name}: {e}")
             raise ParsingError(
-                f"Failed to parse {source_name}", source=source_name, url=url, cause=e
+                "Failed to parse {source_name}", source=source_name, url=url, cause=e
             )
 
     @handle_network_error("RSS feed fetch")
@@ -351,18 +352,17 @@ class UnifiedParserService:
             feed = feedparser.parse(response.content)
 
             if feed.bozo:
-                logger.warning(f"⚠️ Bozo feed from {url}: {feed.bozo_exception}")
+                logger.warning("⚠️ Bozo feed from {url}: {feed.bozo_exception}")
 
             return feed
 
         except requests.RequestException as e:
-            raise NetworkError(f"Failed to fetch RSS feed", url=url, cause=e)
+            raise NetworkError("Failed to fetch RSS feed", url=url, cause=e)
 
     @handle_network_error("RSS feed fetch")
     async def _async_fetch_feed(self, url: str):
         """Fetch RSS feed (async version)."""
         try:
-            import aiohttp
 
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=HEADERS, timeout=30) as response:
@@ -373,12 +373,12 @@ class UnifiedParserService:
                     feed = feedparser.parse(content)
 
                     if feed.bozo:
-                        logger.warning(f"⚠️ Bozo feed from {url}: {feed.bozo_exception}")
+                        logger.warning("⚠️ Bozo feed from {url}: {feed.bozo_exception}")
 
                     return feed
 
         except Exception as e:
-            raise NetworkError(f"Failed to fetch RSS feed", url=url, cause=e)
+            raise NetworkError("Failed to fetch RSS feed", url=url, cause=e)
 
     def _parse_entry(
         self, entry: Any, category: str, subcategory: str, source_name: str
@@ -432,7 +432,7 @@ class UnifiedParserService:
             return news_item
 
         except Exception as e:
-            logger.warning(f"⚠️ Ошибка парсинга записи: {e}")
+            logger.warning("⚠️ Ошибка парсинга записи: {e}")
             return None
 
     def _normalize_date(self, date_str: str) -> Optional[datetime]:
@@ -452,12 +452,12 @@ class UnifiedParserService:
             return dt.astimezone(timezone.utc)
 
         except Exception as e:
-            logger.debug(f"⚠️ Ошибка парсинга даты '{date_str}': {e}")
+            logger.debug("⚠️ Ошибка парсинга даты '{date_str}': {e}")
             return None
 
     def _make_uid(self, url: str, title: str) -> str:
         """Generate unique ID for news item."""
-        return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
+        return hashlib.sha256("{url}|{title}".encode()).hexdigest()
 
     @handle_parsing_error("parse and save")
     def _parse_and_save_sync(self, per_source_limit: Optional[int] = None) -> int:
@@ -472,11 +472,11 @@ class UnifiedParserService:
             # Save to database
             saved_count = upsert_news(news_items)
 
-            logger.info(f"🎉 Парсинг и сохранение завершены: {saved_count} новостей")
+            logger.info("🎉 Парсинг и сохранение завершены: {saved_count} новостей")
             return saved_count
 
         except Exception as e:
-            logger.error(f"❌ Ошибка parse_and_save: {e}")
+            logger.error("❌ Ошибка parse_and_save: {e}")
             return 0
 
     @handle_parsing_error("async parse and save")
@@ -492,11 +492,11 @@ class UnifiedParserService:
             # Save to database
             saved_count = await async_upsert_news(news_items)
 
-            logger.info(f"🎉 Async парсинг и сохранение завершены: {saved_count} новостей")
+            logger.info("🎉 Async парсинг и сохранение завершены: {saved_count} новостей")
             return saved_count
 
         except Exception as e:
-            logger.error(f"❌ Ошибка async parse_and_save: {e}")
+            logger.error("❌ Ошибка async parse_and_save: {e}")
             return 0
 
     def get_parser_stats(self, news_items: List[Dict[str, Any]]) -> Dict[str, Any]:

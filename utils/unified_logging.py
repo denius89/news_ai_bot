@@ -8,9 +8,7 @@ ensuring consistent log formatting, levels, and handlers.
 import logging
 import logging.config
 import sys
-from pathlib import Path
 from typing import Dict, Optional, Any
-from datetime import datetime
 
 try:
     import yaml
