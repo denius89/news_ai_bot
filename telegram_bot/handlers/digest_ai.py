@@ -21,14 +21,14 @@ LOCAL_TZ = pytz.timezone("Europe/Kyiv")
 
 def build_category_keyboard() -> types.InlineKeyboardMarkup:
     from services.categories import get_emoji_icon
-    
+
     categories = get_categories()
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 types.InlineKeyboardButton(
-                    text=f"{get_emoji_icon(cat, '')} {cat.title()}", 
-                    callback_data=f"digest_ai_category:{cat}"
+                    text=f"{get_emoji_icon(cat, '')} {cat.title()}",
+                    callback_data=f"digest_ai_category:{cat}",
                 )
             ]
             for cat in categories
@@ -131,9 +131,9 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
     _, style, raw_category, period = query.data.split(":")
     category = None if raw_category == "all" else raw_category
-    
+
     # Используем стиль, выбранный пользователем в клавиатуре
-    
+
     logger.info(f"➡️ Генерация: category={category}, period={period}, style={style}")
 
     # Show immediate feedback
@@ -145,7 +145,9 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
 
         # Generate AI digest using async service
         categories_list = None if category == "all" else [category]
-        text = await async_digest_service.build_ai_digest(limit=20, categories=categories_list, style=style)
+        text = await async_digest_service.build_ai_digest(
+            limit=20, categories=categories_list, style=style
+        )
 
         # Stop animation
         animation.stop()
@@ -264,10 +266,9 @@ async def cb_digest_ai_category(query: types.CallbackQuery):
     try:
         category = query.data.split(":", 1)[1]
         await query.message.edit_text(
-            f"📚 <b>AI-дайджест: {category.title()}</b>\n\n"
-            "Выберите период для анализа:",
+            f"📚 <b>AI-дайджест: {category.title()}</b>\n\n" "Выберите период для анализа:",
             parse_mode="HTML",
-            reply_markup=build_period_keyboard(category)
+            reply_markup=build_period_keyboard(category),
         )
         await query.answer()
     except Exception as e:
@@ -284,7 +285,7 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
         if len(parts) >= 3:
             period = parts[1]
             category = parts[2]
-            
+
             # Показываем выбор стиля
             kb = build_style_keyboard(category, period)
             await query.message.edit_text(
@@ -292,12 +293,12 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
                 f"Период: {period}\n"
                 "Выберите стиль дайджеста:",
                 parse_mode="HTML",
-                reply_markup=kb
+                reply_markup=kb,
             )
             await query.answer()
         else:
             await query.answer("❌ Неверный формат данных")
-            
+
     except Exception as e:
         logger.error(f"Error in digest_ai_period: {e}")
         await query.answer("❌ Ошибка при выборе периода")

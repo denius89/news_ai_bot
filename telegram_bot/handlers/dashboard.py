@@ -5,7 +5,13 @@ Telegram bot handlers for Dashboard WebApp.
 import logging
 from aiogram import Router, types
 from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import (
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    WebAppInfo,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+)
 from telegram_bot.keyboards import back_inline_keyboard
 
 logger = logging.getLogger(__name__)
@@ -27,10 +33,10 @@ async def open_dashboard(message: types.Message):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="📱 Открыть Dashboard", web_app=WebAppInfo(url=webapp_url))],
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")]
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
         ]
     )
-    
+
     await message.answer(
         "🚀 <b>PulseAI Dashboard</b>\n\n"
         "Откройте ваш персональный дашборд для управления:\n"
@@ -61,10 +67,10 @@ async def open_dashboard_callback(callback_query: types.CallbackQuery):
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="📱 Открыть Dashboard", web_app=WebAppInfo(url=webapp_url))],
-            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")]
+            [InlineKeyboardButton(text="⬅️ Назад", callback_data="back")],
         ]
     )
-    
+
     await callback_query.message.edit_text(
         "🚀 <b>PulseAI Dashboard</b>\n\n"
         "Откройте ваш персональный дашборд для управления:\n"

@@ -34,6 +34,7 @@ class AsyncDigestService:
 
             # Используем новый современный форматтер новостей
             from utils.formatters import format_news
+
             body = format_news(news, limit=len(news), with_header=True)
             return body, news
 
@@ -58,10 +59,7 @@ class AsyncDigestService:
 
             # Используем существующий generate_digest с AI=True
             digest_text = await generate_digest(
-                limit=limit,
-                category=category,
-                ai=True,  # Включаем AI-анализ
-                style=style
+                limit=limit, category=category, ai=True, style=style  # Включаем AI-анализ
             )
 
             logger.info(f"Generated digest type: {type(digest_text)}")

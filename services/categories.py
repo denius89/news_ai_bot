@@ -150,11 +150,11 @@ def get_emoji_icon(category: str, subcategory: str) -> str:
         'tech': '🤖',
         'world': '🌍',
     }
-    
+
     # Если запрашивается только категория (подкатегория пустая)
     if not subcategory:
         return category_icons.get(category, '📰')
-    
+
     # Маппинг для подкатегорий
     icon_map = {
         # Crypto

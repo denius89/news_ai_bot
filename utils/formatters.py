@@ -86,16 +86,16 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
         imp = float(item.importance or 0.0)
 
     title = escape(title_raw)
-    
+
     # Новые эмодзи и форматирование
     cred_icon = "✅" if cred > 0.7 else "⚖️" if cred > 0.4 else "⚖️"
     imp_icon = "⚡"  # Унифицированная иконка для Trend
-    
+
     # Очищаем URL от трекинговых параметров
     clean_link = link
     if clean_link and "?" in clean_link:
         clean_link = clean_link.split("?")[0]
-    
+
     # Новый современный формат в две строки
     return (
         f"📰 <b>{title}</b>\n"
@@ -116,18 +116,18 @@ def format_news(
         if with_header:
             return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
         return "Сегодня новостей нет."
-    
+
     items = news_list[:limit] if limit else news_list
     lines: List[str] = ["📰 <b>Дайджест новостей</b>\n"] if with_header else []
-    
+
     for i, item in enumerate(items):
         # Добавляем новость без нумерации
         lines.append(format_news_item(item))
-        
+
         # Добавляем разделитель между новостями (кроме последней)
         if i < len(items) - 1:
             lines.append("───────────────")
-    
+
     text = "\n".join(lines)
     return text if len(text) <= 4000 else text[:3999] + "…"
 

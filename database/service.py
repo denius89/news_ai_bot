@@ -182,13 +182,14 @@ class DatabaseService:
         try:
             result = self.safe_execute(query)
             news_items = result.data or []
-            
+
             # Добавляем форматированные даты для обратной совместимости
             for item in news_items:
                 if item.get("published_at"):
                     from utils.dates import format_datetime
+
                     item["published_at_fmt"] = format_datetime(item["published_at"])
-            
+
             logger.info("✅ Получено %d новостей", len(news_items))
             return news_items
         except Exception as e:
@@ -240,13 +241,14 @@ class DatabaseService:
         try:
             result = await self.async_safe_execute(query)
             news_items = result.data or []
-            
+
             # Добавляем форматированные даты для обратной совместимости
             for item in news_items:
                 if item.get("published_at"):
                     from utils.dates import format_datetime
+
                     item["published_at_fmt"] = format_datetime(item["published_at"])
-            
+
             logger.info("✅ Async: получено %d новостей", len(news_items))
             return news_items
         except Exception as e:
