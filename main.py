@@ -47,6 +47,26 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # PULSE-WS: Setup templates
 templates = Jinja2Templates(directory="templates")
 
+# PULSE-WS: Add url_for function to template context
+def url_for(request: Request, name: str, **path_params):
+    """FastAPI equivalent of Flask's url_for."""
+    if name == "static":
+        # For static files, construct the URL manually
+        filename = path_params.get("filename", "")
+        return f"/static/{filename}"
+    else:
+        # For other routes, use FastAPI's url_for
+        return request.url_for(name, **path_params)
+
+# PULSE-WS: Add url_for to template context
+templates.env.globals["url_for"] = url_for
+
+# PULSE-WS: Add config to template context
+from config.settings import REACTOR_ENABLED
+templates.env.globals["config"] = type('Config', (), {
+    'REACTOR_ENABLED': REACTOR_ENABLED
+})()
+
 # PULSE-WS: Add template filters
 def importance_icon(value: float) -> str:
     """Filter for displaying importance icons."""
@@ -82,22 +102,95 @@ app.include_router(ws_router)
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     """PULSE-WS: Root endpoint."""
-    return templates.TemplateResponse("index.html", {"request": request, "title": "PulseAI - AI-Powered News & Events"})
+    return templates.TemplateResponse("index.html", {
+        "request": request, 
+        "title": "PulseAI - AI-Powered News & Events",
+        "url_for": lambda name, **kwargs: url_for(request, name, **kwargs)
+    })
 
 @app.get("/digest", response_class=HTMLResponse)
 async def digest(request: Request):
     """PULSE-WS: Digest endpoint."""
-    return templates.TemplateResponse("digest.html", {"request": request, "title": "Daily Digest"})
+    # Get categories from query parameters
+    categories = request.query_params.getlist("category")
+    
+    # Import services
+    from services.unified_digest_service import get_sync_digest_service
+    from routes.news_routes import get_categories
+    
+    try:
+        digest_service = get_sync_digest_service()
+        digest_text = digest_service.build_daily_digest(limit=10, categories=categories)
+        
+        # Get news items for template
+        news_items = digest_service.db_service.get_latest_news(categories=categories, limit=10)
+        
+        # Enrich data for template
+        enriched_items = []
+        for item in news_items:
+            # Convert Pydantic model to dict for template
+            if hasattr(item, "model_dump"):
+                item_dict = item.model_dump()
+            else:
+                item_dict = dict(item)
+            
+            item_dict["source"] = item_dict.get("source") or "—"
+            item_dict["credibility"] = float(item_dict.get("credibility") or 0.0)
+            item_dict["importance"] = float(item_dict.get("importance") or 0.0)
+            item_dict["published_at_fmt"] = item_dict.get("published_at_fmt") or "—"
+            enriched_items.append(item_dict)
+        
+        return templates.TemplateResponse("digest.html", {
+            "request": request, 
+            "title": "Daily Digest",
+            "url_for": lambda name, **kwargs: url_for(request, name, **kwargs),
+            "news": enriched_items,
+            "all_categories": get_categories(),
+            "active_categories": categories,
+            "digest_text": digest_text,
+            "active_page": "digest"
+        })
+    except Exception as e:
+        logger.error(f"Error in digest endpoint: {e}")
+        # Return minimal template with error info
+        return templates.TemplateResponse("digest.html", {
+            "request": request, 
+            "title": "Daily Digest",
+            "url_for": lambda name, **kwargs: url_for(request, name, **kwargs),
+            "news": [],
+            "all_categories": [],
+            "active_categories": categories,
+            "digest_text": f"Ошибка загрузки данных: {str(e)}",
+            "active_page": "digest"
+        })
 
 @app.get("/events", response_class=HTMLResponse)
 async def events(request: Request):
     """PULSE-WS: Events endpoint."""
-    return templates.TemplateResponse("events.html", {"request": request, "title": "Events"})
+    return templates.TemplateResponse("events.html", {
+        "request": request, 
+        "title": "Events",
+        "url_for": lambda name, **kwargs: url_for(request, name, **kwargs)
+    })
 
 @app.get("/live", response_class=HTMLResponse)
 async def live(request: Request):
     """PULSE-WS: Live dashboard endpoint."""
-    return templates.TemplateResponse("pages/live_dashboard.html", {"request": request, "title": "Live Dashboard"})
+    return templates.TemplateResponse("pages/live_dashboard.html", {
+        "request": request, 
+        "title": "Live Dashboard",
+        "url_for": lambda name, **kwargs: url_for(request, name, **kwargs)
+    })
+
+@app.get("/webapp", response_class=HTMLResponse)
+async def webapp(request: Request):
+    """PULSE-WS: WebApp Dashboard endpoint."""
+    logger.info("📱 WebApp dashboard accessed")
+    return templates.TemplateResponse("webapp.html", {
+        "request": request, 
+        "title": "WebApp Dashboard",
+        "url_for": lambda name, **kwargs: url_for(request, name, **kwargs)
+    })
 
 @app.get("/metrics")
 async def metrics():
@@ -116,6 +209,97 @@ async def latest():
 async def health():
     """PULSE-WS: Health check endpoint."""
     return {"status": "healthy", "version": VERSION}
+
+# PULSE-WS: API endpoints
+@app.get("/api/categories")
+async def get_categories_api():
+    """PULSE-WS: API endpoint для получения категорий."""
+    try:
+        from services.categories import get_category_structure, get_emoji_icon
+        
+        structure = get_category_structure()
+        
+        # Преобразуем в формат для WebApp
+        categories_data = {}
+        for category, subcategories in structure.items():
+            categories_data[category] = {
+                "name": category.title(),
+                "icon": get_emoji_icon(category, ""),
+                "emoji": get_emoji_icon(category, ""),  # Добавляем emoji для удобства
+                "subcategories": {},
+            }
+            
+            for subcategory, data in subcategories.items():
+                categories_data[category]["subcategories"][subcategory] = {
+                    "name": subcategory.title(),
+                    "icon": data.get("icon", ""),
+                    "emoji": get_emoji_icon(category, subcategory),
+                    "sources_count": len(data.get("sources", [])),
+                }
+        
+        return {
+            "status": "success",
+            "data": categories_data,
+            "total_categories": len(categories_data),
+            "total_subcategories": sum(len(cat["subcategories"]) for cat in categories_data.values()),
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting categories: {e}")
+        return {"status": "error", "message": str(e)}
+
+@app.get("/api/user_notifications")
+async def get_user_notifications_api(user_id: str = None, limit: int = 50, offset: int = 0):
+    """PULSE-WS: API endpoint для получения уведомлений пользователя."""
+    if not user_id:
+        return {"status": "error", "message": "user_id parameter is required"}
+    
+    try:
+        # Convert user_id - try UUID format first, then fallback to int
+        if len(user_id) == 36 and user_id.count("-") == 4:
+            # It's a UUID
+            final_user_id = user_id
+            logger.info("Using UUID directly: %s", final_user_id)
+        else:
+            try:
+                # Try to convert to int and then get UUID from users table
+                telegram_id = int(user_id)
+                logger.info("Converting telegram_id to UUID: %d", telegram_id)
+                # Get UUID from users table
+                from database.db_models import get_user_by_telegram
+                
+                user_data = get_user_by_telegram(telegram_id)
+                if user_data:
+                    final_user_id = user_data.get("id")
+                    logger.info("Final user_id for query: %s", final_user_id)
+    else:
+                    # Fallback to demo UUID
+                    final_user_id = "f7d38911-4e62-4012-a9bf-2aaa03483497"
+                    logger.warning("Invalid user_id format, using fallback: %s", final_user_id)
+            except (ValueError, TypeError):
+                # Fallback to demo UUID
+                final_user_id = "f7d38911-4e62-4012-a9bf-2aaa03483497"
+                logger.warning("Invalid user_id format, using fallback: %s", final_user_id)
+        
+        logger.info("Final user_id for query: %s", final_user_id)
+        
+        # Get notifications
+        from database.db_models import get_user_notifications
+        logger.info("Calling get_user_notifications with user_id=%s, limit=%d", final_user_id, limit)
+        
+        notifications = get_user_notifications(user_id=final_user_id, limit=limit, offset=offset)
+        logger.info("get_user_notifications returned %d notifications", len(notifications))
+        
+        return {
+            "notifications": notifications,
+            "status": "success",
+            "count": len(notifications),
+            "user_id": final_user_id
+        }
+        
+    except Exception as e:
+        logger.error("Error getting user notifications: %s", e)
+        return {"status": "error", "message": str(e)}
 
 # PULSE-WS: Reactor integration
 if REACTOR_ENABLED:
