@@ -1,0 +1,92 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* PulseAI Light Premium Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Custom Properties for PulseAI Light Premium */
+:root {
+  /* PulseAI Light Premium Tokens */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F2F5F8;
+  --color-border: #E2E8F0;
+  --color-primary: #00BFA6;
+  --color-accent: #8AFFD7;
+  --color-text: #1E293B;
+  --color-muted: #64748B;
+  --color-success: #1ED690;
+  --color-error: #F87171;
+  --color-warning: #FBBF24;
+  --color-highlight: #F0F9FF;
+
+  /* Legacy HSL support */
+  --background: 248 250 252;
+  --foreground: 30 41 59;
+  --card: 255 255 255;
+  --card-foreground: 30 41 59;
+  --popover: 255 255 255;
+  --popover-foreground: 30 41 59;
+  --primary: 0 191 166;
+  --primary-foreground: 255 255 255;
+  --secondary: 242 245 248;
+  --secondary-foreground: 30 41 59;
+  --muted: 242 245 248;
+  --muted-foreground: 100 116 139;
+  --accent: 138 255 215;
+  --accent-foreground: 30 41 59;
+  --destructive: 248 113 113;
+  --destructive-foreground: 255 255 255;
+  --border: 226 232 240;
+  --input: 226 232 240;
+  --ring: 0 191 166;
+  --radius: 1rem;
+}
+
+/* Base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-bg text-text;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+    line-height: 1.6;
+  }
+
+  /* Premium gradient background */
+  body {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F9FBFC 100%);
+    min-height: 100vh;
+  }
+
+  /* Typography */
+  h1 {
+    @apply text-2xl font-semibold tracking-tight text-text;
+  }
+  
+  h2 {
+    @apply text-xl font-medium text-text;
+  }
+  
+  h3 {
+    @apply text-lg font-semibold text-text;
+  }
+  
+  p {
+    @apply text-base text-text leading-relaxed;
+  }
+  
+  .text-muted {
+    @apply text-sm text-muted;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-surface;
+  }
+}
