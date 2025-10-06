@@ -153,7 +153,13 @@
   }
 </script>
 
-<!-- Системные стили (подключаются после токенов) -->
+<!-- PULSE: System CSS Layers (подключаются после токенов) -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/layout.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/components.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/animations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/darkmode.css') }}">
+
+<!-- Legacy styles (будут постепенно заменены системными) -->
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
 
