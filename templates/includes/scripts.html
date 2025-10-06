@@ -1,0 +1,92 @@
+<!-- PulseAI Reactor Scripts -->
+<!-- Единое подключение всех скриптов Reactor -->
+
+<!-- Socket.IO для WebSocket подключений -->
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- Reactor Core Client -->
+<script src="{{ url_for('static', filename='js/reactor.js') }}"></script>
+
+<!-- Reactor Hooks для обработки событий -->
+<script src="{{ url_for('static', filename='js/reactor_hooks.js') }}"></script>
+
+<!-- Reactor CSS для стилей уведомлений и анимаций -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/reactor.css') }}">
+
+<!-- Инициализация Reactor при загрузке страницы -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем, включен ли Reactor
+    const reactorEnabled = {{ 'true' if config.REACTOR_ENABLED else 'false' }};
+    
+    if (reactorEnabled && window.reactor) {
+        console.log('PulseAI Reactor активен');
+        
+        // Дополнительная инициализация для конкретных страниц
+        if (typeof initPageReactor === 'function') {
+            initPageReactor();
+        }
+    } else {
+        console.log('PulseAI Reactor отключен, используем fallback режим');
+        
+        // Fallback: устанавливаем polling для обновления данных
+        setupPollingFallback();
+    }
+});
+
+// Fallback функция для polling когда Reactor отключен
+function setupPollingFallback() {
+    // Обновляем метрики каждые 30 секунд
+    setInterval(function() {
+        fetch('/api/metrics')
+            .then(response => response.json())
+            .then(data => {
+                updateMetricsFallback(data);
+            })
+            .catch(error => {
+                console.warn('Ошибка при получении метрик:', error);
+            });
+    }, 30000);
+    
+    // Обновляем новости каждые 60 секунд
+    setInterval(function() {
+        fetch('/api/news/latest')
+            .then(response => response.json())
+            .then(data => {
+                updateNewsFallback(data);
+            })
+            .catch(error => {
+                console.warn('Ошибка при получении новостей:', error);
+            });
+    }, 60000);
+}
+
+// Fallback функции для обновления UI
+function updateMetricsFallback(data) {
+    const elements = document.querySelectorAll('[data-reactor="metrics"]');
+    elements.forEach(element => {
+        if (data.credibility !== undefined) {
+            const credibilityEl = element.querySelector('[data-metric="credibility"]');
+            if (credibilityEl) {
+                credibilityEl.textContent = (data.credibility * 100).toFixed(1) + '%';
+            }
+        }
+        
+        if (data.importance !== undefined) {
+            const importanceEl = element.querySelector('[data-metric="importance"]');
+            if (importanceEl) {
+                importanceEl.textContent = (data.importance * 100).toFixed(1) + '%';
+            }
+        }
+    });
+}
+
+function updateNewsFallback(data) {
+    const counters = document.querySelectorAll('[data-reactor="news-counter"]');
+    counters.forEach(counter => {
+        if (data.count !== undefined) {
+            counter.textContent = data.count;
+        }
+    });
+}
+</script>
