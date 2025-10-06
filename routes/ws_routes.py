@@ -1,254 +1,193 @@
 """
-WebSocket маршруты для Reactor Core.
+PULSE-WS: Pure FastAPI WebSocket hub for Reactor Core.
 Обеспечивает real-time передачу событий между сервером и клиентами.
 """
 
-import asyncio
 import json
 import logging
+import time
 from typing import Set
-from flask import Blueprint, request
-from flask_socketio import SocketIO, emit as socket_emit, join_room, leave_room
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+# PULSE-WS: Import reactor for event integration
 from core.reactor import reactor, Events
 
 logger = logging.getLogger(__name__)
 
-# Blueprint для WebSocket маршрутов
-ws_bp = Blueprint('ws', __name__, url_prefix='/ws')
+# PULSE-WS: FastAPI router for WebSocket routes
+router = APIRouter(prefix="/ws")
 
-# Глобальный экземпляр SocketIO (будет инициализирован в webapp.py)
-socketio: SocketIO = None
+# PULSE-WS: Set of active WebSocket connections
+active_connections: Set[WebSocket] = set()
 
-# Множество подключенных клиентов
-connected_clients: Set[str] = set()
-
-
-def init_socketio(app, **kwargs):
-    """Инициализация SocketIO для Flask приложения."""
-    global socketio
-    # Удаляем cors_allowed_origins из kwargs если он уже есть
-    kwargs.pop('cors_allowed_origins', None)
-    socketio = SocketIO(app, cors_allowed_origins="*", always_connect=True, **kwargs)
-    
-    # Регистрируем обработчики WebSocket событий
-    register_websocket_handlers()
-    
-    # Подписываемся на события Reactor для передачи клиентам
-    reactor.on(Events.AI_METRICS_UPDATED, handle_reactor_event)
-    reactor.on(Events.NEWS_PROCESSED, handle_reactor_event)
-    reactor.on(Events.DIGEST_CREATED, handle_reactor_event)
-    reactor.on(Events.EVENT_DETECTED, handle_reactor_event)
-    reactor.on(Events.USER_ACTION, handle_reactor_event)
-    reactor.on(Events.SYSTEM_HEALTH_CHECK, handle_reactor_event)
-    reactor.on(Events.REACTOR_HEARTBEAT, handle_reactor_event)
-    
-    logger.info("WebSocket Hub инициализирован")
+# PULSE-WS: Connection statistics
+ws_stats = {
+    "connected_clients": 0,
+    "events_emitted_total": 0,
+    "last_event_timestamp": None
+}
 
 
-def register_websocket_handlers():
-    """Регистрация обработчиков WebSocket событий."""
+@router.websocket("/stream")
+async def stream(websocket: WebSocket):
+    """PULSE-WS: Main WebSocket endpoint for real-time events."""
+    await websocket.accept()
+    active_connections.add(websocket)
+    ws_stats["connected_clients"] = len(active_connections)
     
-    @socketio.on('connect')
-    def handle_connect(auth=None):
-        """Обработка подключения клиента."""
-        client_id = request.sid
-        connected_clients.add(client_id)
-        
-        logger.info(f"Клиент подключился: {client_id}")
-        logger.info(f"Всего подключенных клиентов: {len(connected_clients)}")
-        
-        # Уведомляем о подключении
-        reactor.emit_sync(Events.WEBSOCKET_CONNECTED, client_id=client_id)
-        
-        # Отправляем приветственное сообщение
-        import time
-        socket_emit('reactor_connected', {
-            'message': 'Подключен к PulseAI Reactor',
-            'client_id': client_id,
-            'timestamp': time.time()
-        })
+    client_id = id(websocket)
+    logger.info(f"PULSE-WS: Client connected: {client_id}")
+    logger.info(f"PULSE-WS: Total connected clients: {len(active_connections)}")
     
-    @socketio.on('disconnect')
-    def handle_disconnect():
-        """Обработка отключения клиента."""
-        client_id = request.sid
-        connected_clients.discard(client_id)
-        
-        logger.info(f"Клиент отключился: {client_id}")
-        logger.info(f"Всего подключенных клиентов: {len(connected_clients)}")
-        
-        # Уведомляем об отключении
-        reactor.emit_sync(Events.WEBSOCKET_DISCONNECTED, client_id=client_id)
-    
-    @socketio.on('join_room')
-    def handle_join_room(data):
-        """Подключение клиента к комнате."""
-        room = data.get('room', 'default')
-        join_room(room)
-        
-        client_id = request.sid
-        logger.info(f"Клиент {client_id} подключился к комнате '{room}'")
-        
-        socket_emit('room_joined', {
-            'room': room,
-            'message': f'Подключен к комнате {room}'
-        }, room=room)
-    
-    @socketio.on('leave_room')
-    def handle_leave_room(data):
-        """Отключение клиента от комнаты."""
-        room = data.get('room', 'default')
-        leave_room(room)
-        
-        client_id = request.sid
-        logger.info(f"Клиент {client_id} отключился от комнаты '{room}'")
-    
-    @socketio.on('reactor_subscribe')
-    def handle_reactor_subscribe(data):
-        """Подписка клиента на определенные события."""
-        events = data.get('events', [])
-        client_id = request.sid
-        
-        logger.info(f"Клиент {client_id} подписался на события: {events}")
-        
-        socket_emit('reactor_subscribed', {
-            'events': events,
-            'message': f'Подписка на события {events} активирована'
-        })
-    
-    @socketio.on('reactor_unsubscribe')
-    def handle_reactor_unsubscribe(data):
-        """Отписка клиента от событий."""
-        events = data.get('events', [])
-        client_id = request.sid
-        
-        logger.info(f"Клиент {client_id} отписался от событий: {events}")
-        
-        socket_emit('reactor_unsubscribed', {
-            'events': events,
-            'message': f'Отписка от событий {events} выполнена'
-        })
-    
-    @socketio.on('ping')
-    def handle_ping():
-        """Обработка ping от клиента."""
-        import time
-        client_id = request.sid
-        socket_emit('pong', {'timestamp': time.time()})
-
-
-def handle_reactor_event(event):
-    """Обработчик событий Reactor для передачи клиентам через WebSocket."""
-    if not socketio:
-        return
+    # PULSE-WS: Send welcome message
+    await websocket.send_json({
+        "type": "reactor_connected",
+        "data": {
+            "message": "Connected to PulseAI Reactor",
+            "client_id": client_id,
+            "timestamp": time.time()
+        }
+    })
     
     try:
-        # Преобразуем событие в формат для WebSocket
-        event_data = {
-            'event': event.name,
-            'data': event.data,
-            'source': event.source,
-            'timestamp': event.timestamp.isoformat(),
-            'id': event.id
-        }
+        while True:
+            # PULSE-WS: Handle incoming messages
+            data = await websocket.receive_text()
+            
+            if data == "ping":
+                # PULSE-WS: Heartbeat response
+                await websocket.send_text("pong")
+            elif data.startswith("subscribe:"):
+                # PULSE-WS: Event subscription (future feature)
+                events = data.split(":", 1)[1].split(",")
+                await websocket.send_json({
+                    "type": "reactor_subscribed",
+                    "data": {
+                        "events": events,
+                        "message": f"Subscribed to events: {events}"
+                    }
+                })
+            else:
+                # PULSE-WS: Echo back unknown messages
+                await websocket.send_json({
+                    "type": "echo",
+                    "data": {"message": data}
+                })
+                
+    except WebSocketDisconnect:
+        active_connections.discard(websocket)
+        ws_stats["connected_clients"] = len(active_connections)
         
-        # Отправляем событие всем подключенным клиентам
-        socketio.emit('reactor_event', event_data, namespace='/')
+        logger.info(f"PULSE-WS: Client disconnected: {client_id}")
+        logger.info(f"PULSE-WS: Total connected clients: {len(active_connections)}")
         
-        # Логируем отправку события
-        logger.debug(f"Событие '{event.name}' отправлено {len(connected_clients)} клиентам")
-        
+        # PULSE-WS: Emit disconnect event to reactor
+        try:
+            reactor.emit_sync(Events.WEBSOCKET_DISCONNECTED, client_id=client_id)
+        except Exception as e:
+            logger.error(f"PULSE-WS: Error emitting disconnect event: {e}")
     except Exception as e:
-        logger.error(f"Ошибка при отправке события через WebSocket: {e}")
+        logger.error(f"PULSE-WS: WebSocket error: {e}")
+        active_connections.discard(websocket)
+        ws_stats["connected_clients"] = len(active_connections)
 
 
-def broadcast_event(event_name: str, data: dict, room: str = None):
-    """Прямая отправка события всем клиентам или в конкретную комнату."""
-    if not socketio:
-        logger.warning("SocketIO не инициализирован")
+async def ws_broadcast(event: dict):
+    """PULSE-WS: Broadcast event to all connected WebSocket clients."""
+    if not active_connections:
         return
     
-    import time
-    event_data = {
-        'event': event_name,
-        'data': data,
-        'timestamp': time.time(),
-        'type': 'broadcast'
-    }
+    dead_connections = []
+    ws_stats["events_emitted_total"] += 1
+    ws_stats["last_event_timestamp"] = time.time()
     
-    if room:
-        socketio.emit('reactor_event', event_data, room=room)
-        logger.info(f"Событие '{event_name}' отправлено в комнату '{room}'")
-    else:
-        socketio.emit('reactor_event', event_data)
-        logger.info(f"Событие '{event_name}' отправлено всем клиентам ({len(connected_clients)})")
+    for connection in list(active_connections):
+        try:
+            await connection.send_json(event)
+        except Exception as e:
+            logger.warning(f"PULSE-WS: Failed to send to client {id(connection)}: {e}")
+            dead_connections.append(connection)
+    
+    # PULSE-WS: Clean up dead connections
+    for connection in dead_connections:
+        active_connections.discard(connection)
+        ws_stats["connected_clients"] = len(active_connections)
+    
+    logger.debug(f"PULSE-WS: Event '{event.get('type', 'unknown')}' sent to {len(active_connections)} clients")
+
+
+@router.get("/status")
+async def websocket_status():
+    """PULSE-WS: WebSocket status endpoint."""
+    return {
+        "status": "active",
+        "connected_clients": len(active_connections),
+        "stats": ws_stats,
+        "reactor_events": [
+            "AI_METRICS_UPDATED",
+            "NEWS_PROCESSED", 
+            "DIGEST_CREATED",
+            "EVENT_DETECTED",
+            "USER_ACTION",
+            "SYSTEM_HEALTH_CHECK",
+            "REACTOR_HEARTBEAT"
+        ]
+    }
+
+
+@router.get("/stats")
+async def websocket_stats():
+    """PULSE-WS: WebSocket statistics endpoint."""
+    return {
+        "connected_clients": len(active_connections),
+        "ws_active_connections": len(active_connections),
+        "ws_events_emitted_total": ws_stats["events_emitted_total"],
+        "ws_last_event_ts": ws_stats["last_event_timestamp"],
+        "reactor_events_subscribed": 7
+    }
+
+
+@router.get("/health")
+async def reactor_health():
+    """PULSE-WS: Reactor health check endpoint."""
+    try:
+        health_data = {
+            "reactor": reactor.get_health(),
+            "websocket": {
+                "active_connections": len(active_connections),
+                "stats": ws_stats
+            },
+            "timestamp": time.time()
+        }
+        return health_data
+    except Exception as e:
+        logger.error(f"PULSE-WS: Health check error: {e}")
+        return {
+            "reactor": {"status": "error", "error": str(e)},
+            "websocket": {
+                "active_connections": len(active_connections),
+                "stats": ws_stats
+            },
+            "timestamp": time.time()
+        }
 
 
 def get_connected_clients_count() -> int:
-    """Получение количества подключенных клиентов."""
-    return len(connected_clients)
+    """PULSE-WS: Get number of connected clients (for compatibility)."""
+    return len(active_connections)
 
 
 def get_websocket_stats() -> dict:
-    """Получение статистики WebSocket подключений."""
+    """PULSE-WS: Get WebSocket statistics (for compatibility)."""
     return {
-        'connected_clients': len(connected_clients),
-        'socketio_initialized': socketio is not None,
-        'reactor_events_subscribed': len([
-            Events.AI_METRICS_UPDATED,
-            Events.NEWS_PROCESSED,
-            Events.DIGEST_CREATED,
-            Events.EVENT_DETECTED,
-            Events.USER_ACTION,
-            Events.SYSTEM_HEALTH_CHECK,
-            Events.REACTOR_HEARTBEAT
-        ])
+        "connected_clients": len(active_connections),
+        "ws_active_connections": len(active_connections),
+        "ws_events_emitted_total": ws_stats["events_emitted_total"],
+        "ws_last_event_ts": ws_stats["last_event_timestamp"],
+        "socketio_initialized": False,  # Compatibility flag
+        "reactor_events_subscribed": 7
     }
 
 
-# Маршрут для проверки статуса WebSocket
-@ws_bp.route('/status')
-def websocket_status():
-    """Эндпоинт для проверки статуса WebSocket Hub."""
-    from flask import jsonify
-    
-    return jsonify({
-        'status': 'active',
-        'connected_clients': len(connected_clients),
-        'socketio_initialized': socketio is not None,
-        'reactor_events': [
-            Events.AI_METRICS_UPDATED,
-            Events.NEWS_PROCESSED,
-            Events.DIGEST_CREATED,
-            Events.EVENT_DETECTED,
-            Events.USER_ACTION,
-            Events.SYSTEM_HEALTH_CHECK,
-            Events.REACTOR_HEARTBEAT
-        ]
-    })
-
-
-# Маршрут для получения статистики
-@ws_bp.route('/stats')
-def websocket_stats():
-    """Эндпоинт для получения статистики WebSocket."""
-    from flask import jsonify
-    
-    return jsonify(get_websocket_stats())
-
-
-# Маршрут для проверки здоровья Reactor
-@ws_bp.route('/health')
-def reactor_health():
-    """Эндпоинт для проверки здоровья Reactor."""
-    from flask import jsonify
-    
-    import time
-    health_data = {
-        'reactor': reactor.get_health(),
-        'websocket': get_websocket_stats(),
-        'timestamp': time.time()
-    }
-    
-    return jsonify(health_data)
+# PULSE-WS: Export router for FastAPI app integration
+__all__ = ["router", "ws_broadcast", "get_connected_clients_count", "get_websocket_stats"]

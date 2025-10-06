@@ -1,92 +1,159 @@
 """
-main.py — минимальный ETL + генерация дайджеста + загрузка событий.
-RSS -> (AI-заглушки считаются внутри upsert) -> Supabase.
-Events -> парсинг (Investing.com / API) -> Supabase.
-
-Запуск ETL:
-  python main.py --limit 30        # взять до 30 новостей
-  python main.py --source crypto   # выбрать предустановленные источники
-  python main.py --source all --limit 50  # все источники, но только 50 новостей
-
-Запуск дайджеста:
-  python main.py --digest 5        # дайджест из 5 новостей
-
-Загрузка событий:
-  python main.py --events          # загрузить экономические события
+PULSE-WS: FastAPI application with WebSocket support for PulseAI Reactor.
 """
 
-import argparse
 import logging
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
-from database.db_models import upsert_event, upsert_news
-from digests.generator import generate_digest
-from parsers.events_parser import fetch_investing_events
-from parsers.rss_parser import parse_source, get_sync_parser
+# PULSE-WS: Import configuration
+from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from utils.logging_setup import setup_logging
 
+# PULSE-WS: Import routes
+from routes.ws_routes import router as ws_router
+from routes.news_routes import news_bp
+from routes.webapp_routes import webapp_bp  
+from routes.api_routes import api_bp
+from routes.metrics_routes import metrics_bp
 
-def main():
-    # --- ЛОГИРОВАНИЕ ---
-    setup_logging()
-    logger = logging.getLogger("news_ai_bot")
+# PULSE-WS: Setup logging
+setup_logging()
+logger = logging.getLogger("news_ai_bot")
 
-    parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
-    parser.add_argument("--source", type=str, default="all", help="Категория из sources.yaml или 'all'")
-    parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument(
-        "--digest",
-        type=int,
-        nargs="?",
-        const=5,
-        help="Сформировать дайджест (по умолчанию 5 новостей)",
-    )
-    parser.add_argument("--ai", action="store_true", help="Использовать AI для генерации дайджеста")
-    parser.add_argument("--events", action="store_true", help="Загрузить экономические события")
-    args = parser.parse_args()
+# PULSE-WS: Create FastAPI app
+app = FastAPI(
+    title="PulseAI",
+    description="AI-Powered News & Events with Reactor Core",
+    version=VERSION,
+    debug=DEBUG
+)
 
-    # --- Дайджест ---
-    if args.digest is not None:
-        logger.info(f"Генерация {'AI-' if args.ai else ''}дайджеста " f"(последние {args.digest} новостей)...")
-        digest = generate_digest(limit=args.digest, ai=args.ai)
-        print("\n" + digest + "\n")
-        return
+# PULSE-WS: Configure CORS for WebSocket
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    # --- События ---
-    if args.events:
-        logger.info("Загружаем экономические события с Investing.com...")
-        events = fetch_investing_events(limit_days=2)
-        logger.info(f"Получено {len(events)} событий")
+# PULSE-WS: Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-        for ev in events:
-            upsert_event(ev)
+# PULSE-WS: Setup templates
+templates = Jinja2Templates(directory="templates")
 
-        logger.info("✅ События сохранены")
-        return
+# PULSE-WS: Add template filters
+def importance_icon(value: float) -> str:
+    """Filter for displaying importance icons."""
+    if value is None:
+        return "❔"
+    if value >= 0.8:
+        return "🔥"
+    elif value >= 0.5:
+        return "⚡"
+    return "💤"
 
-    # --- Новости (ETL) ---
-    if args.source == "all":
-        from services.categories import get_all_sources
-        sources = get_all_sources()
-    else:
-        from services.categories import get_sources_by_category
-        sources = get_sources_by_category(args.source)
+def credibility_icon(value: float) -> str:
+    """Filter for displaying credibility icons."""
+    if value is None:
+        return "❔"
+    if value >= 0.8:
+        return "✅"
+    elif value >= 0.5:
+        return "⚠️"
+    return "❌"
 
-    logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
-    logger.info("Используемые источники:")
-    for src in sources:
-        logger.info(f"  {src['name']} ({src['category']}): {src['url']}")
+# PULSE-WS: Add filters to Jinja2 environment
+templates.env.filters["importance_icon"] = importance_icon
+templates.env.filters["credibility_icon"] = credibility_icon
 
-    items = fetch_rss(sources)
+# PULSE-WS: Include WebSocket router
+app.include_router(ws_router)
 
-    if args.limit and len(items) > args.limit:
-        items = items[: args.limit]
-        logger.info(f"Ограничение: берём только {args.limit} новостей")
+# PULSE-WS: Include other routers (convert Flask blueprints to FastAPI routers)
+# Note: This will need to be updated to convert Flask routes to FastAPI
+# For now, we'll create basic endpoints to maintain functionality
 
-    logger.info(f"Получено {len(items)} новостей. Записываем в базу...")
-    upsert_news(items)
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    """PULSE-WS: Root endpoint."""
+    return templates.TemplateResponse("index.html", {"request": request, "title": "PulseAI - AI-Powered News & Events"})
 
-    logger.info("Готово ✅")
+@app.get("/digest", response_class=HTMLResponse)
+async def digest(request: Request):
+    """PULSE-WS: Digest endpoint."""
+    return templates.TemplateResponse("digest.html", {"request": request, "title": "Daily Digest"})
 
+@app.get("/events", response_class=HTMLResponse)
+async def events(request: Request):
+    """PULSE-WS: Events endpoint."""
+    return templates.TemplateResponse("events.html", {"request": request, "title": "Events"})
+
+@app.get("/live", response_class=HTMLResponse)
+async def live(request: Request):
+    """PULSE-WS: Live dashboard endpoint."""
+    return templates.TemplateResponse("pages/live_dashboard.html", {"request": request, "title": "Live Dashboard"})
+
+@app.get("/metrics")
+async def metrics():
+    """PULSE-WS: Metrics endpoint."""
+    from routes.metrics_routes import get_metrics_endpoint
+    return get_metrics_endpoint()
+
+@app.get("/latest")
+async def latest():
+    """PULSE-WS: Latest news endpoint."""
+    from routes.news_routes import api_latest_news
+    return api_latest_news()
+
+# PULSE-WS: Health check
+@app.get("/health")
+async def health():
+    """PULSE-WS: Health check endpoint."""
+    return {"status": "healthy", "version": VERSION}
+
+# PULSE-WS: Reactor integration
+if REACTOR_ENABLED:
+    try:
+        from core.reactor import reactor, Events
+        from routes.ws_routes import ws_broadcast
+        
+        # PULSE-WS: Subscribe to reactor events
+        async def handle_reactor_event(event):
+            """Handle reactor events and broadcast via WebSocket."""
+            try:
+                event_data = {
+                    "type": event.name,
+                    "data": event.data,
+                    "source": event.source,
+                    "timestamp": event.timestamp.isoformat() if hasattr(event.timestamp, 'isoformat') else str(event.timestamp),
+                    "id": event.id
+                }
+                await ws_broadcast(event_data)
+            except Exception as e:
+                logger.error(f"PULSE-WS: Error broadcasting reactor event: {e}")
+        
+        # PULSE-WS: Subscribe to reactor events
+        reactor.on(Events.AI_METRICS_UPDATED, handle_reactor_event)
+        reactor.on(Events.NEWS_PROCESSED, handle_reactor_event)
+        reactor.on(Events.DIGEST_CREATED, handle_reactor_event)
+        reactor.on(Events.EVENT_DETECTED, handle_reactor_event)
+        reactor.on(Events.USER_ACTION, handle_reactor_event)
+        reactor.on(Events.SYSTEM_HEALTH_CHECK, handle_reactor_event)
+        reactor.on(Events.REACTOR_HEARTBEAT, handle_reactor_event)
+        
+        logger.info("✅ PULSE-WS: Reactor integration enabled")
+    except Exception as e:
+        logger.error(f"❌ PULSE-WS: Reactor integration failed: {e}")
+else:
+    logger.info("⚠️ PULSE-WS: Reactor disabled, WebSocket events will not be available")
 
 if __name__ == "__main__":
-    main()
+    import uvicorn
+    logger.info(f"🚀 PULSE-WS: Starting FastAPI app on {WEBAPP_HOST}:{WEBAPP_PORT}")
+    uvicorn.run(app, host=WEBAPP_HOST, port=WEBAPP_PORT, log_level="info" if not DEBUG else "debug")
