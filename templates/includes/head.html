@@ -1,0 +1,240 @@
+<!-- PulseAI Head Includes -->
+<!-- Централизованное подключение CSS и мета-тегов -->
+
+<!-- Design Tokens - основа дизайн-системы -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/variables.css') }}">
+
+<!-- Tailwind CSS CDN для Jinja шаблонов -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  // Конфигурация Tailwind для Jinja шаблонов
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          // Primary palette
+          primary: {
+            50: 'var(--color-primary-50)',
+            100: 'var(--color-primary-100)',
+            200: 'var(--color-primary-200)',
+            300: 'var(--color-primary-300)',
+            400: 'var(--color-primary-400)',
+            500: 'var(--color-primary-500)',
+            600: 'var(--color-primary-600)',
+            700: 'var(--color-primary-700)',
+            800: 'var(--color-primary-800)',
+            900: 'var(--color-primary-900)',
+            950: 'var(--color-primary-950)',
+          },
+          // Secondary palette
+          secondary: {
+            50: 'var(--color-secondary-50)',
+            100: 'var(--color-secondary-100)',
+            200: 'var(--color-secondary-200)',
+            300: 'var(--color-secondary-300)',
+            400: 'var(--color-secondary-400)',
+            500: 'var(--color-secondary-500)',
+            600: 'var(--color-secondary-600)',
+            700: 'var(--color-secondary-700)',
+            800: 'var(--color-secondary-800)',
+            900: 'var(--color-secondary-900)',
+            950: 'var(--color-secondary-950)',
+          },
+          // Semantic colors
+          success: {
+            50: 'var(--color-success-50)',
+            500: 'var(--color-success-500)',
+            600: 'var(--color-success-600)',
+            700: 'var(--color-success-700)',
+          },
+          warning: {
+            50: 'var(--color-warning-50)',
+            500: 'var(--color-warning-500)',
+            600: 'var(--color-warning-600)',
+            700: 'var(--color-warning-700)',
+          },
+          danger: {
+            50: 'var(--color-danger-50)',
+            500: 'var(--color-danger-500)',
+            600: 'var(--color-danger-600)',
+            700: 'var(--color-danger-700)',
+          },
+          info: {
+            50: 'var(--color-info-50)',
+            500: 'var(--color-info-500)',
+            600: 'var(--color-info-600)',
+            700: 'var(--color-info-700)',
+          },
+          // Semantic mappings
+          bg: 'var(--color-bg)',
+          'bg-secondary': 'var(--color-bg-secondary)',
+          'bg-tertiary': 'var(--color-bg-tertiary)',
+          'bg-elevated': 'var(--color-bg-elevated)',
+          text: 'var(--color-text)',
+          'text-secondary': 'var(--color-text-secondary)',
+          'text-tertiary': 'var(--color-text-tertiary)',
+          'text-inverse': 'var(--color-text-inverse)',
+          border: 'var(--color-border)',
+          'border-secondary': 'var(--color-border-secondary)',
+          'border-focus': 'var(--color-border-focus)',
+        },
+        fontFamily: {
+          sans: 'var(--font-sans)',
+          mono: 'var(--font-mono)',
+        },
+        spacing: {
+          '0.5': 'var(--sp-0_5)',
+          '1': 'var(--sp-1)',
+          '1.5': 'var(--sp-1_5)',
+          '2': 'var(--sp-2)',
+          '2.5': 'var(--sp-2_5)',
+          '3': 'var(--sp-3)',
+          '3.5': 'var(--sp-3_5)',
+          '4': 'var(--sp-4)',
+          '5': 'var(--sp-5)',
+          '6': 'var(--sp-6)',
+          '7': 'var(--sp-7)',
+          '8': 'var(--sp-8)',
+          '9': 'var(--sp-9)',
+          '10': 'var(--sp-10)',
+          '11': 'var(--sp-11)',
+          '12': 'var(--sp-12)',
+          '14': 'var(--sp-14)',
+          '16': 'var(--sp-16)',
+          '20': 'var(--sp-20)',
+          '24': 'var(--sp-24)',
+          '28': 'var(--sp-28)',
+          '32': 'var(--sp-32)',
+        },
+        borderRadius: {
+          sm: 'var(--radius-sm)',
+          base: 'var(--radius-base)',
+          md: 'var(--radius-md)',
+          lg: 'var(--radius-lg)',
+          xl: 'var(--radius-xl)',
+          '2xl': 'var(--radius-2xl)',
+          '3xl': 'var(--radius-3xl)',
+          full: 'var(--radius-full)',
+        },
+        boxShadow: {
+          xs: 'var(--shadow-xs)',
+          sm: 'var(--shadow-sm)',
+          base: 'var(--shadow-base)',
+          md: 'var(--shadow-md)',
+          lg: 'var(--shadow-lg)',
+          xl: 'var(--shadow-xl)',
+          '2xl': 'var(--shadow-2xl)',
+          inner: 'var(--shadow-inner)',
+          card: 'var(--shadow-card)',
+          modal: 'var(--shadow-modal)',
+          dropdown: 'var(--shadow-dropdown)',
+        },
+        transitionDuration: {
+          '75': 'var(--duration-75)',
+          '100': 'var(--duration-100)',
+          '150': 'var(--duration-150)',
+          '200': 'var(--duration-200)',
+          '300': 'var(--duration-300)',
+          '500': 'var(--duration-500)',
+          '700': 'var(--duration-700)',
+          '1000': 'var(--duration-1000)',
+        },
+        transitionTimingFunction: {
+          linear: 'var(--ease-linear)',
+          in: 'var(--ease-in)',
+          out: 'var(--ease-out)',
+          'in-out': 'var(--ease-in-out)',
+          soft: 'var(--ease-soft)',
+        },
+      },
+    },
+    darkMode: ['class', 'media'],
+  }
+</script>
+
+<!-- Системные стили (подключаются после токенов) -->
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+<!-- Дополнительные стили -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="{{ url_for('static', filename='assets/logo/site.webmanifest') }}">
+
+<!-- Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/logo/logo_icon_16.png') }}">
+<link rel="icon" href="{{ url_for('static', filename='assets/logo/favicon.ico') }}" sizes="any">
+
+<!-- Meta Tags -->
+<meta name="theme-color" content="#1E3A8A">
+<meta name="description" content="PulseAI — умные дайджесты и события с искусственным интеллектом">
+<meta name="application-name" content="PulseAI">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PulseAI">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#1E3A8A">
+<meta name="keywords" content="AI, новости, дайджест, события, искусственный интеллект">
+
+<!-- Theme Toggle Script -->
+<script>
+  // Theme management
+  (function() {
+    const themeKey = 'pulseai-theme';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    function setTheme(theme) {
+      const root = document.documentElement;
+      
+      if (theme === 'auto') {
+        root.removeAttribute('data-theme');
+        root.setAttribute('data-theme', 'auto');
+      } else {
+        root.setAttribute('data-theme', theme);
+      }
+      
+      localStorage.setItem(themeKey, theme);
+    }
+    
+    function getTheme() {
+      const saved = localStorage.getItem(themeKey);
+      return saved || 'auto';
+    }
+    
+    function initTheme() {
+      const theme = getTheme();
+      setTheme(theme);
+      
+      // Listen for system theme changes
+      prefersDark.addEventListener('change', (e) => {
+        if (getTheme() === 'auto') {
+          setTheme('auto');
+        }
+      });
+    }
+    
+    // Initialize theme on load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTheme);
+    } else {
+      initTheme();
+    }
+    
+    // Expose theme functions globally
+    window.PulseAI = window.PulseAI || {};
+    window.PulseAI.theme = {
+      set: setTheme,
+      get: getTheme,
+      toggle: function() {
+        const current = getTheme();
+        const newTheme = current === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        return newTheme;
+      }
+    };
+  })();
+</script>
