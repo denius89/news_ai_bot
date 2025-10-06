@@ -231,3 +231,18 @@ def websocket_stats():
     from flask import jsonify
     
     return jsonify(get_websocket_stats())
+
+
+# Маршрут для проверки здоровья Reactor
+@ws_bp.route('/health')
+def reactor_health():
+    """Эндпоинт для проверки здоровья Reactor."""
+    from flask import jsonify
+    
+    health_data = {
+        'reactor': reactor.get_health(),
+        'websocket': get_websocket_stats(),
+        'timestamp': asyncio.get_event_loop().time()
+    }
+    
+    return jsonify(health_data)
