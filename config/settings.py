@@ -20,7 +20,7 @@ VERSION = os.getenv("VERSION", "0.1.0")
 # Настройки webapp
 WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8001"))
-WEBAPP_URL = os.getenv("WEBAPP_URL", f"http://localhost:{WEBAPP_PORT}")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://sake-controls-visited-cars.trycloudflare.com")
 
 # Supabase настройки
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
@@ -38,6 +38,11 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 AI_MODEL_SUMMARY = os.getenv("AI_MODEL_SUMMARY", "gpt-4o-mini")
 AI_MODEL_SCORING = os.getenv("AI_MODEL_SCORING", "gpt-4o-mini")
 AI_MAX_TOKENS = int(os.getenv("AI_MAX_TOKENS", "800"))
+
+# ---- REACTOR CORE ----
+REACTOR_ENABLED = os.getenv("REACTOR_ENABLED", "true").lower() == "true"
+REACTOR_WS_PATH = os.getenv("REACTOR_WS_PATH", "/ws/stream")
+REACTOR_LOG_PATH = os.getenv("REACTOR_LOG_PATH", "logs/reactor.log")
 
 # ---- ПУТИ ДО YAML-КОНФИГОВ ----
 LOGGING_YAML = str(BASE_DIR / "config" / "logging.yaml")
@@ -61,6 +66,9 @@ class _C:
     AI_MODEL_SUMMARY = AI_MODEL_SUMMARY
     AI_MODEL_SCORING = AI_MODEL_SCORING
     AI_MAX_TOKENS = AI_MAX_TOKENS
+    REACTOR_ENABLED = REACTOR_ENABLED
+    REACTOR_WS_PATH = REACTOR_WS_PATH
+    REACTOR_LOG_PATH = REACTOR_LOG_PATH
     LOGGING_YAML = LOGGING_YAML
     SOURCES_YAML = SOURCES_YAML
 
