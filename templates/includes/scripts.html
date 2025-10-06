@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function setupPollingFallback() {
     // Обновляем метрики каждые 30 секунд
     setInterval(function() {
-        fetch('/api/metrics')
+        fetch('/metrics')
             .then(response => response.json())
             .then(data => {
                 updateMetricsFallback(data);
@@ -48,7 +48,7 @@ function setupPollingFallback() {
     
     // Обновляем новости каждые 60 секунд
     setInterval(function() {
-        fetch('/api/news/latest')
+        fetch('/latest')
             .then(response => response.json())
             .then(data => {
                 updateNewsFallback(data);

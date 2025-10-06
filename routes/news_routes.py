@@ -3,7 +3,7 @@ Flask-маршруты для отображения новостей и соб�
 """
 
 import logging
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 
 from services.unified_digest_service import get_sync_digest_service
 from services.categories import get_categories
@@ -79,6 +79,23 @@ def events():
         active_page="events",
     )
 
+
+# --- API Endpoints ---
+@news_bp.route("/latest")
+def api_latest_news():
+    """API endpoint для получения последних новостей."""
+    try:
+        from database.db_models import get_latest_news
+        news = get_latest_news(limit=10)
+        
+        return jsonify({
+            "status": "success",
+            "count": len(news),
+            "data": news  # get_latest_news уже возвращает список словарей
+        })
+    except Exception as e:
+        logger.error(f"Ошибка получения новостей: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # --- WebApp Dashboard ---
 @news_bp.route("/webapp")
