@@ -18,7 +18,9 @@ export default function ReactorProvider({ children }) {
   const [metrics, setMetrics] = useState({})
 
   useEffect(() => {
-    const newSocket = io('http://localhost:8001')
+    const newSocket = io('http://localhost:8001', {
+      transports: ['websocket', 'polling']
+    })
     
     newSocket.on('connect', () => {
       setConnected(true)

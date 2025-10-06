@@ -48,7 +48,7 @@ app.register_blueprint(metrics_bp)
 # Инициализируем WebSocket если Reactor включен
 if REACTOR_ENABLED:
     try:
-        init_socketio(app, cors_allowed_origins="*")
+        init_socketio(app)
         logger.info("✅ WebSocket Hub инициализирован")
     except Exception as e:
         logger.error(f"❌ Ошибка инициализации WebSocket: {e}")
@@ -78,7 +78,11 @@ if __name__ == "__main__":
     if REACTOR_ENABLED:
         # Используем SocketIO для запуска с WebSocket поддержкой
         from routes.ws_routes import socketio
-        socketio.run(app, host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+        if socketio:
+            socketio.run(app, host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG, allow_unsafe_werkzeug=True)
+        else:
+            logger.error("❌ SocketIO не инициализирован, запускаем обычный Flask")
+            app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
     else:
         # Обычный Flask запуск
         app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)

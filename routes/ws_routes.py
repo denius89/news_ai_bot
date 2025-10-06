@@ -27,6 +27,8 @@ connected_clients: Set[str] = set()
 def init_socketio(app, **kwargs):
     """Инициализация SocketIO для Flask приложения."""
     global socketio
+    # Удаляем cors_allowed_origins из kwargs если он уже есть
+    kwargs.pop('cors_allowed_origins', None)
     socketio = SocketIO(app, cors_allowed_origins="*", **kwargs)
     
     # Регистрируем обработчики WebSocket событий
