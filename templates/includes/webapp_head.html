@@ -1,0 +1,39 @@
+<!-- PulseAI WebApp Head Includes -->
+<!-- Специальные стили и скрипты для Telegram WebApp -->
+
+<!-- Design Tokens -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/tokens.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/system/variables.css') }}">
+
+<!-- WebApp Specific Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='webapp.css') }}?v=11.8">
+
+<!-- Telegram WebApp SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="{{ url_for('static', filename='assets/logo/site.webmanifest') }}">
+
+<!-- Icons -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='assets/logo/logo_icon_180.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='assets/logo/logo_icon_32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='assets/logo/logo_icon_16.png') }}">
+<link rel="icon" href="{{ url_for('static', filename='assets/logo/favicon.ico') }}" sizes="any">
+
+<!-- Meta Tags -->
+<meta name="theme-color" content="#1E3A8A">
+<meta name="description" content="PulseAI — умные дайджесты и события с искусственным интеллектом">
+<meta name="application-name" content="PulseAI">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PulseAI">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#1E3A8A">
+
+<!-- Cache Control -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">

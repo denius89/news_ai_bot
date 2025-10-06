@@ -69,7 +69,7 @@
                     <span class="news-card__metric-label">Relevance</span>
                     <div class="news-card__progress-bar">
                         <div class="news-card__progress-fill news-card__progress-fill--credibility {{ cred_class }}" 
-                             style="width: {{ cred_width }}%"></div>
+                             data-width="{{ cred_width }}"></div>
                     </div>
                     <span class="news-card__metric-value">{{ cred_width }}%</span>
                 </div>
@@ -82,7 +82,7 @@
                     <span class="news-card__metric-label">Trend</span>
                     <div class="news-card__progress-bar">
                         <div class="news-card__progress-fill news-card__progress-fill--importance {{ imp_class }}" 
-                             style="width: {{ imp_width }}%"></div>
+                             data-width="{{ imp_width }}"></div>
                     </div>
                     <span class="news-card__metric-value">{{ imp_width }}%</span>
                 </div>
