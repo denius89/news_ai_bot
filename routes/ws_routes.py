@@ -29,7 +29,7 @@ def init_socketio(app, **kwargs):
     global socketio
     # Удаляем cors_allowed_origins из kwargs если он уже есть
     kwargs.pop('cors_allowed_origins', None)
-    socketio = SocketIO(app, cors_allowed_origins="*", **kwargs)
+    socketio = SocketIO(app, cors_allowed_origins="*", always_connect=True, **kwargs)
     
     # Регистрируем обработчики WebSocket событий
     register_websocket_handlers()
@@ -50,7 +50,7 @@ def register_websocket_handlers():
     """Регистрация обработчиков WebSocket событий."""
     
     @socketio.on('connect')
-    def handle_connect():
+    def handle_connect(auth=None):
         """Обработка подключения клиента."""
         client_id = request.sid
         connected_clients.add(client_id)
@@ -62,10 +62,11 @@ def register_websocket_handlers():
         reactor.emit_sync(Events.WEBSOCKET_CONNECTED, client_id=client_id)
         
         # Отправляем приветственное сообщение
+        import time
         socket_emit('reactor_connected', {
             'message': 'Подключен к PulseAI Reactor',
             'client_id': client_id,
-            'timestamp': asyncio.get_event_loop().time()
+            'timestamp': time.time()
         })
     
     @socketio.on('disconnect')
