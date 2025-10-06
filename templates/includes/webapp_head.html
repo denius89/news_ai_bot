@@ -35,5 +35,12 @@
 
 <!-- Cache Control -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
+<parameter name="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+
+<!-- PULSE-WS: Reactor Configuration -->
+<script>
+    // Устанавливаем глобальную переменную для reactor.js ПЕРЕД его загрузкой
+    window.reactorEnabled = {{ 'true' if config.REACTOR_ENABLED else 'false' }};
+    console.log('[PULSE-WS] Reactor enabled:', window.reactorEnabled);
+</script>

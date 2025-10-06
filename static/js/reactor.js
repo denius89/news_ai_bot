@@ -6,6 +6,14 @@
 (function() {
     'use strict';
     
+    // PULSE-WS: Check if Reactor is enabled
+    const reactorEnabled = window.reactorEnabled !== undefined ? window.reactorEnabled : true;
+    
+    if (!reactorEnabled) {
+        console.log('[PULSE-WS] Reactor отключен, WebSocket не будет подключен');
+        return;
+    }
+    
     // PULSE-WS: WebSocket connection state
     let socket = null;
     let heartbeatInterval = null;

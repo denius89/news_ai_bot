@@ -6,6 +6,9 @@ webapp_bp = Blueprint("webapp", __name__)
 @webapp_bp.route("/webapp")
 def webapp():
     """WebApp Dashboard route"""
+    import logging
+    logger = logging.getLogger("news_ai_bot")
+    logger.info("📱 WebApp dashboard accessed")
     return render_template("webapp.html")
 
 

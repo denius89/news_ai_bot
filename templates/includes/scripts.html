@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Проверяем, включен ли Reactor
     const reactorEnabled = {{ 'true' if config.REACTOR_ENABLED else 'false' }};
     
+    // Устанавливаем глобальную переменную для reactor.js
+    window.reactorEnabled = reactorEnabled;
+    
     if (reactorEnabled && window.reactor) {
         console.log('PulseAI Reactor активен');
         window.reactor.connect();
