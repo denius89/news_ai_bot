@@ -321,10 +321,8 @@
                         AI-платформа для персонализированных дайджестов новостей и умного календаря событий
                     </h2>
                     
-                    <!-- Reactor Status Indicator -->
-                    <div class="reactor-status" style="margin-bottom: 1rem;">
-                        <span data-reactor="connection-status" class="connected">Подключено к Reactor</span>
-                    </div>
+                    <!-- Reactor Status Component -->
+                    {% include 'components/reactor_status.html' %}
                     <p class="hero-description">
                         Получайте только важные новости с оценкой достоверности и значимости.<br>
                         Следите за ключевыми событиями в мире криптовалют, технологий и экономики.<br>
@@ -364,23 +362,8 @@
                         Фильтруем шум и выделяем только то, что стоит вашего внимания.
                     </p>
                     
-                    <!-- Reactor Metrics Display -->
-                    <div data-reactor="metrics" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-around; text-align: center;">
-                            <div>
-                                <div style="font-size: 0.8rem; color: #666;">Достоверность</div>
-                                <div data-metric="credibility" style="font-weight: bold; color: #28a745;">--%</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: #666;">Важность</div>
-                                <div data-metric="importance" style="font-weight: bold; color: #007bff;">--%</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.8rem; color: #666;">Обновлено</div>
-                                <div data-metric="timestamp" style="font-size: 0.8rem; color: #666;">--</div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Reactor Metrics Component -->
+                    {% include 'components/metrics_display.html' %}
                     
                     <i data-lucide="brain" class="feature-icon"></i>
                 </div>
@@ -413,10 +396,8 @@
                         Не пропустите разлоки токенов, листинги и ключевые апдейты проектов.
                     </p>
                     
-                    <!-- Reactor Events Container -->
-                    <div data-reactor="events-container" style="margin-top: 1rem; max-height: 120px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px;">
-                        <div style="font-size: 0.8rem; color: #666; text-align: center;">События загружаются...</div>
-                    </div>
+                    <!-- Reactor Events Component -->
+                    {% include 'components/events_feed.html' %}
                     
                     <i data-lucide="calendar" class="feature-icon"></i>
                 </div>

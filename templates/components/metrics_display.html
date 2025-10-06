@@ -1,0 +1,134 @@
+<!-- Metrics Display Component -->
+<div class="metrics-display-component">
+    <div class="metrics-header">
+        <span class="metrics-icon">📊</span>
+        <span class="metrics-title">AI Метрики</span>
+    </div>
+    
+    <div class="metrics-grid" data-reactor="metrics">
+        <div class="metric-item">
+            <div class="metric-icon">🎯</div>
+            <div class="metric-content">
+                <div class="metric-label">Достоверность</div>
+                <div class="metric-value" data-metric="credibility">--%</div>
+            </div>
+        </div>
+        
+        <div class="metric-item">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-content">
+                <div class="metric-label">Важность</div>
+                <div class="metric-value" data-metric="importance">--%</div>
+            </div>
+        </div>
+        
+        <div class="metric-item">
+            <div class="metric-icon">📰</div>
+            <div class="metric-content">
+                <div class="metric-label">Новости</div>
+                <div class="metric-value" data-metric="news_processed">0</div>
+            </div>
+        </div>
+        
+        <div class="metric-item">
+            <div class="metric-icon">🕒</div>
+            <div class="metric-content">
+                <div class="metric-label">Обновлено</div>
+                <div class="metric-value" data-metric="timestamp">--</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.metrics-display-component {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 1rem 0;
+}
+
+.metrics-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.metrics-icon {
+    font-size: 1.3rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.metric-item:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.metric-icon {
+    font-size: 1.5rem;
+    opacity: 0.7;
+}
+
+.metric-content {
+    flex: 1;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .metrics-display-component {
+        background: #1f2937;
+        color: white;
+    }
+    
+    .metrics-header {
+        color: white;
+    }
+    
+    .metric-item {
+        background: #374151;
+    }
+    
+    .metric-item:hover {
+        background: #4b5563;
+    }
+    
+    .metric-label {
+        color: #9ca3af;
+    }
+    
+    .metric-value {
+        color: white;
+    }
+}
+</style>

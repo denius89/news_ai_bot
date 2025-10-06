@@ -1,0 +1,87 @@
+<!-- Reactor Status Component -->
+<div class="reactor-status-component">
+    <div class="status-header">
+        <span class="status-icon">⚡</span>
+        <span class="status-title">PulseAI Reactor</span>
+    </div>
+    
+    <div class="status-indicators">
+        <div class="status-item">
+            <span class="status-label">Подключение:</span>
+            <span data-reactor="connection-status" class="status-value">Проверка...</span>
+        </div>
+        
+        <div class="status-item">
+            <span class="status-label">События:</span>
+            <span data-reactor="events-counter" class="status-value">0</span>
+        </div>
+        
+        <div class="status-item">
+            <span class="status-label">Здоровье:</span>
+            <span data-reactor="system-status" class="status-value">OK</span>
+        </div>
+    </div>
+</div>
+
+<style>
+.reactor-status-component {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.status-icon {
+    font-size: 1.2rem;
+}
+
+.status-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.status-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.status-value {
+    font-weight: 500;
+}
+
+.status-value.connected {
+    color: #10b981;
+}
+
+.status-value.disconnected {
+    color: #ef4444;
+}
+
+.status-value.ok {
+    color: #10b981;
+}
+
+.status-value.warning {
+    color: #f59e0b;
+}
+
+.status-value.error {
+    color: #ef4444;
+}
+</style>
