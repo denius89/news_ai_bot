@@ -93,13 +93,13 @@ def api_latest_news():
             "count": len(news),
             "data": [
                 {
-                    "id": n["id"],
-                    "title": n["title"],
-                    "source": n["source"],
-                    "published_at": n["published_at"].isoformat() if n["published_at"] else None,
-                    "category": n["category"],
-                    "credibility": n["credibility"],
-                    "importance": n["importance"]
+                    "id": n.get("id"),
+                    "title": n.get("title"),
+                    "source": n.get("source"),
+                    "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
+                    "category": n.get("category"),
+                    "credibility": n.get("credibility"),
+                    "importance": n.get("importance")
                 }
                 for n in news
             ]

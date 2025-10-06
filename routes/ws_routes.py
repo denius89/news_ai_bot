@@ -133,8 +133,9 @@ def register_websocket_handlers():
     @socketio.on('ping')
     def handle_ping():
         """Обработка ping от клиента."""
+        import time
         client_id = request.sid
-        socket_emit('pong', {'timestamp': asyncio.get_event_loop().time()})
+        socket_emit('pong', {'timestamp': time.time()})
 
 
 def handle_reactor_event(event):
@@ -168,10 +169,11 @@ def broadcast_event(event_name: str, data: dict, room: str = None):
         logger.warning("SocketIO не инициализирован")
         return
     
+    import time
     event_data = {
         'event': event_name,
         'data': data,
-        'timestamp': asyncio.get_event_loop().time(),
+        'timestamp': time.time(),
         'type': 'broadcast'
     }
     
@@ -242,10 +244,11 @@ def reactor_health():
     """Эндпоинт для проверки здоровья Reactor."""
     from flask import jsonify
     
+    import time
     health_data = {
         'reactor': reactor.get_health(),
         'websocket': get_websocket_stats(),
-        'timestamp': asyncio.get_event_loop().time()
+        'timestamp': time.time()
     }
     
     return jsonify(health_data)
