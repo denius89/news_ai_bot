@@ -1,9 +1,6 @@
 <!-- PulseAI Reactor Scripts -->
 <!-- Единое подключение всех скриптов Reactor -->
 
-<!-- Socket.IO для WebSocket подключений -->
-<script src="/socket.io/socket.io.js"></script>
-
 <!-- Reactor Core Client -->
 <script src="{{ url_for('static', filename='js/reactor.js') }}"></script>
 
@@ -21,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (reactorEnabled && window.reactor) {
         console.log('PulseAI Reactor активен');
+        window.reactor.connect();
         
         // Дополнительная инициализация для конкретных страниц
         if (typeof initPageReactor === 'function') {
