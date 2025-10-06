@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
-            notifications = data || [];
+            notifications = data.data?.notifications || [];
             
         } catch (error) {
             console.error('Error loading notifications:', error);
