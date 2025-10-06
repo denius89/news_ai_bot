@@ -70,9 +70,7 @@
 /* === Theme Switching === */
 
 /* Light theme (default) */
-:root {
-  --theme-transition: var(--transition-colors);
-}
+
 
 /* Dark theme */
 :root[data-theme="dark"] {
@@ -93,35 +91,14 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --transition-none: none;
-    --transition-all: none;
-    --transition-default: none;
-    --transition-colors: none;
-    --transition-opacity: none;
-    --transition-shadow: none;
-    --transition-transform: none;
-    
-    --duration-75: 0ms;
-    --duration-100: 0ms;
-    --duration-150: 0ms;
-    --duration-200: 0ms;
-    --duration-300: 0ms;
-    --duration-500: 0ms;
-    --duration-700: 0ms;
-    --duration-1000: 0ms;
-  }
+  
 }
 
 /* === Print Styles === */
 @media print {
-  :root {
-    --color-bg: white;
-    --color-text: black;
-    --color-border: black;
-    --shadow-none: none;
-    --shadow-card: none;
-    --shadow-modal: none;
-    --shadow-dropdown: none;
-  }
+  
+}
+
+:root {
+  --transition-none: none; --transition-all: none; --transition-default: none; --transition-colors: none; --transition-opacity: none; --transition-shadow: none; --transition-transform: none; --duration-75: 0ms; --duration-100: 0ms; --duration-150: 0ms; --duration-200: 0ms; --duration-300: 0ms; --duration-500: 0ms; --duration-700: 0ms; --duration-1000: 0ms; --color-bg: white; --color-text: black; --color-border: black; --shadow-none: none; --shadow-card: none; --shadow-modal: none; --shadow-dropdown: none;
 }

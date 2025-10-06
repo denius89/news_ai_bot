@@ -1,17 +1,4 @@
-/* ============================================================================
-   PulseAI Progress System
-   Прогресс-бары, индикаторы загрузки и метрики
-   ============================================================================ */
 
-/* === Progress Bars === */
-.progress-bar {
-  width: 100%;
-  height: 0.5rem;
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  position: relative;
-}
 
 .progress-bar-sm {
   height: 0.25rem;
@@ -19,13 +6,6 @@
 
 .progress-bar-lg {
   height: 0.75rem;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width var(--duration-300) ease-out;
-  position: relative;
 }
 
 /* Importance bars */
@@ -44,43 +24,6 @@
   transition: width var(--duration-300) ease-out;
   position: relative;
 }
-
-/* Credibility bars */
-.credibility-bar {
-  width: 100%;
-  height: 0.5rem;
-  background: var(--color-bg-secondary);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  position: relative;
-}
-
-.credibility-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  transition: width var(--duration-300) ease-out;
-  position: relative;
-}
-
-/* Color variants */
-.progress-fill-primary { background: var(--color-primary); }
-.progress-fill-secondary { background: var(--color-secondary); }
-.progress-fill-success { background: var(--color-success); }
-.progress-fill-warning { background: var(--color-warning); }
-.progress-fill-danger { background: var(--color-danger); }
-.progress-fill-info { background: var(--color-info); }
-
-/* Importance levels */
-.importance-fill-low { background: var(--color-danger-400); }
-.importance-fill-medium { background: var(--color-warning-400); }
-.importance-fill-high { background: var(--color-success-400); }
-.importance-fill-critical { background: var(--color-danger-600); }
-
-/* Credibility levels */
-.credibility-fill-low { background: var(--color-danger-400); }
-.credibility-fill-medium { background: var(--color-warning-400); }
-.credibility-fill-high { background: var(--color-success-400); }
-.credibility-fill-verified { background: var(--color-info-400); }
 
 /* Animated progress bars */
 .progress-animated .progress-fill {
@@ -105,19 +48,8 @@
 }
 
 @keyframes progress-shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Circular progress */
-.progress-circle {
-  position: relative;
-  width: 4rem;
-  height: 4rem;
+  
+  10
 }
 
 .progress-circle svg {
@@ -126,61 +58,17 @@
   height: 100%;
 }
 
-.progress-circle-bg {
-  fill: none;
-  stroke: var(--color-bg-secondary);
-  stroke-width: 4;
-}
-
-.progress-circle-fill {
-  fill: none;
-  stroke: var(--color-primary);
-  stroke-width: 4;
-  stroke-linecap: round;
-  transition: stroke-dashoffset var(--duration-500) ease-out;
-}
-
-.progress-circle-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  color: var(--color-text);
-}
-
-/* === Metric Cards === */
-.metric-card {
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-4);
-  text-align: center;
-  transition: var(--transition-all);
-}
-
 .metric-card:hover {
   box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
-.metric-value {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-bold);
-  color: var(--color-primary);
-  margin-bottom: var(--sp-1);
-}
+
 
 .metric-label {
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
   font-weight: var(--font-medium);
-}
-
-.metric-change {
-  font-size: var(--text-xs);
-  margin-top: var(--sp-1);
 }
 
 .metric-change.positive {
@@ -219,40 +107,9 @@
   color: var(--color-success-700);
 }
 
-.status-disconnected {
-  background: var(--color-danger-50);
-  color: var(--color-danger-700);
-}
-
-.status-warning {
-  background: var(--color-warning-50);
-  color: var(--color-warning-700);
-}
-
-.status-processing {
-  background: var(--color-info-50);
-  color: var(--color-info-700);
-}
-
-/* === Loading States === */
-.loading-skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--color-bg-secondary) 25%,
-    var(--color-bg-tertiary) 50%,
-    var(--color-bg-secondary) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s infinite;
-}
-
 @keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  
+  10
 }
 
 /* === Data Attributes Support === */
@@ -265,26 +122,21 @@
   width: 0%;
 }
 
-.credibility-fill[data-width] {
-  width: 0%;
-}
-
-.progress-fill[data-width] {
-  width: 0%;
-}
-
 /* === Responsive === */
 @media (max-width: 640px) {
-  .metric-card {
-    padding: var(--sp-3);
-  }
+
   
-  .metric-value {
-    font-size: var(--text-xl);
-  }
-  
-  .progress-circle {
-    width: 3rem;
-    height: 3rem;
-  }
+
+}
+
+0% {
+  transform: translateX(-100%); background-position: 200% 0;
+}
+
+100% {
+  transform: translateX(100%); background-position: -200% 0;
+}
+
+.metric-value {
+  font-size: var(--text-2xl); font-weight: var(--font-bold); color: var(--color-primary); margin-bottom: var(--sp-1); font-size: var(--text-xl);
 }

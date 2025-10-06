@@ -99,10 +99,7 @@
 }
 
 /* Firefox scrollbar */
-:root[data-theme="dark"] {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-gray-600) var(--color-gray-800);
-}
+
 
 /* === Theme Toggle Button === */
 .theme-toggle {
@@ -203,14 +200,7 @@
 
 /* === Print Styles for Dark Mode === */
 @media print {
-  :root[data-theme="dark"] {
-    --color-bg: white;
-    --color-text: black;
-    --color-border: black;
-    --shadow-card: none;
-    --shadow-modal: none;
-    --shadow-dropdown: none;
-  }
+  
   
   :root[data-theme="dark"] .card,
   :root[data-theme="dark"] .btn,
@@ -224,10 +214,7 @@
 
 /* === High Contrast Mode Support === */
 @media (prefers-contrast: high) {
-  :root[data-theme="dark"] {
-    --color-border: var(--color-gray-400);
-    --color-border-secondary: var(--color-gray-300);
-  }
+  
   
   :root[data-theme="dark"] .btn {
     border-width: 2px;
@@ -242,14 +229,6 @@
 html {
   transition: background-color var(--transition-default),
               color var(--transition-default);
-}
-
-/* Smooth theme switching */
-.theme-transition {
-  transition: background-color var(--transition-default),
-              border-color var(--transition-default),
-              color var(--transition-default),
-              box-shadow var(--transition-default);
 }
 
 /* === Dark Mode Utilities === */
@@ -291,4 +270,8 @@ html {
   :root:not([data-theme="light"]) .dark\:border-gray-700 {
     border-color: var(--color-gray-700);
   }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: white; --color-text: black; --color-border: black; --shadow-card: none; --shadow-modal: none; --shadow-dropdown: none; --color-border: var(--color-gray-400); --color-border-secondary: var(--color-gray-300);
 }
