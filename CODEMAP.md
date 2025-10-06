@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-05 20:16:41 UTC_
+_Generated on 2025-10-06 06:55:02 UTC_
 
 ```
 ├── .github/
@@ -29,6 +29,7 @@ _Generated on 2025-10-05 20:16:41 UTC_
 │   ├── bot.pid
 │   └── webapp.pid
 ├── .vscode/
+│   ├── extensions.json
 │   └── settings.json
 ├── ai_modules/
 │   ├── __init__.py
@@ -220,8 +221,10 @@ _Generated on 2025-10-05 20:16:41 UTC_
 ├── .cursorignore
 ├── .editorconfig
 ├── .env.example
+├── .eslintrc.json
 ├── .flake8
 ├── .gitignore
+├── .htmlhintrc
 ├── .pre-commit-config.yaml
 ├── .safety-ignore
 ├── CODEMAP.md

@@ -22,13 +22,16 @@ def digest():
     categories = request.args.getlist("category")
 
     digest_service = get_sync_digest_service()
-    digest_text, news_items = digest_service.build_daily_digest(limit=10, categories=categories)
+    digest_text = digest_service.build_daily_digest(limit=10, categories=categories)
+
+    # Получаем новости отдельно для шаблона
+    news_items = digest_service.db_service.get_latest_news(categories=categories, limit=10)
 
     # Обогащаем данными для шаблона
     enriched_items = []
     for item in news_items:
         # Преобразуем Pydantic модель в словарь для шаблона
-        if hasattr(item, 'model_dump'):
+        if hasattr(item, "model_dump"):
             item_dict = item.model_dump()
         else:
             item_dict = dict(item)

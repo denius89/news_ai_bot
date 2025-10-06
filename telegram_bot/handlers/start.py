@@ -28,31 +28,29 @@ async def cmd_start(message: types.Message):
 async def cb_start(query: types.CallbackQuery):
     """Показать главное меню"""
     await query.message.edit_text("📌 Главное меню:", reply_markup=main_inline_keyboard())
+    await query.answer()
 
 
 @router.callback_query(lambda c: c.data == "back")
 async def cb_back(query: types.CallbackQuery):
     """Возврат в главное меню"""
-    await query.message.edit_text("↩️ Главное меню:", reply_markup=main_inline_keyboard())
+    await query.message.edit_text("📌 Главное меню:", reply_markup=main_inline_keyboard())
+    await query.answer()
 
 
-@router.message(Command("help"))
-async def cmd_help(message: types.Message):
-    """Справка по командам бота"""
+@router.callback_query(lambda c: c.data == "help")
+async def cb_help(query: types.CallbackQuery):
+    """Показать справку"""
     help_text = (
-        "🤖 <b>PulseAI Bot - Справка</b>\n\n"
-        "📌 <b>Основные команды:</b>\n"
-        "• /start - Запуск бота и главное меню\n"
-        "• /digest - Последние новости\n"
-        "• /events - Ближайшие события\n"
-        "• /notifications - Управление уведомлениями\n"
-        "• /help - Эта справка\n\n"
-        "🌐 <b>WebApp:</b>\n"
-        "• Нажмите кнопку '🌐 WebApp' для полного управления подписками\n\n"
-        "🔔 <b>Уведомления:</b>\n"
-        "• Настраивайте уведомления через бот или WebApp\n"
-        "• Получайте важные новости в реальном времени\n\n"
-        "❓ <b>Поддержка:</b>\n"
-        "Если у вас есть вопросы, обратитесь к администратору."
+        "📖 <b>Справка по командам:</b>\n\n"
+        "• /start — главное меню\n"
+        "• /digest — дайджест новостей\n"
+        "• /events — календарь событий\n"
+        "• /dashboard — открыть WebApp\n\n"
+        "💡 <b>Подсказки:</b>\n"
+        "• Используйте кнопки для навигации\n"
+        "• AI-дайджест создается персонально\n"
+        "• В WebApp можно настроить подписки"
     )
-    await message.answer(help_text, parse_mode="HTML")
+    await query.message.edit_text(help_text, parse_mode="HTML", reply_markup=main_inline_keyboard())
+    await query.answer()
