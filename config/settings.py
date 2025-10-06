@@ -40,7 +40,7 @@ AI_MODEL_SCORING = os.getenv("AI_MODEL_SCORING", "gpt-4o-mini")
 AI_MAX_TOKENS = int(os.getenv("AI_MAX_TOKENS", "800"))
 
 # ---- REACTOR CORE ----
-REACTOR_ENABLED = os.getenv("REACTOR_ENABLED", "true").lower() == "true"
+REACTOR_ENABLED = os.getenv("REACTOR_ENABLED", "false").lower() == "true"
 REACTOR_WS_PATH = os.getenv("REACTOR_WS_PATH", "/ws/stream")
 REACTOR_LOG_PATH = os.getenv("REACTOR_LOG_PATH", "logs/reactor.log")
 
