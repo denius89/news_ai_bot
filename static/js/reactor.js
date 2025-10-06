@@ -1,329 +1,248 @@
 /**
- * PulseAI Reactor Client - фронтенд клиент для подключения к Reactor Core
- * Обеспечивает real-time связь с сервером через WebSocket
+ * PULSE-WS: Pure WebSocket client for PulseAI Reactor Core.
+ * Replaces Socket.IO with native WebSocket for better performance and simplicity.
  */
 
-class PulseAIReactor {
-    constructor(options = {}) {
-        this.options = {
-            wsUrl: options.wsUrl || this.getWebSocketUrl(),
-            reconnectInterval: options.reconnectInterval || 5000,
-            maxReconnectAttempts: options.maxReconnectAttempts || 10,
-            debug: options.debug || false,
-            ...options
-        };
-        
-        this.socket = null;
-        this.connected = false;
-        this.reconnectAttempts = 0;
-        this.eventListeners = new Map();
-        this.subscribedEvents = new Set();
-        
-        this.log('PulseAI Reactor Client инициализирован', this.options);
+(function() {
+    'use strict';
+    
+    // PULSE-WS: WebSocket connection state
+    let socket = null;
+    let heartbeatInterval = null;
+    let reconnectTimeout = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 10;
+    const reconnectDelay = 3000;
+    
+    // PULSE-WS: Connection configuration
+    const config = {
+        heartbeatInterval: 25000, // 25 seconds
+        reconnectDelay: 3000,     // 3 seconds
+        maxReconnectAttempts: 10
+    };
+    
+    /**
+     * PULSE-WS: Get WebSocket URL based on current location
+     */
+    function getWebSocketURL() {
+        const scheme = location.protocol === "https:" ? "wss" : "ws";
+        return `${scheme}://${location.host}/ws/stream`;
     }
     
-    getWebSocketUrl() {
-        // Определяем URL для WebSocket подключения
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.host;
-        return `${protocol}//${host}/socket.io/?EIO=4&transport=websocket`;
-    }
-    
-    log(message, data = null) {
-        if (this.options.debug) {
-            console.log(`[PulseAI Reactor] ${message}`, data);
-        }
-    }
-    
-    error(message, error = null) {
-        console.error(`[PulseAI Reactor] ${message}`, error);
-    }
-    
-    connect() {
-        return new Promise((resolve, reject) => {
-            try {
-                this.log('Подключение к Reactor WebSocket...');
-                
-                // Импортируем socket.io-client динамически
-                if (typeof io === 'undefined') {
-                    this.loadSocketIO().then(() => {
-                        this.initSocket(resolve, reject);
-                    }).catch(reject);
-                } else {
-                    this.initSocket(resolve, reject);
-                }
-                
-            } catch (error) {
-                this.error('Ошибка при подключении', error);
-                reject(error);
-            }
-        });
-    }
-    
-    loadSocketIO() {
-        return new Promise((resolve, reject) => {
-            if (document.querySelector('script[src*="socket.io"]')) {
-                resolve();
-                return;
-            }
-            
-            const script = document.createElement('script');
-            // Используем CDN для совместимости с Flask-SocketIO 5.5.1
-            script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
-            script.onload = () => {
-                this.log('Socket.IO клиент загружен с CDN');
-                resolve();
-            };
-            script.onerror = () => {
-                this.error('Ошибка загрузки Socket.IO клиента');
-                reject(new Error('Не удалось загрузить socket.io'));
-            };
-            document.head.appendChild(script);
-        });
-    }
-    
-    initSocket(resolve, reject) {
+    /**
+     * PULSE-WS: Connect to WebSocket server
+     */
+    function connect() {
         try {
-            this.socket = io();
+            const url = getWebSocketURL();
+            console.log('[PULSE-WS] Connecting to:', url);
             
-            this.socket.on('connect', () => {
-                this.connected = true;
-                this.reconnectAttempts = 0;
-                this.log('Подключен к Reactor WebSocket');
+            socket = new WebSocket(url);
+            
+            socket.onopen = function(event) {
+                console.log('[PULSE-WS] Connected successfully');
+                reconnectAttempts = 0;
                 
-                // Уведомляем о подключении
-                this.emit('reactor_connected', { timestamp: Date.now() });
+                // PULSE-WS: Start heartbeat
+                startHeartbeat();
                 
-                // Переподписываемся на события
-                if (this.subscribedEvents.size > 0) {
-                    this.socket.emit('reactor_subscribe', {
-                        events: Array.from(this.subscribedEvents)
-                    });
+                // PULSE-WS: Dispatch connection event
+                window.dispatchEvent(new CustomEvent('reactor_connected', {
+                    detail: {
+                        message: 'Connected to PulseAI Reactor',
+                        timestamp: Date.now()
+                    }
+                }));
+            };
+            
+            socket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    // PULSE-WS: Handle different message types
+                    if (data.type && data.data) {
+                        // PULSE-WS: Dispatch custom event
+                        window.dispatchEvent(new CustomEvent(data.type, {
+                            detail: data.data
+                        }));
+                        
+                        // PULSE-WS: Call specific handlers if they exist
+                        if (window.reactor && window.reactor.handlers && window.reactor.handlers[data.type]) {
+                            window.reactor.handlers[data.type](data.data);
+                        }
+                    } else {
+                        // PULSE-WS: Handle plain text (like pong)
+                        console.log('[PULSE-WS] Received:', data);
+                    }
+                } catch (error) {
+                    // PULSE-WS: Handle non-JSON messages (like pong)
+                    console.log('[PULSE-WS] Received text:', event.data);
                 }
-                
-                resolve();
-            });
+            };
             
-            this.socket.on('disconnect', (reason) => {
-                this.connected = false;
-                this.log('Отключен от Reactor WebSocket', reason);
+            socket.onclose = function(event) {
+                console.warn('[PULSE-WS] Connection closed:', event.code, event.reason);
+                stopHeartbeat();
                 
-                this.emit('reactor_disconnected', { reason, timestamp: Date.now() });
+                // PULSE-WS: Dispatch disconnect event
+                window.dispatchEvent(new CustomEvent('reactor_disconnected', {
+                    detail: {
+                        code: event.code,
+                        reason: event.reason,
+                        timestamp: Date.now()
+                    }
+                }));
                 
-                // Автоматическое переподключение
-                if (this.reconnectAttempts < this.options.maxReconnectAttempts) {
-                    setTimeout(() => this.reconnect(), this.options.reconnectInterval);
+                // PULSE-WS: Attempt reconnection
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    console.log(`[PULSE-WS] Reconnecting in ${reconnectDelay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+                    
+                    reconnectTimeout = setTimeout(connect, reconnectDelay);
+                } else {
+                    console.error('[PULSE-WS] Max reconnection attempts reached');
+                    
+                    // PULSE-WS: Dispatch final disconnect event
+                    window.dispatchEvent(new CustomEvent('reactor_failed', {
+                        detail: {
+                            message: 'Max reconnection attempts reached',
+                            timestamp: Date.now()
+                        }
+                    }));
                 }
-            });
+            };
             
-            this.socket.on('reactor_event', (data) => {
-                this.log('Получено событие от Reactor', data);
-                this.handleReactorEvent(data);
-            });
-            
-            this.socket.on('reactor_connected', (data) => {
-                this.log('Reactor подтвердил подключение', data);
-            });
-            
-            this.socket.on('reactor_subscribed', (data) => {
-                this.log('Подписка подтверждена', data);
-            });
-            
-            this.socket.on('reactor_unsubscribed', (data) => {
-                this.log('Отписка подтверждена', data);
-            });
-            
-            this.socket.on('pong', (data) => {
-                this.log('Pong получен', data);
-            });
-            
-            this.socket.on('connect_error', (error) => {
-                this.error('Ошибка подключения', error);
-                reject(error);
-            });
+            socket.onerror = function(error) {
+                console.error('[PULSE-WS] WebSocket error:', error);
+                
+                // PULSE-WS: Dispatch error event
+                window.dispatchEvent(new CustomEvent('reactor_error', {
+                    detail: {
+                        error: error,
+                        timestamp: Date.now()
+                    }
+                }));
+            };
             
         } catch (error) {
-            this.error('Ошибка инициализации socket', error);
-            reject(error);
+            console.error('[PULSE-WS] Connection error:', error);
         }
     }
     
-    reconnect() {
-        this.reconnectAttempts++;
-        this.log(`Попытка переподключения ${this.reconnectAttempts}/${this.options.maxReconnectAttempts}`);
-        
-        if (this.socket) {
-            this.socket.disconnect();
+    /**
+     * PULSE-WS: Start heartbeat to keep connection alive
+     */
+    function startHeartbeat() {
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
         }
         
-        this.connect().catch((error) => {
-            this.error('Ошибка переподключения', error);
-        });
-    }
-    
-    handleReactorEvent(eventData) {
-        const { event, data, source, timestamp, id } = eventData;
-        
-        // Создаем кастомное событие для браузера
-        const customEvent = new CustomEvent(`reactor:${event}`, {
-            detail: {
-                event,
-                data,
-                source,
-                timestamp,
-                id,
-                originalEvent: eventData
+        heartbeatInterval = setInterval(function() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send('ping');
             }
-        });
-        
-        // Диспетчим событие через window
-        window.dispatchEvent(customEvent);
-        
-        // Также вызываем обработчики из Map
-        const listeners = this.eventListeners.get(event) || [];
-        listeners.forEach(callback => {
-            try {
-                callback(eventData);
-            } catch (error) {
-                this.error(`Ошибка в обработчике события ${event}`, error);
-            }
-        });
+        }, config.heartbeatInterval);
     }
     
-    // Публичные методы для подписки на события
-    
-    on(event, callback) {
-        if (!this.eventListeners.has(event)) {
-            this.eventListeners.set(event, []);
+    /**
+     * PULSE-WS: Stop heartbeat
+     */
+    function stopHeartbeat() {
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
         }
-        this.eventListeners.get(event).push(callback);
-        
-        // Подписываемся на сервере, если подключены
-        if (this.connected && !this.subscribedEvents.has(event)) {
-            this.subscribedEvents.add(event);
-            this.socket.emit('reactor_subscribe', { events: [event] });
-        }
-        
-        this.log(`Подписка на событие: ${event}`);
-        return this;
     }
     
-    off(event, callback) {
-        const listeners = this.eventListeners.get(event);
-        if (listeners) {
-            const index = listeners.indexOf(callback);
-            if (index > -1) {
-                listeners.splice(index, 1);
-            }
+    /**
+     * PULSE-WS: Disconnect from WebSocket
+     */
+    function disconnect() {
+        if (reconnectTimeout) {
+            clearTimeout(reconnectTimeout);
+            reconnectTimeout = null;
+        }
+        
+        stopHeartbeat();
+        
+        if (socket) {
+            socket.close();
+            socket = null;
+        }
+    }
+    
+    /**
+     * PULSE-WS: Send message to server
+     */
+    function send(type, data) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            const message = {
+                type: type,
+                data: data,
+                timestamp: Date.now()
+            };
             
-            // Если обработчиков больше нет, отписываемся от сервера
-            if (listeners.length === 0) {
-                this.eventListeners.delete(event);
-                if (this.connected && this.subscribedEvents.has(event)) {
-                    this.subscribedEvents.delete(event);
-                    this.socket.emit('reactor_unsubscribe', { events: [event] });
-                }
-            }
+            socket.send(JSON.stringify(message));
+        } else {
+            console.warn('[PULSE-WS] Cannot send message: WebSocket not connected');
         }
-        
-        this.log(`Отписка от события: ${event}`);
-        return this;
     }
     
-    emit(event, data) {
-        // Эмитим событие в браузере
-        const customEvent = new CustomEvent(event, { detail: data });
-        window.dispatchEvent(customEvent);
-        
-        this.log(`Событие эмитировано: ${event}`, data);
-        return this;
-    }
-    
-    // Методы для работы с комнатами
-    
-    joinRoom(room) {
-        if (this.connected) {
-            this.socket.emit('join_room', { room });
-            this.log(`Подключение к комнате: ${room}`);
+    /**
+     * PULSE-WS: Subscribe to specific events
+     */
+    function subscribe(events) {
+        if (Array.isArray(events)) {
+            send('subscribe', events.join(','));
+        } else {
+            send('subscribe', events);
         }
-        return this;
     }
     
-    leaveRoom(room) {
-        if (this.connected) {
-            this.socket.emit('leave_room', { room });
-            this.log(`Отключение от комнаты: ${room}`);
-        }
-        return this;
-    }
-    
-    // Ping/Pong для проверки соединения
-    
-    ping() {
-        if (this.connected) {
-            this.socket.emit('ping');
-            this.log('Ping отправлен');
-        }
-        return this;
-    }
-    
-    // Получение статуса
-    
-    getStatus() {
+    /**
+     * PULSE-WS: Get connection status
+     */
+    function getStatus() {
         return {
-            connected: this.connected,
-            reconnectAttempts: this.reconnectAttempts,
-            subscribedEvents: Array.from(this.subscribedEvents),
-            eventListeners: Array.from(this.eventListeners.keys()),
-            wsUrl: this.options.wsUrl
+            connected: socket && socket.readyState === WebSocket.OPEN,
+            readyState: socket ? socket.readyState : WebSocket.CLOSED,
+            reconnectAttempts: reconnectAttempts,
+            url: getWebSocketURL()
         };
     }
     
-    // Отключение
+    /**
+     * PULSE-WS: Global Reactor client API
+     */
+    window.reactor = {
+        connect: connect,
+        disconnect: disconnect,
+        send: send,
+        subscribe: subscribe,
+        getStatus: getStatus,
+        config: config,
+        handlers: {} // For custom event handlers
+        
+        // Legacy compatibility methods
+        // These maintain compatibility with existing code
+    };
     
-    disconnect() {
-        if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-        }
-        this.connected = false;
-        this.log('Отключен от Reactor');
-        return this;
+    // PULSE-WS: Auto-connect when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay to ensure all scripts are loaded
+            setTimeout(connect, 100);
+        });
+    } else {
+        // DOM is already ready
+        setTimeout(connect, 100);
     }
-}
-
-// Создаем глобальный экземпляр
-window.PulseAIReactor = PulseAIReactor;
-
-// Автоматическая инициализация при загрузке DOM
-document.addEventListener('DOMContentLoaded', () => {
-    // Создаем глобальный экземпляр Reactor
-    window.reactor = new PulseAIReactor({
-        debug: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    
+    // PULSE-WS: Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        disconnect();
     });
     
-    // Автоматическое подключение
-    window.reactor.connect().then(() => {
-        console.log('PulseAI Reactor подключен');
-    }).catch((error) => {
-        console.error('Ошибка подключения к PulseAI Reactor:', error);
-    });
+    console.log('[PULSE-WS] Reactor WebSocket client initialized');
     
-    // Добавляем обработчики для глобальных событий
-    window.reactor.on('ai_metrics_updated', (data) => {
-        console.log('AI метрики обновлены:', data);
-    });
-    
-    window.reactor.on('news_processed', (data) => {
-        console.log('Новости обработаны:', data);
-    });
-    
-    window.reactor.on('digest_created', (data) => {
-        console.log('Дайджест создан:', data);
-    });
-});
-
-// Экспорт для модульных систем
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = PulseAIReactor;
-}
+})();
