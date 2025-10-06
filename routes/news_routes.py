@@ -73,7 +73,7 @@ def events():
             ev["importance"] = 0
 
     return render_template(
-        "events.html",
+        "calendar.html",
         events=events_list,
         active_category=category,
         active_page="events",

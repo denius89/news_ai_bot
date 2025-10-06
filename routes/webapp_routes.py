@@ -13,3 +13,8 @@ def webapp():
 def live_dashboard():
     """Live Reactor Dashboard route"""
     return render_template("pages/live_dashboard.html", active_page="live")
+
+@webapp_bp.route("/app")
+def react_app():
+    """React Frontend App route"""
+    return render_template("react_app.html")

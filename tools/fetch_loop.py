@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 class FetchLoop:
     """
     Continuous fetch loop with auto-posting integration.
-    
+
     Features:
     - Configurable intervals
     - AI filtering
@@ -45,7 +45,7 @@ class FetchLoop:
     - Graceful shutdown
     - Metrics tracking
     """
-    
+
     def __init__(self, interval: int = 30, ai_filter: bool = True, auto_post: bool = False):
         """Initialize fetch loop."""
         self.interval = interval
@@ -53,29 +53,29 @@ class FetchLoop:
         self.auto_post = auto_post
         self.running = False
         self.metrics = get_metrics()
-        
+
         # Setup signal handlers for graceful shutdown
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
-        
+
         logger.info(f"FetchLoop initialized: interval={interval}s, ai_filter={ai_filter}, auto_post={auto_post}")
-    
+
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals."""
         logger.info(f"Received signal {signum}, shutting down gracefully...")
         self.running = False
-    
+
     async def _run_fetch_cycle(self) -> bool:
         """
         Run a single fetch cycle.
-        
+
         Returns:
             True if successful, False otherwise
         """
         try:
             logger.info("Starting fetch cycle...")
             start_time = datetime.now(timezone.utc)
-            
+
             # Run optimized parser
             if self.ai_filter:
                 logger.info("Running with AI filtering enabled")
@@ -83,64 +83,64 @@ class FetchLoop:
             else:
                 logger.info("Running without AI filtering")
                 result = await run_optimized_parser()
-            
-            if not result.get('success', False):
+
+            if not result.get("success", False):
                 logger.error(f"Fetch cycle failed: {result.get('error', 'Unknown error')}")
                 return False
-            
+
             # Log results
-            processed = result.get('processed', 0)
-            saved = result.get('saved', 0)
-            ai_calls = result.get('ai_calls', 0)
-            
+            processed = result.get("processed", 0)
+            saved = result.get("saved", 0)
+            ai_calls = result.get("ai_calls", 0)
+
             logger.info(f"Fetch cycle completed: processed={processed}, saved={saved}, ai_calls={ai_calls}")
-            
+
             # Run auto-posting if enabled
             if self.auto_post:
                 logger.info("Running auto-posting...")
                 post_result = await auto_post_digest()
-                
-                if post_result.get('success', False):
-                    published = post_result.get('published_count', 0)
+
+                if post_result.get("success", False):
+                    published = post_result.get("published_count", 0)
                     logger.info(f"Auto-posting completed: published={published} digests")
                 else:
                     logger.warning(f"Auto-posting failed: {post_result.get('reason', 'Unknown error')}")
-            
+
             # Calculate cycle time
             cycle_time = (datetime.now(timezone.utc) - start_time).total_seconds()
             logger.info(f"Cycle completed in {cycle_time:.2f} seconds")
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(f"Error in fetch cycle: {e}")
             return False
-    
+
     async def run(self):
         """Run the continuous fetch loop."""
         self.running = True
         logger.info("Starting fetch loop...")
-        
+
         cycle_count = 0
-        
+
         while self.running:
             try:
                 cycle_count += 1
                 logger.info(f"Starting cycle #{cycle_count}")
-                
+
                 # Run fetch cycle
                 success = await self._run_fetch_cycle()
-                
+
                 if success:
                     logger.info(f"Cycle #{cycle_count} completed successfully")
                 else:
                     logger.error(f"Cycle #{cycle_count} failed")
-                
+
                 # Wait for next cycle
                 if self.running:
                     logger.info(f"Waiting {self.interval} seconds until next cycle...")
                     await asyncio.sleep(self.interval)
-                
+
             except asyncio.CancelledError:
                 logger.info("Fetch loop cancelled")
                 break
@@ -149,9 +149,9 @@ class FetchLoop:
                 if self.running:
                     logger.info(f"Waiting {self.interval} seconds before retry...")
                     await asyncio.sleep(self.interval)
-        
+
         logger.info("Fetch loop stopped")
-    
+
     async def stop(self):
         """Stop the fetch loop gracefully."""
         logger.info("Stopping fetch loop...")
@@ -161,37 +161,16 @@ class FetchLoop:
 async def main():
     """Main function."""
     parser = argparse.ArgumentParser(description="Fetch loop with auto-posting")
-    parser.add_argument(
-        "--interval",
-        type=int,
-        default=30,
-        help="Interval between cycles in seconds (default: 30)"
-    )
-    parser.add_argument(
-        "--ai-filter",
-        action="store_true",
-        help="Enable AI filtering"
-    )
-    parser.add_argument(
-        "--auto-post",
-        action="store_true",
-        help="Enable auto-posting to Telegram"
-    )
-    parser.add_argument(
-        "--once",
-        action="store_true",
-        help="Run only once instead of continuous loop"
-    )
-    
+    parser.add_argument("--interval", type=int, default=30, help="Interval between cycles in seconds (default: 30)")
+    parser.add_argument("--ai-filter", action="store_true", help="Enable AI filtering")
+    parser.add_argument("--auto-post", action="store_true", help="Enable auto-posting to Telegram")
+    parser.add_argument("--once", action="store_true", help="Run only once instead of continuous loop")
+
     args = parser.parse_args()
-    
+
     # Create fetch loop
-    fetch_loop = FetchLoop(
-        interval=args.interval,
-        ai_filter=args.ai_filter,
-        auto_post=args.auto_post
-    )
-    
+    fetch_loop = FetchLoop(interval=args.interval, ai_filter=args.ai_filter, auto_post=args.auto_post)
+
     try:
         if args.once:
             # Run single cycle
@@ -206,7 +185,7 @@ async def main():
         else:
             # Run continuous loop
             await fetch_loop.run()
-            
+
     except KeyboardInterrupt:
         logger.info("Received keyboard interrupt, shutting down...")
         await fetch_loop.stop()

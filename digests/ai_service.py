@@ -49,7 +49,7 @@ class DigestAIService:
         except Exception:
             return False
 
-    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "world") -> str:
+    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "all") -> str:
         """
         Build AI-powered digest from news items.
 
@@ -163,8 +163,8 @@ class DigestAIService:
         # Создаем блок ссылок
         links_block = "\n".join([f"- {item['source']}: {item.get('link', 'No link')}" for item in news_data])
 
-        # Форматируем финальный промт с данными (двойные скобки становятся одинарными)
-        return formatted_prompt.replace("{{text_block}}", news_text).replace("{{links_block}}", links_block)
+        # Форматируем финальный промт с данными
+        return formatted_prompt.replace("{text_block}", news_text).replace("{links_block}", links_block)
 
     def _build_fallback_digest(self, news_items: List[NewsItem]) -> str:
         """

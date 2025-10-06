@@ -130,8 +130,8 @@ def get_prompt_for_category(style: str, category: str) -> str:
     if style not in PROMPTS:
         raise ValueError(f"Unknown style: {style}")
 
-    if category not in CATEGORY_CONTEXT:
-        # Fallback для неизвестных категорий
+    if category not in CATEGORY_CONTEXT or category == "all":
+        # Fallback для неизвестных категорий или "all"
         category = "world"
 
     context = CATEGORY_CONTEXT[category]
