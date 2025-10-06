@@ -1,10 +1,12 @@
 import logging
 from flask import Flask, render_template
 
-from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST
+from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from routes.news_routes import news_bp
 from routes.webapp_routes import webapp_bp
 from routes.api_routes import api_bp
+from routes.ws_routes import ws_bp, init_socketio
+from routes.metrics_routes import metrics_bp
 from utils.logging_setup import setup_logging
 
 # --- ЛОГИРОВАНИЕ ---
@@ -40,6 +42,18 @@ def index():
 app.register_blueprint(news_bp)
 app.register_blueprint(webapp_bp)
 app.register_blueprint(api_bp)
+app.register_blueprint(ws_bp)
+app.register_blueprint(metrics_bp)
+
+# Инициализируем WebSocket если Reactor включен
+if REACTOR_ENABLED:
+    try:
+        init_socketio(app, cors_allowed_origins="*")
+        logger.info("✅ WebSocket Hub инициализирован")
+    except Exception as e:
+        logger.error(f"❌ Ошибка инициализации WebSocket: {e}")
+else:
+    logger.info("⚠️ Reactor отключен, WebSocket не инициализирован")
 
 
 # --- Точка входа ---
@@ -61,4 +75,10 @@ if __name__ == "__main__":
     except Exception:
         logger.exception("⚠️ Ошибка при debug-загрузке новостей")
 
-    app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+    if REACTOR_ENABLED:
+        # Используем SocketIO для запуска с WebSocket поддержкой
+        from routes.ws_routes import socketio
+        socketio.run(app, host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+    else:
+        # Обычный Flask запуск
+        app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
