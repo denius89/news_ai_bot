@@ -13,6 +13,7 @@ from typing import Optional, List
 from database.db_models import supabase
 from models.news import NewsItem
 from digests.ai_service import DigestAIService, DigestConfig
+from core.reactor import reactor, Events
 
 logger = logging.getLogger("generator")
 
@@ -106,12 +107,35 @@ async def generate_digest(
     config = DigestConfig(max_items=8, include_fallback=True)
     service = DigestAIService(config)
 
-    if ai:
-        # Определяем категорию для контекста промта
-        digest_category = category or "world"
-        return await service.build_digest(news_items, style, digest_category)
-    else:
-        return service._build_fallback_digest(news_items)
+    try:
+        if ai:
+            # Определяем категорию для контекста промта
+            digest_category = category or "world"
+            digest_text = await service.build_digest(news_items, style, digest_category)
+        else:
+            digest_text = service._build_fallback_digest(news_items)
+        
+        # Эмитим событие о создании дайджеста
+        reactor.emit_sync(Events.DIGEST_CREATED, {
+            'title': f'Дайджест {digest_category or "общий"}',
+            'style': style,
+            'items_count': len(news_items),
+            'ai_generated': ai,
+            'timestamp': asyncio.get_event_loop().time() if asyncio.get_event_loop().is_running() else 0
+        })
+        
+        logger.info(f"Дайджест создан: {len(news_items)} новостей, AI={ai}")
+        return digest_text
+        
+    except Exception as e:
+        logger.error(f"Ошибка при создании дайджеста: {e}")
+        # Эмитим событие об ошибке
+        reactor.emit_sync(Events.DIGEST_CREATED, {
+            'title': 'Ошибка создания дайджеста',
+            'error': str(e),
+            'status': 'error'
+        })
+        raise
 
 
 def main():
