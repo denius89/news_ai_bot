@@ -104,29 +104,34 @@ def format_news(news: list[dict], limit: int = 5, min_importance: float = 0.4) -
 
 def format_events(events: list[dict], limit: int = 5) -> str:
     """
-    Список ближайших событий (HTML).
-    - время, страна/валюта, заголовок
-    - важность (звёзды + текст)
-    - факт/прогноз/предыдущее
+    Список ближайших событий (HTML) в новом формате.
+    - время, заголовок, важность
+    - метрики: факт/прогноз/предыдущее
     """
     if not events:
-        return "⚠️ No upcoming events"
+        return "⚠️ Нет свежих событий"
 
-    lines = ["📅 <b>Upcoming events</b>"]
+    lines = ["📅 <b>Предстоящие события</b>"]
     for i, ev in enumerate(events[:limit], start=1):
         # дата/время
         when = _fmt_dt(ev.get("event_time"))
-        # страна/валюта
-        flag = country_flag(ev.get("country_code"))
-        currency = escape(ev.get("currency") or "")
-        country = escape(ev.get("country") or "")
         # заголовок
         title = escape(ev.get("title") or "—")
 
-        # важность
-        importance = int(ev.get("importance") or 0)
-        stars = "⭐" * max(1, min(3, importance))
-        importance_text = "Low" if importance <= 1 else "Medium" if importance == 2 else "High"
+        # важность (нормализуем 0-3 в 0-1)
+        importance_raw = float(ev.get("importance") or 0)
+        importance = importance_raw / 3.0 if importance_raw > 0 else 0
+        
+        # Определяем уровень важности
+        if importance >= 0.8:
+            importance_text = "Высокая"
+            importance_icon = "🔥"
+        elif importance >= 0.5:
+            importance_text = "Средняя"
+            importance_icon = "⚡"
+        else:
+            importance_text = "Низкая"
+            importance_icon = "💤"
 
         # метрики
         fact = escape(ev.get("fact") or "—")
@@ -135,9 +140,9 @@ def format_events(events: list[dict], limit: int = 5) -> str:
 
         lines.append(
             f"\n<b>{i}. {title}</b>\n"
-            f"{when} · {flag} {country} {currency}\n"
-            f"{stars} <b>Importance:</b> {importance_text}\n"
-            f"📊 <b>Actual:</b> {fact} · <b>Forecast:</b> {forecast} · <b>Previous:</b> {previous}"
+            f"📅 {when}\n"
+            f"{importance_icon} <b>Важность:</b> {importance_text}\n"
+            f"📊 <b>Фактическое:</b> {fact} · <b>Прогноз:</b> {forecast} · <b>Предыдущее:</b> {previous}"
         )
 
     return _clamp_tg("\n".join(lines))

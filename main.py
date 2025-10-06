@@ -21,7 +21,7 @@ import logging
 from database.db_models import upsert_event, upsert_news
 from digests.generator import generate_digest
 from parsers.events_parser import fetch_investing_events
-from parsers.rss_parser import fetch_rss, load_sources
+from parsers.rss_parser import parse_source, get_sync_parser
 from utils.logging_setup import setup_logging
 
 
@@ -65,9 +65,11 @@ def main():
 
     # --- Новости (ETL) ---
     if args.source == "all":
-        sources = load_sources()
+        from services.categories import get_all_sources
+        sources = get_all_sources()
     else:
-        sources = load_sources(args.source)
+        from services.categories import get_sources_by_category
+        sources = get_sources_by_category(args.source)
 
     logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
     logger.info("Используемые источники:")

@@ -199,7 +199,7 @@ class UnifiedDigestService:
                 else:
                     news_objects.append(item)
 
-            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style)
+            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style, category=cat_display)
 
             return clean_for_telegram(ai_digest)
 
