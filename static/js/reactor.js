@@ -68,9 +68,16 @@ class PulseAIReactor {
             }
             
             const script = document.createElement('script');
-            script.src = '/socket.io/socket.io.js';
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Не удалось загрузить socket.io'));
+            // Используем CDN для совместимости с Flask-SocketIO 5.5.1
+            script.src = 'https://cdn.socket.io/4.7.5/socket.io.min.js';
+            script.onload = () => {
+                this.log('Socket.IO клиент загружен с CDN');
+                resolve();
+            };
+            script.onerror = () => {
+                this.error('Ошибка загрузки Socket.IO клиента');
+                reject(new Error('Не удалось загрузить socket.io'));
+            };
             document.head.appendChild(script);
         });
     }

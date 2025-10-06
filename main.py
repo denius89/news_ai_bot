@@ -73,7 +73,7 @@ def main():
 
     logger.info(f"Загружаем новости из {len(sources)} источников ({args.source})...")
     logger.info("Используемые источники:")
-    for src in sources.values():
+    for src in sources:
         logger.info(f"  {src['name']} ({src['category']}): {src['url']}")
 
     items = fetch_rss(sources)
