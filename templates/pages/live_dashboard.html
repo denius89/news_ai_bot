@@ -1,0 +1,453 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .live-dashboard {
+        padding: 2rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: white;
+    }
+    
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .dashboard-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-icon {
+        font-size: 1.8rem;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-item {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .status-connected {
+        background: rgba(34, 197, 94, 0.3);
+        border: 1px solid rgba(34, 197, 94, 0.5);
+    }
+    
+    .status-disconnected {
+        background: rgba(239, 68, 68, 0.3);
+        border: 1px solid rgba(239, 68, 68, 0.5);
+    }
+    
+    .events-feed {
+        max-height: 300px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .event-item {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        border-left: 3px solid #3b82f6;
+        animation: slideIn 0.3s ease-out;
+    }
+    
+    .event-item.new {
+        border-left-color: #10b981;
+        background: rgba(16, 185, 129, 0.2);
+    }
+    
+    .event-item.error {
+        border-left-color: #ef4444;
+        background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .event-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .event-time {
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+    
+    .pulse-animation {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .controls {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: rgba(59, 130, 246, 0.8);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: rgba(59, 130, 246, 1);
+    }
+    
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+            padding: 0 1rem;
+        }
+        
+        .dashboard-card {
+            padding: 1.5rem;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="live-dashboard">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">⚡ PulseAI Live Dashboard</h1>
+        <p class="dashboard-subtitle">Реактивная система в реальном времени</p>
+        
+        <!-- Connection Status -->
+        <div class="status-indicator" data-reactor="connection-status">
+            <span class="pulse-animation">🔗</span> Подключение...
+        </div>
+    </div>
+    
+    <div class="dashboard-grid">
+        <!-- AI Metrics Card -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <span class="card-icon">🧠</span>
+                AI Метрики
+            </h3>
+            
+            <div class="metrics-grid" data-reactor="metrics">
+                <div class="metric-item">
+                    <div class="metric-value" data-metric="credibility">--%</div>
+                    <div class="metric-label">Достоверность</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" data-metric="importance">--%</div>
+                    <div class="metric-label">Важность</div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <div class="metric-label" data-metric="timestamp">Последнее обновление: --</div>
+            </div>
+        </div>
+        
+        <!-- News Processing Card -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <span class="card-icon">📰</span>
+                Обработка новостей
+            </h3>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value" data-reactor="news-counter">0</div>
+                    <div class="metric-label">Обработано</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="processing-time">0s</div>
+                    <div class="metric-label">Время</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <span data-reactor="digest-status" class="status-indicator status-connected">Готов</span>
+            </div>
+        </div>
+        
+        <!-- System Health Card -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <span class="card-icon">💚</span>
+                Состояние системы
+            </h3>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value" data-reactor="system-status">OK</div>
+                    <div class="metric-label">Статус</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" id="uptime">0m</div>
+                    <div class="metric-label">Время работы</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1rem;">
+                <div class="metric-label">Последняя проверка: <span id="last-health-check">--</span></div>
+            </div>
+        </div>
+        
+        <!-- Events Feed Card -->
+        <div class="dashboard-card">
+            <h3 class="card-title">
+                <span class="card-icon">📡</span>
+                Лента событий
+            </h3>
+            
+            <div class="events-feed" data-reactor="events-container">
+                <div class="event-item">
+                    <div class="event-title">Добро пожаловать в PulseAI Reactor!</div>
+                    <div class="event-time">Система инициализирована</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controls -->
+    <div class="controls">
+        <button class="btn btn-primary" onclick="testEvent()">🎯 Тест событие</button>
+        <button class="btn btn-secondary" onclick="pingReactor()">📡 Ping Reactor</button>
+        <button class="btn btn-secondary" onclick="toggleNotifications()">🔔 Уведомления</button>
+    </div>
+</div>
+
+<script>
+    // Инициализация для live dashboard
+    function initPageReactor() {
+        console.log('Инициализация Reactor для Live Dashboard');
+        
+        if (window.reactor) {
+            // Подписываемся на все события для демонстрации
+            window.reactor.on('ai_metrics_updated', function(data) {
+                console.log('AI метрики обновлены:', data);
+                addEventToFeed('AI метрики обновлены', 'success');
+            });
+            
+            window.reactor.on('news_processed', function(data) {
+                console.log('Новости обработаны:', data);
+                document.getElementById('processing-time').textContent = data.processing_time + 's';
+                addEventToFeed(`Обработано ${data.count} новостей`, 'info');
+            });
+            
+            window.reactor.on('digest_created', function(data) {
+                console.log('Дайджест создан:', data);
+                addEventToFeed(`Дайджест "${data.title}" создан`, 'success');
+            });
+            
+            window.reactor.on('event_detected', function(data) {
+                console.log('Событие обнаружено:', data);
+                if (data.title) {
+                    addEventToFeed(`Событие: ${data.title}`, 'info');
+                }
+            });
+            
+            window.reactor.on('system_health_check', function(data) {
+                console.log('Проверка здоровья системы:', data);
+                document.getElementById('last-health-check').textContent = new Date().toLocaleTimeString();
+                addEventToFeed('Проверка здоровья системы', 'info');
+            });
+            
+            window.reactor.on('reactor_heartbeat', function(data) {
+                console.log('Heartbeat Reactor:', data);
+                updateUptime();
+            });
+            
+            window.reactor.on('reactor_connected', function(data) {
+                console.log('Reactor подключен:', data);
+                addEventToFeed('Подключение к Reactor установлено', 'success');
+            });
+            
+            window.reactor.on('reactor_disconnected', function(data) {
+                console.log('Reactor отключен:', data);
+                addEventToFeed('Соединение с Reactor потеряно', 'error');
+            });
+            
+            // Обновляем uptime каждую секунду
+            setInterval(updateUptime, 1000);
+        }
+    }
+    
+    // Функции для управления
+    function testEvent() {
+        if (window.reactor) {
+            window.reactor.emit('test_event', {
+                message: 'Тестовое событие отправлено',
+                timestamp: Date.now()
+            });
+            addEventToFeed('Тестовое событие отправлено', 'info');
+        }
+    }
+    
+    function pingReactor() {
+        if (window.reactor) {
+            window.reactor.ping();
+            addEventToFeed('Ping отправлен', 'info');
+        }
+    }
+    
+    function toggleNotifications() {
+        const notifications = document.querySelector('.reactor-notifications');
+        if (notifications) {
+            notifications.style.display = notifications.style.display === 'none' ? 'block' : 'none';
+        }
+        addEventToFeed('Уведомления переключены', 'info');
+    }
+    
+    // Вспомогательные функции
+    function addEventToFeed(title, type = 'info') {
+        const container = document.querySelector('[data-reactor="events-container"]');
+        if (!container) return;
+        
+        const eventElement = document.createElement('div');
+        eventElement.className = `event-item ${type}`;
+        eventElement.innerHTML = `
+            <div class="event-title">${title}</div>
+            <div class="event-time">${new Date().toLocaleTimeString()}</div>
+        `;
+        
+        container.insertBefore(eventElement, container.firstChild);
+        
+        // Ограничиваем количество событий
+        const events = container.querySelectorAll('.event-item');
+        if (events.length > 10) {
+            events[events.length - 1].remove();
+        }
+    }
+    
+    function updateUptime() {
+        const uptimeElement = document.getElementById('uptime');
+        if (uptimeElement && window.reactor) {
+            const status = window.reactor.getStatus();
+            const uptimeSeconds = status.uptime || 0;
+            const minutes = Math.floor(uptimeSeconds / 60);
+            const seconds = Math.floor(uptimeSeconds % 60);
+            uptimeElement.textContent = `${minutes}m ${seconds}s`;
+        }
+    }
+    
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        updateUptime();
+    });
+</script>
+{% endblock %}

@@ -7,3 +7,9 @@ webapp_bp = Blueprint("webapp", __name__)
 def webapp():
     """WebApp Dashboard route"""
     return render_template("webapp.html")
+
+
+@webapp_bp.route("/live")
+def live_dashboard():
+    """Live Reactor Dashboard route"""
+    return render_template("pages/live_dashboard.html", active_page="live")
