@@ -320,6 +320,11 @@
                     <h2 class="hero-subtitle">
                         AI-платформа для персонализированных дайджестов новостей и умного календаря событий
                     </h2>
+                    
+                    <!-- Reactor Status Indicator -->
+                    <div class="reactor-status" style="margin-bottom: 1rem;">
+                        <span data-reactor="connection-status" class="connected">Подключено к Reactor</span>
+                    </div>
                     <p class="hero-description">
                         Получайте только важные новости с оценкой достоверности и значимости.<br>
                         Следите за ключевыми событиями в мире криптовалют, технологий и экономики.<br>
@@ -358,6 +363,25 @@
                         Автоматическая оценка достоверности и важности каждой новости с помощью искусственного интеллекта.<br>
                         Фильтруем шум и выделяем только то, что стоит вашего внимания.
                     </p>
+                    
+                    <!-- Reactor Metrics Display -->
+                    <div data-reactor="metrics" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-around; text-align: center;">
+                            <div>
+                                <div style="font-size: 0.8rem; color: #666;">Достоверность</div>
+                                <div data-metric="credibility" style="font-weight: bold; color: #28a745;">--%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.8rem; color: #666;">Важность</div>
+                                <div data-metric="importance" style="font-weight: bold; color: #007bff;">--%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.8rem; color: #666;">Обновлено</div>
+                                <div data-metric="timestamp" style="font-size: 0.8rem; color: #666;">--</div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <i data-lucide="brain" class="feature-icon"></i>
                 </div>
                 
@@ -370,6 +394,12 @@
                         Дайджесты формируются под ваши интересы и предпочтения по категориям.<br>
                         Каждый день вы получаете адаптированный обзор ключевых новостей.
                     </p>
+                    
+                    <!-- Reactor Digest Status -->
+                    <div style="margin-top: 1rem;">
+                        <span data-reactor="digest-status" class="ready">Статус дайджеста</span>
+                    </div>
+                    
                     <i data-lucide="list" class="feature-icon"></i>
                 </div>
                 
@@ -382,6 +412,12 @@
                         Отслеживайте важные события в мире криптовалют, экономики и технологий в одном месте.<br>
                         Не пропустите разлоки токенов, листинги и ключевые апдейты проектов.
                     </p>
+                    
+                    <!-- Reactor Events Container -->
+                    <div data-reactor="events-container" style="margin-top: 1rem; max-height: 120px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 8px;">
+                        <div style="font-size: 0.8rem; color: #666; text-align: center;">События загружаются...</div>
+                    </div>
+                    
                     <i data-lucide="calendar" class="feature-icon"></i>
                 </div>
             </div>
@@ -419,5 +455,23 @@
 <script>
     // Инициализация Lucide иконок
     lucide.createIcons();
+    
+    // Инициализация Reactor для главной страницы
+    function initPageReactor() {
+        console.log('Инициализация Reactor для главной страницы');
+        
+        // Подписываемся на события для обновления UI
+        if (window.reactor) {
+            // Обновляем счетчик новостей
+            window.reactor.on('news_processed', function(data) {
+                console.log('Новости обработаны на главной странице:', data);
+            });
+            
+            // Обновляем статус дайджеста
+            window.reactor.on('digest_created', function(data) {
+                console.log('Дайджест создан на главной странице:', data);
+            });
+        }
+    }
 </script>
 {% endblock %}

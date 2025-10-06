@@ -1,0 +1,357 @@
+/* PulseAI Reactor CSS - стили для реактивных элементов */
+
+/* === УВЕДОМЛЕНИЯ === */
+.reactor-notifications {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    max-width: 400px;
+}
+
+.reactor-notification {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    padding: 16px;
+    position: relative;
+    animation: slideIn 0.3s ease-out;
+    border-left: 4px solid #007bff;
+}
+
+.reactor-notification.success {
+    border-left-color: #28a745;
+}
+
+.reactor-notification.warning {
+    border-left-color: #ffc107;
+}
+
+.reactor-notification.error {
+    border-left-color: #dc3545;
+}
+
+.reactor-notification.info {
+    border-left-color: #17a2b8;
+}
+
+.notification-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.notification-message {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.notification-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-close:hover {
+    color: #333;
+}
+
+/* === АНИМАЦИИ === */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes flash {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgba(0, 123, 255, 0.2);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* === МЕТРИКИ === */
+[data-reactor="metrics"] {
+    transition: all 0.3s ease;
+}
+
+[data-reactor="metrics"].metrics-updated {
+    animation: flash 1s ease-out;
+}
+
+[data-metric] {
+    transition: color 0.3s ease;
+}
+
+/* === СЧЕТЧИКИ === */
+[data-reactor="news-counter"] {
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+[data-reactor="news-counter"].counter-updated {
+    animation: pulse 0.5s ease-out;
+    color: #007bff;
+}
+
+/* === СТАТУС ПОДКЛЮЧЕНИЯ === */
+[data-reactor="connection-status"] {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+[data-reactor="connection-status"].connected {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+[data-reactor="connection-status"].disconnected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* === СТАТУС СИСТЕМЫ === */
+[data-reactor="system-status"] {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+[data-reactor="system-status"].ok {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+[data-reactor="system-status"].warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+[data-reactor="system-status"].error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* === ДАЙДЖЕСТЫ === */
+[data-reactor="digest-status"] {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+[data-reactor="digest-status"].ready {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+[data-reactor="digest-status"].processing {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+[data-reactor="digest-status"].error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* === СОБЫТИЯ === */
+[data-reactor="events-container"] {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.event-item {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.event-item:hover {
+    background: #e9ecef;
+}
+
+.event-item.event-highlighted {
+    background: #fff3cd;
+    border-color: #ffc107;
+    animation: pulse 0.3s ease-out;
+}
+
+.event-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.event-time {
+    font-size: 12px;
+    color: #666;
+}
+
+/* === ИНДИКАТОРЫ ЗАГРУЗКИ === */
+.reactor-loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 768px) {
+    .reactor-notifications {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .reactor-notification {
+        padding: 12px;
+    }
+    
+    .notification-title {
+        font-size: 13px;
+    }
+    
+    .notification-message {
+        font-size: 12px;
+    }
+}
+
+/* === ТЕМНАЯ ТЕМА === */
+@media (prefers-color-scheme: dark) {
+    .reactor-notification {
+        background: #2d3748;
+        color: #e2e8f0;
+        border-left-color: #4299e1;
+    }
+    
+    .notification-title {
+        color: #e2e8f0;
+    }
+    
+    .notification-message {
+        color: #a0aec0;
+    }
+    
+    .notification-close {
+        color: #a0aec0;
+    }
+    
+    .notification-close:hover {
+        color: #e2e8f0;
+    }
+    
+    .event-item {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+    
+    .event-item:hover {
+        background: #4a5568;
+    }
+    
+    .event-title {
+        color: #e2e8f0;
+    }
+    
+    .event-time {
+        color: #a0aec0;
+    }
+}
+
+/* === УТИЛИТЫ === */
+.reactor-hidden {
+    display: none !important;
+}
+
+.reactor-visible {
+    display: block !important;
+}
+
+.reactor-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.reactor-slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
