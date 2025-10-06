@@ -118,11 +118,6 @@
   color: var(--color-success-700);
 }
 
-.status-disconnected {
-  background: var(--color-danger-50);
-  color: var(--color-danger-700);
-}
-
 /* === Reactor Status === */
 [data-reactor="digest-status"] {
   display: inline-block;
@@ -138,11 +133,6 @@
 [data-reactor="digest-status"].ready {
   background: var(--color-success-50);
   color: var(--color-success-700);
-}
-
-[data-reactor="digest-status"].processing {
-  background: var(--color-info-50);
-  color: var(--color-info-700);
 }
 
 [data-reactor="digest-status"].error {
@@ -168,12 +158,7 @@
   transform: translateY(-2px);
 }
 
-.feature-icon {
-  width: 3rem;
-  height: 3rem;
-  margin: var(--sp-4) auto;
-  color: var(--color-primary);
-}
+
 
 /* === News Cards === */
 .news-card {
@@ -237,9 +222,9 @@
     padding: var(--sp-4);
   }
   
-  .feature-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    margin: var(--sp-3) auto;
-  }
+  
+}
+
+.feature-icon {
+  width: 3rem; height: 3rem; margin: var(--sp-4) auto; color: var(--color-primary); width: 2.5rem; height: 2.5rem; margin: var(--sp-3) auto;
 }

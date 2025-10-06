@@ -11,11 +11,7 @@
     }
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
+
 
 /* 1. Hero-блок */
 .hero-section {
@@ -38,30 +34,11 @@
     text-align: left;
 }
 
-.hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #1A1A1A;
-    line-height: 1.2;
-    margin: 0 0 1rem 0;
-}
 
-.hero-subtitle {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #6B7280;
-    line-height: 1.4;
-    margin: 0 0 2rem 0;
-    max-width: 800px;
-}
 
-.hero-description {
-    font-size: 1.1rem;
-    color: #6B7280;
-    line-height: 1.6;
-    margin: 0 0 3rem 0;
-    max-width: 700px;
-}
+
+
+
 
 .hero-buttons {
     display: flex;
@@ -75,18 +52,7 @@
     align-items: center;
 }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: 2px solid transparent;
-}
+
 
 .btn-primary {
     background: #007AFF;
@@ -119,12 +85,7 @@
     margin-bottom: 3rem;
 }
 
-.features-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #1A1A1A;
-    margin: 0 0 1rem 0;
-}
+
 
 .features-subtitle {
     font-size: 1.2rem;
@@ -132,23 +93,9 @@
     margin: 0;
 }
 
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-}
 
-.feature-card {
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+
+
 
 .feature-illustration {
     margin-bottom: 1rem;
@@ -224,9 +171,7 @@
         background: #1A1A1A;
     }
     
-    .feature-card {
-        background: #2A2A2A;
-    }
+    
     
     .hero-title, .features-title, .feature-title, .cta-text {
         color: #E0E0E0;
@@ -239,9 +184,7 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .container {
-        padding: 0 1rem;
-    }
+    
     
     .hero-content, .cta-content {
         grid-template-columns: 1fr;
@@ -252,57 +195,64 @@
         text-align: center;
     }
     
-    .hero-title {
-        font-size: 2.5rem;
-    }
     
-    .hero-subtitle {
-        font-size: 1.3rem;
-    }
     
-    .hero-description {
-        font-size: 1rem;
-    }
     
-    .features-title {
-        font-size: 2rem;
-    }
     
-    .features-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
     
-    .feature-card {
-        padding: 1.5rem;
-    }
+    
+    
+    
+    
+    
+    
     
     .hero-buttons, .cta-buttons {
         flex-direction: column;
         align-items: center;
     }
     
-    .btn {
-        width: 100%;
-        max-width: 280px;
-        justify-content: center;
-    }
+    
 }
 
 @media (max-width: 480px) {
-    .hero-title {
-        font-size: 2rem;
-    }
     
-    .hero-subtitle {
-        font-size: 1.2rem;
-    }
     
-    .features-title {
-        font-size: 1.75rem;
-    }
     
-    .feature-card {
-        padding: 1.25rem;
-    }
+    
+    
+    
+    
+}
+
+.container {
+  max-width: 1200px; margin: 0 auto; padding: 0 2rem; padding: 0 1rem;
+}
+
+.hero-title {
+  font-size: 3rem; font-weight: 700; color: #1A1A1A; line-height: 1.2; margin: 0 0 1rem 0; font-size: 2.5rem; font-size: 2rem;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem; font-weight: 500; color: #6B7280; line-height: 1.4; margin: 0 0 2rem 0; max-width: 800px; font-size: 1.3rem; font-size: 1.2rem;
+}
+
+.hero-description {
+  font-size: 1.1rem; color: #6B7280; line-height: 1.6; margin: 0 0 3rem 0; max-width: 700px; font-size: 1rem;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.875rem 1.5rem; border-radius: 12px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s ease; border: 2px solid transparent; width: 100%; max-width: 280px; justify-content: center;
+}
+
+.features-title {
+  font-size: 2.5rem; font-weight: 700; color: #1A1A1A; margin: 0 0 1rem 0; font-size: 2rem; font-size: 1.75rem;
+}
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; grid-template-columns: 1fr; gap: 1.5rem;
+}
+
+.feature-card {
+  background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; text-align: center; display: flex; flex-direction: column; align-items: center; background: #2A2A2A; padding: 1.5rem; padding: 1.25rem;
 }
