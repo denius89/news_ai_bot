@@ -118,11 +118,14 @@
   color: var(--color-text);
   cursor: pointer;
   transition: var(--transition-all);
+  margin-left: var(--sp-2);
 }
 
 .theme-toggle:hover {
   background: var(--color-bg-secondary);
   border-color: var(--color-border-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-toggle:focus {
@@ -133,11 +136,34 @@
 .theme-toggle svg {
   width: 1.25rem;
   height: 1.25rem;
-  transition: var(--transition-transform);
+  transition: var(--transition-all);
 }
 
-.theme-toggle[data-theme="dark"] svg {
-  transform: rotate(180deg);
+.theme-icon-light {
+  display: block;
+}
+
+.theme-icon-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-dark {
+  display: block;
+}
+
+/* Анимация переключения иконок */
+.theme-toggle svg {
+  animation: theme-switch 0.3s ease-in-out;
+}
+
+@keyframes theme-switch {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* === Dark Mode Specific Components === */
