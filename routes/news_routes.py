@@ -91,7 +91,18 @@ def api_latest_news():
         return jsonify({
             "status": "success",
             "count": len(news),
-            "data": news  # get_latest_news уже возвращает список словарей
+            "data": [
+                {
+                    "id": n["id"],
+                    "title": n["title"],
+                    "source": n["source"],
+                    "published_at": n["published_at"].isoformat() if n["published_at"] else None,
+                    "category": n["category"],
+                    "credibility": n["credibility"],
+                    "importance": n["importance"]
+                }
+                for n in news
+            ]
         })
     except Exception as e:
         logger.error(f"Ошибка получения новостей: {e}")
