@@ -47,9 +47,7 @@ class NewsRepository:
 
             q = (
                 self._db.table("news")
-                .select(
-                    "id, title, content, link, importance, credibility, published_at, source, category"
-                )
+                .select("id, title, content, link, importance, credibility, published_at, source, category")
                 .order("importance", desc=True)
                 .order("published_at", desc=True)
                 .limit(safe_limit)

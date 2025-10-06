@@ -84,6 +84,6 @@ def test_clean_for_telegram_keeps_supported_tags():
     raw = '<b>bold</b> <i>italic</i> <a href="http://test">link</a>'
     cleaned = clean_for_telegram(raw)
 
-    assert '<b>bold</b>' in cleaned
-    assert '<i>italic</i>' in cleaned
+    assert "<b>bold</b>" in cleaned
+    assert "<i>italic</i>" in cleaned
     assert '<a href="http://test">link</a>' in cleaned

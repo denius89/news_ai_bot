@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-10-06T08:44:48.777653+00:00",
+  "total_samples": 396,
+  "positive_samples": 198,
+  "negative_samples": 198,
+  "internal_sources": 2612,
+  "external_sources": 6,
+  "duplicates_removed": 64,
+  "avg_importance": 0.586868686868688,
+  "avg_credibility": 0.7436111111111109,
+  "sources": {
+    "the defiant": 47,
+    "tom's hardware": 23,
+    "espn esports": 22,
+    "bbc politics": 21,
+    "dark reading": 20,
+    "fxstreet": 18,
+    "bbc world": 17,
+    "decrypt eth": 17,
+    "climate home": 15,
+    "al jazeera": 14
+  },
+  "categories": {
+    "unknown": 136,
+    "crypto": 98,
+    "world": 88,
+    "sports": 74
+  }
+}

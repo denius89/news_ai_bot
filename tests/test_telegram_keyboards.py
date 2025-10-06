@@ -58,7 +58,7 @@ def test_keyboard_structure():
 
         # Test main keyboard
         main_kb = main_inline_keyboard()
-        assert hasattr(main_kb, 'inline_keyboard')
+        assert hasattr(main_kb, "inline_keyboard")
         assert len(main_kb.inline_keyboard) >= 5  # Should have at least 5 buttons now
 
         # Check for new buttons
@@ -72,12 +72,12 @@ def test_keyboard_structure():
 
         # Test subscriptions keyboard
         subs_kb = subscriptions_inline_keyboard()
-        assert hasattr(subs_kb, 'inline_keyboard')
+        assert hasattr(subs_kb, "inline_keyboard")
         assert len(subs_kb.inline_keyboard) == 4  # 3 action buttons + back
 
         # Test notifications keyboard
         notif_kb = notifications_inline_keyboard()
-        assert hasattr(notif_kb, 'inline_keyboard')
+        assert hasattr(notif_kb, "inline_keyboard")
         assert len(notif_kb.inline_keyboard) == 4  # 3 action buttons + back
 
         # Test categories keyboard (removed from imports)

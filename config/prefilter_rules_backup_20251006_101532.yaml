@@ -1,0 +1,78 @@
+# Prefilter Rules Configuration
+# Правила для предфильтрации новостей
+
+# Feature flags
+features:
+  auto_learn_enabled: true
+  auto_learn_interval_days: 1
+  auto_learn_min_samples: 100
+  auto_learn_backup_enabled: true
+
+# Настройки анализа отклонений
+rejection_analysis:
+  top_words_limit: 50
+  top_sources_limit: 20
+  frequency_threshold: 0.02  # 2% появления в отклонённых
+
+# Стоп-маркеры (статичные правила)
+stop_markers:
+  - "opinion"
+  - "advertorial"
+  - "sponsored"
+  - "how to buy"
+  - "price prediction"
+  - "click here"
+  - "read more"
+  - "advertisement"
+
+# Маркеры важности по категориям (статичные правила)
+importance_markers:
+  crypto:
+    - "SEC"
+    - "MiCA"
+    - "lawsuit"
+    - "ETF approval"
+    - "regulation"
+    - "ban"
+    - "legal"
+  markets:
+    - "CPI"
+    - "NFP"
+    - "rate decision"
+    - "FOMC"
+    - "GDP"
+    - "inflation"
+  tech:
+    - "release"
+    - "breach"
+    - "CVE"
+    - "LTS"
+    - "EOL"
+    - "security"
+    - "vulnerability"
+  world:
+    - "war"
+    - "conflict"
+    - "election"
+    - "government"
+    - "policy"
+  sports:
+    - "championship"
+    - "tournament"
+    - "record"
+    - "transfer"
+    - "contract"
+
+# Автогенерируемые правила (будут заполняться системой)
+auto_generated:
+  stop_markers: []
+  importance_markers: {}
+  deprecated_rules: []
+  
+# Метаданные для отслеживания автообучения
+auto_learn_metadata:
+  last_analysis: null
+  total_runs: 0
+  rules_added: 0
+  rules_removed: 0
+  last_backup: null

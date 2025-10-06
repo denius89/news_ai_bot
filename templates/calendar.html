@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+
+{% block title %}Календарь событий - PulseAI{% endblock %}
+
+{% block extra_head %}
+<style>
+    .calendar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .calendar-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .calendar-filters {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .filter-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+    
+    .filter-select, .filter-input {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+    
+    .filter-select:focus, .filter-input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+    
+    .events-grid {
+        display: grid;
+        gap: 20px;
+    }
+    
+    .events-by-date {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .date-header {
+        background: var(--bg-secondary);
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .date-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .date-count {
+        background: var(--accent-color);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .events-list {
+        padding: 20px;
+    }
+    
+    .event-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        transition: all 0.2s ease;
+        background: var(--bg-primary);
+    }
+    
+    .event-card:hover {
+        border-color: var(--accent-color);
+        box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .event-card:last-child {
+        margin-bottom: 0;
+    }
+    
+    .event-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    
+    .event-content {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .event-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0 0 5px 0;
+        line-height: 1.3;
+    }
+    
+    .event-meta {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .event-time {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .event-category {
+        font-size: 0.8rem;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .event-importance {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+    
+    .importance-bar {
+        width: 60px;
+        height: 4px;
+        background: var(--bg-secondary);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .importance-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s ease;
+    }
+    
+    .importance-high { background: #ff4757; }
+    .importance-medium { background: #ffa502; }
+    .importance-low { background: #2ed573; }
+    
+    .event-description {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+        margin: 0;
+    }
+    
+    .event-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .event-action {
+        padding: 6px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .event-action:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+        text-decoration: none;
+    }
+    
+    .event-action.primary {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+    }
+    
+    .event-action.primary:hover {
+        background: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: white;
+    }
+    
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        color: var(--text-secondary);
+    }
+    
+    .error {
+        background: #fee;
+        border: 1px solid #fcc;
+        color: #c33;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-secondary);
+    }
+    
+    .empty-state-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+    
+    .empty-state-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+    }
+    
+    .empty-state-text {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    @media (max-width: 768px) {
+        .calendar-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .calendar-filters {
+            justify-content: center;
+        }
+        
+        .event-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .event-actions {
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h1 class="calendar-title">📅 Календарь событий</h1>
+        
+        <div class="calendar-filters">
+            <div class="filter-group">
+                <label class="filter-label">Категория</label>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">Все категории</option>
+                    <option value="crypto">🪙 Криптовалюты</option>
+                    <option value="markets">📈 Финансы</option>
+                    <option value="sports">🏀 Спорт</option>
+                    <option value="tech">💻 Технологии</option>
+                    <option value="world">🌍 Мир</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Важность</label>
+                <select id="importanceFilter" class="filter-select">
+                    <option value="0">Все события</option>
+                    <option value="0.7">Важные (0.7+)</option>
+                    <option value="0.8">Очень важные (0.8+)</option>
+                    <option value="0.9">Критичные (0.9+)</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label class="filter-label">Дней вперед</label>
+                <select id="daysFilter" class="filter-select">
+                    <option value="7">7 дней</option>
+                    <option value="14">14 дней</option>
+                    <option value="30" selected>30 дней</option>
+                    <option value="60">60 дней</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div id="eventsContainer" class="events-grid">
+        <div class="loading">
+            <span>Загрузка событий...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+class EventsCalendar {
+    constructor() {
+        this.events = [];
+        this.filteredEvents = [];
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.loadEvents();
+    }
+    
+    setupEventListeners() {
+        document.getElementById('categoryFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('importanceFilter').addEventListener('change', () => this.applyFilters());
+        document.getElementById('daysFilter').addEventListener('change', () => this.loadEvents());
+    }
+    
+    async loadEvents() {
+        const container = document.getElementById('eventsContainer');
+        container.innerHTML = '<div class="loading"><span>Загрузка событий...</span></div>';
+        
+        try {
+            const days = document.getElementById('daysFilter').value;
+            const response = await fetch(`/api/events/upcoming?days=${days}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                this.events = data.data.events;
+                this.applyFilters();
+            } else {
+                throw new Error(data.error || 'Ошибка загрузки событий');
+            }
+        } catch (error) {
+            console.error('Error loading events:', error);
+            container.innerHTML = `
+                <div class="error">
+                    <strong>Ошибка загрузки событий:</strong><br>
+                    ${error.message}
+                </div>
+            `;
+        }
+    }
+    
+    applyFilters() {
+        const category = document.getElementById('categoryFilter').value;
+        const minImportance = parseFloat(document.getElementById('importanceFilter').value);
+        
+        this.filteredEvents = this.events.filter(event => {
+            if (category && event.category !== category) return false;
+            if (event.importance < minImportance) return false;
+            return true;
+        });
+        
+        this.renderEvents();
+    }
+    
+    renderEvents() {
+        const container = document.getElementById('eventsContainer');
+        
+        if (this.filteredEvents.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📅</div>
+                    <div class="empty-state-title">События не найдены</div>
+                    <div class="empty-state-text">
+                        Попробуйте изменить фильтры или увеличить период поиска
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Group events by date
+        const eventsByDate = {};
+        this.filteredEvents.forEach(event => {
+            const date = new Date(event.starts_at).toDateString();
+            if (!eventsByDate[date]) {
+                eventsByDate[date] = [];
+            }
+            eventsByDate[date].push(event);
+        });
+        
+        // Sort dates
+        const sortedDates = Object.keys(eventsByDate).sort((a, b) => new Date(a) - new Date(b));
+        
+        // Render events grouped by date
+        container.innerHTML = sortedDates.map(date => {
+            const events = eventsByDate[date];
+            const dateObj = new Date(date);
+            const dateStr = dateObj.toLocaleDateString('ru-RU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            return `
+                <div class="events-by-date">
+                    <div class="date-header">
+                        <h3 class="date-title">${dateStr}</h3>
+                        <span class="date-count">${events.length}</span>
+                    </div>
+                    <div class="events-list">
+                        ${events.map(event => this.renderEventCard(event)).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    renderEventCard(event) {
+        const categoryInfo = this.getCategoryInfo(event.category);
+        const importanceClass = this.getImportanceClass(event.importance);
+        const timeStr = new Date(event.starts_at).toLocaleTimeString('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        return `
+            <div class="event-card">
+                <div class="event-icon" style="background-color: ${categoryInfo.color}20; color: ${categoryInfo.color}">
+                    ${categoryInfo.emoji}
+                </div>
+                <div class="event-content">
+                    <h4 class="event-title">${event.title}</h4>
+                    <div class="event-meta">
+                        <span class="event-time">🕐 ${timeStr}</span>
+                        <span class="event-category" style="background-color: ${categoryInfo.color}20; color: ${categoryInfo.color}">
+                            ${categoryInfo.name}
+                        </span>
+                        <div class="event-importance">
+                            <span>Важность:</span>
+                            <div class="importance-bar">
+                                <div class="importance-fill ${importanceClass}" style="width: ${event.importance * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    ${event.description ? `<p class="event-description">${event.description}</p>` : ''}
+                    <div class="event-actions">
+                        ${event.link ? `<a href="${event.link}" target="_blank" class="event-action primary">Открыть источник</a>` : ''}
+                        <a href="#" class="event-action" onclick="this.addToCalendar('${event.starts_at}', '${event.title}')">📅 В календарь</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    getCategoryInfo(category) {
+        const categories = {
+            'crypto': { name: 'Криптовалюты', emoji: '🪙', color: '#F7931A' },
+            'markets': { name: 'Финансы', emoji: '📈', color: '#00D4AA' },
+            'sports': { name: 'Спорт', emoji: '🏀', color: '#FF6B6B' },
+            'tech': { name: 'Технологии', emoji: '💻', color: '#4ECDC4' },
+            'world': { name: 'Мир', emoji: '🌍', color: '#45B7D1' }
+        };
+        return categories[category] || { name: 'Другое', emoji: '📅', color: '#666' };
+    }
+    
+    getImportanceClass(importance) {
+        if (importance >= 0.8) return 'importance-high';
+        if (importance >= 0.6) return 'importance-medium';
+        return 'importance-low';
+    }
+}
+
+// Initialize calendar when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new EventsCalendar();
+});
+
+// Add to calendar function
+function addToCalendar(startTime, title) {
+    const event = {
+        title: title,
+        start: new Date(startTime),
+        allDay: false
+    };
+    
+    // Generate ICS content
+    const icsContent = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//PulseAI//Events//EN',
+        'BEGIN:VEVENT',
+        `DTSTART:${event.start.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+        `DTEND:${new Date(event.start.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+        `SUMMARY:${title}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+    
+    // Create and download file
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    link.click();
+    
+    return false;
+}
+</script>
+{% endblock %}

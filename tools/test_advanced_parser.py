@@ -23,10 +23,10 @@ import feedparser
 # Настраиваем логирование
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('logs/test_advanced_parser.log', encoding='utf-8'),
+        logging.FileHandler("logs/test_advanced_parser.log", encoding="utf-8"),
     ],
 )
 
@@ -52,22 +52,20 @@ class TestAdvancedParser(AdvancedParser):
         try:
             feed = feedparser.parse(content)
             if not feed.entries:
-                return {'success': False, 'reason': 'no_entries'}
+                return {"success": False, "reason": "no_entries"}
 
             # Проверяем лимит для подкатегории
             if subcategory not in self.subcategory_counts:
                 self.subcategory_counts[subcategory] = 0
 
             if self.subcategory_counts[subcategory] >= self.max_news_per_subcategory:
-                logger.info(
-                    f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей"
-                )
+                logger.info(f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
                 return {
-                    'success': True,
-                    'processed': 0,
-                    'saved': 0,
-                    'type': 'rss',
-                    'reason': 'limit_reached',
+                    "success": True,
+                    "processed": 0,
+                    "saved": 0,
+                    "type": "rss",
+                    "reason": "limit_reached",
                 }
 
             processed_count = 0
@@ -82,9 +80,9 @@ class TestAdvancedParser(AdvancedParser):
             for entry in feed.entries[:max_entries]:
                 try:
                     # Извлекаем данные из RSS
-                    title = clean_text(entry.get('title', ''))
-                    link = entry.get('link', '')
-                    summary = clean_text(entry.get('summary', ''))
+                    title = clean_text(entry.get("title", ""))
+                    link = entry.get("link", "")
+                    summary = clean_text(entry.get("summary", ""))
 
                     if not title:
                         continue
@@ -96,25 +94,23 @@ class TestAdvancedParser(AdvancedParser):
                     if not text_for_ai:
                         continue
 
-                    importance = evaluate_importance({'title': title, 'content': text_for_ai})
-                    credibility = evaluate_credibility({'title': title, 'content': text_for_ai})
+                    importance = evaluate_importance({"title": title, "content": text_for_ai})
+                    credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
                     if importance < self.min_importance:
-                        logger.debug(
-                            f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})"
-                        )
+                        logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                         continue
 
                     # Сохраняем в БД
                     news_item = {
-                        'title': title,
-                        'content': summary,
-                        'link': link,
-                        'source': name,
-                        'category': category,
-                        'subcategory': subcategory,
-                        'importance': importance,
-                        'credibility': credibility,
+                        "title": title,
+                        "content": summary,
+                        "link": link,
+                        "source": name,
+                        "category": category,
+                        "subcategory": subcategory,
+                        "importance": importance,
+                        "credibility": credibility,
                     }
 
                     # Используем асинхронный сервис БД
@@ -123,23 +119,21 @@ class TestAdvancedParser(AdvancedParser):
                     saved_count += 1
                     self.subcategory_counts[subcategory] += 1
 
-                    logger.info(
-                        f"[{category}/{subcategory}] {title[:50]}... -> SAVED (importance: {importance:.2f})"
-                    )
+                    logger.info(f"[{category}/{subcategory}] {title[:50]}... -> SAVED (importance: {importance:.2f})")
 
                 except Exception as e:
                     logger.error(f"Ошибка обработки RSS записи: {e}")
                     continue
 
             return {
-                'success': True,
-                'processed': processed_count,
-                'saved': saved_count,
-                'type': 'rss',
+                "success": True,
+                "processed": processed_count,
+                "saved": saved_count,
+                "type": "rss",
             }
 
         except Exception as e:
-            return {'success': False, 'reason': f'rss_parse_error: {e}'}
+            return {"success": False, "reason": f"rss_parse_error: {e}"}
 
     async def _process_html_source(self, category, subcategory, name, url, content):
         """Обработка HTML источника с ограничением по количеству."""
@@ -149,50 +143,46 @@ class TestAdvancedParser(AdvancedParser):
                 self.subcategory_counts[subcategory] = 0
 
             if self.subcategory_counts[subcategory] >= self.max_news_per_subcategory:
-                logger.info(
-                    f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей"
-                )
+                logger.info(f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
                 return {
-                    'success': True,
-                    'processed': 0,
-                    'saved': 0,
-                    'type': 'html',
-                    'reason': 'limit_reached',
+                    "success": True,
+                    "processed": 0,
+                    "saved": 0,
+                    "type": "html",
+                    "reason": "limit_reached",
                 }
 
             # Извлекаем контент каскадным методом
             extracted = self._extract_content_cascade(url, content)
             if not extracted:
-                return {'success': False, 'reason': 'content_extraction_failed'}
+                return {"success": False, "reason": "content_extraction_failed"}
 
-            title = extracted['title']
-            maintext = extracted['maintext']
-            method = extracted['method']
+            title = extracted["title"]
+            maintext = extracted["maintext"]
+            method = extracted["method"]
 
             if not title or not maintext:
-                return {'success': False, 'reason': 'insufficient_content'}
+                return {"success": False, "reason": "insufficient_content"}
 
             # Оценка важности и достоверности
             text_for_ai = f"{title} {maintext}".strip()
-            importance = evaluate_importance({'title': title, 'content': text_for_ai})
-            credibility = evaluate_credibility({'title': title, 'content': text_for_ai})
+            importance = evaluate_importance({"title": title, "content": text_for_ai})
+            credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
             if importance < self.min_importance:
-                logger.debug(
-                    f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})"
-                )
-                return {'success': False, 'reason': 'low_importance', 'importance': importance}
+                logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                return {"success": False, "reason": "low_importance", "importance": importance}
 
             # Сохраняем в БД
             news_item = {
-                'title': title,
-                'content': maintext,
-                'link': url,
-                'source': name,
-                'category': category,
-                'subcategory': subcategory,
-                'importance': importance,
-                'credibility': credibility,
+                "title": title,
+                "content": maintext,
+                "link": url,
+                "source": name,
+                "category": category,
+                "subcategory": subcategory,
+                "importance": importance,
+                "credibility": credibility,
             }
 
             # Используем асинхронный сервис БД
@@ -201,22 +191,20 @@ class TestAdvancedParser(AdvancedParser):
 
             self.subcategory_counts[subcategory] += 1
 
-            logger.info(
-                f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})"
-            )
+            logger.info(f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
 
             return {
-                'success': True,
-                'processed': 1,
-                'saved': 1,
-                'type': 'html',
-                'method': method,
-                'importance': importance,
-                'credibility': credibility,
+                "success": True,
+                "processed": 1,
+                "saved": 1,
+                "type": "html",
+                "method": method,
+                "importance": importance,
+                "credibility": credibility,
             }
 
         except Exception as e:
-            return {'success': False, 'reason': f'html_parse_error: {e}'}
+            return {"success": False, "reason": f"html_parse_error: {e}"}
 
 
 async def main():
@@ -243,22 +231,22 @@ async def main():
             print(f"💾 Сохранено в БД: {stats.get('total_saved', 0)}")
 
             # Показываем статистику по подкатегориям
-            if hasattr(parser, 'subcategory_counts'):
+            if hasattr(parser, "subcategory_counts"):
                 print(f"\n📈 Статистика по подкатегориям:")
                 for subcategory, count in parser.subcategory_counts.items():
                     print(f"   • {subcategory}: {count} новостей")
 
-            if stats.get('errors'):
+            if stats.get("errors"):
                 print(f"\n⚠️  Ошибки ({len(stats['errors'])}):")
-                for error in stats['errors'][:5]:  # Показываем первые 5 ошибок
+                for error in stats["errors"][:5]:  # Показываем первые 5 ошибок
                     print(f"   • {error}")
-                if len(stats['errors']) > 5:
+                if len(stats["errors"]) > 5:
                     print(f"   ... и еще {len(stats['errors']) - 5} ошибок")
 
             print("=" * 60)
 
             # Возвращаем код выхода в зависимости от результатов
-            if stats.get('total_saved', 0) > 0:
+            if stats.get("total_saved", 0) > 0:
                 return 0  # Успех
             else:
                 return 1  # Нет сохраненных новостей

@@ -24,10 +24,10 @@ from parsers.advanced_parser import AdvancedParser
 # Настраиваем логирование
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('logs/advanced_parser.log', encoding='utf-8'),
+        logging.FileHandler("logs/advanced_parser.log", encoding="utf-8"),
     ],
 )
 
@@ -36,20 +36,20 @@ logger = logging.getLogger(__name__)
 
 async def main():
     """Основная функция запуска парсера."""
-    parser = argparse.ArgumentParser(description='Запуск продвинутого парсера новостей')
+    parser = argparse.ArgumentParser(description="Запуск продвинутого парсера новостей")
     parser.add_argument(
-        '--min-importance',
+        "--min-importance",
         type=float,
         default=0.3,
-        help='Минимальный порог важности для сохранения новости (по умолчанию: 0.3)',
+        help="Минимальный порог важности для сохранения новости (по умолчанию: 0.3)",
     )
     parser.add_argument(
-        '--max-concurrent',
+        "--max-concurrent",
         type=int,
         default=10,
-        help='Максимальное количество одновременных запросов (по умолчанию: 10)',
+        help="Максимальное количество одновременных запросов (по умолчанию: 10)",
     )
-    parser.add_argument('--verbose', action='store_true', help='Подробное логирование')
+    parser.add_argument("--verbose", action="store_true", help="Подробное логирование")
 
     args = parser.parse_args()
 
@@ -57,9 +57,7 @@ async def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     logger.info("🚀 Запуск продвинутого парсера новостей")
-    logger.info(
-        f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}"
-    )
+    logger.info(f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}")
 
     try:
         async with AdvancedParser(
@@ -81,17 +79,17 @@ async def main():
             print(f"🔄 Всего новостей обработано: {stats.get('total_processed', 0)}")
             print(f"💾 Сохранено в БД: {stats.get('total_saved', 0)}")
 
-            if stats.get('errors'):
+            if stats.get("errors"):
                 print(f"\n⚠️  Ошибки ({len(stats['errors'])}):")
-                for error in stats['errors'][:5]:  # Показываем первые 5 ошибок
+                for error in stats["errors"][:5]:  # Показываем первые 5 ошибок
                     print(f"   • {error}")
-                if len(stats['errors']) > 5:
+                if len(stats["errors"]) > 5:
                     print(f"   ... и еще {len(stats['errors']) - 5} ошибок")
 
             print("=" * 60)
 
             # Возвращаем код выхода в зависимости от результатов
-            if stats.get('total_saved', 0) > 0:
+            if stats.get("total_saved", 0) > 0:
                 return 0  # Успех
             else:
                 return 1  # Нет сохраненных новостей

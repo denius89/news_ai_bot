@@ -15,9 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from database.service import get_async_service
 
 # Настраиваем логирование
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +37,7 @@ async def clean_old_news():
         # Выполняем удаление через Supabase
         client = await db_service.async_client
         result = await db_service.async_safe_execute(
-            client.table('news').delete().lt('published_at', cutoff_date.isoformat())
+            client.table("news").delete().lt("published_at", cutoff_date.isoformat())
         )
 
         if result:
@@ -52,21 +50,21 @@ async def clean_old_news():
 
         # Получаем все новости для проверки дубликатов
         all_news = await db_service.async_safe_execute(
-            client.table('news').select('id, title, link').order('published_at', desc=True)
+            client.table("news").select("id, title, link").order("published_at", desc=True)
         )
 
-        if all_news and hasattr(all_news, 'data') and all_news.data:
+        if all_news and hasattr(all_news, "data") and all_news.data:
             seen_titles = set()
             seen_links = set()
             duplicates_to_delete = []
 
             for news in all_news.data:
-                title = news.get('title', '').lower().strip()
-                link = news.get('link', '').strip()
+                title = news.get("title", "").lower().strip()
+                link = news.get("link", "").strip()
 
                 # Проверяем дубликаты по title и link
                 if (title in seen_titles or link in seen_links) and title and link:
-                    duplicates_to_delete.append(news['id'])
+                    duplicates_to_delete.append(news["id"])
                 else:
                     if title:
                         seen_titles.add(title)
@@ -78,20 +76,16 @@ async def clean_old_news():
                 logger.info(f"Найдено {len(duplicates_to_delete)} дубликатов")
 
                 for news_id in duplicates_to_delete:
-                    await db_service.async_safe_execute(
-                        client.table('news').delete().eq('id', news_id)
-                    )
+                    await db_service.async_safe_execute(client.table("news").delete().eq("id", news_id))
 
                 logger.info(f"✅ Удалено {len(duplicates_to_delete)} дубликатов")
             else:
                 logger.info("✅ Дубликаты не найдены")
 
         # Получаем статистику после очистки
-        count_result = await db_service.async_safe_execute(
-            client.table('news').select('id', count='exact')
-        )
+        count_result = await db_service.async_safe_execute(client.table("news").select("id", count="exact"))
 
-        if count_result and hasattr(count_result, 'data'):
+        if count_result and hasattr(count_result, "data"):
             total_count = len(count_result.data) if count_result.data else 0
             logger.info(f"📊 Всего новостей в базе после очистки: {total_count}")
 

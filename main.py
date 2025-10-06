@@ -31,9 +31,7 @@ def main():
     logger = logging.getLogger("news_ai_bot")
 
     parser = argparse.ArgumentParser(description="News AI Bot - ETL Pipeline")
-    parser.add_argument(
-        "--source", type=str, default="all", help="Категория из sources.yaml или 'all'"
-    )
+    parser.add_argument("--source", type=str, default="all", help="Категория из sources.yaml или 'all'")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument(
         "--digest",
@@ -48,10 +46,7 @@ def main():
 
     # --- Дайджест ---
     if args.digest is not None:
-        logger.info(
-            f"Генерация {'AI-' if args.ai else ''}дайджеста "
-            f"(последние {args.digest} новостей)..."
-        )
+        logger.info(f"Генерация {'AI-' if args.ai else ''}дайджеста " f"(последние {args.digest} новостей)...")
         digest = generate_digest(limit=args.digest, ai=args.ai)
         print("\n" + digest + "\n")
         return

@@ -43,16 +43,14 @@ async def cmd_subscribe(message: types.Message):
         args = message.text.split(maxsplit=1)
         if len(args) < 2:
             await message.answer(
-                "❌ Использование: /subscribe <category>\n"
-                f"Доступные категории: {', '.join(get_categories())}"
+                "❌ Использование: /subscribe <category>\n" f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
         category = args[1].strip().lower()
         if category not in get_categories():
             await message.answer(
-                f"❌ Неизвестная категория: {category}\n"
-                f"Доступные категории: {', '.join(get_categories())}"
+                f"❌ Неизвестная категория: {category}\n" f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
@@ -86,16 +84,14 @@ async def cmd_unsubscribe(message: types.Message):
         args = message.text.split(maxsplit=1)
         if len(args) < 2:
             await message.answer(
-                "❌ Использование: /unsubscribe <category>\n"
-                f"Доступные категории: {', '.join(get_categories())}"
+                "❌ Использование: /unsubscribe <category>\n" f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
         category = args[1].strip().lower()
         if category not in get_categories():
             await message.answer(
-                f"❌ Неизвестная категория: {category}\n"
-                f"Доступные категории: {', '.join(get_categories())}"
+                f"❌ Неизвестная категория: {category}\n" f"Доступные категории: {', '.join(get_categories())}"
             )
             return
 
@@ -186,7 +182,7 @@ async def cmd_help_subs(message: types.Message):
 /notify_on digest
 /notify_off events
 """.format(
-        ', '.join(get_categories()), ', '.join(NOTIFICATION_TYPES)
+        ", ".join(get_categories()), ", ".join(NOTIFICATION_TYPES)
     )
 
     await message.answer(help_text, parse_mode="HTML")
@@ -199,9 +195,7 @@ async def cmd_help_subs(message: types.Message):
 async def cb_subscriptions_menu(query: types.CallbackQuery):
     """Показать меню подписок"""
     text = "📋 <b>Управление подписками</b>\n\nВыберите действие:"
-    await query.message.edit_text(
-        text, parse_mode="HTML", reply_markup=subscriptions_inline_keyboard()
-    )
+    await query.message.edit_text(text, parse_mode="HTML", reply_markup=subscriptions_inline_keyboard())
 
 
 # Удален дублирующий обработчик - теперь используется в notifications.py
@@ -217,9 +211,7 @@ async def cb_my_subs(query: types.CallbackQuery):
         )
 
         if not user_id:
-            await query.message.edit_text(
-                "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
-            )
+            await query.message.edit_text("❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard())
             return
 
         # Get subscriptions
@@ -243,27 +235,21 @@ async def cb_my_subs(query: types.CallbackQuery):
 
     except Exception as e:
         logger.error("Error in cb_my_subs: %s", e)
-        await query.message.edit_text(
-            "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
-        )
+        await query.message.edit_text("❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard())
 
 
 @router.callback_query(F.data == "subscribe_menu")
 async def cb_subscribe_menu(query: types.CallbackQuery):
     """Показать меню выбора категории для подписки"""
     text = "➕ <b>Подписаться на категорию</b>\n\nВыберите категорию:"
-    await query.message.edit_text(
-        text, parse_mode="HTML", reply_markup=categories_inline_keyboard("subscribe")
-    )
+    await query.message.edit_text(text, parse_mode="HTML", reply_markup=categories_inline_keyboard("subscribe"))
 
 
 @router.callback_query(F.data == "unsubscribe_menu")
 async def cb_unsubscribe_menu(query: types.CallbackQuery):
     """Показать меню выбора категории для отписки"""
     text = "➖ <b>Отписаться от категории</b>\n\nВыберите категорию:"
-    await query.message.edit_text(
-        text, parse_mode="HTML", reply_markup=categories_inline_keyboard("unsubscribe")
-    )
+    await query.message.edit_text(text, parse_mode="HTML", reply_markup=categories_inline_keyboard("unsubscribe"))
 
 
 @router.callback_query(F.data.startswith("subscribe:"))
@@ -350,9 +336,7 @@ async def cb_my_notifications(query: types.CallbackQuery):
         )
 
         if not user_id:
-            await query.message.edit_text(
-                "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
-            )
+            await query.message.edit_text("❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard())
             return
 
         # Get notifications
@@ -383,9 +367,7 @@ async def cb_my_notifications(query: types.CallbackQuery):
 
     except Exception as e:
         logger.error("Error in cb_my_notifications: %s", e)
-        await query.message.edit_text(
-            "❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard()
-        )
+        await query.message.edit_text("❌ Не удалось выполнить действие", reply_markup=back_inline_keyboard())
 
 
 @router.callback_query(F.data == "notify_on_digest")

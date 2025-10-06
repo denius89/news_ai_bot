@@ -79,9 +79,7 @@ async def example_with_global_functions():
         chat_id = 123456789  # Replace with actual chat ID
 
         # Send message using global function
-        success = await send_message(
-            chat_id, "🚀 Это сообщение отправлено через глобальную функцию!"
-        )
+        success = await send_message(chat_id, "🚀 Это сообщение отправлено через глобальную функцию!")
 
         if success:
             logger.info("✅ Глобальная функция send_message работает")
@@ -118,9 +116,7 @@ async def example_context_manager():
 
         # Use async context manager
         async with TelegramSender() as sender:
-            success = await sender.send_message(
-                chat_id, "🔄 Это сообщение отправлено через async context manager!"
-            )
+            success = await sender.send_message(chat_id, "🔄 Это сообщение отправлено через async context manager!")
 
             if success:
                 logger.info("✅ Context manager работает")
@@ -142,9 +138,7 @@ async def example_error_handling():
 
         # Try to send to invalid chat ID
         invalid_chat_id = 999999999
-        success = await sender.send_message(
-            invalid_chat_id, "Это сообщение не должно быть доставлено"
-        )
+        success = await sender.send_message(invalid_chat_id, "Это сообщение не должно быть доставлено")
 
         if not success:
             logger.info("✅ Обработка ошибок работает - сообщение не отправлено")

@@ -29,11 +29,11 @@ async def test_generate_digest_wraps_service():
     )
 
     # Мокаем fetch_recent_news чтобы вернуть нашу тестовую новость
-    with patch.object(generator, 'fetch_recent_news') as mock_fetch:
+    with patch.object(generator, "fetch_recent_news") as mock_fetch:
         mock_fetch.return_value = [test_news]
 
         # Мокаем DigestAIService.build_digest
-        with patch('digests.generator.DigestAIService') as mock_service_class:
+        with patch("digests.generator.DigestAIService") as mock_service_class:
             mock_service = MagicMock()
 
             # Делаем мок асинхронным
@@ -63,7 +63,7 @@ async def test_generate_digest_no_ai(monkeypatch):
 
     # Mock the generate_digest function directly
     async def mock_generate_digest(limit=10, category=None, ai=False, style="analytical"):
-        return "📰 <b>Дайджест новостей:</b>\n\n<b>1. <a href=\"http://test1\">Новость 1</a></b>\n<b>2. Новость 2</b>"
+        return '📰 <b>Дайджест новостей:</b>\n\n<b>1. <a href="http://test1">Новость 1</a></b>\n<b>2. Новость 2</b>'
 
     monkeypatch.setattr(generator, "generate_digest", mock_generate_digest)
 
@@ -144,9 +144,7 @@ def test_fetch_recent_news_formats_dates(monkeypatch):
     # Import after monkeypatch
     import digests.generator as generator
 
-    monkeypatch.setattr(
-        generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})()
-    )
+    monkeypatch.setattr(generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})())
 
     result = generator.fetch_recent_news(limit=2, category="test")
     assert isinstance(result, list)
@@ -185,9 +183,7 @@ def test_fetch_recent_news_contains_expected_titles(monkeypatch):
     # Import after monkeypatch
     import digests.generator as generator
 
-    monkeypatch.setattr(
-        generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})()
-    )
+    monkeypatch.setattr(generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})())
 
     result = generator.fetch_recent_news(limit=3)
     titles = [row.title for row in result]

@@ -14,9 +14,7 @@ from typing import Dict, List, Set
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Настраиваем логирование
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,7 @@ logger = logging.getLogger(__name__)
 def load_yaml_file(file_path: Path) -> Dict:
     """Загрузка YAML файла."""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
     except Exception as e:
         logger.error(f"Ошибка загрузки {file_path}: {e}")
@@ -34,7 +32,7 @@ def load_yaml_file(file_path: Path) -> Dict:
 def save_yaml_file(file_path: Path, data: Dict):
     """Сохранение YAML файла."""
     try:
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             yaml.dump(data, f, default_flow_style=False, sort_keys=True)
         logger.info(f"Файл сохранен: {file_path}")
     except Exception as e:
@@ -47,13 +45,13 @@ def extract_urls_from_sources(sources_list: List) -> Set[str]:
 
     for source in sources_list:
         if isinstance(source, dict):
-            url = source.get('url', '')
+            url = source.get("url", "")
             if url:
                 urls.add(url)
         elif isinstance(source, str):
-            if ':' in source:
+            if ":" in source:
                 # Формат "name: url"
-                url = source.split(':', 1)[1].strip()
+                url = source.split(":", 1)[1].strip()
                 if url:
                     urls.add(url)
             else:
@@ -81,13 +79,13 @@ def merge_sources(old_sources: List, new_sources: List) -> List:
     # Сначала добавляем старые источники
     for source in old_sources:
         if isinstance(source, dict):
-            url = source.get('url', '')
+            url = source.get("url", "")
             if url in all_urls:
                 merged_sources.append(source)
                 all_urls.discard(url)  # Убираем из множества, чтобы не дублировать
         elif isinstance(source, str):
-            if ':' in source:
-                url = source.split(':', 1)[1].strip()
+            if ":" in source:
+                url = source.split(":", 1)[1].strip()
             else:
                 url = source.strip()
 
@@ -98,12 +96,12 @@ def merge_sources(old_sources: List, new_sources: List) -> List:
     # Затем добавляем новые источники, которых не было в старых
     for source in new_sources:
         if isinstance(source, dict):
-            url = source.get('url', '')
+            url = source.get("url", "")
             if url in all_urls:
                 merged_sources.append(source)
         elif isinstance(source, str):
-            if ':' in source:
-                url = source.split(':', 1)[1].strip()
+            if ":" in source:
+                url = source.split(":", 1)[1].strip()
             else:
                 url = source.strip()
 
@@ -137,18 +135,18 @@ def merge_configs(old_config: Dict, new_config: Dict) -> Dict:
             old_subcategory_data = old_subcategories.get(subcategory, {})
             new_subcategory_data = new_subcategories.get(subcategory, {})
 
-            old_sources = old_subcategory_data.get('sources', [])
-            new_sources = new_subcategory_data.get('sources', [])
+            old_sources = old_subcategory_data.get("sources", [])
+            new_sources = new_subcategory_data.get("sources", [])
 
             # Объединяем источники
             merged_sources = merge_sources(old_sources, new_sources)
 
             # Сохраняем иконку (приоритет у старой конфигурации)
-            icon = old_subcategory_data.get('icon') or new_subcategory_data.get('icon')
+            icon = old_subcategory_data.get("icon") or new_subcategory_data.get("icon")
 
-            merged_config[category][subcategory]['sources'] = merged_sources
+            merged_config[category][subcategory]["sources"] = merged_sources
             if icon:
-                merged_config[category][subcategory]['icon'] = icon
+                merged_config[category][subcategory]["icon"] = icon
 
     return merged_config
 
@@ -192,7 +190,7 @@ async def main():
     total_sources = 0
     for category, subcategories in merged_config.items():
         for subcategory, data in subcategories.items():
-            sources = data.get('sources', [])
+            sources = data.get("sources", [])
             total_sources += len(sources)
 
     logger.info(f"✅ Объединение завершено!")
@@ -202,7 +200,7 @@ async def main():
     for category, subcategories in merged_config.items():
         category_sources = 0
         for subcategory, data in subcategories.items():
-            sources = data.get('sources', [])
+            sources = data.get("sources", [])
             category_sources += len(sources)
 
         if category_sources > 0:

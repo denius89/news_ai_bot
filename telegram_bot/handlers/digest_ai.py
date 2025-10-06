@@ -35,13 +35,7 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
             ]
             for cat in categories
         ]
-        + [
-            [
-                types.InlineKeyboardButton(
-                    text="📚 Все категории", callback_data="digest_ai_category:all"
-                )
-            ]
-        ]
+        + [[types.InlineKeyboardButton(text="📚 Все категории", callback_data="digest_ai_category:all")]]
         + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")]]
     )
 
@@ -49,11 +43,7 @@ def build_category_keyboard() -> types.InlineKeyboardMarkup:
 def build_period_keyboard(category: str) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                types.InlineKeyboardButton(
-                    text=label, callback_data=f"digest_ai_period:{period}:{category}"
-                )
-            ]
+            [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_period:{period}:{category}")]
             for period, label in PERIODS.items()
         ]
         + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data="digest_ai")]]
@@ -63,20 +53,10 @@ def build_period_keyboard(category: str) -> types.InlineKeyboardMarkup:
 def build_style_keyboard(category: str, period: str) -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                types.InlineKeyboardButton(
-                    text=label, callback_data=f"digest_ai_style:{style}:{category}:{period}"
-                )
-            ]
+            [types.InlineKeyboardButton(text=label, callback_data=f"digest_ai_style:{style}:{category}:{period}")]
             for style, label in STYLES.items()
         ]
-        + [
-            [
-                types.InlineKeyboardButton(
-                    text="⬅️ Назад", callback_data=f"digest_ai_period:{period}:{category}"
-                )
-            ]
-        ]
+        + [[types.InlineKeyboardButton(text="⬅️ Назад", callback_data=f"digest_ai_period:{period}:{category}")]]
     )
 
 
@@ -143,15 +123,13 @@ async def cb_digest_ai_style(query: types.CallbackQuery):
         # Generate AI digest using async service
         categories_list = None if category == "all" else [category]
         digest_service = get_async_digest_service()
-        text = await digest_service.async_build_ai_digest(
-            limit=20, categories=categories_list, style=style
-        )
+        text = await digest_service.async_build_ai_digest(limit=20, categories=categories_list, style=style)
 
         # Stop animation
         animation.stop()
 
         # Проверяем тип результата
-        if hasattr(text, '__await__'):
+        if hasattr(text, "__await__"):
             logger.error(f"Got coroutine instead of string: {type(text)}")
             text = "❌ Ошибка: получена корутина вместо строки"
         else:
@@ -227,7 +205,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
     """Handle subscription to category from digest actions."""
     try:
         category = query.data.split(":", 1)[1]
-        category_name = get_categories().get(category, {}).get('name', category)
+        category_name = get_categories().get(category, {}).get("name", category)
 
         # Subscribe user to category
         user_id = query.from_user.id
@@ -241,9 +219,7 @@ async def cb_subscribe_category(query: types.CallbackQuery):
 
         # Update message to show subscription success
         await query.message.edit_reply_markup(
-            reply_markup=build_digest_actions_keyboard(
-                query.from_user.username or "пользователь", category
-            )
+            reply_markup=build_digest_actions_keyboard(query.from_user.username or "пользователь", category)
         )
 
     except Exception as e:
@@ -286,9 +262,7 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
             # Показываем выбор стиля
             kb = build_style_keyboard(category, period)
             await query.message.edit_text(
-                f"📚 <b>AI-дайджест: {category.title()}</b>\n\n"
-                f"Период: {period}\n"
-                "Выберите стиль дайджеста:",
+                f"📚 <b>AI-дайджест: {category.title()}</b>\n\n" f"Период: {period}\n" "Выберите стиль дайджеста:",
                 parse_mode="HTML",
                 reply_markup=kb,
             )

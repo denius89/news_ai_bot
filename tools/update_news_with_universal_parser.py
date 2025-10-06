@@ -16,7 +16,7 @@ from parsers.universal_rss_parser import UniversalRSSParser
 from database.service import get_async_service
 
 # Настраиваем логирование
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -47,8 +47,8 @@ async def update_news_with_universal_parser():
         for news_item in all_news:
             try:
                 # Добавляем AI анализ (пустые значения, будут заполнены позже)
-                news_item['importance'] = 0.0
-                news_item['credibility'] = 0.0
+                news_item["importance"] = 0.0
+                news_item["credibility"] = 0.0
 
                 # Сохраняем в базу
                 await db_service.async_upsert_news([news_item])
@@ -58,9 +58,7 @@ async def update_news_with_universal_parser():
                     print(f"   💾 Сохранено {saved_count} новостей...")
 
             except Exception as e:
-                logger.warning(
-                    f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}"
-                )
+                logger.warning(f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}")
                 continue
 
         print(f"✅ Успешно сохранено {saved_count} новостей")
@@ -68,7 +66,7 @@ async def update_news_with_universal_parser():
         # Статистика по категориям
         categories = {}
         for news_item in all_news:
-            cat = news_item.get('category', 'unknown')
+            cat = news_item.get("category", "unknown")
             if cat not in categories:
                 categories[cat] = 0
             categories[cat] += 1

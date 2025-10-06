@@ -15,7 +15,7 @@ from ai_modules.importance import evaluate_importance  # noqa: E402
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -47,9 +47,7 @@ def update_news_ai_analysis(news_id: int, importance: float, credibility: float)
 
     try:
         safe_execute(
-            supabase.table("news")
-            .update({"importance": importance, "credibility": credibility})
-            .eq("id", news_id)
+            supabase.table("news").update({"importance": importance, "credibility": credibility}).eq("id", news_id)
         )
         return True
     except Exception as e:
@@ -98,9 +96,7 @@ def main():
                 # Обновляем в базе данных
                 if update_news_ai_analysis(news_item["id"], importance, credibility):
                     total_updated += 1
-                    logger.info(
-                        f"✅ {news_item['id']}: importance={importance:.2f}, credibility={credibility:.2f}"
-                    )
+                    logger.info(f"✅ {news_item['id']}: importance={importance:.2f}, credibility={credibility:.2f}")
                 else:
                     logger.error(f"❌ Не удалось обновить новость {news_item['id']}")
 

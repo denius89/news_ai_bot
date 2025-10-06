@@ -25,9 +25,7 @@ def test_insert_news():
     items = []
     for source_name, source_info in sources.items():
         try:
-            parsed_items = parse_source(
-                source_info["url"], source_info["category"], "general", source_info["name"]
-            )
+            parsed_items = parse_source(source_info["url"], source_info["category"], "general", source_info["name"])
             if parsed_items:
                 items.extend(parsed_items[:2])  # максимум 2 новости на источник
         except Exception as e:

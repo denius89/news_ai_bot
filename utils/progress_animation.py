@@ -46,9 +46,7 @@ class ProgressAnimation:
                 progress_text = self._build_progress_text(step, i, total_steps, progress_bar)
 
                 try:
-                    await self.message.edit_text(
-                        progress_text, parse_mode="HTML", disable_web_page_preview=True
-                    )
+                    await self.message.edit_text(progress_text, parse_mode="HTML", disable_web_page_preview=True)
                 except TelegramBadRequest as e:
                     if "message is not modified" in str(e):
                         # Message content is the same, continue
@@ -148,9 +146,7 @@ async def show_quick_progress(
         logger.warning(f"Failed to show quick progress: {e}")
 
 
-def build_digest_actions_keyboard(
-    username: str, category: str = None
-) -> types.InlineKeyboardMarkup:
+def build_digest_actions_keyboard(username: str, category: str = None) -> types.InlineKeyboardMarkup:
     """
     Build inline keyboard with digest actions.
 
@@ -175,13 +171,7 @@ def build_digest_actions_keyboard(
         )
 
     # Enable auto-digest button
-    buttons.append(
-        [
-            types.InlineKeyboardButton(
-                text="🔔 Включить авто-дайджест", callback_data="enable_auto_digest"
-            )
-        ]
-    )
+    buttons.append([types.InlineKeyboardButton(text="🔔 Включить авто-дайджест", callback_data="enable_auto_digest")])
 
     # Back button
     buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])

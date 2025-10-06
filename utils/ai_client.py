@@ -34,9 +34,7 @@ def ask(prompt: str, model: str = None, max_tokens: int = None) -> str:
         raise e
 
 
-async def ask_async(
-    prompt: str, model: str = None, max_tokens: int = None, style: str = "analytical"
-) -> str:
+async def ask_async(prompt: str, model: str = None, max_tokens: int = None, style: str = "analytical") -> str:
     """
     Асинхронная функция для обращения к OpenAI ChatCompletion.
     """

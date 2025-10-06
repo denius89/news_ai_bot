@@ -45,7 +45,7 @@ async def test_llm_not_configured_fallback():
     service = DigestAIService(config)
 
     # Мокаем проверку доступности OpenAI
-    with patch.object(service, '_openai_available', False):
+    with patch.object(service, "_openai_available", False):
         result = await service.build_digest(news_items, "analytical")
 
         # Проверяем fallback результат
@@ -90,7 +90,7 @@ async def test_handles_bad_dates():
     service = DigestAIService(config)
 
     # Мокаем отсутствие OpenAI для fallback режима
-    with patch.object(service, '_openai_available', False):
+    with patch.object(service, "_openai_available", False):
         result = await service.build_digest(news_items, "analytical")
 
         # Проверяем, что digest строится несмотря на отсутствие дат
@@ -123,8 +123,8 @@ async def test_ai_summarization_success():
     service = DigestAIService(config)
 
     # Мокаем успешный AI вызов
-    with patch.object(service, '_openai_available', True):
-        with patch.object(service, '_llm_summarize') as mock_llm:
+    with patch.object(service, "_openai_available", True):
+        with patch.object(service, "_llm_summarize") as mock_llm:
             mock_llm.return_value = (
                 "📰 <b>Сводка новостей</b>\n\nBitcoin показал рост...\n\n"
                 "<b>Почему это важно:</b>\n1. Влияет на крипторынок"
@@ -164,8 +164,8 @@ async def test_ai_summarization_failure_fallback():
     service = DigestAIService(config)
 
     # Мокаем доступность OpenAI, но ошибку в AI вызове
-    with patch.object(service, '_openai_available', True):
-        with patch.object(service, '_llm_summarize') as mock_llm:
+    with patch.object(service, "_openai_available", True):
+        with patch.object(service, "_llm_summarize") as mock_llm:
             mock_llm.side_effect = Exception("AI API Error")
 
             result = await service.build_digest(news_items, "analytical")
@@ -219,8 +219,8 @@ async def test_max_items_limit():
     service = DigestAIService(config)
 
     # Мокаем AI вызов
-    with patch.object(service, '_openai_available', True):
-        with patch.object(service, '_llm_summarize') as mock_llm:
+    with patch.object(service, "_openai_available", True):
+        with patch.object(service, "_llm_summarize") as mock_llm:
             mock_llm.return_value = "📰 <b>Сводка</b>\n\nTest content"
 
             await service.build_digest(news_items, "analytical")

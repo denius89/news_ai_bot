@@ -131,9 +131,7 @@ def main():
     args = parser.parse_args()
 
     # Generate digest
-    digest = asyncio.run(
-        generate_digest(limit=args.limit, category=args.category, ai=args.ai, style=args.style)
-    )
+    digest = asyncio.run(generate_digest(limit=args.limit, category=args.category, ai=args.ai, style=args.style))
 
     print(digest)
 

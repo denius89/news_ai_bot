@@ -98,9 +98,7 @@ def generate_batch_summary(
     if not news_items:
         return "Сегодня новостей нет."
 
-    text_block = "\n".join(
-        f"{i+1}. {item.title}: {(item.content or '')[:400]}" for i, item in enumerate(news_items)
-    )
+    text_block = "\n".join(f"{i+1}. {item.title}: {(item.content or '')[:400]}" for i, item in enumerate(news_items))
     links_block = "\n".join(f"- {item.title}: {item.link}" for item in news_items if item.link)
 
     base_prompt = PROMPTS.get(style, PROMPTS["analytical"])
@@ -118,11 +116,7 @@ def generate_batch_summary(
         formatted = format_digest_output(raw_text, style=style)
 
         if "<b>Почему это важно" not in formatted:
-            formatted += (
-                "\n\n<b>Почему это важно:</b>\n"
-                "— Событие влияет на рынок\n"
-                "— Важно для инвесторов"
-            )
+            formatted += "\n\n<b>Почему это важно:</b>\n" "— Событие влияет на рынок\n" "— Важно для инвесторов"
 
         return clean_for_telegram(formatted)
     except Exception as e:

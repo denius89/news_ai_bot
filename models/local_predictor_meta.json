@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-10-06T08:34:14.095433+00:00",
+  "dataset_size": 1330,
+  "model_type": "logreg",
+  "features": [
+    "title_length",
+    "title_word_count",
+    "content_length",
+    "content_word_count",
+    "source_trust_score",
+    "category_crypto",
+    "category_tech",
+    "category_sports",
+    "category_world",
+    "category_markets",
+    "category_unknown",
+    "total_words",
+    "important_words_ratio",
+    "spam_words_ratio",
+    "title_important_words",
+    "title_spam_words",
+    "time_features"
+  ],
+  "importance_model": {
+    "f1_score": 0.8598531428575815,
+    "improvement": 0.0,
+    "replaced": true,
+    "model_type": "logreg"
+  },
+  "credibility_model": {
+    "f1_score": 0.9021988981147808,
+    "improvement": 0.0,
+    "replaced": true,
+    "model_type": "logreg"
+  },
+  "version": 1
+}

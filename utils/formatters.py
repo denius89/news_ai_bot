@@ -7,9 +7,7 @@ from models.news import NewsItem
 from models.event import EventItem
 
 
-def format_date(
-    dt: Optional[datetime], fmt: str = "%d %b %Y, %H:%M", tz: str = "Europe/Warsaw"
-) -> str:
+def format_date(dt: Optional[datetime], fmt: str = "%d %b %Y, %H:%M", tz: str = "Europe/Warsaw") -> str:
     """
     Format datetime object to human-readable string with timezone support.
 
@@ -71,17 +69,17 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
     """
     # Поддерживаем как объекты, так и словари
     if isinstance(item, dict):
-        title_raw = (item.get('title') or item.get('source') or "Untitled").strip()
-        link = item.get('link') or ""
-        source = escape(item.get('source') or "—")
-        published = item.get('published_at_fmt') or format_date(item.get('published_at')) or "—"
-        cred = float(item.get('credibility') or 0.0)
-        imp = float(item.get('importance') or 0.0)
+        title_raw = (item.get("title") or item.get("source") or "Untitled").strip()
+        link = item.get("link") or ""
+        source = escape(item.get("source") or "—")
+        published = item.get("published_at_fmt") or format_date(item.get("published_at")) or "—"
+        cred = float(item.get("credibility") or 0.0)
+        imp = float(item.get("importance") or 0.0)
     else:
         title_raw = (item.title or item.source or "Untitled").strip()
         link = item.link or ""
         source = escape(item.source or "—")
-        published = getattr(item, 'published_at_fmt', None) or format_date(item.published_at) or "—"
+        published = getattr(item, "published_at_fmt", None) or format_date(item.published_at) or "—"
         cred = float(item.credibility or 0.0)
         imp = float(item.importance or 0.0)
 
@@ -101,13 +99,11 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
         f"🗞️ {source}\n"
         f"📅 {published}\n"
         f"⚡ Trend: {imp:.1f}  {cred_icon} Relevance: {cred:.1f}\n"
-        f"🔗 <a href=\"{escape(clean_link)}\">{clean_link}</a>"
+        f'🔗 <a href="{escape(clean_link)}">{clean_link}</a>'
     )
 
 
-def format_news(
-    news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True
-) -> str:
+def format_news(news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True) -> str:
     """
     Современный дайджест в стиле BBC/Bloomberg с разделителями между новостями.
     """
@@ -173,11 +169,7 @@ def format_news_items(news: List[NewsItem], limit: int = 5, min_importance: floa
             summary = summary[:259] + "…"
         summary = escape(summary)
 
-        title_line = (
-            f"<b>{i}. <a href=\"{escape(link)}\">{title}</a></b>"
-            if link
-            else f"<b>{i}. {title}</b>"
-        )
+        title_line = f'<b>{i}. <a href="{escape(link)}">{title}</a></b>' if link else f"<b>{i}. {title}</b>"
 
         if summary:
             lines.append(

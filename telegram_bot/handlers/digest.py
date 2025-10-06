@@ -31,16 +31,10 @@ def categories_keyboard() -> types.InlineKeyboardMarkup:
 
     categories = get_categories()
     keyboard = [
-        [
-            types.InlineKeyboardButton(
-                text=f"{get_emoji_icon(cat, '')} {cat.title()}", callback_data=f"digest:{cat}"
-            )
-        ]
+        [types.InlineKeyboardButton(text=f"{get_emoji_icon(cat, '')} {cat.title()}", callback_data=f"digest:{cat}")]
         for cat in categories
     ]
-    keyboard.append(
-        [types.InlineKeyboardButton(text="🌐 Все категории", callback_data="digest:all")]
-    )
+    keyboard.append([types.InlineKeyboardButton(text="🌐 Все категории", callback_data="digest:all")])
     keyboard.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
     return types.InlineKeyboardMarkup(inline_keyboard=keyboard)
 
@@ -55,9 +49,7 @@ async def send_digest(
 
     # ⚡️ используем асинхронный сервис дайджестов
     digest_service = get_async_digest_service()
-    digest_text = await digest_service.async_build_daily_digest(
-        limit=limit, style="analytical", categories=cats
-    )
+    digest_text = await digest_service.async_build_daily_digest(limit=limit, categories=cats)
 
     # Используем готовый текст из сервиса, чтобы сохранить метрики важности/актуальности
     text = digest_text
@@ -104,13 +96,21 @@ async def send_digest(
             )
             await target.answer(cache_time=0)
 
-    logger.info("✅ Digest sent: category=%s, count=%d", category, len(digest_text.split('\n')))
+    logger.info("✅ Digest sent: category=%s, count=%d", category, len(digest_text.split("\n")))
 
 
 @router.message(Command("digest"))
 async def cmd_digest(message: types.Message):
     """Команда /digest → выводим общий поток."""
     await send_digest(message, limit=5, category="all")
+
+
+@router.callback_query(F.data == "digest_menu")
+async def cb_digest_menu(query: types.CallbackQuery):
+    """Показать меню выбора категорий для дайджеста."""
+    keyboard = categories_keyboard()
+    await query.message.edit_text("📌 Выберите категорию для дайджеста:", reply_markup=keyboard)
+    await query.answer()
 
 
 @router.callback_query(F.data.startswith("digest:"))

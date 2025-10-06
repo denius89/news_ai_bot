@@ -39,9 +39,9 @@ class MemoryCache:
         async with self._lock:
             if cache_key in self.cache:
                 entry = self.cache[cache_key]
-                if entry['expires'] > time.time():
+                if entry["expires"] > time.time():
                     logger.debug(f"Cache hit for key: {cache_key}")
-                    return entry['value']
+                    return entry["value"]
                 else:
                     # Expired, remove it
                     del self.cache[cache_key]
@@ -56,7 +56,7 @@ class MemoryCache:
         expires = time.time() + (ttl or self.default_ttl)
 
         async with self._lock:
-            self.cache[cache_key] = {'value': value, 'expires': expires, 'created': time.time()}
+            self.cache[cache_key] = {"value": value, "expires": expires, "created": time.time()}
             logger.debug(f"Cache set for key: {cache_key}, TTL: {ttl or self.default_ttl}s")
 
     async def delete(self, key: Union[str, Dict]) -> bool:
@@ -83,7 +83,7 @@ class MemoryCache:
 
         async with self._lock:
             for key, entry in self.cache.items():
-                if entry['expires'] <= current_time:
+                if entry["expires"] <= current_time:
                     expired_keys.append(key)
 
             for key in expired_keys:
@@ -98,15 +98,13 @@ class MemoryCache:
         """Get cache statistics."""
         current_time = time.time()
         total_entries = len(self.cache)
-        expired_entries = sum(
-            1 for entry in self.cache.values() if entry['expires'] <= current_time
-        )
+        expired_entries = sum(1 for entry in self.cache.values() if entry["expires"] <= current_time)
 
         return {
-            'total_entries': total_entries,
-            'active_entries': total_entries - expired_entries,
-            'expired_entries': expired_entries,
-            'hit_ratio': getattr(self, '_hit_ratio', 0.0),
+            "total_entries": total_entries,
+            "active_entries": total_entries - expired_entries,
+            "expired_entries": expired_entries,
+            "hit_ratio": getattr(self, "_hit_ratio", 0.0),
         }
 
 
@@ -198,7 +196,7 @@ def cached(cache_name: str = "default", ttl: int = 300):
             @asyncio.coroutine
             async def async_wrapper(*args, **kwargs):
                 # Create cache key from function name and arguments
-                cache_key = {'func': func.__name__, 'args': args, 'kwargs': kwargs}
+                cache_key = {"func": func.__name__, "args": args, "kwargs": kwargs}
 
                 # Try to get from cache
                 result = await cache.get(cache_key)
@@ -215,7 +213,7 @@ def cached(cache_name: str = "default", ttl: int = 300):
 
             def sync_wrapper(*args, **kwargs):
                 # Create cache key from function name and arguments
-                cache_key = {'func': func.__name__, 'args': args, 'kwargs': kwargs}
+                cache_key = {"func": func.__name__, "args": args, "kwargs": kwargs}
 
                 # Try to get from cache (sync version)
                 import asyncio
