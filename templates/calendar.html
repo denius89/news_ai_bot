@@ -136,8 +136,8 @@ function loadFullCalendarFallback() {
         <p id="popupCategory"></p>
         <p id="popupDescription"></p>
         <p id="popupSource"></p>
-        <div style="margin-top: 20px;">
-            <button class="pulseai-btn" id="popupSourceBtn" style="margin-right: 12px;">🔗 Открыть источник</button>
+        <div class="mt-5">
+            <button class="pulseai-btn mr-3" id="popupSourceBtn">🔗 Открыть источник</button>
             <button class="pulseai-btn" onclick="addToCalendarFromPopup()">📎 В календарь</button>
         </div>
     </div>
@@ -435,7 +435,7 @@ class EventsCalendar {
                         <div class="event-importance">
                             <span>Важность:</span>
                             <div class="importance-bar">
-                                <div class="importance-fill ${importanceClass}" style="width: ${event.importance * 100}%"></div>
+                                <div class="importance-fill ${importanceClass}" data-width="${event.importance * 100}"></div>
                             </div>
                         </div>
                     </div>
