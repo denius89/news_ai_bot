@@ -17,6 +17,10 @@ class TestWebSocketBasic:
         client = TestClient(app)
         
         with client.websocket_connect("/ws/stream") as websocket:
+            # Clear welcome message first
+            welcome = websocket.receive_json()
+            assert welcome["type"] == "reactor_connected"
+            
             # Test heartbeat
             websocket.send_text("ping")
             response = websocket.receive_text()
