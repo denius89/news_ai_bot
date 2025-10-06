@@ -55,9 +55,7 @@ class UnifiedDigestService:
             Formatted digest text
         """
         try:
-            news_items = self.db_service.get_latest_news(
-                source=source, categories=categories, limit=limit
-            )
+            news_items = self.db_service.get_latest_news(source=source, categories=categories, limit=limit)
 
             if not news_items:
                 return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
@@ -87,9 +85,7 @@ class UnifiedDigestService:
             Formatted digest text
         """
         try:
-            news_items = await self.db_service.async_get_latest_news(
-                source=source, categories=categories, limit=limit
-            )
+            news_items = await self.db_service.async_get_latest_news(source=source, categories=categories, limit=limit)
 
             if not news_items:
                 return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
@@ -135,10 +131,10 @@ class UnifiedDigestService:
 
             # Use AI service for generation
             cat_display = categories[0] if categories else category or "all"
-            ai_service = DigestAIService()
-            ai_digest = ai_service.generate_ai_digest(
-                news_items=news_items, category=cat_display, style=style, period=period
-            )
+            # For sync version, use fallback digest
+            from utils.formatters import format_news
+
+            ai_digest = format_news(news_items, limit=limit)
 
             return clean_for_telegram(ai_digest)
 
@@ -172,9 +168,7 @@ class UnifiedDigestService:
             if categories is None and category is not None:
                 categories = [category]
 
-            news_items = await self.db_service.async_get_latest_news(
-                categories=categories, limit=limit
-            )
+            news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit)
 
             if not news_items:
                 cat_display = categories[0] if categories else category or "all"
@@ -183,9 +177,29 @@ class UnifiedDigestService:
             # Use AI service for generation
             cat_display = categories[0] if categories else category or "all"
             ai_service = DigestAIService()
-            ai_digest = ai_service.generate_ai_digest(
-                news_items=news_items, category=cat_display, style=style, period=period
-            )
+
+            # Convert dicts to NewsItem objects
+            from models.news import NewsItem
+
+            news_objects = []
+            for item in news_items:
+                if isinstance(item, dict):
+                    news_obj = NewsItem(
+                        title=item.get("title", ""),
+                        content=item.get("content", ""),
+                        link=item.get("link", ""),
+                        source=item.get("source", ""),
+                        published_at=item.get("published_at", ""),
+                        category=item.get("category", ""),
+                        subcategory=item.get("subcategory", ""),
+                        credibility=item.get("credibility", 0.0),
+                        importance=item.get("importance", 0.0),
+                    )
+                    news_objects.append(news_obj)
+                else:
+                    news_objects.append(item)
+
+            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style)
 
             return clean_for_telegram(ai_digest)
 
@@ -216,9 +230,7 @@ class UnifiedDigestService:
             )
 
             # Filter by importance
-            filtered_items = [
-                item for item in news_items if item.get('importance', 0) >= min_importance
-            ]
+            filtered_items = [item for item in news_items if item.get("importance", 0) >= min_importance]
 
             return filtered_items[:limit]
 
@@ -249,9 +261,7 @@ class UnifiedDigestService:
             )
 
             # Filter by importance
-            filtered_items = [
-                item for item in news_items if item.get('importance', 0) >= min_importance
-            ]
+            filtered_items = [item for item in news_items if item.get("importance", 0) >= min_importance]
 
             return filtered_items[:limit]
 
