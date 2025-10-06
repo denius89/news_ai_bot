@@ -1,0 +1,127 @@
+/* ============================================================================
+   PulseAI CSS Variables
+   Подключение токенов по теме и утилитарные переменные
+   ============================================================================ */
+
+/* Import tokens */
+@import './tokens.css';
+
+/* === Utility Variables === */
+
+/* Layout */
+--max-width-container: var(--container-xl);
+--max-width-content: 65ch;
+
+/* Navigation */
+--nav-height: 4rem;
+--nav-height-mobile: 3.5rem;
+
+/* Sidebar */
+--sidebar-width: 16rem;
+--sidebar-width-collapsed: 4rem;
+
+/* Footer */
+--footer-height: 4rem;
+
+/* === Component Variables === */
+
+/* Button */
+--btn-height-sm: 2rem;
+--btn-height-md: 2.5rem;
+--btn-height-lg: 3rem;
+--btn-padding-x-sm: var(--sp-3);
+--btn-padding-x-md: var(--sp-4);
+--btn-padding-x-lg: var(--sp-6);
+
+/* Input */
+--input-height-sm: 2rem;
+--input-height-md: 2.5rem;
+--input-height-lg: 3rem;
+--input-padding-x: var(--sp-3);
+--input-border-width: 1px;
+
+/* Card */
+--card-padding: var(--sp-6);
+--card-padding-sm: var(--sp-4);
+--card-padding-lg: var(--sp-8);
+
+/* Modal */
+--modal-max-width: 32rem;
+--modal-max-width-lg: 48rem;
+--modal-backdrop-blur: 8px;
+
+/* Toast */
+--toast-max-width: 24rem;
+--toast-duration: 5s;
+
+/* === Animation Variables === */
+
+/* Pulse (Reactor) */
+--pulse-duration: 2s;
+--pulse-scale: 1.05;
+
+/* Flash (Alerts) */
+--flash-duration: 0.3s;
+
+/* Slide transitions */
+--slide-distance: 100%;
+--slide-duration: 0.3s;
+
+/* === Theme Switching === */
+
+/* Light theme (default) */
+:root {
+  --theme-transition: var(--transition-colors);
+}
+
+/* Dark theme */
+:root[data-theme="dark"] {
+  /* Variables are already overridden in tokens.css */
+}
+
+/* Auto theme (system preference) */
+:root[data-theme="auto"] {
+  /* Uses media query from tokens.css */
+}
+
+/* === Accessibility === */
+
+/* Focus ring */
+--focus-ring-width: 2px;
+--focus-ring-offset: 2px;
+--focus-ring-color: var(--color-primary-500);
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-none: none;
+    --transition-all: none;
+    --transition-default: none;
+    --transition-colors: none;
+    --transition-opacity: none;
+    --transition-shadow: none;
+    --transition-transform: none;
+    
+    --duration-75: 0ms;
+    --duration-100: 0ms;
+    --duration-150: 0ms;
+    --duration-200: 0ms;
+    --duration-300: 0ms;
+    --duration-500: 0ms;
+    --duration-700: 0ms;
+    --duration-1000: 0ms;
+  }
+}
+
+/* === Print Styles === */
+@media print {
+  :root {
+    --color-bg: white;
+    --color-text: black;
+    --color-border: black;
+    --shadow-none: none;
+    --shadow-card: none;
+    --shadow-modal: none;
+    --shadow-dropdown: none;
+  }
+}
