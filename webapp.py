@@ -17,6 +17,15 @@ logger = logging.getLogger("news_ai_bot")
 app = Flask(__name__)
 app.config["VERSION"] = VERSION
 
+# Добавляем REACTOR_ENABLED в контекст шаблонов
+@app.context_processor
+def inject_config():
+    return {
+        'config': {
+            'REACTOR_ENABLED': REACTOR_ENABLED
+        }
+    }
+
 
 # 🔥 Фильтр для отображения иконок важности
 def importance_icon(value: float) -> str:
