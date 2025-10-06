@@ -135,6 +135,25 @@ class ReactorCore:
                 except Exception as e:
                     logger.error(f"Ошибка в обработчике события '{event_name}': {e}")
         
+        # PULSE-WS: Broadcast to WebSocket clients
+        try:
+            from routes.ws_routes import ws_broadcast
+            
+            # Create event data for WebSocket
+            ws_event_data = {
+                "type": event.name,
+                "data": event.data,
+                "source": event.source,
+                "timestamp": event.timestamp.isoformat(),
+                "id": event.id
+            }
+            
+            # Schedule WebSocket broadcast (non-blocking)
+            asyncio.create_task(ws_broadcast(ws_event_data))
+        except Exception as e:
+            # Don't fail the event emission if WebSocket broadcast fails
+            logger.debug(f"PULSE-WS: WebSocket broadcast failed: {e}")
+        
         return event
     
     def emit_sync(self, event_name: str, **data) -> ReactorEvent:
@@ -164,6 +183,30 @@ class ReactorCore:
                         callback(event)
                 except Exception as e:
                     logger.error(f"Ошибка в синхронном обработчике события '{event_name}': {e}")
+        
+        # PULSE-WS: Broadcast to WebSocket clients (sync version)
+        try:
+            from routes.ws_routes import ws_broadcast
+            import asyncio
+            
+            # Create event data for WebSocket
+            ws_event_data = {
+                "type": event.name,
+                "data": event.data,
+                "source": event.source,
+                "timestamp": event.timestamp.isoformat(),
+                "id": event.id
+            }
+            
+            # Schedule WebSocket broadcast in event loop
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                asyncio.create_task(ws_broadcast(ws_event_data))
+            else:
+                loop.run_until_complete(ws_broadcast(ws_event_data))
+        except Exception as e:
+            # Don't fail the event emission if WebSocket broadcast fails
+            logger.debug(f"PULSE-WS: WebSocket broadcast failed (sync): {e}")
         
         return event
     
