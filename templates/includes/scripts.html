@@ -62,6 +62,38 @@ function setupPollingFallback() {
     }, 60000);
 }
 
+// PULSE: Theme Management
+function toggleTheme() {
+    if (window.PulseAI && window.PulseAI.theme) {
+        const newTheme = window.PulseAI.theme.toggle();
+        console.log(`Тема переключена на: ${newTheme}`);
+        updateThemeIcon(newTheme);
+    }
+}
+
+function updateThemeIcon(theme) {
+    const lightIcon = document.querySelector('.theme-icon-light');
+    const darkIcon = document.querySelector('.theme-icon-dark');
+    
+    if (lightIcon && darkIcon) {
+        if (theme === 'dark') {
+            lightIcon.style.display = 'none';
+            darkIcon.style.display = 'block';
+        } else {
+            lightIcon.style.display = 'block';
+            darkIcon.style.display = 'none';
+        }
+    }
+}
+
+// Инициализация иконок темы
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.PulseAI && window.PulseAI.theme) {
+        const currentTheme = window.PulseAI.theme.get();
+        updateThemeIcon(currentTheme);
+    }
+});
+
 // Fallback функции для обновления UI
 function updateMetricsFallback(data) {
     const elements = document.querySelectorAll('[data-reactor="metrics"]');
