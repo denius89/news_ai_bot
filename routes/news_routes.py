@@ -109,11 +109,7 @@ def api_latest_news():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # --- WebApp Dashboard ---
-@news_bp.route("/webapp")
-def webapp():
-    """WebApp Dashboard with tabs for subscriptions, notifications, and calendar."""
-    logger.info("📱 WebApp dashboard accessed")
-    return render_template("webapp.html")
+# Moved to webapp_routes.py to avoid conflicts
 
 
 __all__ = ["news_bp"]
