@@ -62,9 +62,7 @@ async def test_services_layer():
         # Тест асинхронного сервиса дайджестов
         async_digest = get_async_digest_service()
         async_digest_text = await async_digest.async_build_daily_digest(limit=3)
-        logger.info(
-            f"✅ Async Digest Service: сгенерирован дайджест ({len(async_digest_text)} символов)"
-        )
+        logger.info(f"✅ Async Digest Service: сгенерирован дайджест ({len(async_digest_text)} символов)")
 
         # Тест AI дайджеста
         ai_digest = sync_digest.build_ai_digest(category="crypto", style="analytical", limit=3)
@@ -239,16 +237,12 @@ async def test_error_handling():
         # Тест обработки несуществующих данных
         sync_db = get_sync_service()
         empty_news = sync_db.get_latest_news(categories=["nonexistent"], limit=1)
-        logger.info(
-            f"✅ Error Handling: корректно обработана пустая выборка ({len(empty_news)} новостей)"
-        )
+        logger.info(f"✅ Error Handling: корректно обработана пустая выборка ({len(empty_news)} новостей)")
 
         # Тест обработки несуществующих пользователей
         subscription_service = get_async_subscription_service()
         empty_subscriptions = await subscription_service.get_user_subscriptions(999999)
-        logger.info(
-            f"✅ Error Handling: корректно обработаны пустые подписки ({empty_subscriptions})"
-        )
+        logger.info(f"✅ Error Handling: корректно обработаны пустые подписки ({empty_subscriptions})")
 
         return True
 

@@ -68,7 +68,7 @@ class TestOptimizedHTTPClient:
     @pytest.mark.asyncio
     async def test_get_with_cache(self, client):
         """Test GET request with caching."""
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock successful response
             mock_response = AsyncMock()
             mock_response.status = 200
@@ -88,7 +88,7 @@ class TestOptimizedHTTPClient:
     @pytest.mark.asyncio
     async def test_get_error_handling(self, client):
         """Test GET request error handling."""
-        with patch.object(client.session, 'get') as mock_get:
+        with patch.object(client.session, "get") as mock_get:
             # Mock failed response
             mock_response = AsyncMock()
             mock_response.status = 404
@@ -99,7 +99,7 @@ class TestOptimizedHTTPClient:
 
     def test_get_sync(self, client):
         """Test sync GET request."""
-        with patch.object(client.sync_client, 'get') as mock_get:
+        with patch.object(client.sync_client, "get") as mock_get:
             # Mock successful response
             mock_response = Mock()
             mock_response.status_code = 200
@@ -112,7 +112,7 @@ class TestOptimizedHTTPClient:
     @pytest.mark.asyncio
     async def test_post(self, client):
         """Test POST request."""
-        with patch.object(client.session, 'post') as mock_post:
+        with patch.object(client.session, "post") as mock_post:
             # Mock successful response
             mock_response = AsyncMock()
             mock_response.status = 200
@@ -124,7 +124,7 @@ class TestOptimizedHTTPClient:
 
     def test_post_sync(self, client):
         """Test sync POST request."""
-        with patch.object(client.sync_client, 'post') as mock_post:
+        with patch.object(client.sync_client, "post") as mock_post:
             # Mock successful response
             mock_response = Mock()
             mock_response.status_code = 200

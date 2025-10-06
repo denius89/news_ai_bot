@@ -78,7 +78,7 @@ def format_news(news: list[dict], limit: int = 5, min_importance: float = 0.4) -
         summary = _short(item.get("content") or item.get("summary") or "", 260)
         summary = escape(summary)
 
-        title_line = f"<b>{i}. <a href=\"{escape(link)}\">{title}</a></b>"
+        title_line = f'<b>{i}. <a href="{escape(link)}">{title}</a></b>'
 
         if summary:
             lines.append(
@@ -162,6 +162,6 @@ def format_digest_ai(summary: str, news: list[dict] | None = None, limit: int = 
             title_raw = (item.get("title") or item.get("source") or "Untitled").strip()
             title = escape(title_raw)
             link = escape(item.get("link") or "")
-            lines.append(f"{i}. <a href=\"{link}\">{title}</a>")
+            lines.append(f'{i}. <a href="{link}">{title}</a>')
 
     return _clamp_tg("\n".join(lines))

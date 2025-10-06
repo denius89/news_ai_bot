@@ -40,7 +40,7 @@ async def test_progress_animation_basic(mock_callback_query):
     animation = ProgressAnimation(mock_callback_query)
 
     # Mock the sleep to speed up test
-    with patch('asyncio.sleep', new_callable=AsyncMock):
+    with patch("asyncio.sleep", new_callable=AsyncMock):
         await animation.show_generation_progress(steps, progress_bar=True, interval=0.1)
 
     # Verify that edit_text was called for each step
@@ -62,7 +62,7 @@ async def test_progress_animation_without_bar(mock_callback_query):
 
     animation = ProgressAnimation(mock_callback_query)
 
-    with patch('asyncio.sleep', new_callable=AsyncMock):
+    with patch("asyncio.sleep", new_callable=AsyncMock):
         await animation.show_generation_progress(steps, progress_bar=False, interval=0.1)
 
     # Check that progress bar was not included
@@ -90,7 +90,7 @@ async def test_progress_animation_stop(mock_callback_query):
         return
 
     # Start animation with mocked sleep
-    with patch('asyncio.sleep', side_effect=mock_sleep):
+    with patch("asyncio.sleep", side_effect=mock_sleep):
         await animation.show_generation_progress(steps, interval=0.1)
 
     # Should have called edit_text for first step only
@@ -139,7 +139,7 @@ def test_build_progress_text():
 @pytest.mark.asyncio
 async def test_show_generation_progress_convenience(mock_callback_query):
     """Test the convenience function."""
-    with patch('asyncio.sleep', new_callable=AsyncMock):
+    with patch("asyncio.sleep", new_callable=AsyncMock):
         animation = await show_generation_progress(mock_callback_query, interval=0.1)
 
         # Wait a bit for the background task to start
@@ -179,7 +179,7 @@ async def test_telegram_bad_request_handling(mock_callback_query):
     animation = ProgressAnimation(mock_callback_query)
 
     # Should not raise exception
-    with patch('asyncio.sleep', new_callable=AsyncMock):
+    with patch("asyncio.sleep", new_callable=AsyncMock):
         await animation.show_generation_progress(steps, interval=0.1)
 
     # Should have attempted to call edit_text
@@ -196,7 +196,7 @@ async def test_progress_animation_error_handling(mock_callback_query):
     animation = ProgressAnimation(mock_callback_query)
 
     # Should not raise exception
-    with patch('asyncio.sleep', new_callable=AsyncMock):
+    with patch("asyncio.sleep", new_callable=AsyncMock):
         await animation.show_generation_progress(steps, interval=0.1)
 
     # Should have attempted to call edit_text

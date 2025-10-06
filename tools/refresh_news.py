@@ -19,9 +19,7 @@ from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
 
 # Настройка логирования
-logging.basicConfig(
-    level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -83,16 +81,16 @@ def load_news_from_sources(target_count=500):
 
                     # Подготавливаем данные для вставки
                     news_data = {
-                        'uid': item['uid'],
-                        'title': item.get('title', ''),
-                        'link': item.get('link', ''),
-                        'published_at': item.get('published_at'),
-                        'content': item.get('content', ''),
-                        'credibility': credibility,
-                        'importance': importance,
-                        'source': source_name,
-                        'category': category,
-                        'subcategory': subcategory,
+                        "uid": item["uid"],
+                        "title": item.get("title", ""),
+                        "link": item.get("link", ""),
+                        "published_at": item.get("published_at"),
+                        "content": item.get("content", ""),
+                        "credibility": credibility,
+                        "importance": importance,
+                        "source": source_name,
+                        "category": category,
+                        "subcategory": subcategory,
                     }
 
                     # Вставляем в базу данных

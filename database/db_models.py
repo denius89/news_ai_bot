@@ -30,9 +30,7 @@ if SUPABASE_URL and SUPABASE_KEY:
     except Exception as e:
         logger.error("❌ Ошибка инициализации Supabase: %s", e)
 else:
-    logger.warning(
-        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
-    )
+    logger.warning("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
 
 
 # --- SAFE EXECUTE (ретраи) ---
@@ -82,11 +80,11 @@ def parse_datetime_from_row(value: Union[str, datetime, None]) -> Optional[datet
     if isinstance(value, str):
         try:
             # Попробуем ISO формат
-            if 'T' in value or '+' in value or value.endswith('Z'):
-                return datetime.fromisoformat(value.replace('Z', '+00:00'))
+            if "T" in value or "+" in value or value.endswith("Z"):
+                return datetime.fromisoformat(value.replace("Z", "+00:00"))
             # Попробуем простой формат даты
-            elif len(value) == 10 and value.count('-') == 2:
-                return datetime.fromisoformat(value + 'T00:00:00+00:00')
+            elif len(value) == 10 and value.count("-") == 2:
+                return datetime.fromisoformat(value + "T00:00:00+00:00")
             # Fallback к текущему времени
             else:
                 logger.warning(f"Не удалось распарсить дату: {value}")
@@ -141,14 +139,8 @@ def upsert_news(items: List[Dict]):
 
             enriched = enrich_news_with_ai(item)
 
-            title = (
-                (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
-            )
-            content = (
-                (enriched.get("content") or "").strip()
-                or (enriched.get("summary") or "").strip()
-                or title
-            )
+            title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
+            content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
             uid = make_uid(enriched.get("url", ""), title)
 
             row = {
@@ -156,8 +148,7 @@ def upsert_news(items: List[Dict]):
                 "title": title[:512],
                 "content": content,
                 "link": enriched.get("url"),
-                "published_at": ensure_utc_iso(enriched.get("published_at"))
-                or datetime.now(timezone.utc).isoformat(),
+                "published_at": ensure_utc_iso(enriched.get("published_at")) or datetime.now(timezone.utc).isoformat(),
                 "source": enriched.get("source"),
                 "category": (enriched.get("category") or "").lower() or None,
                 "credibility": enriched.get("credibility"),
@@ -246,9 +237,7 @@ def get_latest_events(limit: int = 10) -> List[Dict]:
 
     query = (
         supabase.table("events")
-        .select(
-            "event_time, country, country_code, currency, title, importance, fact, forecast, previous, source"
-        )
+        .select("event_time, country, country_code, currency, title, importance, fact, forecast, previous, source")
         .order("event_time", desc=False)
         .limit(limit)
     )
@@ -282,9 +271,7 @@ def get_latest_news(
 
     query = (
         supabase.table("news")
-        .select(
-            "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
-        )
+        .select("id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance")
         .order("published_at", desc=True)
         .limit(limit)
     )
@@ -312,9 +299,7 @@ def get_latest_news(
 # --- USER MANAGEMENT FUNCTIONS ---
 
 
-def upsert_user_by_telegram(
-    telegram_id: int, username: str | None = None, locale: str = 'ru'
-) -> str:
+def upsert_user_by_telegram(telegram_id: int, username: str | None = None, locale: str = "ru") -> str:
     """
     Создает или обновляет пользователя по Telegram ID.
 
@@ -332,9 +317,7 @@ def upsert_user_by_telegram(
 
     try:
         # Сначала пытаемся найти существующего пользователя
-        existing_user = (
-            supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
-        )
+        existing_user = supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
 
         if existing_user.data:
             user_id = existing_user.data[0]["id"]
@@ -403,11 +386,7 @@ def add_subscription(user_id: str, category: str) -> bool:
         return False
 
     try:
-        result = (
-            supabase.table("subscriptions")
-            .insert({"user_id": user_id, "category": category})
-            .execute()
-        )
+        result = supabase.table("subscriptions").insert({"user_id": user_id, "category": category}).execute()
 
         if result.data:
             logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
@@ -437,13 +416,7 @@ def remove_subscription(user_id: str, category: str) -> int:
         return 0
 
     try:
-        result = (
-            supabase.table("subscriptions")
-            .delete()
-            .eq("user_id", user_id)
-            .eq("category", category)
-            .execute()
-        )
+        result = supabase.table("subscriptions").delete().eq("user_id", user_id).eq("category", category).execute()
 
         deleted_count = len(result.data) if result.data else 0
         if deleted_count > 0:
@@ -482,8 +455,8 @@ def list_subscriptions(user_id: str) -> list[dict]:
 
 def upsert_notification(
     user_id: str,
-    type_: str = 'digest',
-    frequency: str = 'daily',
+    type_: str = "digest",
+    frequency: str = "daily",
     enabled: bool = True,
     preferred_hour: int = 9,
 ) -> None:
@@ -553,9 +526,7 @@ def list_notifications(user_id: str) -> list[dict]:
 # --- USER NOTIFICATIONS FUNCTIONS ---
 
 
-def get_user_notifications(
-    user_id: Union[int, str], limit: int = 50, offset: int = 0
-) -> List[Dict]:
+def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: int = 0) -> List[Dict]:
     """
     Получает уведомления пользователя.
 
@@ -633,9 +604,7 @@ def create_user_notification(
 
         if result.data and len(result.data) > 0:
             notification_id = result.data[0].get("id")
-            logger.info(
-                f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}"
-            )
+            logger.info(f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}")
             return str(notification_id)
         else:
             logger.error(f"❌ Не удалось создать уведомление для user_id={user_id}")
@@ -662,9 +631,7 @@ def mark_notification_read(user_id: Union[int, str], notification_id: Union[int,
         return False
 
     try:
-        logger.info(
-            "Marking notification as read: user_id=%s, notification_id=%s", user_id, notification_id
-        )
+        logger.info("Marking notification as read: user_id=%s, notification_id=%s", user_id, notification_id)
         result = (
             supabase.table("user_notifications")
             .update({"read": True})

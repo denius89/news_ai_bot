@@ -41,7 +41,7 @@ def test_subscriptions_router():
         from telegram_bot.handlers import subscriptions
 
         # Check that router exists
-        assert hasattr(subscriptions, 'router')
+        assert hasattr(subscriptions, "router")
         assert subscriptions.router is not None
 
         print("✅ Subscriptions роутер найден")
@@ -63,7 +63,7 @@ def test_all_handlers():
         # Check that all modules have router attribute
         modules = [start, digest, digest_ai, events, subscriptions]
         for module in modules:
-            assert hasattr(module, 'router'), f"Модуль {module.__name__} не имеет router"
+            assert hasattr(module, "router"), f"Модуль {module.__name__} не имеет router"
             assert module.router is not None, f"Router в {module.__name__} равен None"
 
         print("✅ Все обработчики имеют роутеры")

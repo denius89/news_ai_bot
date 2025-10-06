@@ -27,7 +27,7 @@ class TestSourcesYAML:
         """Проверяет, что YAML файл валиден"""
         sources_file = Path(__file__).parent.parent / "config" / "sources.yaml"
 
-        with open(sources_file, 'r', encoding='utf-8') as f:
+        with open(sources_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         assert data is not None
@@ -42,7 +42,7 @@ class TestSourcesYAML:
         assert isinstance(categories, list)
 
         # Проверяем, что есть основные категории
-        expected_categories = ['crypto', 'sports', 'markets', 'tech', 'world']
+        expected_categories = ["crypto", "sports", "markets", "tech", "world"]
         for category in expected_categories:
             assert category in categories
 
@@ -55,9 +55,9 @@ class TestSourcesYAML:
 
             for subcategory, data in subcategories.items():
                 assert isinstance(data, dict)
-                assert 'icon' in data
-                assert data['icon'] is not None
-                assert len(data['icon']) > 0
+                assert "icon" in data
+                assert data["icon"] is not None
+                assert len(data["icon"]) > 0
 
     def test_subcategories_have_sources(self):
         """Проверяет, что у каждой подкатегории есть источники"""
@@ -65,17 +65,17 @@ class TestSourcesYAML:
 
         for category, subcategories in structure.items():
             for subcategory, data in subcategories.items():
-                assert 'sources' in data
-                assert isinstance(data['sources'], list)
-                assert len(data['sources']) > 0
+                assert "sources" in data
+                assert isinstance(data["sources"], list)
+                assert len(data["sources"]) > 0
 
                 # Проверяем структуру источников
-                for source in data['sources']:
+                for source in data["sources"]:
                     assert isinstance(source, dict)
-                    assert 'name' in source
-                    assert 'url' in source
-                    assert len(source['name']) > 0
-                    assert len(source['url']) > 0
+                    assert "name" in source
+                    assert "url" in source
+                    assert len(source["name"]) > 0
+                    assert len(source["url"]) > 0
 
 
 class TestCategoriesService:
@@ -132,8 +132,8 @@ class TestCategoriesService:
                 assert len(sources) > 0
 
                 for source in sources:
-                    assert 'name' in source
-                    assert 'url' in source
+                    assert "name" in source
+                    assert "url" in source
 
     def test_get_all_sources(self):
         """Тест функции get_all_sources"""
@@ -176,15 +176,15 @@ class TestCategoriesService:
         stats = get_statistics()
 
         assert isinstance(stats, dict)
-        assert 'categories' in stats
-        assert 'subcategories' in stats
-        assert 'sources' in stats
-        assert 'avg_sources_per_subcategory' in stats
+        assert "categories" in stats
+        assert "subcategories" in stats
+        assert "sources" in stats
+        assert "avg_sources_per_subcategory" in stats
 
-        assert stats['categories'] > 0
-        assert stats['subcategories'] > 0
-        assert stats['sources'] > 0
-        assert stats['avg_sources_per_subcategory'] > 0
+        assert stats["categories"] > 0
+        assert stats["subcategories"] > 0
+        assert stats["sources"] > 0
+        assert stats["avg_sources_per_subcategory"] > 0
 
     def test_get_emoji_icon(self):
         """Тест функции get_emoji_icon"""
@@ -256,45 +256,45 @@ class TestWebAppAPI:
         """Flask test client"""
         from webapp import app
 
-        app.config['TESTING'] = True
+        app.config["TESTING"] = True
         with app.test_client() as client:
             yield client
 
     def test_categories_api(self, client):
         """Смоук-тест API /categories"""
-        response = client.get('/api/categories')
+        response = client.get("/api/categories")
 
         assert response.status_code == 200
 
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert 'data' in data
-        assert 'total_categories' in data
-        assert 'total_subcategories' in data
+        assert data["status"] == "success"
+        assert "data" in data
+        assert "total_categories" in data
+        assert "total_subcategories" in data
 
         # Проверяем структуру данных
-        categories_data = data['data']
+        categories_data = data["data"]
         assert isinstance(categories_data, dict)
         assert len(categories_data) > 0
 
         for category_id, category_data in categories_data.items():
-            assert 'name' in category_data
-            assert 'icon' in category_data
-            assert 'subcategories' in category_data
-            assert isinstance(category_data['subcategories'], dict)
+            assert "name" in category_data
+            assert "icon" in category_data
+            assert "subcategories" in category_data
+            assert isinstance(category_data["subcategories"], dict)
 
     def test_categories_validate_api(self, client):
         """Смоук-тест API /categories/validate"""
-        response = client.get('/api/categories/validate')
+        response = client.get("/api/categories/validate")
 
         assert response.status_code == 200
 
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert 'valid' in data
-        assert 'errors' in data
-        assert isinstance(data['valid'], bool)
-        assert isinstance(data['errors'], list)
+        assert data["status"] == "success"
+        assert "valid" in data
+        assert "errors" in data
+        assert isinstance(data["valid"], bool)
+        assert isinstance(data["errors"], list)
 
 
 class TestDatabaseIntegration:
@@ -306,15 +306,15 @@ class TestDatabaseIntegration:
 
         # Проверяем, что функции принимают subcategory
         # Это косвенная проверка того, что код обновлен
-        assert hasattr(db_models, 'upsert_news')
+        assert hasattr(db_models, "upsert_news")
 
     def test_parsers_use_categories_service(self):
         """Проверяет, что парсеры используют services/categories"""
         from parsers import rss_parser
 
         # Проверяем, что функция load_sources существует и использует новый сервис
-        assert hasattr(rss_parser, 'load_sources')
-        assert hasattr(rss_parser, 'parse_source')
+        assert hasattr(rss_parser, "load_sources")
+        assert hasattr(rss_parser, "parse_source")
 
 
 if __name__ == "__main__":

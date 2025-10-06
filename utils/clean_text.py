@@ -61,9 +61,7 @@ def clean_for_telegram(text: str) -> str:
         tag.unwrap()
 
     # Удаляем ненужные контейнеры
-    for tag in soup.find_all(
-        ["html", "head", "body", "meta", "title", "div", "span", "script", "style"]
-    ):
+    for tag in soup.find_all(["html", "head", "body", "meta", "title", "div", "span", "script", "style"]):
         tag.decompose()  # используем decompose() вместо unwrap() для полного удаления
 
     # Чистим атрибуты, кроме href у <a>

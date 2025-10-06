@@ -45,7 +45,7 @@ async def test_build_digest_happy_path():
     service = DigestAIService(config)
 
     # Мокаем AI вызов, чтобы вернуть предсказуемый результат
-    with patch.object(service, '_llm_summarize') as mock_llm:
+    with patch.object(service, "_llm_summarize") as mock_llm:
         mock_llm.return_value = (
             "📰 <b>Сводка новостей</b>\n\nАнализ рынка показывает...\n\n"
             "<b>Почему это важно:</b>\n1. Влияет на инвестиции\n2. Важно для трейдеров"
@@ -103,10 +103,9 @@ async def test_build_digest_many_news():
     service = DigestAIService(config)
 
     # Мокаем AI вызов
-    with patch.object(service, '_llm_summarize') as mock_llm:
+    with patch.object(service, "_llm_summarize") as mock_llm:
         mock_llm.return_value = (
-            "📰 <b>Сводка новостей</b>\n\nАнализ показывает...\n\n"
-            "<b>Почему это важно:</b>\n1. Важно для рынка"
+            "📰 <b>Сводка новостей</b>\n\nАнализ показывает...\n\n" "<b>Почему это важно:</b>\n1. Важно для рынка"
         )
 
         result = await service.build_digest(news_items, "analytical")
@@ -142,7 +141,7 @@ async def test_build_digest_fallback_mode():
     config = DigestConfig(max_items=8, include_fallback=True)
     service = DigestAIService(config)
 
-    with patch.object(service, '_openai_available', False):
+    with patch.object(service, "_openai_available", False):
         result = await service.build_digest(news_items, "analytical")
 
         # Проверяем fallback результат
@@ -176,7 +175,7 @@ async def test_generate_digest_with_news(monkeypatch):
     async def mock_generate_digest(limit=10, category=None, ai=False, style="analytical"):
         if ai:
             return "AI DIGEST: Test AI content"
-        return "📰 <b>Дайджест новостей:</b>\n\n<b>1. <a href=\"http://example.com/1\">News 1</a></b>\n<b>2. News 2</b>"
+        return '📰 <b>Дайджест новостей:</b>\n\n<b>1. <a href="http://example.com/1">News 1</a></b>\n<b>2. News 2</b>'
 
     monkeypatch.setattr(generator, "generate_digest", mock_generate_digest)
 

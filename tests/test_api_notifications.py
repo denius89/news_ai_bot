@@ -11,7 +11,7 @@ from webapp import app
 @pytest.fixture
 def client():
     """Flask test client."""
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
 
@@ -21,94 +21,94 @@ class TestNotificationsAPI:
 
     def test_get_notifications_missing_user_id(self, client):
         """Test GET /api/notifications without user_id parameter."""
-        response = client.get('/api/notifications')
+        response = client.get("/api/notifications")
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'user_id parameter is required' in data['message']
+        assert data["status"] == "error"
+        assert "user_id parameter is required" in data["message"]
 
-    @patch('routes.api_routes.list_notifications')
+    @patch("routes.api_routes.list_notifications")
     def test_get_notifications_success(self, mock_get_notifications, client):
         """Test successful GET /api/notifications."""
         # Mock database response
         mock_get_notifications.return_value = [
             {
-                'id': 'notif-1',
-                'title': 'Test Notification',
-                'message': 'Test message',
-                'category': 'crypto',
-                'read': False,
-                'created_at': '2025-10-02T10:00:00Z',
+                "id": "notif-1",
+                "title": "Test Notification",
+                "message": "Test message",
+                "category": "crypto",
+                "read": False,
+                "created_at": "2025-10-02T10:00:00Z",
             },
             {
-                'id': 'notif-2',
-                'title': 'Read Notification',
-                'message': 'Already read',
-                'category': 'economy',
-                'read': True,
-                'created_at': '2025-10-01T10:00:00Z',
+                "id": "notif-2",
+                "title": "Read Notification",
+                "message": "Already read",
+                "category": "economy",
+                "read": True,
+                "created_at": "2025-10-01T10:00:00Z",
             },
         ]
 
-        response = client.get('/api/notifications?user_id=test-user-123')
+        response = client.get("/api/notifications?user_id=test-user-123")
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert 'notifications' in data['data']
-        assert data['data']['total_count'] == 2
-        assert data['data']['unread_count'] == 1
+        assert data["status"] == "success"
+        assert "notifications" in data["data"]
+        assert data["data"]["total_count"] == 2
+        assert data["data"]["unread_count"] == 1
 
-    @patch('routes.api_routes.list_notifications')
+    @patch("routes.api_routes.list_notifications")
     def test_get_notifications_empty(self, mock_get_notifications, client):
         """Test GET /api/notifications with no notifications."""
         mock_get_notifications.return_value = []
 
-        response = client.get('/api/notifications?user_id=test-user-123')
+        response = client.get("/api/notifications?user_id=test-user-123")
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert data['data']['notifications'] == []
-        assert data['data']['total_count'] == 0
-        assert data['data']['unread_count'] == 0
+        assert data["status"] == "success"
+        assert data["data"]["notifications"] == []
+        assert data["data"]["total_count"] == 0
+        assert data["data"]["unread_count"] == 0
 
-    @patch('routes.api_routes.list_notifications')
+    @patch("routes.api_routes.list_notifications")
     def test_get_notifications_error(self, mock_get_notifications, client):
         """Test GET /api/notifications with database error."""
         mock_get_notifications.side_effect = Exception("Database error")
 
-        response = client.get('/api/notifications?user_id=test-user-123')
+        response = client.get("/api/notifications?user_id=test-user-123")
         # API should return success with empty data on error (graceful degradation)
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert data['data']['notifications'] == []
+        assert data["status"] == "success"
+        assert data["data"]["notifications"] == []
 
     def test_mark_notification_read_not_implemented(self, client):
         """Test marking notification as read (not implemented yet)."""
         response = client.post(
-            '/api/notifications/mark-read',
-            json={'user_id': 'test-user-123', 'notification_id': 'notif-1'},
+            "/api/notifications/mark-read",
+            json={"user_id": "test-user-123", "notification_id": "notif-1"},
         )
         assert response.status_code == 501
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'Use /api/user_notifications/mark_read instead' in data['message']
+        assert data["status"] == "error"
+        assert "Use /api/user_notifications/mark_read instead" in data["message"]
 
     def test_get_notification_settings_not_implemented(self, client):
         """Test getting notification settings (not implemented yet)."""
-        response = client.get('/api/notification-settings?user_id=test-user-123')
+        response = client.get("/api/notification-settings?user_id=test-user-123")
         assert response.status_code == 501
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'Not implemented yet' in data['message']
+        assert data["status"] == "error"
+        assert "Not implemented yet" in data["message"]
 
     def test_update_notification_settings_not_implemented(self, client):
         """Test updating notification settings (not implemented yet)."""
         response = client.post(
-            '/api/notification-settings/update',
-            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': True},
+            "/api/notification-settings/update",
+            json={"user_id": "test-user-123", "category": "crypto", "enabled": True},
         )
         assert response.status_code == 501
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'Not implemented yet' in data['message']
+        assert data["status"] == "error"
+        assert "Not implemented yet" in data["message"]

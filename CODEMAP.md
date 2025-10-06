@@ -1,6 +1,6 @@
 # 📂 Project Structure
 
-_Generated on 2025-10-06 06:55:02 UTC_
+_Generated on 2025-10-06 10:25:30 UTC_
 
 ```
 ├── .github/
@@ -33,19 +33,42 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   └── settings.json
 ├── ai_modules/
 │   ├── __init__.py
+│   ├── adaptive_thresholds.py
+│   ├── auto_rule_manager.py
+│   ├── cache.py
 │   ├── credibility.py
-│   └── importance.py
+│   ├── event_context.py
+│   ├── event_forecast.py
+│   ├── event_generator.py
+│   ├── importance.py
+│   ├── local_predictor.py
+│   ├── metrics.py
+│   ├── optimized_credibility.py
+│   ├── optimized_importance.py
+│   ├── prefilter.py
+│   ├── rejection_analyzer.py
+│   ├── self_tuning_collector.py
+│   ├── self_tuning_trainer.py
+│   └── teaser_generator.py
 ├── config/
 │   ├── __init__.py
+│   ├── ai_optimization.yaml
+│   ├── app.yaml
 │   ├── constants.py
 │   ├── icons_map.json
 │   ├── logging.yaml
+│   ├── prefilter_rules.yaml
+│   ├── prefilter_rules_backup_20251006_101532.yaml
 │   ├── settings.py
 │   ├── sources.backup.20251005.yaml
 │   ├── sources.backup.before_distribute.20251005_182653.yaml
 │   ├── sources.backup.merged.yaml
 │   ├── sources.backup.smart_distribute.20251005_182824.yaml
 │   └── sources.yaml
+├── data/
+│   ├── dataset_report.json
+│   ├── pulseai_dataset.csv
+│   └── self_tuning_dataset.csv
 ├── database/
 │   ├── migrations/
 │   │   ├── 2025_01_04_add_subcategory_field.sql
@@ -61,6 +84,7 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── async_db_models.py
 │   ├── create_user_notifications_table.sql
 │   ├── db_models.py
+│   ├── events_service.py
 │   ├── init_tables.sql
 │   ├── MIGRATION_INSTRUCTIONS.md
 │   ├── seed_data.sql
@@ -75,6 +99,7 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── generator.py
 │   └── prompts.py
 ├── docs/
+│   ├── AI_OPTIMIZATION.md
 │   ├── ARCHITECTURE.md
 │   ├── COMMUNICATION.md
 │   ├── DATABASE_MAINTENANCE.md
@@ -83,16 +108,28 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── PARSERS.md
 │   ├── SOURCES.md
 │   └── VISION.md
+├── events/
+│   ├── providers/
+│   │   ├── __init__.py
+│   │   ├── coinmarketcal.py
+│   │   ├── espn.py
+│   │   └── investing.py
+│   ├── __init__.py
+│   └── events_parser.py
 ├── examples/
 │   └── telegram_sender_example.py
 ├── logs/
 ├── models/
 │   ├── event.py
+│   ├── local_predictor_credibility.pkl
+│   ├── local_predictor_importance.pkl
+│   ├── local_predictor_meta.json
 │   └── news.py
 ├── parsers/
 │   ├── __init__.py
 │   ├── advanced_parser.py
 │   ├── events_parser.py
+│   ├── optimized_parser.py
 │   ├── rss_parser.py
 │   └── unified_parser.py
 ├── repositories/
@@ -100,7 +137,10 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   └── news_repository.py
 ├── routes/
 │   ├── __init__.py
+│   ├── analytics_routes.py
 │   ├── api_routes.py
+│   ├── events_routes.py
+│   ├── metrics_routes.py
 │   ├── news_routes.py
 │   ├── subscriptions.py
 │   └── webapp_routes.py
@@ -112,6 +152,7 @@ _Generated on 2025-10-06 06:55:02 UTC_
 ├── services/
 │   ├── __init__.py
 │   ├── categories.py
+│   ├── event_intelligence_service.py
 │   ├── notification_service.py
 │   ├── subscription_service.py
 │   └── unified_digest_service.py
@@ -139,15 +180,22 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   │   ├── dashboard.py
 │   │   ├── digest.py
 │   │   ├── digest_ai.py
+│   │   ├── digest_handler.py
 │   │   ├── events.py
 │   │   ├── notifications.py
+│   │   ├── review_handler.py
 │   │   ├── start.py
 │   │   └── subscriptions.py
+│   ├── services/
+│   │   ├── content_scheduler.py
+│   │   ├── feedback_tracker.py
+│   │   └── post_selector.py
 │   ├── __init__.py
 │   ├── bot.py
 │   └── keyboards.py
 ├── templates/
 │   ├── base.html
+│   ├── calendar.html
 │   ├── digest.html
 │   ├── events.html
 │   ├── index.html
@@ -155,12 +203,15 @@ _Generated on 2025-10-06 06:55:02 UTC_
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py
+│   ├── test_adaptive_thresholds_ttl.py
 │   ├── test_advanced_parser.py
 │   ├── test_ai_modules.py
+│   ├── test_ai_optimization.py
 │   ├── test_ai_service.py
 │   ├── test_ai_summary.py
 │   ├── test_api_notifications.py
 │   ├── test_api_subscriptions.py
+│   ├── test_auto_learning.py
 │   ├── test_bot_routers.py
 │   ├── test_cache.py
 │   ├── test_clean_text.py
@@ -182,6 +233,7 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── test_main_import.py
 │   ├── test_news_repository.py
 │   ├── test_openai.py
+│   ├── test_optimization_integration.py
 │   ├── test_parsers.py
 │   ├── test_progress_animation.py
 │   ├── test_routes.py
@@ -193,9 +245,15 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── test_user_notifications.py
 │   └── test_webapp.py
 ├── tools/
+│   ├── analyze_rejections.py
+│   ├── build_baseline_dataset.py
+│   ├── check_all_sources.py
 │   ├── clean_old_news.py
 │   ├── distribute_sources.py
+│   ├── fetch_and_store_events.py
 │   ├── fetch_and_store_news.py
+│   ├── fetch_loop.py
+│   ├── fetch_optimized.py
 │   ├── fill_ai_analysis_all.py
 │   ├── load_fresh_news.py
 │   ├── merge_sources.py
@@ -206,6 +264,7 @@ _Generated on 2025-10-06 06:55:02 UTC_
 │   ├── send_daily_digests.py
 │   ├── smart_distribute_sources.py
 │   ├── test_advanced_parser.py
+│   ├── train_self_tuning.py
 │   ├── update_news_with_universal_parser.py
 │   ├── update_rss_sources.py
 │   └── validate_rss_sources.py
@@ -227,8 +286,12 @@ _Generated on 2025-10-06 06:55:02 UTC_
 ├── .htmlhintrc
 ├── .pre-commit-config.yaml
 ├── .safety-ignore
+├── ADAPTIVE_THRESHOLDS_TTL_REPORT.md
+├── AI_OPTIMIZATION_REPORT.md
+├── AUTO_LEARNING_FILTER_REPORT.md
 ├── CODEMAP.md
 ├── CONTRIBUTING.md
+├── DAY13_FINAL_REPORT.md
 ├── LICENSE
 ├── main.py
 ├── Makefile
@@ -238,9 +301,21 @@ _Generated on 2025-10-06 06:55:02 UTC_
 ├── pytest.ini
 ├── README.md
 ├── requirements.txt
+├── SELF_TUNING_PREDICTOR_REPORT.md
 ├── setup.cfg
 ├── start_bot.sh
 ├── TASKS.md
+├── test_adaptive_ttl_quick.py
+├── test_auto_learning_quick.py
+├── test_autopublish_quick.py
+├── test_autopublish_simple.py
+├── test_baseline_dataset_quick.py
+├── test_day13_finalization.py
+├── test_event_intelligence_quick.py
+├── test_events_system_quick.py
 ├── test_global_system.py
+├── test_optimization_quick.py
+├── test_self_tuning_quick.py
+├── test_smart_posting_quick.py
 └── webapp.py
 ```

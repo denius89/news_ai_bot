@@ -1,0 +1,215 @@
+auto_generated:
+  deprecated_rules: []
+  importance_markers: {}
+  source_blacklist:
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685865+00:00'
+    samples_count: 50
+    source: cryptoblog.fake.io
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685870+00:00'
+    samples_count: 50
+    source: earnmoney.today
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685874+00:00'
+    samples_count: 50
+    source: spamcrypto.com
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685877+00:00'
+    samples_count: 50
+    source: spamtech.blog
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685881+00:00'
+    samples_count: 50
+    source: fake-tech.com
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685884+00:00'
+    samples_count: 50
+    source: sportsfake.news
+  - auto: true
+    confidence: 0.7142857142857142
+    created_at: '2025-10-06T08:15:32.685888+00:00'
+    samples_count: 50
+    source: spam-sports.io
+  stop_markers:
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685734+00:00'
+    samples_count: 250
+    word: click
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685775+00:00'
+    samples_count: 250
+    word: here
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685780+00:00'
+    samples_count: 150
+    word: free
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685784+00:00'
+    samples_count: 100
+    word: bitcoin
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685788+00:00'
+    samples_count: 100
+    word: giveaway
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685792+00:00'
+    samples_count: 100
+    word: software
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685795+00:00'
+    samples_count: 100
+    word: sports
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685803+00:00'
+    samples_count: 50
+    word: scam
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685807+00:00'
+    samples_count: 50
+    word: claim
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685812+00:00'
+    samples_count: 50
+    word: make
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685816+00:00'
+    samples_count: 50
+    word: money
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685819+00:00'
+    samples_count: 50
+    word: cryptocurrency
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685823+00:00'
+    samples_count: 50
+    word: trading
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685827+00:00'
+    samples_count: 50
+    word: signals
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685830+00:00'
+    samples_count: 50
+    word: now
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685833+00:00'
+    samples_count: 50
+    word: best
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685836+00:00'
+    samples_count: 50
+    word: antivirus
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685840+00:00'
+    samples_count: 50
+    word: '2025'
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685843+00:00'
+    samples_count: 50
+    word: download
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685847+00:00'
+    samples_count: 50
+    word: watch
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685850+00:00'
+    samples_count: 50
+    word: live
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685853+00:00'
+    samples_count: 50
+    word: streams
+  - auto: true
+    confidence: 1.0
+    created_at: '2025-10-06T08:15:32.685856+00:00'
+    samples_count: 50
+    word: streaming
+auto_learn_metadata:
+  last_analysis: '2025-10-06T08:15:32.686033+00:00'
+  last_backup: '2025-10-06T08:15:32.686052+00:00'
+  rules_added: 30
+  rules_removed: 0
+  total_runs: 1
+features:
+  auto_learn_backup_enabled: true
+  auto_learn_enabled: true
+  auto_learn_interval_days: 1
+  auto_learn_min_samples: 100
+importance_markers:
+  crypto:
+  - SEC
+  - MiCA
+  - lawsuit
+  - ETF approval
+  - regulation
+  - ban
+  - legal
+  markets:
+  - CPI
+  - NFP
+  - rate decision
+  - FOMC
+  - GDP
+  - inflation
+  sports:
+  - championship
+  - tournament
+  - record
+  - transfer
+  - contract
+  tech:
+  - release
+  - breach
+  - CVE
+  - LTS
+  - EOL
+  - security
+  - vulnerability
+  world:
+  - war
+  - conflict
+  - election
+  - government
+  - policy
+rejection_analysis:
+  frequency_threshold: 0.02
+  top_sources_limit: 20
+  top_words_limit: 50
+stop_markers:
+- opinion
+- advertorial
+- sponsored
+- how to buy
+- price prediction
+- click here
+- read more
+- advertisement

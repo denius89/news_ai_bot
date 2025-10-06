@@ -1,0 +1,183 @@
+# AI Optimization Configuration
+# Настройки для оптимизации AI-фильтрации
+
+# Feature flags
+features:
+  prefilter_enabled: true
+  cache_enabled: true
+  local_predictor_enabled: false  # По умолчанию выключен
+  adaptive_thresholds_enabled: true
+  cache_ttl_enabled: true
+  self_tuning_enabled: true
+  self_tuning_auto_train: true
+
+# Пороги
+thresholds:
+  ai_importance_threshold: 0.6
+  ai_credibility_threshold: 0.7
+  local_predictor_threshold: 0.5
+
+# Адаптивные пороги по категориям
+category_thresholds:
+  crypto: 
+    importance: 0.55
+    credibility: 0.65
+  markets: 
+    importance: 0.6
+    credibility: 0.7
+  tech: 
+    importance: 0.6
+    credibility: 0.7
+  sports: 
+    importance: 0.5
+    credibility: 0.6
+  world: 
+    importance: 0.7
+    credibility: 0.7
+
+# Пороги по умолчанию (если категория не найдена)
+default_thresholds:
+  importance: 0.6
+  credibility: 0.7
+
+# Таймауты (в миллисекундах)
+timeouts:
+  prefilter_max_ms: 10
+  cache_max_ms: 50
+  local_predictor_max_ms: 100
+
+# Предфильтр правила
+prefilter:
+  # Минимальная длина заголовка
+  min_title_words: 6
+  
+  # Стоп-маркеры для исключения
+  stop_markers:
+    - "opinion"
+    - "advertorial" 
+    - "sponsored"
+    - "how to buy"
+    - "price prediction"
+    - "click here"
+    - "read more"
+    - "advertisement"
+  
+  # Ключевые маркеры важности по категориям
+  importance_markers:
+    crypto:
+      - "SEC"
+      - "MiCA"
+      - "lawsuit"
+      - "ETF approval"
+      - "regulation"
+      - "ban"
+      - "legal"
+    markets:
+      - "CPI"
+      - "NFP"
+      - "rate decision"
+      - "FOMC"
+      - "GDP"
+      - "inflation"
+    tech:
+      - "release"
+      - "breach"
+      - "CVE"
+      - "LTS"
+      - "EOL"
+      - "security"
+      - "vulnerability"
+    world:
+      - "war"
+      - "conflict"
+      - "election"
+      - "government"
+      - "policy"
+    sports:
+      - "championship"
+      - "tournament"
+      - "record"
+      - "transfer"
+      - "contract"
+
+# Кэш настройки
+cache:
+  # TTL в днях (0 = без TTL)
+  ttl_days: 3
+  # TTL в секундах (для обратной совместимости)
+  ttl_seconds: 0
+  # Максимальный размер кэша
+  max_size: 10000
+  # Ключ для дедупликации
+  dedup_key_format: "{title_norm}|{link_norm}|{source}|{date_yyyy_mm_dd}"
+  # Частичное обновление кэша
+  partial_update: true
+
+# Локальный предиктор
+local_predictor:
+  # Тип модели: "rules" или "logistic"
+  model_type: "rules"
+  # Веса для правил
+  weights:
+    title_length: 0.2
+    source_reputation: 0.3
+    category_match: 0.2
+    keyword_match: 0.3
+
+# Self-tuning настройки
+self_tuning:
+  interval_days: 2
+  min_samples: 500
+  max_samples: 10000
+  model_type: "logreg"          # варианты: logreg | randomforest | lightgbm
+  replace_threshold: 0.01       # улучшение F1 минимум на 1%
+  backup_enabled: true
+
+# Dataset builder настройки
+dataset_builder:
+  external_sources:
+    fake_news: true
+    news_category: true
+    crypto_headlines: true
+    ag_news: false
+  balance_classes: true
+  min_title_length: 5
+  min_samples_per_class: 500
+  save_report: true
+
+# Smart posting настройки
+smart_posting:
+  enabled: true
+  teaser_generator: true
+  review_mode: true
+  adaptive_schedule: true
+  reaction_tracking: true
+
+# Content scheduler настройки
+autopublish_schedule:
+  morning:
+    start_hour: 6
+    end_hour: 12
+    categories: [world, markets]
+    description: "Morning news and market updates"
+  day:
+    start_hour: 12
+    end_hour: 18
+    categories: [tech, crypto]
+    description: "Technology and crypto developments"
+  evening:
+    start_hour: 18
+    end_hour: 22
+    categories: [sports, world]
+    description: "Evening sports and world news"
+  night:
+    start_hour: 22
+    end_hour: 6
+    categories: [crypto, tech]
+    description: "Late night crypto and tech updates"
+
+# Review mode настройки
+review_mode:
+  enabled: true
+  admin_id: 123456789
+  auto_post_timeout_min: 10

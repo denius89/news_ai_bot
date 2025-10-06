@@ -13,9 +13,9 @@ class TestDatabaseService:
     def test_init_sync_mode(self):
         """Test initialization in sync mode."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
-            patch('database.service.create_client') as mock_create,
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch("database.service.create_client") as mock_create,
         ):
 
             mock_client = Mock()
@@ -31,9 +31,9 @@ class TestDatabaseService:
     async def test_init_async_mode(self):
         """Test initialization in async mode."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
-            patch('database.service.create_async_client') as mock_create,
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch("database.service.create_async_client") as mock_create,
         ):
 
             mock_client = AsyncMock()
@@ -49,9 +49,9 @@ class TestDatabaseService:
     def test_get_latest_news_sync(self):
         """Test get_latest_news in sync mode."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
-            patch('database.service.create_client') as mock_create,
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch("database.service.create_client") as mock_create,
         ):
 
             mock_client = Mock()
@@ -59,9 +59,7 @@ class TestDatabaseService:
             mock_result = Mock()
             mock_result.data = [{"id": 1, "title": "Test News"}]
 
-            mock_client.table.return_value.select.return_value.order.return_value.limit.return_value = (
-                mock_query
-            )
+            mock_client.table.return_value.select.return_value.order.return_value.limit.return_value = mock_query
             mock_query.eq.return_value = mock_query
             mock_query.in_.return_value = mock_query
             mock_query.execute.return_value = mock_result
@@ -78,9 +76,9 @@ class TestDatabaseService:
     def test_upsert_news_sync(self):
         """Test upsert_news in sync mode."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
-            patch('database.service.create_client') as mock_create,
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch("database.service.create_client") as mock_create,
         ):
 
             mock_client = Mock()
@@ -102,9 +100,9 @@ class TestDatabaseService:
     def test_safe_execute_sync(self):
         """Test safe_execute in sync mode."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
-            patch('database.service.create_client') as mock_create,
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch("database.service.create_client") as mock_create,
         ):
 
             mock_client = Mock()
@@ -125,15 +123,15 @@ class TestDatabaseService:
     async def test_async_get_latest_news(self):
         """Test async_get_latest_news."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
         ):
 
             service = DatabaseService(async_mode=True)
 
             # Mock the entire method
             with patch.object(
-                service, 'async_get_latest_news', return_value=[{"id": 1, "title": "Async News"}]
+                service, "async_get_latest_news", return_value=[{"id": 1, "title": "Async News"}]
             ) as mock_method:
                 result = await service.async_get_latest_news(limit=5)
 
@@ -145,14 +143,14 @@ class TestDatabaseService:
     async def test_async_upsert_news(self):
         """Test async_upsert_news."""
         with (
-            patch('database.service.SUPABASE_URL', 'test_url'),
-            patch('database.service.SUPABASE_KEY', 'test_key'),
+            patch("database.service.SUPABASE_URL", "test_url"),
+            patch("database.service.SUPABASE_KEY", "test_key"),
         ):
 
             service = DatabaseService(async_mode=True)
 
             # Mock the entire method
-            with patch.object(service, 'async_upsert_news', return_value=1) as mock_method:
+            with patch.object(service, "async_upsert_news", return_value=1) as mock_method:
                 news_items = [{"title": "Async News", "content": "Async content"}]
                 result = await service.async_upsert_news(news_items)
 
@@ -195,8 +193,8 @@ class TestDatabaseService:
         assert uid1 != uid3  # Different URL should produce different UID
         assert len(uid1) == 64  # SHA256 produces 64-character hex string
 
-    @patch('database.service.evaluate_importance')
-    @patch('database.service.evaluate_credibility')
+    @patch("database.service.evaluate_importance")
+    @patch("database.service.evaluate_credibility")
     def test_enrich_news_with_ai(self, mock_cred, mock_imp):
         """Test _enrich_news_with_ai method."""
         mock_imp.return_value = 0.85
@@ -224,7 +222,7 @@ class TestGlobalServices:
 
         database.service._sync_service = None
 
-        with patch('database.service.DatabaseService') as mock_service:
+        with patch("database.service.DatabaseService") as mock_service:
             service1 = get_sync_service()
             service2 = get_sync_service()
 
@@ -239,7 +237,7 @@ class TestGlobalServices:
 
         database.service._async_service = None
 
-        with patch('database.service.DatabaseService') as mock_service:
+        with patch("database.service.DatabaseService") as mock_service:
             service1 = get_async_service()
             service2 = get_async_service()
 
@@ -253,7 +251,7 @@ class TestBackwardCompatibility:
 
     def test_backward_compatibility_get_latest_news(self):
         """Test backward compatibility for get_latest_news."""
-        with patch('database.service.get_sync_service') as mock_get_service:
+        with patch("database.service.get_sync_service") as mock_get_service:
             mock_service = Mock()
             mock_service.get_latest_news.return_value = [{"title": "Test News"}]
             mock_get_service.return_value = mock_service
@@ -268,7 +266,7 @@ class TestBackwardCompatibility:
 
     def test_backward_compatibility_upsert_news(self):
         """Test backward compatibility for upsert_news."""
-        with patch('database.service.get_sync_service') as mock_get_service:
+        with patch("database.service.get_sync_service") as mock_get_service:
             mock_service = Mock()
             mock_service.upsert_news.return_value = 3
             mock_get_service.return_value = mock_service

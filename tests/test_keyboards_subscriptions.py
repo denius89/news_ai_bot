@@ -25,7 +25,7 @@ class TestSubscriptionKeyboards:
         keyboard = subscriptions_inline_keyboard()
 
         # Check keyboard type
-        assert hasattr(keyboard, 'inline_keyboard')
+        assert hasattr(keyboard, "inline_keyboard")
         assert isinstance(keyboard.inline_keyboard, list)
 
         # Should have 4 rows: 3 action buttons + 1 back button
@@ -72,7 +72,7 @@ class TestSubscriptionKeyboards:
         keyboard = notifications_inline_keyboard()
 
         # Check keyboard type
-        assert hasattr(keyboard, 'inline_keyboard')
+        assert hasattr(keyboard, "inline_keyboard")
         assert isinstance(keyboard.inline_keyboard, list)
 
         # Should have 4 rows: 3 action buttons + 1 back button
@@ -115,15 +115,15 @@ class TestSubscriptionKeyboards:
 
     @pytest.mark.unit
     @patch(
-        'digests.configs.CATEGORIES',
-        {'crypto': 'Криптовалюты', 'economy': 'Экономика', 'tech': 'Технологии'},
+        "digests.configs.CATEGORIES",
+        {"crypto": "Криптовалюты", "economy": "Экономика", "tech": "Технологии"},
     )
     def test_categories_keyboard_subscribe(self):
         """Test categories keyboard for subscribe action."""
         keyboard = categories_inline_keyboard("subscribe")
 
         # Check keyboard structure
-        assert hasattr(keyboard, 'inline_keyboard')
+        assert hasattr(keyboard, "inline_keyboard")
         assert len(keyboard.inline_keyboard) == 6  # 5 categories + back button
 
         # Check callback data format
@@ -132,19 +132,19 @@ class TestSubscriptionKeyboards:
                 if button.callback_data != "back":
                     assert button.callback_data.startswith("subscribe:")
                     category = button.callback_data.split(":", 1)[1]
-                    assert category in ['crypto', 'sports', 'markets', 'tech', 'world']
+                    assert category in ["crypto", "sports", "markets", "tech", "world"]
 
     @pytest.mark.unit
     @patch(
-        'digests.configs.CATEGORIES',
-        {'crypto': 'Криптовалюты', 'economy': 'Экономика', 'tech': 'Технологии'},
+        "digests.configs.CATEGORIES",
+        {"crypto": "Криптовалюты", "economy": "Экономика", "tech": "Технологии"},
     )
     def test_categories_keyboard_unsubscribe(self):
         """Test categories keyboard for unsubscribe action."""
         keyboard = categories_inline_keyboard("unsubscribe")
 
         # Check keyboard structure
-        assert hasattr(keyboard, 'inline_keyboard')
+        assert hasattr(keyboard, "inline_keyboard")
         assert len(keyboard.inline_keyboard) == 6  # 5 categories + back button
 
         # Check callback data format
@@ -153,7 +153,7 @@ class TestSubscriptionKeyboards:
                 if button.callback_data != "back":
                     assert button.callback_data.startswith("unsubscribe:")
                     category = button.callback_data.split(":", 1)[1]
-                    assert category in ['crypto', 'sports', 'markets', 'tech', 'world']
+                    assert category in ["crypto", "sports", "markets", "tech", "world"]
 
     @pytest.mark.unit
     def test_main_keyboard_has_subscription_buttons(self):

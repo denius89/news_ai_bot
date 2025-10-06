@@ -130,5 +130,31 @@ CREATE TABLE IF NOT EXISTS user_notifications (
   read         BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+-- =========================
+-- События (новый формат для Events & Calendar System)
+-- =========================
+CREATE TABLE IF NOT EXISTS events_new (
+  id           SERIAL PRIMARY KEY,
+  title        TEXT NOT NULL,
+  category     TEXT NOT NULL,
+  subcategory  TEXT NOT NULL,
+  starts_at    TIMESTAMPTZ NOT NULL,
+  ends_at      TIMESTAMPTZ,
+  source       TEXT NOT NULL,
+  link         TEXT,
+  importance   FLOAT DEFAULT 0.5 CHECK (importance >= 0 AND importance <= 1),
+  description  TEXT,
+  location     TEXT,
+  organizer    TEXT,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Индексы для таблицы событий
+CREATE INDEX IF NOT EXISTS idx_events_new_starts_at ON events_new(starts_at);
+CREATE INDEX IF NOT EXISTS idx_events_new_category ON events_new(category);
+CREATE INDEX IF NOT EXISTS idx_events_new_importance ON events_new(importance);
+CREATE INDEX IF NOT EXISTS idx_events_new_source ON events_new(source);
+CREATE INDEX IF NOT EXISTS idx_events_new_subcategory ON events_new(subcategory);
+
 CREATE INDEX IF NOT EXISTS idx_user_notifications_user_read_created
   ON user_notifications (user_id, read, created_at DESC);

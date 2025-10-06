@@ -35,11 +35,7 @@ class TestAdvancedParser:
                     ]
                 }
             },
-            "tech": {
-                "ai": {
-                    "sources": [{"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml"}]
-                }
-            },
+            "tech": {"ai": {"sources": [{"name": "OpenAI Blog", "url": "https://openai.com/blog/rss.xml"}]}},
         }
 
     @pytest.fixture
@@ -77,11 +73,11 @@ class TestAdvancedParser:
         import yaml
 
         config_file = tmp_path / "sources.yaml"
-        with open(config_file, 'w', encoding='utf-8') as f:
+        with open(config_file, "w", encoding="utf-8") as f:
             yaml.dump(sample_sources_config, f)
 
         # Мокаем путь к конфигу
-        with patch('parsers.advanced_parser.Path', return_value=config_file):
+        with patch("parsers.advanced_parser.Path", return_value=config_file):
             await parser._load_sources_config()
 
         assert parser.sources_config == sample_sources_config
@@ -93,18 +89,18 @@ class TestAdvancedParser:
 
         assert len(sources) == 3
         assert (
-            'crypto',
-            'btc',
-            'Bitcoin Magazine',
-            'https://bitcoinmagazine.com/.rss/full/',
+            "crypto",
+            "btc",
+            "Bitcoin Magazine",
+            "https://bitcoinmagazine.com/.rss/full/",
         ) in sources
         assert (
-            'crypto',
-            'btc',
-            'CoinTelegraph',
-            'https://cointelegraph.com/rss/tag/bitcoin',
+            "crypto",
+            "btc",
+            "CoinTelegraph",
+            "https://cointelegraph.com/rss/tag/bitcoin",
         ) in sources
-        assert ('tech', 'ai', 'OpenAI Blog', 'https://openai.com/blog/rss.xml') in sources
+        assert ("tech", "ai", "OpenAI Blog", "https://openai.com/blog/rss.xml") in sources
 
     @pytest.mark.asyncio
     async def test_fetch_content_success(self, parser):
@@ -114,10 +110,10 @@ class TestAdvancedParser:
         # Мокаем HTTP запрос
         mock_response = AsyncMock()
         mock_response.status = 200
-        mock_response.headers = {'content-type': 'text/html; charset=utf-8'}
+        mock_response.headers = {"content-type": "text/html; charset=utf-8"}
         mock_response.read = AsyncMock(return_value=b"<html>Test content</html>")
 
-        with patch.object(parser.session, 'get') as mock_get:
+        with patch.object(parser.session, "get") as mock_get:
             mock_get.return_value.__aenter__.return_value = mock_response
 
             success, content_type, content = await parser._fetch_content("https://example.com")
@@ -134,7 +130,7 @@ class TestAdvancedParser:
         await parser._init_session()
 
         # Мокаем HTTP запрос с ошибкой
-        with patch.object(parser.session, 'get') as mock_get:
+        with patch.object(parser.session, "get") as mock_get:
             mock_get.side_effect = Exception("Connection error")
 
             success, content_type, content = await parser._fetch_content("https://example.com")
@@ -160,7 +156,7 @@ class TestAdvancedParser:
         """Тест неудачного извлечения контента с помощью news-please."""
         url = "https://example.com/article"
 
-        with patch('parsers.advanced_parser.NewsPlease') as mock_newsplease:
+        with patch("parsers.advanced_parser.NewsPlease") as mock_newsplease:
             mock_newsplease.from_file.return_value = None
 
             result = parser._extract_with_newsplease(url, sample_html_content)
@@ -182,7 +178,7 @@ class TestAdvancedParser:
         """Тест неудачного извлечения контента с помощью trafilatura."""
         url = "https://example.com/article"
 
-        with patch('parsers.advanced_parser.trafilatura') as mock_trafilatura:
+        with patch("parsers.advanced_parser.trafilatura") as mock_trafilatura:
             mock_trafilatura.extract.return_value = ""  # Пустой результат
 
             result = parser._extract_with_trafilatura(url, sample_html_content)
@@ -193,38 +189,38 @@ class TestAdvancedParser:
         """Тест успешного каскадного извлечения контента."""
         url = "https://example.com/article"
 
-        with patch.object(parser, '_extract_with_newsplease') as mock_newsplease:
+        with patch.object(parser, "_extract_with_newsplease") as mock_newsplease:
             mock_newsplease.return_value = {
-                'title': 'Test Title',
-                'maintext': 'Test content',
-                'method': 'news-please',
+                "title": "Test Title",
+                "maintext": "Test content",
+                "method": "news-please",
             }
 
             result = parser._extract_content_cascade(url, sample_html_content)
 
             assert result is not None
-            assert result['method'] == 'news-please'
+            assert result["method"] == "news-please"
 
     def test_extract_content_cascade_fallback(self, parser, sample_html_content):
         """Тест каскадного извлечения с fallback."""
         url = "https://example.com/article"
 
         with (
-            patch.object(parser, '_extract_with_newsplease') as mock_newsplease,
-            patch.object(parser, '_extract_with_trafilatura') as mock_trafilatura,
+            patch.object(parser, "_extract_with_newsplease") as mock_newsplease,
+            patch.object(parser, "_extract_with_trafilatura") as mock_trafilatura,
         ):
 
             mock_newsplease.return_value = None
             mock_trafilatura.return_value = {
-                'title': 'Test Title',
-                'maintext': 'Test content',
-                'method': 'trafilatura',
+                "title": "Test Title",
+                "maintext": "Test content",
+                "method": "trafilatura",
             }
 
             result = parser._extract_content_cascade(url, sample_html_content)
 
             assert result is not None
-            assert result['method'] == 'trafilatura'
+            assert result["method"] == "trafilatura"
 
     @pytest.mark.asyncio
     async def test_process_html_source_success(self, parser, sample_html_content):
@@ -239,33 +235,31 @@ class TestAdvancedParser:
         mock_db_instance.async_upsert_news = AsyncMock()
 
         with (
-            patch.object(parser, '_extract_content_cascade') as mock_extract,
-            patch('parsers.advanced_parser.evaluate_importance') as mock_importance,
-            patch('parsers.advanced_parser.evaluate_credibility') as mock_credibility,
-            patch('parsers.advanced_parser.get_async_service') as mock_db_service,
+            patch.object(parser, "_extract_content_cascade") as mock_extract,
+            patch("parsers.advanced_parser.evaluate_importance") as mock_importance,
+            patch("parsers.advanced_parser.evaluate_credibility") as mock_credibility,
+            patch("parsers.advanced_parser.get_async_service") as mock_db_service,
         ):
 
             mock_extract.return_value = {
-                'title': 'Bitcoin Reaches New High',
-                'maintext': 'Bitcoin price has reached a new all-time high...',
-                'method': 'news-please',
+                "title": "Bitcoin Reaches New High",
+                "maintext": "Bitcoin price has reached a new all-time high...",
+                "method": "news-please",
             }
 
             mock_importance.return_value = 0.8
             mock_credibility.return_value = 0.9
             mock_db_service.return_value = mock_db_instance
 
-            result = await parser._process_html_source(
-                category, subcategory, name, url, sample_html_content
-            )
+            result = await parser._process_html_source(category, subcategory, name, url, sample_html_content)
 
-            assert result['success'] is True
-            assert result['processed'] == 1
-            assert result['saved'] == 1
-            assert result['type'] == 'html'
-            assert result['method'] == 'news-please'
-            assert result['importance'] == 0.8
-            assert result['credibility'] == 0.9
+            assert result["success"] is True
+            assert result["processed"] == 1
+            assert result["saved"] == 1
+            assert result["type"] == "html"
+            assert result["method"] == "news-please"
+            assert result["importance"] == 0.8
+            assert result["credibility"] == 0.9
 
             # Проверяем, что БД сервис был вызван
             mock_db_service.assert_called_once()
@@ -280,25 +274,23 @@ class TestAdvancedParser:
         url = "https://example.com/article"
 
         with (
-            patch.object(parser, '_extract_content_cascade') as mock_extract,
-            patch('parsers.advanced_parser.evaluate_importance') as mock_importance,
+            patch.object(parser, "_extract_content_cascade") as mock_extract,
+            patch("parsers.advanced_parser.evaluate_importance") as mock_importance,
         ):
 
             mock_extract.return_value = {
-                'title': 'Low Importance News',
-                'maintext': 'This is not very important news...',
-                'method': 'news-please',
+                "title": "Low Importance News",
+                "maintext": "This is not very important news...",
+                "method": "news-please",
             }
 
             mock_importance.return_value = 0.1  # Ниже порога 0.3
 
-            result = await parser._process_html_source(
-                category, subcategory, name, url, sample_html_content
-            )
+            result = await parser._process_html_source(category, subcategory, name, url, sample_html_content)
 
-            assert result['success'] is False
-            assert result['reason'] == 'low_importance'
-            assert result['importance'] == 0.1
+            assert result["success"] is False
+            assert result["reason"] == "low_importance"
+            assert result["importance"] == 0.1
 
     @pytest.mark.asyncio
     async def test_process_source_with_network_error(self, parser):
@@ -310,13 +302,13 @@ class TestAdvancedParser:
 
         await parser._init_session()
 
-        with patch.object(parser, '_fetch_content') as mock_fetch:
+        with patch.object(parser, "_fetch_content") as mock_fetch:
             mock_fetch.return_value = (False, None, None)
 
             result = await parser._process_source(category, subcategory, name, url)
 
-            assert result['success'] is False
-            assert result['reason'] == 'fetch_failed'
+            assert result["success"] is False
+            assert result["reason"] == "fetch_failed"
 
         await parser._close_session()
 
@@ -327,25 +319,25 @@ class TestAdvancedParser:
         parser.sources_config = sample_sources_config
 
         with (
-            patch.object(parser, '_init_session'),
-            patch.object(parser, '_close_session'),
-            patch.object(parser, '_process_source') as mock_process,
+            patch.object(parser, "_init_session"),
+            patch.object(parser, "_close_session"),
+            patch.object(parser, "_process_source") as mock_process,
         ):
 
             # Мокаем результаты обработки
             mock_process.side_effect = [
-                {'success': True, 'processed': 2, 'saved': 1, 'type': 'rss'},
-                {'success': True, 'processed': 1, 'saved': 1, 'type': 'html'},
-                {'success': False, 'reason': 'fetch_failed'},
+                {"success": True, "processed": 2, "saved": 1, "type": "rss"},
+                {"success": True, "processed": 1, "saved": 1, "type": "html"},
+                {"success": False, "reason": "fetch_failed"},
             ]
 
             stats = await parser.run()
 
-            assert stats['total_sources'] == 3
-            assert stats['successful'] == 2
-            assert stats['failed'] == 1
-            assert stats['total_processed'] == 3
-            assert stats['total_saved'] == 2
+            assert stats["total_sources"] == 3
+            assert stats["successful"] == 2
+            assert stats["failed"] == 1
+            assert stats["total_processed"] == 3
+            assert stats["total_saved"] == 2
 
     @pytest.mark.asyncio
     async def test_context_manager(self, sample_sources_config, tmp_path):
@@ -353,10 +345,10 @@ class TestAdvancedParser:
         import yaml
 
         config_file = tmp_path / "sources.yaml"
-        with open(config_file, 'w', encoding='utf-8') as f:
+        with open(config_file, "w", encoding="utf-8") as f:
             yaml.dump(sample_sources_config, f)
 
-        with patch('parsers.advanced_parser.Path', return_value=config_file):
+        with patch("parsers.advanced_parser.Path", return_value=config_file):
             async with AdvancedParser() as parser:
                 assert parser.session is not None
                 assert parser.sources_config == sample_sources_config
@@ -377,25 +369,21 @@ class TestAdvancedParserIntegration:
 
         try:
             # Тестируем реальную загрузку (может быть медленным)
-            success, content_type, content = await parser._fetch_content(
-                "https://www.binance.com/en/blog"
-            )
+            success, content_type, content = await parser._fetch_content("https://www.binance.com/en/blog")
 
             if success and content:
                 # Проверяем, что контент содержит HTML
-                html_content = content.decode('utf-8', errors='ignore').lower()
-                assert 'html' in html_content
-                assert 'binance' in html_content
+                html_content = content.decode("utf-8", errors="ignore").lower()
+                assert "html" in html_content
+                assert "binance" in html_content
 
                 # Пытаемся извлечь контент
-                extracted = parser._extract_content_cascade(
-                    "https://www.binance.com/en/blog", content
-                )
+                extracted = parser._extract_content_cascade("https://www.binance.com/en/blog", content)
 
                 if extracted:
-                    assert 'title' in extracted
-                    assert 'maintext' in extracted
-                    assert len(extracted['maintext']) > 50
+                    assert "title" in extracted
+                    assert "maintext" in extracted
+                    assert len(extracted["maintext"]) > 50
 
         finally:
             await parser._close_session()
@@ -407,13 +395,13 @@ class TestAdvancedParserIntegration:
 
         # Тестовые данные
         test_data = {
-            'title': 'Bitcoin Reaches New All-Time High of $125,000',
-            'content': 'Bitcoin has reached a new all-time high of $125,000, marking a significant milestone in cryptocurrency adoption. The price surge is attributed to increased institutional adoption and positive regulatory developments.',
+            "title": "Bitcoin Reaches New All-Time High of $125,000",
+            "content": "Bitcoin has reached a new all-time high of $125,000, marking a significant milestone in cryptocurrency adoption. The price surge is attributed to increased institutional adoption and positive regulatory developments.",
         }
 
         with (
-            patch('parsers.advanced_parser.evaluate_importance') as mock_importance,
-            patch('parsers.advanced_parser.evaluate_credibility') as mock_credibility,
+            patch("parsers.advanced_parser.evaluate_importance") as mock_importance,
+            patch("parsers.advanced_parser.evaluate_credibility") as mock_credibility,
         ):
 
             mock_importance.return_value = 0.9

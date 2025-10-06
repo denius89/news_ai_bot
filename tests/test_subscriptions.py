@@ -411,116 +411,108 @@ class TestSubscriptionsAPI:
         """Flask test client."""
         from webapp import app
 
-        app.config['TESTING'] = True
+        app.config["TESTING"] = True
         with app.test_client() as client:
             yield client
 
-    @patch('services.subscription_service.SubscriptionService.add')
+    @patch("services.subscription_service.SubscriptionService.add")
     def test_update_subscription_success(self, mock_add_subscription, client):
         """Test successful POST /api/subscriptions/update."""
         mock_add_subscription.return_value = True
 
         response = client.post(
-            '/api/subscriptions/update',
-            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': True},
+            "/api/subscriptions/update",
+            json={"user_id": "test-user-123", "category": "crypto", "enabled": True},
         )
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert 'Successfully subscribed to' in data['message']
+        assert data["status"] == "success"
+        assert "Successfully subscribed to" in data["message"]
 
-    @patch('services.subscription_service.SubscriptionService.remove')
+    @patch("services.subscription_service.SubscriptionService.remove")
     def test_update_subscription_disable(self, mock_remove_subscription, client):
         """Test disabling subscription via API."""
         mock_remove_subscription.return_value = 1
 
         response = client.post(
-            '/api/subscriptions/update',
-            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': False},
+            "/api/subscriptions/update",
+            json={"user_id": "test-user-123", "category": "crypto", "enabled": False},
         )
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
+        assert data["status"] == "success"
 
     def test_update_subscription_missing_user_id(self, client):
         """Test POST /api/subscriptions/update without user_id."""
-        response = client.post(
-            '/api/subscriptions/update', json={'category': 'crypto', 'enabled': True}
-        )
+        response = client.post("/api/subscriptions/update", json={"category": "crypto", "enabled": True})
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'user_id, category, and enabled are required' in data['message']
+        assert data["status"] == "error"
+        assert "user_id, category, and enabled are required" in data["message"]
 
     def test_update_subscription_missing_category(self, client):
         """Test POST /api/subscriptions/update without category."""
-        response = client.post(
-            '/api/subscriptions/update', json={'user_id': 'test-user-123', 'enabled': True}
-        )
+        response = client.post("/api/subscriptions/update", json={"user_id": "test-user-123", "enabled": True})
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'user_id, category, and enabled are required' in data['message']
+        assert data["status"] == "error"
+        assert "user_id, category, and enabled are required" in data["message"]
 
     def test_update_subscription_missing_enabled(self, client):
         """Test POST /api/subscriptions/update without enabled field."""
-        response = client.post(
-            '/api/subscriptions/update', json={'user_id': 'test-user-123', 'category': 'crypto'}
-        )
+        response = client.post("/api/subscriptions/update", json={"user_id": "test-user-123", "category": "crypto"})
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'user_id, category, and enabled are required' in data['message']
+        assert data["status"] == "error"
+        assert "user_id, category, and enabled are required" in data["message"]
 
     def test_update_subscription_invalid_json(self, client):
         """Test POST /api/subscriptions/update with invalid JSON."""
-        response = client.post(
-            '/api/subscriptions/update', data='invalid json', content_type='application/json'
-        )
+        response = client.post("/api/subscriptions/update", data="invalid json", content_type="application/json")
         assert response.status_code == 400
         # Flask returns None for invalid JSON, so we just check the status code
 
-    @patch('services.subscription_service.SubscriptionService.add')
+    @patch("services.subscription_service.SubscriptionService.add")
     def test_update_subscription_database_error(self, mock_add_subscription, client):
         """Test POST /api/subscriptions/update with database error."""
         mock_add_subscription.side_effect = Exception("Database error")
 
         response = client.post(
-            '/api/subscriptions/update',
-            json={'user_id': 'test-user-123', 'category': 'crypto', 'enabled': True},
+            "/api/subscriptions/update",
+            json={"user_id": "test-user-123", "category": "crypto", "enabled": True},
         )
         assert response.status_code == 500
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'Internal server error' in data['message']
+        assert data["status"] == "error"
+        assert "Internal server error" in data["message"]
 
     def test_get_subscription_categories(self, client):
         """Test GET /api/subscription-categories - endpoint doesn't exist."""
         # This endpoint doesn't exist, so we expect 404
-        response = client.get('/api/subscription-categories')
+        response = client.get("/api/subscription-categories")
         assert response.status_code == 404
 
-    @patch('services.subscription_service.SubscriptionService.list')
+    @patch("services.subscription_service.SubscriptionService.list")
     def test_get_user_subscriptions(self, mock_get_subscriptions, client):
         """Test GET /api/subscriptions."""
         mock_subscriptions = [
-            {'category': 'crypto'},
-            {'category': 'economy'},
-            {'category': 'technology'},
+            {"category": "crypto"},
+            {"category": "economy"},
+            {"category": "technology"},
         ]
         mock_get_subscriptions.return_value = mock_subscriptions
 
-        response = client.get('/api/subscriptions?user_id=test-user-123')
+        response = client.get("/api/subscriptions?user_id=test-user-123")
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'success'
-        assert 'categories' in data['data']
-        assert data['data']['total_subscriptions'] == 3
+        assert data["status"] == "success"
+        assert "categories" in data["data"]
+        assert data["data"]["total_subscriptions"] == 3
 
     def test_get_user_subscriptions_missing_user_id(self, client):
         """Test GET /api/subscriptions without user_id."""
-        response = client.get('/api/subscriptions')
+        response = client.get("/api/subscriptions")
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'error'
-        assert 'user_id parameter is required' in data['message']
+        assert data["status"] == "error"
+        assert "user_id parameter is required" in data["message"]

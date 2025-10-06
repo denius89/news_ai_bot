@@ -1,0 +1,49 @@
+# PulseAI Application Configuration
+
+# Telegram Bot Configuration
+telegram:
+  bot_token: "${TELEGRAM_BOT_TOKEN}"
+  channel_id: "${TELEGRAM_CHANNEL_ID}"
+
+# Auto-publishing Configuration
+autopublish:
+  enabled: true
+  dry_run: false
+  interval_minutes: 30
+  min_gap_minutes: 10
+  format: "pulse_digest_v2"
+
+# Database Configuration
+database:
+  url: "${DATABASE_URL}"
+  pool_size: 10
+  max_overflow: 20
+
+# AI Configuration
+ai:
+  openai_api_key: "${OPENAI_API_KEY}"
+  model: "gpt-4"
+  max_tokens: 1000
+  temperature: 0.7
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Server Configuration
+server:
+  host: "0.0.0.0"
+  port: 8001
+  debug: false
+  workers: 1
+
+# Features
+features:
+  ai_optimization: true
+  auto_learning: true
+  self_tuning: true
+  autopublish: true

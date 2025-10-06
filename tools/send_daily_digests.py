@@ -203,9 +203,7 @@ async def generate_personalized_digest(
         return fallback_text
 
 
-async def send_personalized_digest(
-    user: Dict, subs_svc: SubscriptionService, telegram_sender: TelegramSender
-) -> bool:
+async def send_personalized_digest(user: Dict, subs_svc: SubscriptionService, telegram_sender: TelegramSender) -> bool:
     """
     Отправить персонализированный дайджест пользователю.
 
@@ -303,9 +301,7 @@ async def main():
                 return await send_personalized_digest(user, subs_svc, telegram_sender)
 
         # Запускаем параллельную отправку
-        results = await asyncio.gather(
-            *[send_to_user(user) for user in users_to_notify], return_exceptions=True
-        )
+        results = await asyncio.gather(*[send_to_user(user) for user in users_to_notify], return_exceptions=True)
 
         # Подсчитываем результаты
         sent_count = sum(1 for result in results if result is True)

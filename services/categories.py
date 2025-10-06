@@ -25,7 +25,7 @@ def _load_sources() -> Dict:
     try:
         file_mtime = SOURCES_FILE.stat().st_mtime
         if _sources_cache is None or _cache_timestamp != file_mtime:
-            with open(SOURCES_FILE, 'r', encoding='utf-8') as f:
+            with open(SOURCES_FILE, "r", encoding="utf-8") as f:
                 _sources_cache = yaml.safe_load(f)
             _cache_timestamp = file_mtime
             logger.info("✅ Источники загружены из %s", SOURCES_FILE)
@@ -114,9 +114,7 @@ def get_all_sources() -> List[Tuple[str, str, str, str]]:
         for subcategory, data in subcategories.items():
             sources_list = data.get("sources", [])
             for source in sources_list:
-                all_sources.append(
-                    (category, subcategory, source.get("name", ""), source.get("url", ""))
-                )
+                all_sources.append((category, subcategory, source.get("name", ""), source.get("url", "")))
 
     return all_sources
 
@@ -144,75 +142,75 @@ def get_emoji_icon(category: str, subcategory: str) -> str:
     """
     # Маппинг для основных категорий
     category_icons = {
-        'crypto': '₿',
-        'sports': '⚽',
-        'markets': '📈',
-        'tech': '🤖',
-        'world': '🌍',
+        "crypto": "₿",
+        "sports": "⚽",
+        "markets": "📈",
+        "tech": "🤖",
+        "world": "🌍",
     }
 
     # Если запрашивается только категория (подкатегория пустая)
     if not subcategory:
-        return category_icons.get(category, '📰')
+        return category_icons.get(category, "📰")
 
     # Маппинг для подкатегорий
     icon_map = {
         # Crypto
-        'btc': '₿',
-        'eth': 'Ξ',
-        'altcoin': '🪙',
-        'defi': '🏦',
-        'nft': '🖼️',
-        'gamefi': '🎮',
-        'exchange': '🏢',
-        'regulation': '⚖️',
-        'security': '🔒',
-        'market_trends': '📊',
+        "btc": "₿",
+        "eth": "Ξ",
+        "altcoin": "🪙",
+        "defi": "🏦",
+        "nft": "🖼️",
+        "gamefi": "🎮",
+        "exchange": "🏢",
+        "regulation": "⚖️",
+        "security": "🔒",
+        "market_trends": "📊",
         # Sports
-        'football': '⚽',
-        'basketball': '🏀',
-        'tennis': '🎾',
-        'ufc': '🥊',
-        'cricket': '🏏',
-        'baseball': '⚾',
-        'badminton': '🏸',
-        'table_tennis': '🏓',
-        'esports': '🎮',
-        'sports_other': '🏆',
+        "football": "⚽",
+        "basketball": "🏀",
+        "tennis": "🎾",
+        "ufc": "🥊",
+        "cricket": "🏏",
+        "baseball": "⚾",
+        "badminton": "🏸",
+        "table_tennis": "🏓",
+        "esports": "🎮",
+        "sports_other": "🏆",
         # Markets
-        'stocks': '📈',
-        'bonds': '📊',
-        'forex': '💱',
-        'commodities': '🌾',
-        'ipos': '📋',
-        'earnings': '💰',
-        'etf': '📊',
-        'economic_data': '📊',
-        'central_banks': '🏛️',
+        "stocks": "📈",
+        "bonds": "📊",
+        "forex": "💱",
+        "commodities": "🌾",
+        "ipos": "📋",
+        "earnings": "💰",
+        "etf": "📊",
+        "economic_data": "📊",
+        "central_banks": "🏛️",
         # Tech
-        'ai': '🤖',
-        'bigtech': '💻',
-        'hardware': '🔧',
-        'software': '💿',
-        'cybersecurity': '🛡️',
-        'blockchain': '⛓️',
-        'startups': '🚀',
-        'conferences': '🎤',
+        "ai": "🤖",
+        "bigtech": "💻",
+        "hardware": "🔧",
+        "software": "💿",
+        "cybersecurity": "🛡️",
+        "blockchain": "⛓️",
+        "startups": "🚀",
+        "conferences": "🎤",
         # World
-        'conflicts': '⚠️',
-        'elections': '🗳️',
-        'energy': '⚡',
-        'geopolitics': '🌍',
-        'diplomacy': '🤝',
-        'sanctions': '🚫',
-        'organizations': '🏛️',
-        'migration': '👥',
-        'climate': '🌱',
-        'global_risks': '⚠️',
+        "conflicts": "⚠️",
+        "elections": "🗳️",
+        "energy": "⚡",
+        "geopolitics": "🌍",
+        "diplomacy": "🤝",
+        "sanctions": "🚫",
+        "organizations": "🏛️",
+        "migration": "👥",
+        "climate": "🌱",
+        "global_risks": "⚠️",
     }
 
     icon_key = get_icon(category, subcategory)
-    return icon_map.get(icon_key, category_icons.get(category, '📰'))
+    return icon_map.get(icon_key, category_icons.get(category, "📰"))
 
 
 def validate_sources() -> Tuple[bool, List[str]]:
@@ -240,25 +238,23 @@ def validate_sources() -> Tuple[bool, List[str]]:
                 continue
 
             # Проверяем наличие иконки
-            if 'icon' not in data:
+            if "icon" not in data:
                 errors.append(f"У подкатегории '{category}.{subcategory}' отсутствует иконка")
 
             # Проверяем источники
-            sources_list = data.get('sources', [])
+            sources_list = data.get("sources", [])
             if not isinstance(sources_list, list):
                 errors.append(f"Источники в '{category}.{subcategory}' должны быть списком")
                 continue
 
             for i, source in enumerate(sources_list):
                 if not isinstance(source, dict):
-                    errors.append(
-                        f"Источник #{i+1} в '{category}.{subcategory}' должен быть словарем"
-                    )
+                    errors.append(f"Источник #{i+1} в '{category}.{subcategory}' должен быть словарем")
                     continue
 
-                if 'name' not in source:
+                if "name" not in source:
                     errors.append(f"Источник #{i+1} в '{category}.{subcategory}' без имени")
-                if 'url' not in source:
+                if "url" not in source:
                     errors.append(f"Источник #{i+1} в '{category}.{subcategory}' без URL")
 
     return len(errors) == 0, errors
@@ -280,14 +276,14 @@ def get_statistics() -> Dict:
     for category, subcategories in sources.items():
         total_subcategories += len(subcategories)
         for subcategory, data in subcategories.items():
-            sources_list = data.get('sources', [])
+            sources_list = data.get("sources", [])
             total_sources += len(sources_list)
 
     return {
-        'categories': total_categories,
-        'subcategories': total_subcategories,
-        'sources': total_sources,
-        'avg_sources_per_subcategory': (
+        "categories": total_categories,
+        "subcategories": total_subcategories,
+        "sources": total_sources,
+        "avg_sources_per_subcategory": (
             round(total_sources / total_subcategories, 1) if total_subcategories > 0 else 0
         ),
     }

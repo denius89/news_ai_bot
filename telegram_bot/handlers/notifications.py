@@ -64,9 +64,9 @@ async def cb_my_notifications(query: types.CallbackQuery):
         text = "🔔 <b>Ваши уведомления</b>\n\n"
 
         for i, notification in enumerate(notifications[:10], 1):  # Показываем последние 10
-            status = "✅" if notification.get('read', False) else "🔔"
-            title = notification.get('title', 'Без заголовка')
-            created_at = notification.get('created_at', '')
+            status = "✅" if notification.get("read", False) else "🔔"
+            title = notification.get("title", "Без заголовка")
+            created_at = notification.get("created_at", "")
 
             # Форматируем дату
             if created_at:
@@ -74,7 +74,7 @@ async def cb_my_notifications(query: types.CallbackQuery):
                     from datetime import datetime
 
                     if isinstance(created_at, str):
-                        dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+                        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
                     else:
                         dt = created_at
                     formatted_date = dt.strftime("%d.%m.%Y %H:%M")
@@ -95,8 +95,7 @@ async def cb_my_notifications(query: types.CallbackQuery):
     except Exception as e:
         logger.error(f"❌ Error getting notifications for user {query.from_user.id}: {e}")
         await query.message.edit_text(
-            "❌ <b>Ошибка при загрузке уведомлений</b>\n\n"
-            "Попробуйте позже или обратитесь в поддержку.",
+            "❌ <b>Ошибка при загрузке уведомлений</b>\n\n" "Попробуйте позже или обратитесь в поддержку.",
             parse_mode="HTML",
             reply_markup=back_inline_keyboard(),
         )
@@ -117,9 +116,7 @@ async def cb_mark_read(query: types.CallbackQuery):
         )
 
         if not success:
-            logger.warning(
-                f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}"
-            )
+            logger.warning(f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}")
 
     except Exception as e:
         logger.error(f"❌ Error handling mark_read callback: {e}")

@@ -26,10 +26,10 @@ from database.service import get_async_service
 # Настраиваем логирование
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler('logs/rss_update.log', encoding='utf-8'),
+        logging.FileHandler("logs/rss_update.log", encoding="utf-8"),
     ],
 )
 
@@ -48,7 +48,7 @@ class RSSUpdater:
         self.session = None
 
         # Статистика
-        self.stats = {'checked': 0, 'removed': 0, 'added': 0, 'updated_categories': set()}
+        self.stats = {"checked": 0, "removed": 0, "added": 0, "updated_categories": set()}
 
         # GitHub репозитории с RSS-фидами
         self.github_sources = [
@@ -64,46 +64,46 @@ class RSSUpdater:
 
         # Маппинг ключевых слов для категоризации
         self.category_keywords = {
-            'crypto': {
-                'bitcoin': ['bitcoin', 'btc', 'bitcoinmagazine'],
-                'ethereum': ['ethereum', 'eth', 'ethereum.org'],
-                'altcoins': ['altcoin', 'cryptocurrency', 'coin', 'crypto'],
-                'defi': ['defi', 'decentralized', 'uniswap', 'compound'],
-                'nft': ['nft', 'non-fungible', 'opensea'],
-                'gamefi': ['gamefi', 'gaming', 'play-to-earn'],
-                'regulation': ['regulation', 'sec', 'cftc', 'legal'],
-                'exchanges': ['exchange', 'binance', 'coinbase'],
-                'security': ['security', 'hack', 'exploit', 'vulnerability'],
+            "crypto": {
+                "bitcoin": ["bitcoin", "btc", "bitcoinmagazine"],
+                "ethereum": ["ethereum", "eth", "ethereum.org"],
+                "altcoins": ["altcoin", "cryptocurrency", "coin", "crypto"],
+                "defi": ["defi", "decentralized", "uniswap", "compound"],
+                "nft": ["nft", "non-fungible", "opensea"],
+                "gamefi": ["gamefi", "gaming", "play-to-earn"],
+                "regulation": ["regulation", "sec", "cftc", "legal"],
+                "exchanges": ["exchange", "binance", "coinbase"],
+                "security": ["security", "hack", "exploit", "vulnerability"],
             },
-            'markets': {
-                'stocks': ['stock', 'equity', 'nasdaq', 'nyse'],
-                'commodities': ['commodity', 'gold', 'oil', 'silver'],
-                'forex': ['forex', 'currency', 'fx', 'dollar'],
-                'bonds': ['bond', 'treasury', 'yield'],
-                'central_banks': ['fed', 'federal reserve', 'ecb', 'central bank'],
-                'economic_data': ['economic', 'gdp', 'inflation', 'unemployment'],
+            "markets": {
+                "stocks": ["stock", "equity", "nasdaq", "nyse"],
+                "commodities": ["commodity", "gold", "oil", "silver"],
+                "forex": ["forex", "currency", "fx", "dollar"],
+                "bonds": ["bond", "treasury", "yield"],
+                "central_banks": ["fed", "federal reserve", "ecb", "central bank"],
+                "economic_data": ["economic", "gdp", "inflation", "unemployment"],
             },
-            'tech': {
-                'ai': ['ai', 'artificial intelligence', 'machine learning', 'openai'],
-                'bigtech': ['google', 'apple', 'microsoft', 'amazon', 'meta'],
-                'startups': ['startup', 'venture', 'funding', 'unicorn'],
-                'cybersecurity': ['security', 'cyber', 'hack', 'breach'],
-                'hardware': ['hardware', 'cpu', 'gpu', 'chip'],
-                'blockchain_tech': ['blockchain', 'smart contract', 'web3'],
+            "tech": {
+                "ai": ["ai", "artificial intelligence", "machine learning", "openai"],
+                "bigtech": ["google", "apple", "microsoft", "amazon", "meta"],
+                "startups": ["startup", "venture", "funding", "unicorn"],
+                "cybersecurity": ["security", "cyber", "hack", "breach"],
+                "hardware": ["hardware", "cpu", "gpu", "chip"],
+                "blockchain_tech": ["blockchain", "smart contract", "web3"],
             },
-            'sports': {
-                'football': ['football', 'soccer', 'premier league', 'champions league'],
-                'basketball': ['basketball', 'nba', 'ncaa'],
-                'tennis': ['tennis', 'wimbledon', 'us open'],
-                'esports': ['esports', 'gaming', 'twitch', 'streaming'],
+            "sports": {
+                "football": ["football", "soccer", "premier league", "champions league"],
+                "basketball": ["basketball", "nba", "ncaa"],
+                "tennis": ["tennis", "wimbledon", "us open"],
+                "esports": ["esports", "gaming", "twitch", "streaming"],
             },
-            'world': {
-                'elections': ['election', 'vote', 'presidential', 'parliament'],
-                'geopolitics': ['geopolitics', 'diplomacy', 'international'],
-                'conflicts': ['conflict', 'war', 'military', 'defense'],
-                'energy': ['energy', 'oil', 'gas', 'renewable'],
-                'climate': ['climate', 'environment', 'carbon', 'green'],
-                'diplomacy': ['diplomacy', 'un', 'nato', 'summit'],
+            "world": {
+                "elections": ["election", "vote", "presidential", "parliament"],
+                "geopolitics": ["geopolitics", "diplomacy", "international"],
+                "conflicts": ["conflict", "war", "military", "defense"],
+                "energy": ["energy", "oil", "gas", "renewable"],
+                "climate": ["climate", "environment", "carbon", "green"],
+                "diplomacy": ["diplomacy", "un", "nato", "summit"],
             },
         }
 
@@ -140,7 +140,7 @@ class RSSUpdater:
             return
 
         try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
+            with open(self.config_path, "r", encoding="utf-8") as f:
                 self.sources_config = yaml.safe_load(f) or {}
             logger.info(f"Загружена конфигурация из {self.config_path}")
         except Exception as e:
@@ -157,7 +157,7 @@ class RSSUpdater:
                 shutil.copy2(self.config_path, self.backup_path)
                 logger.info(f"Создана резервная копия: {self.backup_path}")
 
-            with open(self.config_path, 'w', encoding='utf-8') as f:
+            with open(self.config_path, "w", encoding="utf-8") as f:
                 yaml.dump(self.sources_config, f, default_flow_style=False, sort_keys=True)
             logger.info(f"Конфигурация сохранена в {self.config_path}")
         except Exception as e:
@@ -185,11 +185,11 @@ class RSSUpdater:
                 content_lower = content.lower()
 
                 # Должен содержать RSS или Atom структуру
-                if not ('<rss' in content_lower or '<feed' in content_lower):
+                if not ("<rss" in content_lower or "<feed" in content_lower):
                     return False
 
                 # Должен содержать элементы новостей
-                if not ('<item>' in content_lower or '<entry>' in content_lower):
+                if not ("<item>" in content_lower or "<entry>" in content_lower):
                     return False
 
                 return True
@@ -217,11 +217,11 @@ class RSSUpdater:
 
                         # Ищем RSS-ссылки в тексте
                         rss_patterns = [
-                            r'https?://[^\s\)]+\.rss',
-                            r'https?://[^\s\)]+/feed',
-                            r'https?://[^\s\)]+/rss\.xml',
-                            r'https?://[^\s\)]+/feed\.xml',
-                            r'https?://[^\s\)]+/rss',
+                            r"https?://[^\s\)]+\.rss",
+                            r"https?://[^\s\)]+/feed",
+                            r"https?://[^\s\)]+/rss\.xml",
+                            r"https?://[^\s\)]+/feed\.xml",
+                            r"https?://[^\s\)]+/rss",
                         ]
 
                         for pattern in rss_patterns:
@@ -275,19 +275,19 @@ class RSSUpdater:
                 if not isinstance(subcategory_data, dict):
                     continue
 
-                sources_list = subcategory_data.get('sources', [])
+                sources_list = subcategory_data.get("sources", [])
                 for source in sources_list:
                     if isinstance(source, dict):
-                        url = source.get('url', '')
-                        name = source.get('name', '')
+                        url = source.get("url", "")
+                        name = source.get("name", "")
                     elif isinstance(source, str):
-                        if ':' in source:
-                            name, url = source.split(':', 1)
+                        if ":" in source:
+                            name, url = source.split(":", 1)
                             name = name.strip()
                             url = url.strip()
                         else:
                             url = source
-                            name = ''
+                            name = ""
                     else:
                         continue
 
@@ -303,20 +303,18 @@ class RSSUpdater:
             category, subcategory, name, url = source_info
             async with semaphore:
                 is_valid = await self._validate_rss_feed(url)
-                self.stats['checked'] += 1
+                self.stats["checked"] += 1
 
                 if not is_valid:
                     if category not in invalid_sources:
                         invalid_sources[category] = {}
                     if subcategory not in invalid_sources[category]:
                         invalid_sources[category][subcategory] = []
-                    invalid_sources[category][subcategory].append({'name': name, 'url': url})
+                    invalid_sources[category][subcategory].append({"name": name, "url": url})
 
                     # Логируем удаление
-                    with open('logs/removed_rss.log', 'a', encoding='utf-8') as f:
-                        f.write(
-                            f"{datetime.now().isoformat()} - {category}/{subcategory} - {url}\n"
-                        )
+                    with open("logs/removed_rss.log", "a", encoding="utf-8") as f:
+                        f.write(f"{datetime.now().isoformat()} - {category}/{subcategory} - {url}\n")
 
                     logger.warning(f"❌ Невалидный RSS: {category}/{subcategory} - {url}")
                 else:
@@ -340,29 +338,27 @@ class RSSUpdater:
 
                 # Удаляем невалидные источники
                 valid_sources = []
-                sources_list = self.sources_config[category][subcategory].get('sources', [])
+                sources_list = self.sources_config[category][subcategory].get("sources", [])
 
                 for source in sources_list:
-                    source_url = ''
+                    source_url = ""
                     if isinstance(source, dict):
-                        source_url = source.get('url', '')
-                    elif isinstance(source, str) and ':' in source:
-                        source_url = source.split(':', 1)[1].strip()
+                        source_url = source.get("url", "")
+                    elif isinstance(source, str) and ":" in source:
+                        source_url = source.split(":", 1)[1].strip()
 
                     # Проверяем, не входит ли этот источник в список невалидных
-                    is_invalid = any(inv_source['url'] == source_url for inv_source in sources)
+                    is_invalid = any(inv_source["url"] == source_url for inv_source in sources)
 
                     if not is_invalid:
                         valid_sources.append(source)
 
                 # Обновляем список источников
-                self.sources_config[category][subcategory]['sources'] = valid_sources
-                self.stats['removed'] += len(sources)
-                self.stats['updated_categories'].add(f"{category}/{subcategory}")
+                self.sources_config[category][subcategory]["sources"] = valid_sources
+                self.stats["removed"] += len(sources)
+                self.stats["updated_categories"].add(f"{category}/{subcategory}")
 
-                logger.info(
-                    f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}"
-                )
+                logger.info(f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}")
 
     async def _add_new_sources(self):
         """Добавление новых RSS-источников из GitHub."""
@@ -384,7 +380,7 @@ class RSSUpdater:
                 # Определяем категорию
                 category, subcategory = self._categorize_rss(url)
                 if not category or not subcategory:
-                    category, subcategory = 'misc', 'uncategorized'
+                    category, subcategory = "misc", "uncategorized"
 
                 # Проверяем, что источник еще не добавлен
                 if self._is_source_exists(url):
@@ -397,12 +393,12 @@ class RSSUpdater:
                     valid_new_sources[category][subcategory] = []
 
                 # Извлекаем название из URL
-                name = urlparse(url).netloc.replace('www.', '')
+                name = urlparse(url).netloc.replace("www.", "")
 
-                valid_new_sources[category][subcategory].append({'name': name, 'url': url})
+                valid_new_sources[category][subcategory].append({"name": name, "url": url})
 
                 # Логируем добавление
-                with open('logs/added_rss.log', 'a', encoding='utf-8') as f:
+                with open("logs/added_rss.log", "a", encoding="utf-8") as f:
                     f.write(f"{datetime.now().isoformat()} - {category}/{subcategory} - {url}\n")
 
                 logger.info(f"🆕 Новый валидный RSS: {category}/{subcategory} - {url}")
@@ -418,13 +414,13 @@ class RSSUpdater:
 
             for subcategory, sources in subcategories.items():
                 if subcategory not in self.sources_config[category]:
-                    self.sources_config[category][subcategory] = {'sources': []}
+                    self.sources_config[category][subcategory] = {"sources": []}
 
                 # Добавляем источники
                 for source in sources:
-                    self.sources_config[category][subcategory]['sources'].append(source)
-                    self.stats['added'] += 1
-                    self.stats['updated_categories'].add(f"{category}/{subcategory}")
+                    self.sources_config[category][subcategory]["sources"].append(source)
+                    self.stats["added"] += 1
+                    self.stats["updated_categories"].add(f"{category}/{subcategory}")
 
         logger.info(f"Добавлено {self.stats['added']} новых валидных источников")
 
@@ -438,13 +434,13 @@ class RSSUpdater:
                 if not isinstance(subcategory_data, dict):
                     continue
 
-                sources_list = subcategory_data.get('sources', [])
+                sources_list = subcategory_data.get("sources", [])
                 for source in sources_list:
-                    source_url = ''
+                    source_url = ""
                     if isinstance(source, dict):
-                        source_url = source.get('url', '')
-                    elif isinstance(source, str) and ':' in source:
-                        source_url = source.split(':', 1)[1].strip()
+                        source_url = source.get("url", "")
+                    elif isinstance(source, str) and ":" in source:
+                        source_url = source.split(":", 1)[1].strip()
 
                     if source_url == url:
                         return True
@@ -474,15 +470,15 @@ class RSSUpdater:
         print(f"🆕 Добавлено новых: {self.stats['added']}")
         print(f"🗂  Обновлено категорий: {len(self.stats['updated_categories'])}")
 
-        if self.stats['updated_categories']:
+        if self.stats["updated_categories"]:
             print(f"\n📂 Обновленные категории:")
-            for category in sorted(self.stats['updated_categories']):
+            for category in sorted(self.stats["updated_categories"]):
                 print(f"   • {category}")
 
         print("=" * 60)
 
         # Сохраняем отчет в лог
-        with open('logs/rss_update_summary.log', 'w', encoding='utf-8') as f:
+        with open("logs/rss_update_summary.log", "w", encoding="utf-8") as f:
             f.write(f"RSS Update Summary - {datetime.now().isoformat()}\n")
             f.write(f"Checked: {self.stats['checked']}\n")
             f.write(f"Removed: {self.stats['removed']}\n")

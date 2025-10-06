@@ -37,9 +37,7 @@ def prepare_test_environment():
 
     # Если есть критические предупреждения, прерываем тесты
     # Исключаем предупреждения о порте 5000 (системный процесс ControlCenter)
-    critical_warnings = [
-        w for w in result['warnings'] if 'не удалось найти свободный порт' in w and '5000' not in w
-    ]
+    critical_warnings = [w for w in result["warnings"] if "не удалось найти свободный порт" in w and "5000" not in w]
 
     if critical_warnings:
         print("\n❌ Критические ошибки при подготовке окружения:")
@@ -51,8 +49,8 @@ def prepare_test_environment():
         pytest.exit("Окружение не готово для тестов", returncode=1)
 
     # Сохраняем информацию о свободных портах для использования в тестах
-    os.environ['TEST_WEBAPP_PORT'] = str(result['free_ports'].get('webapp', 8001))
-    os.environ['TEST_API_PORT'] = str(result['free_ports'].get('api', 5000))
+    os.environ["TEST_WEBAPP_PORT"] = str(result["free_ports"].get("webapp", 8001))
+    os.environ["TEST_API_PORT"] = str(result["free_ports"].get("api", 5000))
 
     print("✅ Окружение готово для тестов")
     print(f"   WebApp порт: {os.environ['TEST_WEBAPP_PORT']}")
@@ -70,9 +68,9 @@ def test_ports():
     Предоставляет свободные порты для использования в тестах.
     """
     return {
-        'webapp': int(os.environ.get('TEST_WEBAPP_PORT', 8001)),
-        'api': int(os.environ.get('TEST_API_PORT', 5000)),
-        'test': 8080,
+        "webapp": int(os.environ.get("TEST_WEBAPP_PORT", 8001)),
+        "api": int(os.environ.get("TEST_API_PORT", 5000)),
+        "test": 8080,
     }
 
 

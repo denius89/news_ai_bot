@@ -16,10 +16,10 @@ import time
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from services.categories import get_all_sources
-from parsers.universal_rss_parser import UniversalRSSParser
+from parsers.unified_parser import UnifiedParser
 
 # Настраиваем логирование
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 HEADERS = {
@@ -31,21 +31,21 @@ HEADERS = {
 def check_rss_source(url: str, name: str) -> dict:
     """Проверяет один RSS источник."""
     result = {
-        'url': url,
-        'name': name,
-        'status': 'unknown',
-        'status_code': None,
-        'content_type': None,
-        'entries_count': 0,
-        'error': None,
-        'is_valid': False,
+        "url": url,
+        "name": name,
+        "status": "unknown",
+        "status_code": None,
+        "content_type": None,
+        "entries_count": 0,
+        "error": None,
+        "is_valid": False,
     }
 
     try:
         # Проверяем доступность
         response = requests.get(url, headers=HEADERS, timeout=10, allow_redirects=True)
-        result['status_code'] = response.status_code
-        result['content_type'] = response.headers.get('Content-Type', '')
+        result["status_code"] = response.status_code
+        result["content_type"] = response.headers.get("Content-Type", "")
 
         if response.status_code == 200:
             # Проверяем, является ли это RSS
@@ -53,27 +53,27 @@ def check_rss_source(url: str, name: str) -> dict:
             feed = feedparser.parse(content)
 
             if feed.bozo and not feed.entries:
-                result['status'] = 'invalid_rss'
-                result['error'] = str(feed.bozo_exception)
+                result["status"] = "invalid_rss"
+                result["error"] = str(feed.bozo_exception)
             elif feed.entries:
-                result['status'] = 'valid'
-                result['entries_count'] = len(feed.entries)
-                result['is_valid'] = True
+                result["status"] = "valid"
+                result["entries_count"] = len(feed.entries)
+                result["is_valid"] = True
             else:
-                result['status'] = 'empty'
+                result["status"] = "empty"
         else:
-            result['status'] = 'http_error'
-            result['error'] = f"HTTP {response.status_code}"
+            result["status"] = "http_error"
+            result["error"] = f"HTTP {response.status_code}"
 
     except requests.exceptions.Timeout:
-        result['status'] = 'timeout'
-        result['error'] = 'Request timeout'
+        result["status"] = "timeout"
+        result["error"] = "Request timeout"
     except requests.exceptions.ConnectionError:
-        result['status'] = 'connection_error'
-        result['error'] = 'Connection error'
+        result["status"] = "connection_error"
+        result["error"] = "Connection error"
     except Exception as e:
-        result['status'] = 'error'
-        result['error'] = str(e)
+        result["status"] = "error"
+        result["error"] = str(e)
 
     return result
 
@@ -84,18 +84,18 @@ def find_alternative_rss(base_url: str, name: str) -> list:
 
     # Типичные пути для RSS фидов
     rss_paths = [
-        '/rss',
-        '/feed',
-        '/feeds',
-        '/rss.xml',
-        '/feed.xml',
-        '/feeds/rss',
-        '/feeds/all.rss',
-        '/.rss',
-        '/news/rss',
-        '/blog/rss',
-        '/atom.xml',
-        '/feeds/atom',
+        "/rss",
+        "/feed",
+        "/feeds",
+        "/rss.xml",
+        "/feed.xml",
+        "/feeds/rss",
+        "/feeds/all.rss",
+        "/.rss",
+        "/news/rss",
+        "/blog/rss",
+        "/atom.xml",
+        "/feeds/atom",
     ]
 
     try:
@@ -104,7 +104,7 @@ def find_alternative_rss(base_url: str, name: str) -> list:
         for path in rss_paths:
             test_url = base_domain + path
             result = check_rss_source(test_url, f"{name} ({path})")
-            if result['is_valid']:
+            if result["is_valid"]:
                 alternatives.append(result)
 
     except Exception as e:
@@ -135,11 +135,11 @@ def validate_all_sources():
             cat, subcat, name, url = future_to_source[future]
             try:
                 result = future.result()
-                result['category'] = cat
-                result['subcategory'] = subcat
+                result["category"] = cat
+                result["subcategory"] = subcat
                 results.append(result)
 
-                if result['is_valid']:
+                if result["is_valid"]:
                     valid_sources.append(result)
                     print(f"✅ {name}: {result['entries_count']} записей")
                 else:
@@ -153,14 +153,12 @@ def validate_all_sources():
     print(f"\n📊 Результаты валидации:")
     print(f"   ✅ Валидных источников: {len(valid_sources)}")
     print(f"   ❌ Невалидных источников: {len(invalid_sources)}")
-    print(
-        f"   📈 Успешность: {len(valid_sources)/(len(valid_sources)+len(invalid_sources))*100:.1f}%"
-    )
+    print(f"   📈 Успешность: {len(valid_sources)/(len(valid_sources)+len(invalid_sources))*100:.1f}%")
 
     # Группировка по статусам
     status_counts = {}
     for result in invalid_sources:
-        status = result['status']
+        status = result["status"]
         status_counts[status] = status_counts.get(status, 0) + 1
 
     print(f"\n🔍 Анализ проблем:")
@@ -172,9 +170,9 @@ def validate_all_sources():
     alternatives_found = 0
 
     for result in invalid_sources[:5]:  # Проверяем первые 5 неработающих
-        if result['status'] in ['http_error', 'connection_error']:
+        if result["status"] in ["http_error", "connection_error"]:
             print(f"\n🔍 Ищем альтернативы для {result['name']}...")
-            alternatives = find_alternative_rss(result['url'], result['name'])
+            alternatives = find_alternative_rss(result["url"], result["name"])
 
             if alternatives:
                 alternatives_found += len(alternatives)
@@ -204,15 +202,13 @@ def test_parser_with_valid_sources():
     # Тестируем первые 3 валидных источника
     test_sources = valid_sources[:3]
 
-    parser = UniversalRSSParser()
+    parser = UnifiedParser()
     total_news = 0
 
     for source in test_sources:
         print(f"\n📰 Тестируем: {source['name']}")
         try:
-            news_items = parser.parse_source(
-                source['url'], source['category'], source['subcategory'], source['name']
-            )
+            news_items = parser.parse_source(source["url"], source["category"], source["subcategory"], source["name"])
 
             if news_items:
                 total_news += len(news_items)
