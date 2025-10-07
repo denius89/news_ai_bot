@@ -119,8 +119,8 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                   <Card className="text-center">
                     <CardContent className="pt-6">
                       <div className="text-2xl font-bold text-text">{stat.value}</div>
-                      <div className="text-sm text-muted">{stat.label}</div>
-                      <div className="text-xs text-success mt-1">{stat.trend}</div>
+                      <div className="text-sm text-muted-strong">{stat.label}</div>
+                      <div className="text-success-strong mt-1">{stat.trend}</div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -180,7 +180,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                       <p className="text-sm font-medium text-text">
                         Получен новый дайджест по криптовалютам
                       </p>
-                      <p className="text-xs text-muted">2 минуты назад</p>
+                      <p className="text-xs text-muted-strong">2 минуты назад</p>
                     </div>
                   </div>
                   
@@ -190,7 +190,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                       <p className="text-sm font-medium text-text">
                         Добавлен новый источник новостей
                       </p>
-                      <p className="text-xs text-muted">1 час назад</p>
+                      <p className="text-xs text-muted-strong">1 час назад</p>
                     </div>
                   </div>
                   
@@ -200,7 +200,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                       <p className="text-sm font-medium text-text">
                         Обновлены настройки уведомлений
                       </p>
-                      <p className="text-xs text-muted">3 часа назад</p>
+                      <p className="text-xs text-muted-strong">3 часа назад</p>
                     </div>
                   </div>
                 </div>

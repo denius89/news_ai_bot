@@ -145,6 +145,16 @@
     color: #94A3B8; /* Better contrast for dark theme */
   }
 
+  /* Better contrast for success indicators */
+  .text-success-strong {
+    @apply text-xs;
+    color: #059669; /* Darker green for better contrast */
+  }
+  
+  .dark .text-success-strong {
+    color: #10B981; /* Brighter green for dark theme */
+  }
+
   /* Focus styles */
   *:focus-visible {
     @apply outline-none ring-2;
