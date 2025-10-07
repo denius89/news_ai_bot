@@ -20,19 +20,19 @@ module.exports = {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // PulseAI Light Premium Design Tokens
-        bg: '#F8FAFC',
-        surface: '#FFFFFF',
-        'surface-alt': '#F2F5F8',
-        border: '#E2E8F0',
-        primary: '#00BFA6',
-        accent: '#8AFFD7',
-        text: '#1E293B',
-        muted: '#64748B',
-        success: '#1ED690',
-        error: '#F87171',
-        warning: '#FBBF24',
-        highlight: '#F0F9FF',
+        // PulseAI Design Tokens (CSS Variables)
+        bg: 'var(--color-bg)',
+        surface: 'var(--color-surface)',
+        'surface-alt': 'var(--color-surface-alt)',
+        border: 'var(--color-border)',
+        primary: 'var(--color-primary)',
+        accent: 'var(--color-accent)',
+        text: 'var(--color-text)',
+        muted: 'var(--color-muted)',
+        success: 'var(--color-success)',
+        error: 'var(--color-error)',
+        warning: 'var(--color-warning)',
+        highlight: 'var(--color-highlight)',
         
         // Legacy support
         background: '#F8FAFC',
@@ -62,6 +62,9 @@ module.exports = {
         'card': '0 2px 8px rgba(0, 0, 0, 0.06)',
         'card-hover': '0 4px 16px rgba(0, 0, 0, 0.12)',
         'soft': '0 1px 3px rgba(0, 0, 0, 0.1)',
+        'card-dark': '0 2px 8px rgba(0, 0, 0, 0.3)',
+        'card-hover-dark': '0 4px 16px rgba(0, 0, 0, 0.4)',
+        'soft-dark': '0 1px 3px rgba(0, 0, 0, 0.2)',
       },
       borderRadius: {
         lg: '1rem',

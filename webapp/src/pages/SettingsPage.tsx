@@ -25,7 +25,12 @@ interface NotificationSettings {
   frequency: 'instant' | 'hourly' | 'daily' | 'weekly';
 }
 
-const SettingsPage: React.FC = () => {
+interface SettingsPageProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [notifications, setNotifications] = useState<NotificationSettings>({
     push: true,

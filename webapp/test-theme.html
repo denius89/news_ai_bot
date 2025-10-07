@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Test</title>
+    <style>
+        :root {
+            --color-bg: #F8FAFC;
+            --color-surface: #FFFFFF;
+            --color-surface-alt: #F2F5F8;
+            --color-border: #E2E8F0;
+            --color-primary: #00BFA6;
+            --color-accent: #8AFFD7;
+            --color-text: #1E293B;
+            --color-muted: #64748B;
+            --color-highlight: #F0F9FF;
+        }
+
+        .dark {
+            --color-bg: #0F1115;
+            --color-surface: #1B1E23;
+            --color-surface-alt: #23272E;
+            --color-border: #2C3138;
+            --color-primary: #00BFA6;
+            --color-accent: #8AFFD7;
+            --color-text: #E6E8EB;
+            --color-muted: #9EA2A7;
+            --color-highlight: rgba(0, 191, 166, 0.08);
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .card {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .dark .card {
+            background-color: var(--color-surface-alt);
+            border-color: var(--color-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: var(--color-accent);
+        }
+
+        .toggle-btn {
+            background-color: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid var(--color-border);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dark .toggle-btn {
+            background-color: var(--color-surface-alt);
+            border-color: var(--color-border);
+        }
+    </style>
+</head>
+<body>
+    <h1>PulseAI Theme Test</h1>
+    
+    <div class="card">
+        <h2>Light/Dark Theme Test</h2>
+        <p>Этот тест проверяет, как работают CSS-переменные в светлой и темной теме.</p>
+        <button class="toggle-btn" onclick="toggleTheme()">Переключить тему</button>
+    </div>
+
+    <div class="card">
+        <h3>Карточка с контентом</h3>
+        <p>Текст в карточке должен автоматически менять цвет при переключении темы.</p>
+        <button class="btn">Основная кнопка</button>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+            }
+        }
+    </script>
+</body>
+</html>

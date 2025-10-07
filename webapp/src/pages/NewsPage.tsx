@@ -16,7 +16,12 @@ interface NewsItem {
   importance: number;
 }
 
-const NewsPage: React.FC = () => {
+interface NewsPageProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+const NewsPage: React.FC<NewsPageProps> = ({ theme, onThemeToggle }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');

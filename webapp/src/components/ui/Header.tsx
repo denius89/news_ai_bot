@@ -1,19 +1,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { ThemeToggle } from './ThemeToggle';
 
 interface HeaderProps {
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
   className?: string;
+  theme?: 'light' | 'dark';
+  onThemeToggle?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
   title, 
   subtitle, 
   actions, 
-  className 
+  className,
+  theme,
+  onThemeToggle
 }) => {
   return (
     <motion.header 
@@ -29,11 +34,16 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       </div>
       
-      {actions && (
-        <div className="flex items-center space-x-2">
-          {actions}
-        </div>
-      )}
+      <div className="flex items-center space-x-2">
+        {theme && onThemeToggle && (
+          <ThemeToggle 
+            theme={theme} 
+            onToggle={onThemeToggle}
+            size="sm"
+          />
+        )}
+        {actions}
+      </div>
     </motion.header>
   );
 };
@@ -50,7 +60,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   actions, 
   showBack = false,
   onBack,
-  className 
+  className,
+  theme,
+  onThemeToggle
 }) => {
   return (
     <motion.header 
@@ -90,11 +102,16 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         </div>
       </div>
       
-      {actions && (
-        <div className="flex items-center space-x-2">
-          {actions}
-        </div>
-      )}
+      <div className="flex items-center space-x-2">
+        {theme && onThemeToggle && (
+          <ThemeToggle 
+            theme={theme} 
+            onToggle={onThemeToggle}
+            size="sm"
+          />
+        )}
+        {actions}
+      </div>
     </motion.header>
   );
 };

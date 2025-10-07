@@ -3,21 +3,49 @@
   
   /* Card Components */
   .card {
-    @apply bg-surface rounded-2xl shadow-card p-6 border border-border/50;
+    @apply rounded-2xl p-6 border;
+    background-color: var(--color-surface);
+    border-color: rgba(226, 232, 240, 0.5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease-in-out;
+  }
+  
+  .dark .card {
+    background-color: var(--color-surface-alt);
+    border-color: rgba(44, 49, 56, 0.6);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
   
   .card:hover {
-    @apply shadow-card-hover scale-[1.02];
+    @apply scale-[1.02];
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+  
+  .dark .card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
   
   .card-compact {
-    @apply bg-surface rounded-xl shadow-soft p-4 border border-border/50;
+    @apply rounded-xl p-4 border;
+    background-color: var(--color-surface);
+    border-color: rgba(226, 232, 240, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease-in-out;
   }
   
+  .dark .card-compact {
+    background-color: var(--color-surface-alt);
+    border-color: rgba(44, 49, 56, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+  
   .card-compact:hover {
-    @apply shadow-card scale-[1.01];
+    @apply scale-[1.01];
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  
+  .dark .card-compact:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
   /* Button Components */
@@ -27,15 +55,51 @@
   }
   
   .btn-primary {
-    @apply bg-primary text-white shadow-soft hover:shadow-md hover:bg-accent active:scale-[0.98];
+    @apply text-white shadow-soft hover:shadow-md active:scale-[0.98];
+    background-color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-accent);
   }
   
   .btn-secondary {
-    @apply bg-surface border border-border text-text hover:bg-highlight;
+    @apply border;
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--color-highlight);
+  }
+  
+  .dark .btn-secondary {
+    background-color: var(--color-surface-alt);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  
+  .dark .btn-secondary:hover {
+    background-color: var(--color-highlight);
   }
   
   .btn-ghost {
-    @apply bg-transparent text-text hover:bg-surface-alt;
+    @apply bg-transparent;
+    color: var(--color-text);
+  }
+  
+  .btn-ghost:hover {
+    background-color: var(--color-surface-alt);
+  }
+  
+  .dark .btn-ghost {
+    color: var(--color-text);
+  }
+  
+  .dark .btn-ghost:hover {
+    background-color: var(--color-surface-alt);
   }
   
   .btn-sm {
@@ -54,9 +118,29 @@
 
   /* Input Components */
   .input {
-    @apply w-full rounded-xl border border-border bg-surface px-4 py-2 text-text placeholder:text-muted;
-    @apply focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all;
+    @apply w-full rounded-xl border px-4 py-2 focus:ring-2 focus:border-transparent outline-none transition-all;
+    border-color: var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
     min-height: 44px;
+  }
+  
+  .input::placeholder {
+    color: var(--color-muted);
+  }
+  
+  .input:focus {
+    --tw-ring-color: var(--color-primary);
+  }
+  
+  .dark .input {
+    border-color: var(--color-border);
+    background-color: var(--color-surface-alt);
+    color: var(--color-text);
+  }
+  
+  .dark .input::placeholder {
+    color: var(--color-muted);
   }
   
   .input-sm {
@@ -71,18 +155,44 @@
 
   /* Navigation Components */
   .nav-header {
-    @apply sticky top-0 backdrop-blur-sm bg-surface/70 border-b border-border px-6 py-4;
-    @apply flex justify-between items-center;
+    @apply sticky top-0 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-bottom-color: var(--color-border);
+  }
+  
+  .dark .nav-header {
+    background-color: rgba(27, 30, 35, 0.7);
+    border-bottom-color: var(--color-border);
   }
   
   .nav-bottom {
-    @apply fixed bottom-0 inset-x-0 flex justify-around bg-surface border-t border-border py-2;
+    @apply fixed bottom-0 inset-x-0 flex justify-around border-t py-2;
+    background-color: var(--color-surface);
+    border-top-color: var(--color-border);
     padding-bottom: env(safe-area-inset-bottom);
   }
   
+  .dark .nav-bottom {
+    background-color: var(--color-surface-alt);
+    border-top-color: var(--color-border);
+  }
+  
   .nav-item {
-    @apply flex flex-col items-center text-muted hover:text-primary transition-colors;
+    @apply flex flex-col items-center transition-colors;
+    color: var(--color-muted);
     min-height: 44px;
+  }
+  
+  .nav-item:hover {
+    color: var(--color-primary);
+  }
+  
+  .dark .nav-item {
+    color: var(--color-muted);
+  }
+  
+  .dark .nav-item:hover {
+    color: var(--color-primary);
   }
   
   .nav-item.active {

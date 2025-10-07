@@ -16,7 +16,12 @@ interface Event {
   impact: string;
 }
 
-const EventsPage: React.FC = () => {
+interface EventsPageProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+const EventsPage: React.FC<EventsPageProps> = ({ theme, onThemeToggle }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
