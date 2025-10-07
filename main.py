@@ -10,19 +10,26 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 # PULSE-WS: Import configuration
-from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
-from utils.logging_setup import setup_logging
+# from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
+# from utils.logging_setup import setup_logging
 
 # PULSE-WS: Import routes
-from routes.ws_routes import router as ws_router
-from routes.news_routes import news_bp
-from routes.webapp_routes import webapp_bp  
-from routes.api_routes import api_bp
-from routes.metrics_routes import metrics_bp
+# from routes.ws_routes import router as ws_router
+# from routes.news_routes import news_bp
+# from routes.webapp_routes import webapp_bp  
+# from routes.api_routes import api_bp
+# from routes.metrics_routes import metrics_bp
 
 # PULSE-WS: Setup logging
-setup_logging()
+# setup_logging()
 logger = logging.getLogger("news_ai_bot")
+
+# PULSE-WS: Hardcoded values to avoid circular imports
+VERSION = "0.1.0"
+DEBUG = True
+WEBAPP_PORT = 8001
+WEBAPP_HOST = "0.0.0.0"
+REACTOR_ENABLED = False
 
 # PULSE-WS: Create FastAPI app
 app = FastAPI(
@@ -93,7 +100,7 @@ templates.env.filters["importance_icon"] = importance_icon
 templates.env.filters["credibility_icon"] = credibility_icon
 
 # PULSE-WS: Include WebSocket router
-app.include_router(ws_router)
+# app.include_router(ws_router)  # Disabled to avoid circular imports
 
 # PULSE-WS: Include other routers (convert Flask blueprints to FastAPI routers)
 # Note: This will need to be updated to convert Flask routes to FastAPI
@@ -272,7 +279,7 @@ async def get_user_notifications_api(user_id: str = None, limit: int = 50, offse
                 if user_data:
                     final_user_id = user_data.get("id")
                     logger.info("Final user_id for query: %s", final_user_id)
-    else:
+                else:
                     # Fallback to demo UUID
                     final_user_id = "f7d38911-4e62-4012-a9bf-2aaa03483497"
                     logger.warning("Invalid user_id format, using fallback: %s", final_user_id)

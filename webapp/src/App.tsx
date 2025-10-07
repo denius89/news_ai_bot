@@ -21,11 +21,11 @@ import { initializeTheme, toggleTheme, getThemePreference, type Theme } from './
 import './styles/index.css';
 
 const App: React.FC = () => {
-  console.log('🚀 App.tsx component loaded');
   
   const [isMobile, setIsMobile] = useState(false);
   const [activePage, setActivePage] = useState('home');
   const [theme, setTheme] = useState<Theme>('light');
+  const [unreadNewsCount, setUnreadNewsCount] = useState(0);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -66,6 +66,34 @@ const App: React.FC = () => {
     setTheme(newTheme);
   };
 
+  // Функция для получения количества новых новостей
+  const fetchUnreadNewsCount = async () => {
+    try {
+      const response = await fetch('/api/latest');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'success') {
+          // Считаем новости за последние 2 часа как "новые"
+          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+          const newNewsCount = data.data.filter((item: any) => {
+            const publishedAt = new Date(item.published_at);
+            return publishedAt > twoHoursAgo;
+          }).length;
+          setUnreadNewsCount(newNewsCount);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching unread news count:', error);
+    }
+  };
+
+  // Загружаем количество новых новостей при монтировании и обновляем каждые 5 минут
+  useEffect(() => {
+    fetchUnreadNewsCount();
+    const interval = setInterval(fetchUnreadNewsCount, 5 * 60 * 1000); // 5 минут
+    return () => clearInterval(interval);
+  }, []);
+
   const navigationItems = [
     {
       id: 'home',
@@ -86,9 +114,12 @@ const App: React.FC = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
       ),
-      onClick: () => setActivePage('news'),
+      onClick: () => {
+        setActivePage('news');
+        setUnreadNewsCount(0); // Сбрасываем счетчик при переходе на страницу новостей
+      },
       active: activePage === 'news',
-      badge: 3,
+      badge: unreadNewsCount > 0 ? unreadNewsCount : undefined,
     },
     {
       id: 'digest',
@@ -163,7 +194,7 @@ const App: React.FC = () => {
 
   return (
     <TelegramWebApp>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-bg">
         <AnimatePresence mode="wait">
           <motion.div

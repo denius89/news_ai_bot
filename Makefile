@@ -1,219 +1,260 @@
-# Makefile for news_ai_bot — quick dev commands
+# PulseAI Development Makefile
+# 🚀 Централизованное управление сервисами
 
-PY?=python3
+# =============================================================================
+# 🎯 КОНФИГУРАЦИЯ ПОРТОВ
+# =============================================================================
 
-.PHONY: run-bot run-web run-digests run-events run-news test test-cov lint format check dev run-tests-bot check-db run-all stop-all restart-all status logs
+REACT_PORT = 3000
+FLASK_PORT = 8001
+FASTAPI_PORT = 8000
 
-# 1) Run Telegram bot
-run-bot:
-	$(PY) -m telegram_bot.bot
+# =============================================================================
+# 🎯 ЦВЕТА И ФОРМАТИРОВАНИЕ
+# =============================================================================
 
-# 2) Run web app
-run-web:
-	$(PY) webapp.py
+GREEN = \033[0;32m
+YELLOW = \033[0;33m
+RED = \033[0;31m
+BLUE = \033[0;34m
+NC = \033[0m # No Color
 
-# 3) Run digests generator (AI, category economy, limit 5)
-run-digests:
-	$(PY) -m digests.generator --ai --limit 5 --category economy
+# =============================================================================
+# 🎯 ОСНОВНЫЕ КОМАНДЫ
+# =============================================================================
 
-# 4) Fetch and store events
-run-events:
-	$(PY) tools/fetch_and_store_events.py
+.PHONY: help start stop restart check-ports logs clean
 
-# 5) Fetch and store news
-run-news:
-	$(PY) tools/fetch_and_store_news.py
+# Показать справку
+help:
+	@echo "$(BLUE)🚀 PulseAI Development Commands$(NC)"
+	@echo ""
+	@echo "$(GREEN)Основные команды:$(NC)"
+	@echo "  $(YELLOW)make start$(NC)        - Запустить все сервисы"
+	@echo "  $(YELLOW)make stop$(NC)         - Остановить все сервисы"
+	@echo "  $(YELLOW)make restart$(NC)      - Перезапустить все сервисы"
+	@echo "  $(YELLOW)make check-ports$(NC)  - Проверить доступность портов"
+	@echo "  $(YELLOW)make logs$(NC)         - Показать логи всех сервисов"
+	@echo "  $(YELLOW)make clean$(NC)        - Очистить процессы и порты"
+	@echo ""
+	@echo "$(GREEN)Индивидуальные сервисы:$(NC)"
+	@echo "  $(YELLOW)make react$(NC)        - Запустить только React (порт $(REACT_PORT))"
+	@echo "  $(YELLOW)make flask$(NC)        - Запустить только Flask API (порт $(FLASK_PORT))"
+	@echo "  $(YELLOW)make bot$(NC)          - Запустить только Telegram Bot"
+	@echo ""
+	@echo "$(GREEN)Схема портов:$(NC)"
+	@echo "  $(YELLOW)React Frontend:$(NC)   http://localhost:$(REACT_PORT)"
+	@echo "  $(YELLOW)Flask API:$(NC)        http://localhost:$(FLASK_PORT)"
+	@echo "  $(YELLOW)FastAPI:$(NC)          http://localhost:$(FASTAPI_PORT)"
 
-# 6) Run tests (с автоматической подготовкой окружения)
-test:
-	@echo "🧪 Запуск тестов с автоматической подготовкой окружения..."
-	@$(MAKE) prepare-test-env
-	$(PY) -m pytest
+# =============================================================================
+# 🎯 ПРОВЕРКА ПОРТОВ
+# =============================================================================
 
-# 7) Run tests with coverage (с автоматической подготовкой окружения)
-test-cov:
-	@echo "🧪 Запуск тестов с покрытием и подготовкой окружения..."
-	@$(MAKE) prepare-test-env
-	$(PY) -m pytest --cov --cov-report=term-missing
-
-# 8) Подготовка окружения для тестов
-prepare-test-env:
-	@echo "🔧 Подготовка окружения для тестов..."
-	@$(PY) tools/port_manager.py --prepare
-	@if [ $$? -ne 0 ]; then \
-		echo "❌ Ошибка подготовки окружения"; \
-		echo "💡 Попробуйте: make cleanup-env"; \
-		exit 1; \
-	fi
-
-# 9) Очистка окружения
-cleanup-env:
-	@echo "🧹 Очистка окружения..."
-	@$(PY) tools/port_manager.py --cleanup
-
-# 10) Проверка состояния окружения
-check-env:
-	@echo "🔍 Проверка состояния окружения..."
-	@$(PY) tools/port_manager.py --check
-
-# 11) Lint (только критические ошибки)
-lint:
-	flake8 . \
-		--exclude=venv,__pycache__,.git,tools,parsers/advanced_parser.py \
-		--max-line-length=120 \
-		--ignore=E402,E501,W293,F401,F841,F541,E722 \
-		--select=F821,F811
-
-# 11.1) Lint полный (все ошибки)
-lint-full:
-	flake8 . --exclude=venv,__pycache__,.git
-
-# 12) Format (black)
-format:
-	black .
-
-# 13) Pre-push checks (Black + Flake8 + Tests)
-pre-push:
-	@echo "🔍 Running pre-push checks..."
-	@$(MAKE) format
-	@$(MAKE) lint
-	@echo "✅ Pre-push checks completed"
-
-# 14) Check: lint + tests (с подготовкой окружения)
-check:
-	@echo "🔍 Проверка кода и тестов..."
-	@$(MAKE) prepare-test-env
-	@$(MAKE) pre-push
-	@$(MAKE) test
-
-# 14) Run tests then bot (с подготовкой окружения)
-run-tests-bot:
-	@$(MAKE) prepare-test-env
-	$(MAKE) test
-	$(MAKE) run-bot
-
-# 15) Check database schema
-check-db:
-	$(PY) tools/check_database.py
-
-# 16) Dev: run bot and web together
-dev:
-	$(MAKE) run-bot & \
-	$(MAKE) run-web
-
-# === Управление всеми процессами ===
-
-# 14) Запустить все процессы (бот + WebApp)
-run-all:
-	$(PY) tools/run_all.py start
-
-# 15) Остановить все процессы
-stop-all:
-	$(PY) tools/run_all.py stop
-
-# 16) Перезапустить все процессы
-restart-all:
-	$(PY) tools/run_all.py restart
-
-# 17) Показать статус процессов
-status:
-	$(PY) tools/run_all.py status
-
-# 18) Показать логи процессов
-logs:
-	@if command -v tail >/dev/null 2>&1; then \
-		tail -n 100 -f logs/bot.log logs/webapp.log; \
-	else \
-		echo "💡 Для просмотра логов откройте файлы:"; \
-		echo "   - logs/bot.log"; \
-		echo "   - logs/webapp.log"; \
-		echo ""; \
-		echo "Или используйте: python tools/run_all.py logs"; \
-	fi
-
-# === Управление портами ===
-
-# 19) Проверить занятые порты
 check-ports:
-	@echo "🔍 Проверка портов 8001 и 5000..."
-	@if lsof -i :8001 >/dev/null 2>&1; then \
-		echo "⚠️  Порт 8001 занят:"; \
-		lsof -i :8001; \
+	@echo "$(BLUE)🔍 Проверка портов...$(NC)"
+	@echo ""
+	@$(MAKE) check-port-react
+	@$(MAKE) check-port-flask
+	@$(MAKE) check-port-fastapi
+	@echo ""
+
+check-port-react:
+	@if lsof -Pi :$(REACT_PORT) -sTCP:LISTEN -t >/dev/null 2>&1; then \
+		echo "$(RED)❌ Порт $(REACT_PORT) занят$(NC)"; \
+		lsof -Pi :$(REACT_PORT) -sTCP:LISTEN; \
 	else \
-		echo "✅ Порт 8001 свободен"; \
+		echo "$(GREEN)✅ Порт $(REACT_PORT) свободен$(NC)"; \
 	fi
-	@if lsof -i :5000 >/dev/null 2>&1; then \
-		echo "⚠️  Порт 5000 занят:"; \
-		lsof -i :5000; \
+
+check-port-flask:
+	@if lsof -Pi :$(FLASK_PORT) -sTCP:LISTEN -t >/dev/null 2>&1; then \
+		echo "$(RED)❌ Порт $(FLASK_PORT) занят$(NC)"; \
+		lsof -Pi :$(FLASK_PORT) -sTCP:LISTEN; \
 	else \
-		echo "✅ Порт 5000 свободен"; \
+		echo "$(GREEN)✅ Порт $(FLASK_PORT) свободен$(NC)"; \
 	fi
 
-# 20) Освободить порты
-free-ports:
-	@echo "🛑 Освобождаем порты..."
-	@if lsof -i :8001 >/dev/null 2>&1; then \
-		echo "Убиваем процессы на порту 8001..."; \
-		lsof -ti :8001 | xargs kill -9 2>/dev/null || true; \
+check-port-fastapi:
+	@if lsof -Pi :$(FASTAPI_PORT) -sTCP:LISTEN -t >/dev/null 2>&1; then \
+		echo "$(RED)❌ Порт $(FASTAPI_PORT) занят$(NC)"; \
+		lsof -Pi :$(FASTAPI_PORT) -sTCP:LISTEN; \
+	else \
+		echo "$(GREEN)✅ Порт $(FASTAPI_PORT) свободен$(NC)"; \
 	fi
-	@if lsof -i :5000 >/dev/null 2>&1; then \
-		echo "Убиваем процессы на порту 5000..."; \
-		lsof -ti :5000 | xargs kill -9 2>/dev/null || true; \
-	fi
-	@echo "✅ Порты освобождены"
 
-# 21) Безопасный запуск WebApp
-run-web-safe:
-	@echo "🚀 Безопасный запуск WebApp..."
-	@$(MAKE) check-ports
-	@if lsof -i :8001 >/dev/null 2>&1; then \
-		echo "⚠️  Порт 8001 занят, освобождаем..."; \
-		$(MAKE) free-ports; \
-		sleep 2; \
-	fi
-	@$(MAKE) run-web
+# =============================================================================
+# 🎯 ЗАПУСК СЕРВИСОВ
+# =============================================================================
 
-# 22) Безопасный запуск всех сервисов
-dev-safe:
-	@echo "🚀 Безопасный запуск всех сервисов..."
-	@$(MAKE) free-ports
+start: check-ports
+	@echo "$(BLUE)🚀 Запуск PulseAI сервисов...$(NC)"
+	@echo ""
+	@$(MAKE) start-flask
 	@sleep 2
-	@$(MAKE) run-all
+	@$(MAKE) start-react
+	@echo ""
+	@echo "$(GREEN)✅ Все сервисы запущены!$(NC)"
+	@echo "$(YELLOW)React Frontend:$(NC) http://localhost:$(REACT_PORT)"
+	@echo "$(YELLOW)Flask API:$(NC) http://localhost:$(FLASK_PORT)"
 
-# === Обслуживание базы данных ===
+start-react:
+	@echo "$(BLUE)⚛️  Запуск React (Vite)...$(NC)"
+	@cd webapp && npm run dev > ../logs/react.log 2>&1 &
+	@echo "$$!" > logs/react.pid
+	@sleep 3
+	@if curl -s http://localhost:$(REACT_PORT) > /dev/null; then \
+		echo "$(GREEN)✅ React запущен на порту $(REACT_PORT)$(NC)"; \
+	else \
+		echo "$(RED)❌ React не запустился$(NC)"; \
+	fi
 
-# 23) Полное обслуживание базы данных
-db-maintenance:
-	@echo "🏗️  Полное обслуживание базы данных..."
-	$(PY) tools/database_maintenance.py
+start-flask:
+	@echo "$(BLUE)🐍 Запуск Flask API...$(NC)"
+	@python3 webapp.py > logs/flask.log 2>&1 &
+	@echo "$$!" > logs/flask.pid
+	@sleep 3
+	@if curl -s http://localhost:$(FLASK_PORT)/api/health > /dev/null; then \
+		echo "$(GREEN)✅ Flask API запущен на порту $(FLASK_PORT)$(NC)"; \
+	else \
+		echo "$(RED)❌ Flask API не запустился$(NC)"; \
+	fi
 
-# 24) Очистка базы данных
-db-cleanup:
-	@echo "🧹 Очистка базы данных..."
-	$(PY) tools/cleanup_database.py
+start-bot:
+	@echo "$(BLUE)🤖 Запуск Telegram Bot...$(NC)"
+	@python3 main.py > logs/bot.log 2>&1 &
+	@echo "$$!" > logs/bot.pid
+	@sleep 2
+	@echo "$(GREEN)✅ Telegram Bot запущен$(NC)"
 
-# 25) Оптимизация базы данных
-db-optimize:
-	@echo "⚡ Оптимизация базы данных..."
-	$(PY) tools/optimize_database.py
+# =============================================================================
+# 🎯 ИНДИВИДУАЛЬНЫЕ КОМАНДЫ
+# =============================================================================
 
-# 26) Проверка структуры базы данных
-db-check:
-	@echo "🔍 Проверка структуры базы данных..."
-	$(PY) tools/check_all_columns.py
-	$(PY) tools/check_users_table.py
+react: check-port-react
+	@$(MAKE) start-react
 
-# === Проверка источников RSS ===
+flask: check-port-flask
+	@$(MAKE) start-flask
 
-# 27) Проверка всех RSS источников
-check-sources:
-	@echo "🔍 Проверка RSS источников..."
-	$(PY) tools/check_sources.py
+bot:
+	@$(MAKE) start-bot
 
-# 28) Показать отчеты источников
-sources-report:
-	@echo "📊 Отчеты источников:"
-	@echo "   📄 CSV: logs/sources_check.csv"
-	@echo "   📄 Markdown: logs/sources_check.md"
-	@echo "   📄 JSON: logs/sources_check.json"
+# =============================================================================
+# 🎯 ОСТАНОВКА СЕРВИСОВ
+# =============================================================================
 
+stop:
+	@echo "$(BLUE)🛑 Остановка сервисов...$(NC)"
+	@$(MAKE) stop-react
+	@$(MAKE) stop-flask
+	@$(MAKE) stop-bot
+	@echo "$(GREEN)✅ Все сервисы остановлены$(NC)"
+
+stop-react:
+	@if [ -f logs/react.pid ]; then \
+		kill $$(cat logs/react.pid) 2>/dev/null || true; \
+		rm -f logs/react.pid; \
+		echo "$(YELLOW)🛑 React остановлен$(NC)"; \
+	fi
+
+stop-flask:
+	@if [ -f logs/flask.pid ]; then \
+		kill $$(cat logs/flask.pid) 2>/dev/null || true; \
+		rm -f logs/flask.pid; \
+		echo "$(YELLOW)🛑 Flask остановлен$(NC)"; \
+	fi
+
+stop-bot:
+	@if [ -f logs/bot.pid ]; then \
+		kill $$(cat logs/bot.pid) 2>/dev/null || true; \
+		rm -f logs/bot.pid; \
+		echo "$(YELLOW)🛑 Bot остановлен$(NC)"; \
+	fi
+
+# =============================================================================
+# 🎯 ПЕРЕЗАПУСК И ОЧИСТКА
+# =============================================================================
+
+restart: stop start
+
+clean: stop
+	@echo "$(BLUE)🧹 Очистка...$(NC)"
+	@# Убиваем все процессы на наших портах
+	@lsof -ti:$(REACT_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(FLASK_PORT) | xargs kill -9 2>/dev/null || true
+	@lsof -ti:$(FASTAPI_PORT) | xargs kill -9 2>/dev/null || true
+	@# Очищаем логи
+	@rm -f logs/*.pid
+	@echo "$(GREEN)✅ Очистка завершена$(NC)"
+
+# =============================================================================
+# 🎯 ЛОГИ И МОНИТОРИНГ
+# =============================================================================
+
+logs:
+	@echo "$(BLUE)📋 Логи сервисов:$(NC)"
+	@echo ""
+	@echo "$(YELLOW)=== React (последние 10 строк) ===$(NC)"
+	@tail -10 logs/react.log 2>/dev/null || echo "Нет логов React"
+	@echo ""
+	@echo "$(YELLOW)=== Flask (последние 10 строк) ===$(NC)"
+	@tail -10 logs/flask.log 2>/dev/null || echo "Нет логов Flask"
+	@echo ""
+	@echo "$(YELLOW)=== Bot (последние 10 строк) ===$(NC)"
+	@tail -10 logs/bot.log 2>/dev/null || echo "Нет логов Bot"
+
+logs-react:
+	@tail -f logs/react.log
+
+logs-flask:
+	@tail -f logs/flask.log
+
+logs-bot:
+	@tail -f logs/bot.log
+
+# =============================================================================
+# 🎯 РАЗРАБОТКА
+# =============================================================================
+
+install:
+	@echo "$(BLUE)📦 Установка зависимостей...$(NC)"
+	@pip3 install -r requirements.txt
+	@cd webapp && npm install
+	@echo "$(GREEN)✅ Зависимости установлены$(NC)"
+
+dev: install start
+
+# =============================================================================
+# 🎯 ТЕСТИРОВАНИЕ
+# =============================================================================
+
+test-api:
+	@echo "$(BLUE)🧪 Тестирование API...$(NC)"
+	@curl -s http://localhost:$(FLASK_PORT)/api/health | jq .
+	@curl -s http://localhost:$(FLASK_PORT)/api/latest?limit=3 | jq '.data | length'
+
+test-react:
+	@echo "$(BLUE)🧪 Тестирование React...$(NC)"
+	@curl -s http://localhost:$(REACT_PORT) | grep -o '<title>.*</title>'
+
+test: test-api test-react
+
+# =============================================================================
+# 🎯 СТАТУС
+# =============================================================================
+
+status:
+	@echo "$(BLUE)📊 Статус сервисов:$(NC)"
+	@echo ""
+	@$(MAKE) check-ports
+	@echo ""
+	@if [ -f logs/react.pid ]; then echo "$(GREEN)✅ React: запущен$(NC)"; else echo "$(RED)❌ React: остановлен$(NC)"; fi
+	@if [ -f logs/flask.pid ]; then echo "$(GREEN)✅ Flask: запущен$(NC)"; else echo "$(RED)❌ Flask: остановлен$(NC)"; fi
+	@if [ -f logs/bot.pid ]; then echo "$(GREEN)✅ Bot: запущен$(NC)"; else echo "$(RED)❌ Bot: остановлен$(NC)"; fi
+
+# =============================================================================
+# 🎯 ДЕФОЛТНАЯ КОМАНДА
+# =============================================================================
+
+.DEFAULT_GOAL := help

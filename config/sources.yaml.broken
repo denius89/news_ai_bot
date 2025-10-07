@@ -1,0 +1,617 @@
+crypto:
+  altcoins:
+    icon: altcoin
+    sources: []
+  bitcoin:
+    icon: btc
+    sources: []
+  defi:
+    icon: defi
+    sources:
+    - &id001
+      name: thecryptobasic.com
+      url: https://thecryptobasic.com/feed
+      category: crypto
+      subcategory: altcoins
+    - &id002
+      name: cryptocurrencynewscast.online
+      url: https://www.cryptocurrencynewscast.online/feed
+      category: crypto
+      subcategory: altcoins
+    - &id003
+      name: blog.coinjar.com
+      url: https://blog.coinjar.com/feed
+      category: crypto
+      subcategory: altcoins
+    - &id004
+      name: financemagnates.com
+      url: https://www.financemagnates.com/cryptocurrency/feed
+      category: crypto
+      subcategory: altcoins
+    - &id005
+      name: blog.luke.lol
+      url: https://blog.luke.lol/category/cryptocurrency/feed
+      category: crypto
+      subcategory: altcoins
+  ethereum:
+    icon: eth
+    sources:
+    - name: bitcoinethereumnews.com
+      url: https://bitcoinethereumnews.com/feed
+      category: crypto
+      subcategory: bitcoin
+    - name: usethebitcoin.com
+      url: https://usethebitcoin.com/feed
+      category: crypto
+      subcategory: bitcoin
+  exchanges:
+    icon: exchange
+    sources:
+    - name: bitcoinexchangeguide.com
+      url: https://bitcoinexchangeguide.com/feed
+      category: crypto
+      subcategory: bitcoin
+    - name: blog.kraken.com
+      url: https://blog.kraken.com/feed
+      category: misc
+      subcategory: uncategorized
+    - name: blog.bitfinex.com
+      url: https://blog.bitfinex.com/feed
+      category: misc
+      subcategory: uncategorized
+  gamefi:
+    icon: gamefi
+    sources:
+    - *id001
+    - *id002
+    - *id003
+    - *id004
+    - *id005
+  market_trends:
+    icon: market_trends
+    sources:
+    - &id013
+      name: aws.amazon.com
+      url: https://aws.amazon.com/security/security-bulletins/rss/feed
+      category: crypto
+      subcategory: regulation
+    - name: etoro.com
+      url: https://www.etoro.com/news-and-analysis/feed
+      category: misc
+      subcategory: uncategorized
+    - name: joeytrend.com
+      url: https://joeytrend.com/feed
+      category: misc
+      subcategory: uncategorized
+    - name: themarketscompass.substack.com
+      url: https://themarketscompass.substack.com/feed
+      category: misc
+      subcategory: uncategorized
+    - &id019
+      name: blog.google
+      url: https://blog.google/threat-analysis-group/rss
+      category: tech
+      subcategory: bigtech
+  nft:
+    icon: nft
+    sources:
+    - *id001
+    - *id002
+    - *id003
+    - *id004
+    - *id005
+  regulation:
+    icon: regulation
+    sources: []
+  security:
+    icon: security
+    sources: []
+markets:
+  bonds:
+    icon: bonds
+    sources: []
+  central_banks:
+    icon: central_banks
+    sources: []
+  commodities:
+    icon: commodities
+    sources: []
+  earnings:
+    icon: earnings
+    sources: []
+  economic_data:
+    icon: economic_data
+    sources: []
+  forex:
+    icon: forex
+    sources:
+    - *id002
+    - *id004
+    - *id005
+    - name: blog.cryptographyengineering.com
+      url: https://blog.cryptographyengineering.com/feed
+      category: crypto
+      subcategory: altcoins
+    - name: cryptocurrencynews.com
+      url: https://cryptocurrencynews.com/feed
+      category: crypto
+      subcategory: altcoins
+  funds_etfs:
+    icon: etf
+    sources:
+    - &id020
+      name: coinfunda.com
+      url: https://coinfunda.com/feed
+      category: crypto
+      subcategory: altcoins
+  ipos:
+    icon: ipos
+    sources: []
+  stocks:
+    icon: stocks
+    sources:
+    - name: btctrading.wordpress.com
+      url: https://btctrading.wordpress.com/feed
+      category: crypto
+      subcategory: bitcoin
+    - &id017
+      name: sharedsecurity.net
+      url: https://sharedsecurity.net/feed
+      category: crypto
+      subcategory: regulation
+sports:
+  badminton:
+    icon: badminton
+    sources: []
+  baseball:
+    icon: baseball
+    sources: []
+  basketball:
+    icon: basketball
+    sources:
+    - name: bitcoinbazis.hu
+      url: http://www.bitcoinbazis.hu/feed
+      category: crypto
+      subcategory: bitcoin
+  cricket:
+    icon: cricket
+    sources: []
+  esports:
+    icon: esports
+    sources:
+    - *id005
+  football:
+    icon: football
+    sources: []
+  other:
+    icon: sports_other
+    sources: []
+  table_tennis:
+    icon: table_tennis
+    sources: []
+  tennis:
+    icon: tennis
+    sources: []
+  ufc_mma:
+    icon: ufc
+    sources:
+    - &id006
+      name: jalammar.github.io
+      url: https://jalammar.github.io/feed.xml
+      category: misc
+      subcategory: uncategorized
+    - name: grammarly.com
+      url: https://www.grammarly.com/blog/feed
+      category: misc
+      subcategory: uncategorized
+    - &id007
+      name: jalammar.github.io
+      url: https://jalammar.github.io/feed
+      category: misc
+      subcategory: uncategorized
+tech:
+  ai:
+    icon: ai
+    sources: []
+  bigtech:
+    icon: bigtech
+    sources: []
+  blockchain_tech:
+    icon: blockchain
+    sources:
+    - name: blockchain.news
+      url: https://blockchain.news/rss
+      category: tech
+      subcategory: ai
+  conferences:
+    icon: conferences
+    sources:
+    - &id015
+      name: ubuntu.com
+      url: https://ubuntu.com/security/notices/rss.xml
+      category: crypto
+      subcategory: regulation
+    - &id016
+      name: rcesecurity.com
+      url: https://www.rcesecurity.com/feed
+      category: crypto
+      subcategory: regulation
+  cybersecurity:
+    icon: cybersecurity
+    sources: []
+  hardware:
+    icon: hardware
+    sources:
+    - name: cointelegraph.com
+      url: https://cointelegraph.com/feed
+      category: crypto
+      subcategory: altcoins
+    - name: inteltechniques.com
+      url: https://inteltechniques.com/blog/feed
+      category: misc
+      subcategory: uncategorized
+    - name: spectrum.ieee.org
+      url: https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss
+      category: misc
+      subcategory: uncategorized
+    - &id018
+      name: cloudblog.withgoogle.com
+      url: https://cloudblog.withgoogle.com/topics/threat-intelligence/rss
+      category: tech
+      subcategory: bigtech
+  software:
+    icon: software
+    sources:
+    - name: coinstats.app
+      url: https://coinstats.app/blog/feed
+      category: crypto
+      subcategory: altcoins
+    - name: absoluteappsec.com
+      url: https://absoluteappsec.com/rss
+      category: crypto
+      subcategory: regulation
+    - &id014
+      name: github.blog
+      url: https://github.blog/category/security/feed
+      category: crypto
+      subcategory: regulation
+    - name: wesecureapp.com
+      url: https://wesecureapp.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: absoluteappsec.com
+      url: https://absoluteappsec.com/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: lilianweng.github.io
+      url: https://lilianweng.github.io/lil-log/feed.xml
+      category: misc
+      subcategory: uncategorized
+    - *id006
+    - name: geohot.github.io
+      url: https://geohot.github.io/blog/feed
+      category: misc
+      subcategory: uncategorized
+    - *id007
+    - name: geohot.github.io
+      url: https://geohot.github.io/blog/feed.xml
+      category: misc
+      subcategory: uncategorized
+    - name: lilianweng.github.io
+      url: https://lilianweng.github.io/lil-log/feed
+      category: misc
+      subcategory: uncategorized
+    - &id008
+      name: joelonsoftware.com
+      url: https://www.joelonsoftware.com/feed
+      category: world
+      subcategory: conflicts
+  startups:
+    icon: startups
+    sources: []
+world:
+  climate:
+    icon: climate
+    sources:
+    - &id009
+      name: malwaretech.com
+      url: https://malwaretech.com/feed.xml
+      category: world
+      subcategory: conflicts
+    - &id010
+      name: defenseindepth.libsyn.com
+      url: https://defenseindepth.libsyn.com/rss
+      category: world
+      subcategory: conflicts
+    - &id011
+      name: towardsdatascience.com
+      url: https://towardsdatascience.com/feed
+      category: world
+      subcategory: conflicts
+    - &id012
+      name: blog.malwarebytes.com
+      url: https://blog.malwarebytes.com/feed
+      category: world
+      subcategory: conflicts
+    - *id008
+  conflicts:
+    icon: conflicts
+    sources: []
+  diplomacy:
+    icon: diplomacy
+    sources: []
+  elections:
+    icon: elections
+    sources:
+    - *id009
+    - *id010
+    - *id011
+    - *id012
+    - *id008
+  energy:
+    icon: energy
+    sources:
+    - *id009
+    - *id010
+    - *id011
+    - *id012
+    - *id008
+  geopolitics:
+    icon: geopolitics
+    sources:
+    - *id009
+    - *id010
+    - *id011
+    - *id012
+    - *id008
+  global_risks:
+    icon: global_risks
+    sources:
+    - name: tech.eu
+      url: https://tech.eu/category/cybersecurity/feed
+      category: crypto
+      subcategory: regulation
+    - name: legitsecurity.com
+      url: https://www.legitsecurity.com/blog/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: nist.gov
+      url: https://www.nist.gov/blogs/cybersecurity-insights/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: cybersecuritypulse.net
+      url: https://www.cybersecuritypulse.net/feed
+      category: crypto
+      subcategory: regulation
+    - name: blog.pcisecuritystandards.org
+      url: https://blog.pcisecuritystandards.org/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: microsoft.com
+      url: https://www.microsoft.com/security/blog/feed
+      category: crypto
+      subcategory: regulation
+    - name: nytimes.com
+      url: https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/spotlight/cybersecurity/rss.xml
+      category: crypto
+      subcategory: regulation
+    - *id013
+    - name: blog.securityinnovation.com
+      url: https://blog.securityinnovation.com/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: blog.mozilla.org
+      url: https://blog.mozilla.org/security/feed
+      category: crypto
+      subcategory: regulation
+    - name: theguardian.com
+      url: https://www.theguardian.com/technology/data-computer-security/rss
+      category: crypto
+      subcategory: regulation
+    - name: zdnet.com
+      url: https://www.zdnet.com/topic/security/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: cloudsecurityalliance.org
+      url: https://cloudsecurityalliance.org/blog/feed
+      category: crypto
+      subcategory: regulation
+    - name: defensivesecurity.org
+      url: https://defensivesecurity.org/feed
+      category: crypto
+      subcategory: regulation
+    - name: tripwire.com
+      url: https://www.tripwire.com/state-of-security/feed
+      category: crypto
+      subcategory: regulation
+    - name: esecurityplanet.com
+      url: https://www.esecurityplanet.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: securitylabs.datadoghq.com
+      url: https://securitylabs.datadoghq.com/rss/feed.xml
+      category: crypto
+      subcategory: regulation
+    - name: strategyofsecurity.com
+      url: https://strategyofsecurity.com/rss
+      category: crypto
+      subcategory: regulation
+    - name: resecurity.com
+      url: https://www.resecurity.com/feed
+      category: crypto
+      subcategory: regulation
+    - *id014
+    - name: welivesecurity.com
+      url: https://www.welivesecurity.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: wired.com
+      url: https://www.wired.com/feed/category/security/latest/rss
+      category: crypto
+      subcategory: regulation
+    - name: aws.amazon.com
+      url: https://aws.amazon.com/blogs/security/feed
+      category: crypto
+      subcategory: regulation
+    - name: cybersecuritynews.com
+      url: https://cybersecuritynews.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: tenable.com
+      url: https://www.tenable.com/security/research/feed
+      category: crypto
+      subcategory: regulation
+    - name: krebsonsecurity.com
+      url: https://krebsonsecurity.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: cisecurity.org
+      url: https://www.cisecurity.org/feed
+      category: crypto
+      subcategory: regulation
+    - name: blog.compass-security.com
+      url: https://blog.compass-security.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: securityaffairs.co
+      url: http://securityaffairs.co/wordpress/feed
+      category: crypto
+      subcategory: regulation
+    - name: hackernoon.com
+      url: https://hackernoon.com/tagged/cybersecurity/feed
+      category: crypto
+      subcategory: regulation
+    - name: arstechnica.com
+      url: https://arstechnica.com/tag/security/feed
+      category: crypto
+      subcategory: regulation
+    - name: cloudsecurityalliance.org
+      url: https://cloudsecurityalliance.org/feed
+      category: crypto
+      subcategory: regulation
+    - name: siliconangle.com
+      url: https://siliconangle.com/category/security/feed
+      category: crypto
+      subcategory: regulation
+    - *id015
+    - name: cybersecurityventures.com
+      url: https://cybersecurityventures.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: ventureinsecurity.net
+      url: https://ventureinsecurity.net/feed
+      category: crypto
+      subcategory: regulation
+    - name: heimdalsecurity.com
+      url: https://heimdalsecurity.com/blog/feed
+      category: crypto
+      subcategory: regulation
+    - name: positive.security
+      url: https://positive.security/blog/rss.xml
+      category: crypto
+      subcategory: regulation
+    - name: securityledger.com
+      url: https://securityledger.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: omeronsecurity.com
+      url: https://www.omeronsecurity.com/feed
+      category: crypto
+      subcategory: regulation
+    - name: helpnetsecurity.com
+      url: https://www.helpnetsecurity.com/feed
+      category: crypto
+      subcategory: regulation
+    - *id016
+    - *id017
+    - name: smashingsecurity.com
+      url: http://www.smashingsecurity.com/rss
+      category: crypto
+      subcategory: regulation
+    - name: netskope.com
+      url: https://www.netskope.com/blog/category/netskope-threat-labs/feed
+      category: misc
+      subcategory: uncategorized
+    - name: threatpost.com
+      url: https://threatpost.com/feed
+      category: misc
+      subcategory: uncategorized
+    - name: newsletter.blockthreat.io
+      url: https://newsletter.blockthreat.io/feed
+      category: misc
+      subcategory: uncategorized
+    - *id018
+    - *id019
+  migration:
+    icon: migration
+    sources:
+    - *id009
+    - *id010
+    - *id011
+    - *id012
+    - *id008
+  organizations:
+    icon: organizations
+    sources:
+    - *id020
+    - *id015
+    - name: techcrunch.com
+      url: https://techcrunch.com/startups/feed
+      category: tech
+      subcategory: startups
+    - name: omny.fm
+      url: https://omny.fm/shows/troy-hunt-weekly-update/playlists/podcast.rss
+      category: world
+      subcategory: diplomacy
+    - name: unconfirmed.libsyn.com
+      url: https://unconfirmed.libsyn.com/rss
+      category: world
+      subcategory: diplomacy
+    - name: foundation.mozilla.org
+      url: https://foundation.mozilla.org/en/blog/rss
+      category: world
+      subcategory: diplomacy
+    - name: coffeeandjunk.substack.com
+      url: https://coffeeandjunk.substack.com/feed
+      category: world
+      subcategory: diplomacy
+    - name: news.ycombinator.com
+      url: http://news.ycombinator.com/rss
+      category: world
+      subcategory: diplomacy
+    - name: unit42.paloaltonetworks.com
+      url: https://unit42.paloaltonetworks.com/feed
+      category: world
+      subcategory: diplomacy
+    - name: omgubuntu.co.uk
+      url: https://www.omgubuntu.co.uk/feed
+      category: world
+      subcategory: diplomacy
+    - name: c4isrnet.com
+      url: https://www.c4isrnet.com/arc/outboundfeeds/rss
+      category: world
+      subcategory: diplomacy
+    - name: techcrunch.com
+      url: https://techcrunch.com/feed
+      category: world
+      subcategory: diplomacy
+    - name: wunderbit.co
+      url: https://wunderbit.co/en/rss
+      category: world
+      subcategory: diplomacy
+    - name: news.crunchbase.com
+      url: https://news.crunchbase.com/feed
+      category: world
+      subcategory: diplomacy
+    - name: fortunez.com
+      url: https://fortunez.com/feed
+      category: world
+      subcategory: diplomacy
+  sanctions:
+    icon: sanctions
+    sources:
+    - *id009
+    - *id010
+    - *id011
+    - *id012
+    - *id008
