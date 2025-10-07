@@ -26,12 +26,7 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'unsafe-none',
       'Cross-Origin-Resource-Policy': 'cross-origin',
     },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8001',
-        changeOrigin: true,
-      },
-    },
+    // Proxy убран - теперь Flask обрабатывает все запросы
   },
   build: {
     outDir: 'dist',

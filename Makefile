@@ -27,7 +27,7 @@ NC = \033[0m # No Color
 
 # Показать справку
 help:
-	@echo "$(BLUE)🚀 PulseAI Development Commands$(NC)"
+	@echo "$(BLUE)🚀 PulseAI Production Commands$(NC)"
 	@echo ""
 	@echo "$(GREEN)Основные команды:$(NC)"
 	@echo "  $(YELLOW)make start$(NC)        - Запустить все сервисы"
@@ -38,14 +38,14 @@ help:
 	@echo "  $(YELLOW)make clean$(NC)        - Очистить процессы и порты"
 	@echo ""
 	@echo "$(GREEN)Индивидуальные сервисы:$(NC)"
-	@echo "  $(YELLOW)make react$(NC)        - Запустить только React (порт $(REACT_PORT))"
-	@echo "  $(YELLOW)make flask$(NC)        - Запустить только Flask API (порт $(FLASK_PORT))"
+	@echo "  $(YELLOW)make flask$(NC)        - Запустить Flask + React (порт $(FLASK_PORT))"
 	@echo "  $(YELLOW)make bot$(NC)          - Запустить только Telegram Bot"
+	@echo "  $(YELLOW)make build$(NC)        - Собрать React для production"
 	@echo ""
-	@echo "$(GREEN)Схема портов:$(NC)"
-	@echo "  $(YELLOW)React Frontend:$(NC)   http://localhost:$(REACT_PORT)"
-	@echo "  $(YELLOW)Flask API:$(NC)        http://localhost:$(FLASK_PORT)"
-	@echo "  $(YELLOW)FastAPI:$(NC)          http://localhost:$(FASTAPI_PORT)"
+	@echo "$(GREEN)Архитектура:$(NC)"
+	@echo "  $(YELLOW)Flask (порт $(FLASK_PORT)):$(NC)   React статика + API"
+	@echo "  $(YELLOW)Telegram Bot:$(NC)                 Управление подписками"
+	@echo "  $(YELLOW)React:$(NC)                        Статические файлы в Flask"
 
 # =============================================================================
 # 🎯 ПРОВЕРКА ПОРТОВ
@@ -90,13 +90,12 @@ check-port-fastapi:
 start: check-ports
 	@echo "$(BLUE)🚀 Запуск PulseAI сервисов...$(NC)"
 	@echo ""
+	@$(MAKE) build
 	@$(MAKE) start-flask
-	@sleep 2
-	@$(MAKE) start-react
 	@echo ""
 	@echo "$(GREEN)✅ Все сервисы запущены!$(NC)"
-	@echo "$(YELLOW)React Frontend:$(NC) http://localhost:$(REACT_PORT)"
-	@echo "$(YELLOW)Flask API:$(NC) http://localhost:$(FLASK_PORT)"
+	@echo "$(YELLOW)Flask + React:$(NC) http://localhost:$(FLASK_PORT)/webapp"
+	@echo "$(YELLOW)API:$(NC) http://localhost:$(FLASK_PORT)/api"
 
 start-react:
 	@echo "$(BLUE)⚛️  Запуск React (Vite)...$(NC)"
@@ -122,19 +121,21 @@ start-flask:
 
 start-bot:
 	@echo "$(BLUE)🤖 Запуск Telegram Bot...$(NC)"
-	@python3 main.py > logs/bot.log 2>&1 &
+	@python3 bot.py > logs/bot.log 2>&1 &
 	@echo "$$!" > logs/bot.pid
 	@sleep 2
 	@echo "$(GREEN)✅ Telegram Bot запущен$(NC)"
+
+build:
+	@echo "$(BLUE)🔨 Сборка React для production...$(NC)"
+	@cd webapp && npx vite build
+	@echo "$(GREEN)✅ React собран в webapp/dist/$(NC)"
 
 # =============================================================================
 # 🎯 ИНДИВИДУАЛЬНЫЕ КОМАНДЫ
 # =============================================================================
 
-react: check-port-react
-	@$(MAKE) start-react
-
-flask: check-port-flask
+flask: check-port-flask build
 	@$(MAKE) start-flask
 
 bot:
@@ -146,7 +147,6 @@ bot:
 
 stop:
 	@echo "$(BLUE)🛑 Остановка сервисов...$(NC)"
-	@$(MAKE) stop-react
 	@$(MAKE) stop-flask
 	@$(MAKE) stop-bot
 	@echo "$(GREEN)✅ Все сервисы остановлены$(NC)"
