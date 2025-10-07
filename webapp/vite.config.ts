@@ -18,7 +18,7 @@ export default defineConfig({
     allowedHosts: [
       'localhost',
       '127.0.0.1',
-      'lenses-verified-leone-efficiency.trycloudflare.com',
+      'inputs-endless-designers-stakeholders.trycloudflare.com',
       '.trycloudflare.com' // Allow all trycloudflare.com subdomains
     ],
     headers: {
