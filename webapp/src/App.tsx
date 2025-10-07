@@ -139,7 +139,11 @@ const App: React.FC = () => {
   };
 
   const renderPage = () => {
-    const pageProps = { theme, onThemeToggle: handleThemeToggle };
+    const pageProps = { 
+      theme, 
+      onThemeToggle: handleThemeToggle,
+      onNavigate: setActivePage 
+    };
     
     switch (activePage) {
       case 'home':

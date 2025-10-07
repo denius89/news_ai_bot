@@ -334,7 +334,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme, onThemeToggle }) => {
                   <h3 className="text-lg font-semibold text-text mb-2">
                     Календарь событий
                   </h3>
-                  <p className="text-muted mb-4">
+                  <p className="text-muted-strong mb-4">
                     Здесь будет отображаться интерактивный календарь
                   </p>
                   <Button variant="secondary">
@@ -352,7 +352,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme, onThemeToggle }) => {
               <h3 className="text-xl font-semibold text-text mb-2">
                 События не найдены
               </h3>
-              <p className="text-muted mb-6">
+              <p className="text-muted-strong mb-6">
                 Попробуйте изменить фильтры или выбрать другой временной период
               </p>
               <Button 

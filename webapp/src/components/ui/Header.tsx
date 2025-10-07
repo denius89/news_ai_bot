@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex flex-col space-y-1">
         <h1 className="text-xl font-semibold text-text">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-muted">{subtitle}</p>
+          <p className="text-sm text-muted-strong">{subtitle}</p>
         )}
       </div>
       
@@ -97,7 +97,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
         <div className="flex flex-col space-y-1">
           <h1 className="text-lg font-semibold text-text">{title}</h1>
           {subtitle && (
-            <p className="text-xs text-muted">{subtitle}</p>
+            <p className="text-xs text-muted-strong">{subtitle}</p>
           )}
         </div>
       </div>

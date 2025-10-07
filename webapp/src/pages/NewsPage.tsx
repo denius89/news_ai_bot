@@ -267,7 +267,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ theme, onThemeToggle }) => {
               <h3 className="text-xl font-semibold text-text mb-2">
                 Новости не найдены
               </h3>
-              <p className="text-muted mb-6">
+              <p className="text-muted-strong mb-6">
                 Попробуйте изменить поисковый запрос или выберите другую категорию
               </p>
               <Button 
