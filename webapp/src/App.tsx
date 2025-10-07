@@ -12,13 +12,20 @@ import SettingsPage from './pages/SettingsPage';
 // Components
 import { BottomNavigation } from './components/ui/BottomNavigation';
 import { MobileHeader } from './components/ui/Header';
+import { TelegramWebApp } from './components/TelegramWebApp';
+
+// Utils
+import { initializeTheme, toggleTheme, getThemePreference, type Theme } from './utils/theme';
 
 // Styles
 import './styles/index.css';
 
 const App: React.FC = () => {
+  console.log('🚀 App.tsx component loaded');
+  
   const [isMobile, setIsMobile] = useState(false);
   const [activePage, setActivePage] = useState('home');
+  const [theme, setTheme] = useState<Theme>('light');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -30,6 +37,34 @@ const App: React.FC = () => {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    // Initialize theme system
+    const cleanup = initializeTheme();
+    setTheme(getThemePreference());
+    
+    // Listen for theme changes from other tabs/windows
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'pulseai-theme') {
+        const newTheme = e.newValue as Theme;
+        if (newTheme === 'light' || newTheme === 'dark') {
+          setTheme(newTheme);
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      cleanup?.();
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  const handleThemeToggle = () => {
+    const newTheme = toggleTheme();
+    setTheme(newTheme);
+  };
 
   const navigationItems = [
     {
@@ -104,25 +139,28 @@ const App: React.FC = () => {
   };
 
   const renderPage = () => {
+    const pageProps = { theme, onThemeToggle: handleThemeToggle };
+    
     switch (activePage) {
       case 'home':
-        return <HomePage />;
+        return <HomePage {...pageProps} />;
       case 'news':
-        return <NewsPage />;
+        return <NewsPage {...pageProps} />;
       case 'digest':
-        return <DigestPage />;
+        return <DigestPage {...pageProps} />;
       case 'events':
-        return <EventsPage />;
+        return <EventsPage {...pageProps} />;
       case 'settings':
-        return <SettingsPage />;
+        return <SettingsPage {...pageProps} />;
       default:
-        return <HomePage />;
+        return <HomePage {...pageProps} />;
     }
   };
 
   return (
-    <Router>
-      <div className="min-h-screen bg-bg">
+    <TelegramWebApp>
+      <Router>
+        <div className="min-h-screen bg-bg">
         <AnimatePresence mode="wait">
           <motion.div
             key={activePage}
@@ -172,8 +210,9 @@ const App: React.FC = () => {
             </div>
           </nav>
         )}
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </TelegramWebApp>
   );
 };
 

@@ -15,7 +15,12 @@ interface DigestItem {
   keyPoints: string[];
 }
 
-const DigestPage: React.FC = () => {
+interface DigestPageProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+const DigestPage: React.FC<DigestPageProps> = ({ theme, onThemeToggle }) => {
   const [digests, setDigests] = useState<DigestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');

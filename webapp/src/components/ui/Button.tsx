@@ -53,6 +53,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={cn(
           baseClasses,
+          'transition-colors duration-300',
           variantClasses[variant],
           sizeClasses[size],
           widthClasses,

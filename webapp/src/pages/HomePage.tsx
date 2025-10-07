@@ -1,10 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/ui/Header';
 
-const HomePage: React.FC = () => {
+interface HomePageProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle }) => {
+  const navigate = useNavigate();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -36,25 +43,25 @@ const HomePage: React.FC = () => {
 
   const quickActions = [
     {
-      title: '📰 Новости',
+      title: 'Новости',
       description: 'Последние новости по всем категориям',
       href: '/news',
       icon: '📰',
     },
     {
-      title: '🤖 AI Дайджест',
+      title: 'AI Дайджест',
       description: 'Персональный дайджест от ИИ',
       href: '/digest',
       icon: '🤖',
     },
     {
-      title: '📅 События',
+      title: 'События',
       description: 'Календарь важных событий',
       href: '/events',
       icon: '📅',
     },
     {
-      title: '⚙️ Настройки',
+      title: 'Настройки',
       description: 'Управление подписками и уведомлениями',
       href: '/settings',
       icon: '⚙️',
@@ -66,6 +73,8 @@ const HomePage: React.FC = () => {
       <Header 
         title="PulseAI" 
         subtitle="Ваш персональный AI-помощник для новостей"
+        theme={theme}
+        onThemeToggle={onThemeToggle}
       />
       
       <main className="container-main">
@@ -87,7 +96,11 @@ const HomePage: React.FC = () => {
                   Получайте персональные новости и аналитику, созданную с помощью 
                   искусственного интеллекта специально для вас
                 </p>
-                <Button size="lg" className="btn-primary">
+                <Button 
+                  size="lg" 
+                  className="btn-primary"
+                  onClick={() => navigate('/news')}
+                >
                   Начать работу
                 </Button>
               </CardContent>
@@ -140,7 +153,7 @@ const HomePage: React.FC = () => {
                       <Button 
                         variant="secondary" 
                         className="w-full"
-                        onClick={() => window.location.href = action.href}
+                        onClick={() => navigate(action.href)}
                       >
                         Открыть
                       </Button>

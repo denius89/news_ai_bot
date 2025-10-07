@@ -40,13 +40,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       return (
         <div className="relative">
           {iconPosition === 'left' && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted dark:text-muted">
               {icon}
             </div>
           )}
           {inputElement}
           {iconPosition === 'right' && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted dark:text-muted">
               {icon}
             </div>
           )}
