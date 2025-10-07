@@ -1,17 +1,31 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import { resolve } from 'path'
+import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/webapp',
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   server: {
     port: 3000,
+    host: true, // Allow external connections
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      'lenses-verified-leone-efficiency.trycloudflare.com',
+      '.trycloudflare.com' // Allow all trycloudflare.com subdomains
+    ],
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      'Cross-Origin-Opener-Policy': 'unsafe-none',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8001',
