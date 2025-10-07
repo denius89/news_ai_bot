@@ -5,11 +5,13 @@ webapp_bp = Blueprint("webapp", __name__)
 
 @webapp_bp.route("/webapp")
 def webapp():
-    """WebApp Dashboard route"""
+    """WebApp Dashboard route - перенаправляем на React"""
+    from flask import redirect
     import logging
     logger = logging.getLogger("news_ai_bot")
-    logger.info("📱 WebApp dashboard accessed")
-    return render_template("webapp.html")
+    logger.info("📱 WebApp dashboard accessed - redirecting to React")
+    # Перенаправляем на React приложение
+    return redirect("http://localhost:3000/webapp")
 
 
 @webapp_bp.route("/live")
@@ -19,5 +21,9 @@ def live_dashboard():
 
 @webapp_bp.route("/app")
 def react_app():
-    """React Frontend App route"""
-    return render_template("react_app.html")
+    """React Frontend App route - перенаправляем на React"""
+    from flask import redirect
+    import logging
+    logger = logging.getLogger("news_ai_bot")
+    logger.info("📱 React app accessed - redirecting to React")
+    return redirect("http://localhost:3000/webapp")

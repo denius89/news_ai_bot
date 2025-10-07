@@ -35,19 +35,7 @@ declare global {
   }
 }
 
-// Initialize Telegram WebApp if available
 console.log('🚀 main.tsx loaded');
-console.log('🔍 window.Telegram exists:', !!window.Telegram);
-console.log('🔍 window.Telegram.WebApp exists:', !!window.Telegram?.WebApp);
-
-if (window.Telegram?.WebApp) {
-  console.log('✅ Initializing Telegram WebApp');
-  window.Telegram.WebApp.ready();
-  window.Telegram.WebApp.expand();
-  console.log('✅ Telegram WebApp initialized');
-} else {
-  console.log('❌ Telegram WebApp not available');
-}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

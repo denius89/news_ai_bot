@@ -82,27 +82,77 @@ def events():
 
 # --- API Endpoints ---
 @news_bp.route("/latest")
+@news_bp.route("/api/latest")  # Добавляем альтернативный маршрут для совместимости
 def api_latest_news():
     """API endpoint для получения последних новостей."""
     try:
         from database.db_models import get_latest_news
-        news = get_latest_news(limit=10)
+        
+        # Получаем параметры пагинации
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 20))
+        
+        # Получаем новости из базы данных
+        all_news = get_latest_news(limit=1000)  # Получаем больше для пагинации
+        
+        # Применяем пагинацию
+        total = len(all_news)
+        start_idx = (page - 1) * limit
+        end_idx = start_idx + limit
+        news = all_news[start_idx:end_idx]
+        
+        # Сортируем по важности, достоверности и свежести
+        import datetime
+        now = datetime.datetime.now(datetime.timezone.utc)
+        
+        def calculate_score(item):
+            importance = float(item.get('importance', 0.5))
+            credibility = float(item.get('credibility', 0.5))
+            
+            # Бонус за свежесть
+            published_at = item.get('published_at')
+            if published_at:
+                if isinstance(published_at, str):
+                    try:
+                        published_at = datetime.datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                    except:
+                        published_at = now
+                hours_ago = (now - published_at).total_seconds() / 3600
+                freshness_bonus = 0.1 if hours_ago <= 6 else 0.05 if hours_ago <= 24 else 0
+            else:
+                freshness_bonus = 0
+            
+            return importance * 0.6 + credibility * 0.4 + freshness_bonus
+        
+        news.sort(key=calculate_score, reverse=True)
+        
+        # Применяем пагинацию после сортировки
+        paginated_news = news[start_idx:end_idx]
         
         return jsonify({
             "status": "success",
-            "count": len(news),
             "data": [
                 {
                     "id": n.get("id"),
                     "title": n.get("title"),
+                    "content": n.get("content"),
                     "source": n.get("source"),
+                    "url": n.get("link"),  # Добавляем ссылку на новость
                     "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
                     "category": n.get("category"),
                     "credibility": n.get("credibility"),
                     "importance": n.get("importance")
                 }
-                for n in news
-            ]
+                for n in paginated_news
+            ],
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "total_pages": (total + limit - 1) // limit,
+                "has_next": end_idx < total,
+                "has_prev": page > 1
+            }
         })
     except Exception as e:
         logger.error(f"Ошибка получения новостей: {e}")
