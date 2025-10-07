@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/ui/Header';
@@ -8,10 +7,10 @@ import { Header } from '../components/ui/Header';
 interface HomePageProps {
   theme: 'light' | 'dark';
   onThemeToggle: () => void;
+  onNavigate?: (page: string) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle }) => {
-  const navigate = useNavigate();
+const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -45,25 +44,25 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle }) => {
     {
       title: 'Новости',
       description: 'Последние новости по всем категориям',
-      href: '/news',
+      page: 'news',
       icon: '📰',
     },
     {
       title: 'AI Дайджест',
       description: 'Персональный дайджест от ИИ',
-      href: '/digest',
+      page: 'digest',
       icon: '🤖',
     },
     {
       title: 'События',
       description: 'Календарь важных событий',
-      href: '/events',
+      page: 'events',
       icon: '📅',
     },
     {
       title: 'Настройки',
       description: 'Управление подписками и уведомлениями',
-      href: '/settings',
+      page: 'settings',
       icon: '⚙️',
     },
   ];
@@ -92,14 +91,14 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle }) => {
                 <h1 className="text-3xl font-bold text-text mb-2">
                   Добро пожаловать в PulseAI
                 </h1>
-                <p className="text-muted text-lg mb-6 max-w-2xl mx-auto">
+                <p className="text-muted-strong text-lg mb-6 max-w-2xl mx-auto">
                   Получайте персональные новости и аналитику, созданную с помощью 
                   искусственного интеллекта специально для вас
                 </p>
                 <Button 
                   size="lg" 
                   className="btn-primary"
-                  onClick={() => navigate('/news')}
+                  onClick={() => onNavigate?.('news')}
                 >
                   Начать работу
                 </Button>
@@ -153,7 +152,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle }) => {
                       <Button 
                         variant="secondary" 
                         className="w-full"
-                        onClick={() => navigate(action.href)}
+                        onClick={() => onNavigate?.(action.page)}
                       >
                         Открыть
                       </Button>

@@ -272,7 +272,7 @@ const DigestPage: React.FC<DigestPageProps> = ({ theme, onThemeToggle }) => {
                 <h3 className="text-xl font-semibold text-text mb-2">
                   Создать новый дайджест
                 </h3>
-                <p className="text-muted mb-6 max-w-md mx-auto">
+                <p className="text-muted-strong mb-6 max-w-md mx-auto">
                   Сгенерируйте персональный дайджест на основе ваших интересов и предпочтений
                 </p>
                 <Button variant="primary" size="lg">
@@ -289,7 +289,7 @@ const DigestPage: React.FC<DigestPageProps> = ({ theme, onThemeToggle }) => {
               <h3 className="text-xl font-semibold text-text mb-2">
                 Дайджесты не найдены
               </h3>
-              <p className="text-muted mb-6">
+              <p className="text-muted-strong mb-6">
                 Попробуйте выбрать другую категорию или создайте новый дайджест
               </p>
               <Button 

@@ -249,7 +249,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => 
                           <span className="text-2xl">{category.icon}</span>
                           <div>
                             <h4 className="font-medium text-text">{category.name}</h4>
-                            <p className="text-sm text-muted">
+                            <p className="text-sm text-muted-strong">
                               {category.subcategories.filter(sub => sub.enabled).length} из {category.subcategories.length} подкатегорий
                             </p>
                           </div>
@@ -300,7 +300,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => 
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-text">Push-уведомления</h4>
-                      <p className="text-sm text-muted">Получать уведомления в браузере</p>
+                      <p className="text-sm text-muted-strong">Получать уведомления в браузере</p>
                     </div>
                     <Button
                       variant={notifications.push ? 'primary' : 'secondary'}
@@ -314,7 +314,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => 
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-text">Email-уведомления</h4>
-                      <p className="text-sm text-muted">Получать дайджесты на email</p>
+                      <p className="text-sm text-muted-strong">Получать дайджесты на email</p>
                     </div>
                     <Button
                       variant={notifications.email ? 'primary' : 'secondary'}
@@ -328,7 +328,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => 
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-text">AI-дайджесты</h4>
-                      <p className="text-sm text-muted">Персональные дайджесты от ИИ</p>
+                      <p className="text-sm text-muted-strong">Персональные дайджесты от ИИ</p>
                     </div>
                     <Button
                       variant={notifications.digest ? 'primary' : 'secondary'}
@@ -342,7 +342,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme, onThemeToggle }) => 
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-text">Важные события</h4>
-                      <p className="text-sm text-muted">Уведомления о важных событиях</p>
+                      <p className="text-sm text-muted-strong">Уведомления о важных событиях</p>
                     </div>
                     <Button
                       variant={notifications.events ? 'primary' : 'secondary'}
