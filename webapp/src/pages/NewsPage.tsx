@@ -96,42 +96,43 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
            } catch (error) {
              console.error('❌ Error fetching news:', error);
       
-      // Fallback to mock data if API fails
-      const fallbackNews: NewsItem[] = [
-        {
-          id: '1',
-          title: 'Bitcoin достигает новых максимумов на фоне институционального интереса',
-          content: 'Криптовалюта Bitcoin показала значительный рост в последние дни, достигнув новых максимумов...',
-          source: 'CoinDesk',
-          category: 'crypto',
-          publishedAt: '2025-01-06T10:00:00Z',
-          credibility: 0.92,
-          importance: 0.88,
-          url: 'https://example.com/bitcoin-news',
-        },
-        {
-          id: '2',
-          title: 'ИИ-революция: новые достижения в области машинного обучения',
-          content: 'Исследователи представили новую архитектуру нейронных сетей, которая может...',
-          source: 'TechCrunch',
-          category: 'tech',
-          publishedAt: '2025-01-06T09:30:00Z',
-          credibility: 0.89,
-          importance: 0.85,
-          url: 'https://example.com/ai-news',
-        },
-        {
-          id: '3',
-          title: 'Чемпионат мира по футболу: обновления и результаты',
-          content: 'Вчера состоялись ключевые матчи чемпионата мира по футболу...',
-          source: 'ESPN',
-          category: 'sports',
-          publishedAt: '2025-01-06T08:15:00Z',
-          credibility: 0.95,
-          importance: 0.72,
-          url: 'https://example.com/sports-news',
-        },
-      ];
+             // Fallback to mock data if API fails
+                    const now = new Date();
+                    const fallbackNews: NewsItem[] = [
+                      {
+                        id: '1',
+                        title: 'Bitcoin достигает новых максимумов на фоне институционального интереса',
+                        content: 'Криптовалюта Bitcoin показала значительный рост в последние дни, достигнув новых максимумов...',
+                        source: 'CoinDesk',
+                        category: 'crypto',
+                        publishedAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 часа назад
+                        credibility: 0.92,
+                        importance: 0.88,
+                        url: 'https://example.com/bitcoin-news',
+                      },
+                      {
+                        id: '2',
+                        title: 'ИИ-революция: новые достижения в области машинного обучения',
+                        content: 'Исследователи представили новую архитектуру нейронных сетей, которая может...',
+                        source: 'TechCrunch',
+                        category: 'tech',
+                        publishedAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(), // 4 часа назад
+                        credibility: 0.89,
+                        importance: 0.85,
+                        url: 'https://example.com/ai-news',
+                      },
+                      {
+                        id: '3',
+                        title: 'Чемпионат мира по футболу: обновления и результаты',
+                        content: 'Вчера состоялись ключевые матчи чемпионата мира по футболу...',
+                        source: 'ESPN',
+                        category: 'sports',
+                        publishedAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(), // 6 часов назад
+                        credibility: 0.95,
+                        importance: 0.72,
+                        url: 'https://example.com/sports-news',
+                      },
+                    ];
       
       setNews(fallbackNews);
       setHasMoreNews(false);
@@ -169,13 +170,12 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     const currentY = e.touches[0].clientY;
-    const distance = startY - currentY; // Обратная логика для свайпа снизу
+    const distance = currentY - startY; // Исправлено: нормальная логика для свайпа снизу
     
     // Проверяем что мы внизу страницы (scrollY близко к максимальному значению)
     const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
     
     if (distance > 0 && isAtBottom) {
-      e.preventDefault();
       setIsPulling(true);
       setPullDistance(Math.min(distance, 100)); // Max pull distance
     }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Pages
@@ -11,7 +11,6 @@ import SettingsPage from './pages/SettingsPage';
 
 // Components
 import { BottomNavigation } from './components/ui/BottomNavigation';
-import { MobileHeader } from './components/ui/Header';
 import { TelegramWebApp } from './components/TelegramWebApp';
 
 // Utils
@@ -163,11 +162,11 @@ const App: React.FC = () => {
     out: { opacity: 0, x: -20 },
   };
 
-  const pageTransition = {
-    type: 'tween',
-    ease: 'anticipate',
-    duration: 0.3,
-  };
+         const pageTransition = {
+           type: 'tween' as const,
+           ease: 'anticipate' as const,
+           duration: 0.3,
+         };
 
   const renderPage = () => {
     const pageProps = { 

@@ -1,5 +1,6 @@
 import logging
-from flask import Flask, render_template
+import os
+from flask import Flask, render_template, send_from_directory, redirect
 
 from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from routes.news_routes import news_bp
@@ -42,10 +43,37 @@ def importance_icon(value: float) -> str:
 app.jinja_env.filters["importance_icon"] = importance_icon
 
 
-# Главная страница
+# Путь к собранному React
+REACT_DIST_PATH = os.path.join(os.path.dirname(__file__), 'webapp', 'dist')
+
+# React статические файлы
+@app.route('/webapp')
+@app.route('/webapp/')
+@app.route('/webapp/<path:path>')
+def serve_react(path=''):
+    """Обслуживает React приложение как статику"""
+    try:
+        if path == '' or path == '/':
+            return send_from_directory(REACT_DIST_PATH, 'index.html')
+        
+        # Попробовать отдать статический файл
+        try:
+            return send_from_directory(REACT_DIST_PATH, path)
+        except:
+            # React Router fallback - все неизвестные пути ведут на index.html
+            return send_from_directory(REACT_DIST_PATH, 'index.html')
+    except FileNotFoundError:
+        # Если папка dist не существует, показать сообщение
+        return f"""
+        <h1>React не собран</h1>
+        <p>Запустите: <code>cd webapp && npm run build</code></p>
+        <p>Папка {REACT_DIST_PATH} не найдена.</p>
+        """, 404
+
+# Главная страница перенаправляет на React
 @app.route("/")
 def index():
-    return render_template("index.html", active_page="home")
+    return redirect('/webapp')
 
 
 # Регистрируем маршруты

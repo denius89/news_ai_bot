@@ -101,7 +101,7 @@ export const initializeTheme = (): Theme => {
     };
   }
   
-  return theme;
+  return theme as Theme;
 };
 
 /**
