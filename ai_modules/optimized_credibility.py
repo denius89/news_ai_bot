@@ -100,16 +100,14 @@ def evaluate_credibility(news_item: Dict) -> float:
         # Fallback to local prediction if available
         try:
             local_pred = predict_news_item(news_item)
-            logger.warning(
-                f"Using local predictor fallback for credibility: {local_pred.credibility}")
+            logger.warning(f"Using local predictor fallback for credibility: {local_pred.credibility}")
             return local_pred.credibility
         except Exception:
             logger.error("Both AI and local predictor failed for credibility")
             return 0.0
 
 
-def evaluate_credibility_with_cache(news_item: Dict,
-                                    cache_credibility: Optional[float] = None) -> float:
+def evaluate_credibility_with_cache(news_item: Dict, cache_credibility: Optional[float] = None) -> float:
     """
     Evaluate credibility with explicit cache value.
 
@@ -167,8 +165,7 @@ def evaluate_both_with_optimization(news_item: Dict) -> tuple[float, float]:
 
             # Check if cache entry needs refresh (partial update)
             if cache.needs_refresh(cached_entry):
-                logger.info(
-                    f"[CACHE] entry needs refresh, performing partial update (credibility only)")
+                logger.info("[CACHE] entry needs refresh, performing partial update (credibility only)")
                 metrics.increment_partial_updates()
 
                 # Perform partial update - re-evaluate credibility only
@@ -192,8 +189,7 @@ def evaluate_both_with_optimization(news_item: Dict) -> tuple[float, float]:
                     return cached_entry.ai_importance, cached_entry.ai_credibility
             else:
                 metrics.increment_ai_skipped_cache()
-                logger.debug(
-                    f"Using cached scores: {cached_entry.ai_importance}, {cached_entry.ai_credibility}")
+                logger.debug(f"Using cached scores: {cached_entry.ai_importance}, {cached_entry.ai_credibility}")
                 return cached_entry.ai_importance, cached_entry.ai_credibility
     except Exception as e:
         logger.error(f"Error checking cache: {e}")
@@ -205,8 +201,7 @@ def evaluate_both_with_optimization(news_item: Dict) -> tuple[float, float]:
         local_pred = predict_news_item(news_item)
         if local_pred.importance < 0.5 or local_pred.credibility < 0.5:  # Configurable thresholds
             metrics.increment_ai_skipped_local_pred()
-            logger.debug(
-                f"News filtered by local predictor: {local_pred.importance}, {local_pred.credibility}")
+            logger.debug(f"News filtered by local predictor: {local_pred.importance}, {local_pred.credibility}")
             return local_pred.importance, local_pred.credibility
     except Exception as e:
         logger.error(f"Error in local predictor: {e}")
@@ -228,18 +223,19 @@ def evaluate_both_with_optimization(news_item: Dict) -> tuple[float, float]:
         adaptive_thresholds = get_adaptive_thresholds()
 
         if adaptive_thresholds.is_enabled():
-            importance_threshold, credibility_threshold = adaptive_thresholds.get_thresholds(
-                category)
+            importance_threshold, credibility_threshold = adaptive_thresholds.get_thresholds(category)
 
             if importance >= importance_threshold and credibility >= credibility_threshold:
                 metrics.increment_adaptive_thresholds_applied()
                 logger.debug(
-                    f"[THRESHOLD] category={category} importance>{importance_threshold} credibility>{credibility_threshold} - PASSED"
+                    f"[THRESHOLD] category={category} importance>{importance_threshold} "
+                    f"credibility>{credibility_threshold} - PASSED"
                 )
             else:
                 metrics.increment_adaptive_thresholds_skipped()
                 logger.debug(
-                    f"[THRESHOLD] category={category} importance<{importance_threshold} or credibility<{credibility_threshold} - FAILED"
+                    f"[THRESHOLD] category={category} importance<{importance_threshold} or "
+                    f"credibility<{credibility_threshold} - FAILED"
                 )
                 return 0.0, 0.0
         else:
@@ -261,8 +257,7 @@ def evaluate_both_with_optimization(news_item: Dict) -> tuple[float, float]:
         # Fallback to local prediction if available
         try:
             local_pred = predict_news_item(news_item)
-            logger.warning(
-                f"Using local predictor fallback: {local_pred.importance}, {local_pred.credibility}")
+            logger.warning(f"Using local predictor fallback: {local_pred.importance}, {local_pred.credibility}")
             return local_pred.importance, local_pred.credibility
         except Exception:
             logger.error("Both AI and local predictor failed")

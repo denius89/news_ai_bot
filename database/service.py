@@ -17,7 +17,7 @@ import httpx
 from supabase import create_client, create_async_client, Client, AsyncClient
 
 # Add project root to path
-sys.path.append(str(Path(__file__).parent.parent))
+sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
@@ -128,11 +128,7 @@ class DatabaseService:
             try:
                 return await query.execute()
             except (httpx.RemoteProtocolError, httpx.ConnectError, httpx.TimeoutException) as e:
-                logger.warning(
-                    "⚠️ Attempt %d/%d: async connection error %s",
-                    attempt + 1,
-                    retries,
-                    e)
+                logger.warning("⚠️ Attempt %d/%d: async connection error %s", attempt + 1, retries, e)
                 if attempt < retries - 1:
                     await asyncio.sleep(delay * (2**attempt))  # Exponential backoff
                 else:
@@ -164,11 +160,7 @@ class DatabaseService:
             logger.warning("⚠️ Sync Supabase client not available")
             return []
 
-        logger.debug(
-            "get_latest_news: source=%s, categories=%s, limit=%s",
-            source,
-            categories,
-            limit)
+        logger.debug("get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
 
         query = (
             self.sync_client.table("news")
@@ -263,11 +255,7 @@ class DatabaseService:
             logger.error("❌ Failed to get async client: %s", e)
             return []
 
-        logger.debug(
-            "async_get_latest_news: source=%s, categories=%s, limit=%s",
-            source,
-            categories,
-            limit)
+        logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
 
         query = (
             client.table("news")
@@ -363,10 +351,8 @@ class DatabaseService:
                 enriched = self._enrich_news_with_ai(item)
 
                 # Extract and validate fields
-                title = (enriched.get("title") or "").strip(
-                ) or enriched.get("source") or "Без названия"
-                content = (enriched.get("content") or "").strip() or (
-                    enriched.get("summary") or "").strip() or title
+                title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
+                content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
 
                 # Generate UID
                 uid = self._make_uid(enriched.get("link", ""), title)

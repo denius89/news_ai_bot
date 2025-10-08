@@ -228,8 +228,7 @@ def get_dashboard_data():
             },
         }
 
-        return jsonify({"success": True, "data": dashboard_data,
-                       "timestamp": datetime.now(timezone.utc).isoformat()})
+        return jsonify({"success": True, "data": dashboard_data, "timestamp": datetime.now(timezone.utc).isoformat()})
 
     except Exception as e:
         logger.error(f"Error getting dashboard data: {e}")

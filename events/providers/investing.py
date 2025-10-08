@@ -5,10 +5,9 @@ This provider fetches financial events from Investing.com
 including economic indicators, central bank meetings, and earnings.
 """
 
-import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 import aiohttp
 
@@ -113,18 +112,16 @@ class InvestingProvider:
                         title="Non-Farm Payrolls (NFP)",
                         category="markets",
                         subcategory="employment",
-                        starts_at=datetime.combine(
-                            date,
-                            datetime.min.time().replace(
-                                hour=12,
-                                minute=30)).replace(
-                            tzinfo=timezone.utc),
+                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=12, minute=30)).replace(
+                            tzinfo=timezone.utc
+                        ),
                         ends_at=None,
                         source="investing.com",
                         link="https://www.investing.com/economic-calendar/",
                         importance=0.9,
                         description="Monthly employment report for the United States",
-                    ))
+                    )
+                )
 
             if date.day % 15 == 0:  # Mid-month
                 events.append(
@@ -132,18 +129,16 @@ class InvestingProvider:
                         title="Consumer Price Index (CPI)",
                         category="markets",
                         subcategory="inflation",
-                        starts_at=datetime.combine(
-                            date,
-                            datetime.min.time().replace(
-                                hour=12,
-                                minute=30)).replace(
-                            tzinfo=timezone.utc),
+                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=12, minute=30)).replace(
+                            tzinfo=timezone.utc
+                        ),
                         ends_at=None,
                         source="investing.com",
                         link="https://www.investing.com/economic-calendar/",
                         importance=0.9,
                         description="Monthly inflation indicator",
-                    ))
+                    )
+                )
 
             # Central bank meetings (monthly)
             if date.day <= 7 and date.month % 2 == 0:  # First week of even months
@@ -152,18 +147,16 @@ class InvestingProvider:
                         title="FOMC Meeting",
                         category="markets",
                         subcategory="monetary_policy",
-                        starts_at=datetime.combine(
-                            date,
-                            datetime.min.time().replace(
-                                hour=18,
-                                minute=0)).replace(
-                            tzinfo=timezone.utc),
+                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=18, minute=0)).replace(
+                            tzinfo=timezone.utc
+                        ),
                         ends_at=None,
                         source="investing.com",
                         link="https://www.investing.com/economic-calendar/",
                         importance=0.95,
                         description="Federal Open Market Committee meeting",
-                    ))
+                    )
+                )
 
             if date.day <= 7 and date.month % 2 == 1:  # First week of odd months
                 events.append(
@@ -171,18 +164,16 @@ class InvestingProvider:
                         title="ECB Interest Rate Decision",
                         category="markets",
                         subcategory="monetary_policy",
-                        starts_at=datetime.combine(
-                            date,
-                            datetime.min.time().replace(
-                                hour=12,
-                                minute=45)).replace(
-                            tzinfo=timezone.utc),
+                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=12, minute=45)).replace(
+                            tzinfo=timezone.utc
+                        ),
                         ends_at=None,
                         source="investing.com",
                         link="https://www.investing.com/economic-calendar/",
                         importance=0.9,
                         description="European Central Bank monetary policy decision",
-                    ))
+                    )
+                )
 
             # GDP releases (quarterly)
             if date.month in [1, 4, 7, 10] and date.day <= 10:
@@ -191,18 +182,16 @@ class InvestingProvider:
                         title="GDP Growth Rate",
                         category="markets",
                         subcategory="economic_growth",
-                        starts_at=datetime.combine(
-                            date,
-                            datetime.min.time().replace(
-                                hour=12,
-                                minute=30)).replace(
-                            tzinfo=timezone.utc),
+                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=12, minute=30)).replace(
+                            tzinfo=timezone.utc
+                        ),
                         ends_at=None,
                         source="investing.com",
                         link="https://www.investing.com/economic-calendar/",
                         importance=0.85,
                         description="Quarterly economic growth indicator",
-                    ))
+                    )
+                )
 
         return events
 

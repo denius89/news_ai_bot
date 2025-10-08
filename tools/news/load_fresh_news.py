@@ -17,9 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 # Настраиваем логирование
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +64,9 @@ async def load_fresh_news():
         # Общая статистика
         total_result = await db_service.async_safe_execute(client.table("news").select("id", count="exact"))
 
-        total_count = (len(total_result.data) if total_result and hasattr(
-            total_result, "data") and total_result.data else 0)
+        total_count = (
+            len(total_result.data) if total_result and hasattr(total_result, "data") and total_result.data else 0
+        )
 
         logger.info("📊 Статистика загруженных новостей:")
         logger.info(f"📈 Всего новостей в базе: {total_count}")

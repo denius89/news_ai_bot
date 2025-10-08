@@ -2,6 +2,10 @@ import logging
 import os
 from flask import Flask, render_template, send_from_directory, redirect
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from config.core.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from routes.news_routes import news_bp
 
@@ -42,8 +46,14 @@ def importance_icon(value: float) -> str:
 app.jinja_env.filters["importance_icon"] = importance_icon
 
 
+# Импортируем централизованную систему путей
+from config.paths import get_path, setup_pythonpath
+
+# Настраиваем PYTHONPATH
+setup_pythonpath()
+
 # Путь к собранному React
-REACT_DIST_PATH = os.path.join(os.path.dirname(__file__), "webapp", "dist")
+REACT_DIST_PATH = get_path('webapp_dist')
 
 
 # React статические файлы

@@ -109,19 +109,15 @@ class UnifiedParser:
                 try:
                     # Clean text
                     title = clean_text(entry.get("title", ""))
-                    content_text = clean_text(
-                        entry.get(
-                            "summary", "") or entry.get(
-                            "description", ""))
+                    content_text = clean_text(entry.get("summary", "") or entry.get("description", ""))
 
                     if not title:
                         continue
 
                     # Parse date
                     published_at = self.normalize_date(
-                        entry.get("published") or entry.get("updated") or str(
-                            entry.get(
-                                "published_parsed", "")))
+                        entry.get("published") or entry.get("updated") or str(entry.get("published_parsed", ""))
+                    )
 
                     if not published_at:
                         published_at = datetime.now(timezone.utc)
@@ -158,12 +154,7 @@ class UnifiedParser:
             logger.error(f"❌ Error parsing RSS feed {source_name}: {e}")
             return []
 
-    async def parse_source_async(
-            self,
-            url: str,
-            category: str,
-            subcategory: str,
-            source_name: str) -> List[Dict]:
+    async def parse_source_async(self, url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
         """Parse single RSS source asynchronously."""
         try:
             async with aiohttp.ClientSession() as session:
@@ -185,12 +176,7 @@ class UnifiedParser:
             logger.error(f"❌ Error parsing source {source_name}: {e}")
             return []
 
-    def parse_source_sync(
-            self,
-            url: str,
-            category: str,
-            subcategory: str,
-            source_name: str) -> List[Dict]:
+    def parse_source_sync(self, url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
         """Parse single RSS source synchronously."""
         try:
             content = self._fetch_url_sync(url)
@@ -219,8 +205,7 @@ class UnifiedParser:
 
         # Filter by categories if specified
         if categories:
-            all_sources = [(cat, subcat, name, url)
-                           for cat, subcat, name, url in all_sources if cat in categories]
+            all_sources = [(cat, subcat, name, url) for cat, subcat, name, url in all_sources if cat in categories]
 
         logger.info(f"Starting async parsing of {len(all_sources)} sources")
 
@@ -243,16 +228,13 @@ class UnifiedParser:
         logger.info(f"✅ Async parsing completed: {len(all_news)} total news items")
         return all_news
 
-    def parse_all_sources_sync(self,
-                               categories: Optional[List[str]] = None,
-                               limit_per_source: int = 5) -> List[Dict]:
+    def parse_all_sources_sync(self, categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
         """Parse all RSS sources synchronously."""
         all_sources = get_all_sources()
 
         # Filter by categories if specified
         if categories:
-            all_sources = [(cat, subcat, name, url)
-                           for cat, subcat, name, url in all_sources if cat in categories]
+            all_sources = [(cat, subcat, name, url) for cat, subcat, name, url in all_sources if cat in categories]
 
         logger.info(f"Starting sync parsing of {len(all_sources)} sources")
 
@@ -400,25 +382,19 @@ def parse_source(url: str, category: str, subcategory: str, source_name: str) ->
     return parser.parse_source_sync(url, category, subcategory, source_name)
 
 
-async def async_parse_source(
-        url: str,
-        category: str,
-        subcategory: str,
-        source_name: str) -> List[Dict]:
+async def async_parse_source(url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
     """Backward compatibility function for async parsing single source."""
     parser = get_async_parser()
     return await parser.parse_source_async(url, category, subcategory, source_name)
 
 
-def parse_all_sources(categories: Optional[List[str]] = None,
-                      limit_per_source: int = 5) -> List[Dict]:
+def parse_all_sources(categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
     """Backward compatibility function for parsing all sources."""
     parser = get_sync_parser()
     return parser.parse_all_sources_sync(categories, limit_per_source)
 
 
-async def async_parse_all_sources(
-        categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
+async def async_parse_all_sources(categories: Optional[List[str]] = None, limit_per_source: int = 5) -> List[Dict]:
     """Backward compatibility function for async parsing all sources."""
     parser = get_async_parser()
     return await parser.async_parse_all_sources_async(categories, limit_per_source)

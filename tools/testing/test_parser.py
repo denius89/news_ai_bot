@@ -59,8 +59,7 @@ class TestAdvancedParser(AdvancedParser):
                 self.subcategory_counts[subcategory] = 0
 
             if self.subcategory_counts[subcategory] >= self.max_news_per_subcategory:
-                logger.info(
-                    f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
+                logger.info(f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
                 return {
                     "success": True,
                     "processed": 0,
@@ -99,8 +98,7 @@ class TestAdvancedParser(AdvancedParser):
                     credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
                     if importance < self.min_importance:
-                        logger.debug(
-                            f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                        logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                         continue
 
                     # Сохраняем в БД
@@ -121,8 +119,7 @@ class TestAdvancedParser(AdvancedParser):
                     saved_count += 1
                     self.subcategory_counts[subcategory] += 1
 
-                    logger.info(
-                        f"[{category}/{subcategory}] {title[:50]}... -> SAVED (importance: {importance:.2f})")
+                    logger.info(f"[{category}/{subcategory}] {title[:50]}... -> SAVED (importance: {importance:.2f})")
 
                 except Exception as e:
                     logger.error(f"Ошибка обработки RSS записи: {e}")
@@ -146,8 +143,7 @@ class TestAdvancedParser(AdvancedParser):
                 self.subcategory_counts[subcategory] = 0
 
             if self.subcategory_counts[subcategory] >= self.max_news_per_subcategory:
-                logger.info(
-                    f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
+                logger.info(f"[{category}/{subcategory}] Достигнут лимит {self.max_news_per_subcategory} новостей")
                 return {
                     "success": True,
                     "processed": 0,
@@ -174,8 +170,7 @@ class TestAdvancedParser(AdvancedParser):
             credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
             if importance < self.min_importance:
-                logger.debug(
-                    f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                 return {"success": False, "reason": "low_importance", "importance": importance}
 
             # Сохраняем в БД
@@ -196,8 +191,7 @@ class TestAdvancedParser(AdvancedParser):
 
             self.subcategory_counts[subcategory] += 1
 
-            logger.info(
-                f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
+            logger.info(f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
 
             return {
                 "success": True,

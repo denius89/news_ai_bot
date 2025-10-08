@@ -94,25 +94,13 @@ class BaselineDatasetBuilder:
                 rules = yaml.safe_load(f) or {}
 
             return {
-                "stop_markers": rules.get(
-                    "stop_markers",
-                    []),
+                "stop_markers": rules.get("stop_markers", []),
                 "auto_stop_markers": [
-                    item.get(
-                        "word",
-                        "") for item in rules.get(
-                        "auto_generated",
-                        {}).get(
-                        "stop_markers",
-                        [])],
+                    item.get("word", "") for item in rules.get("auto_generated", {}).get("stop_markers", [])
+                ],
                 "source_blacklist": [
-                    item.get(
-                        "source",
-                        "") for item in rules.get(
-                        "auto_generated",
-                        {}).get(
-                        "source_blacklist",
-                        [])],
+                    item.get("source", "") for item in rules.get("auto_generated", {}).get("source_blacklist", [])
+                ],
             }
         except Exception as e:
             logger.warning(f"Error loading prefilter rules: {e}")
@@ -567,16 +555,13 @@ class BaselineDatasetBuilder:
         positive_samples = [s for s in samples if s.get("label", 0) == 1]
         negative_samples = [s for s in samples if s.get("label", 0) == 0]
 
-        logger.info(
-            f"Before balancing: {len(positive_samples)} positive, {len(negative_samples)} negative")
+        logger.info(f"Before balancing: {len(positive_samples)} positive, {len(negative_samples)} negative")
 
         # Check if we have enough samples per class
         if len(positive_samples) < self.min_samples_per_class:
-            logger.warning(
-                f"Not enough positive samples: {len(positive_samples)} < {self.min_samples_per_class}")
+            logger.warning(f"Not enough positive samples: {len(positive_samples)} < {self.min_samples_per_class}")
         if len(negative_samples) < self.min_samples_per_class:
-            logger.warning(
-                f"Not enough negative samples: {len(negative_samples)} < {self.min_samples_per_class}")
+            logger.warning(f"Not enough negative samples: {len(negative_samples)} < {self.min_samples_per_class}")
 
         # Balance by undersampling the larger class
         if len(positive_samples) > len(negative_samples):
@@ -594,8 +579,7 @@ class BaselineDatasetBuilder:
 
         balanced_samples = positive_samples + negative_samples
 
-        logger.info(
-            f"After balancing: {len(positive_samples)} positive, {len(negative_samples)} negative")
+        logger.info(f"After balancing: {len(positive_samples)} positive, {len(negative_samples)} negative")
 
         return balanced_samples
 
@@ -606,15 +590,11 @@ class BaselineDatasetBuilder:
         self.stats["negative_samples"] = sum(1 for s in samples if s.get("label", 0) == 0)
 
         # Calculate averages
-        importance_values = [s.get("importance", 0.0)
-                             for s in samples if s.get("importance", 0.0) > 0]
-        credibility_values = [s.get("credibility", 0.0)
-                              for s in samples if s.get("credibility", 0.0) > 0]
+        importance_values = [s.get("importance", 0.0) for s in samples if s.get("importance", 0.0) > 0]
+        credibility_values = [s.get("credibility", 0.0) for s in samples if s.get("credibility", 0.0) > 0]
 
-        self.stats["avg_importance"] = sum(importance_values) / \
-            len(importance_values) if importance_values else 0.0
-        self.stats["avg_credibility"] = sum(
-            credibility_values) / len(credibility_values) if credibility_values else 0.0
+        self.stats["avg_importance"] = sum(importance_values) / len(importance_values) if importance_values else 0.0
+        self.stats["avg_credibility"] = sum(credibility_values) / len(credibility_values) if credibility_values else 0.0
 
         # Count sources and categories
         sources = Counter(s.get("source", "unknown") for s in samples)
@@ -630,13 +610,7 @@ class BaselineDatasetBuilder:
         try:
             with open(self.dataset_path, "w", newline="", encoding="utf-8") as f:
                 if samples:
-                    fieldnames = [
-                        "title",
-                        "category",
-                        "source",
-                        "importance",
-                        "credibility",
-                        "label"]
+                    fieldnames = ["title", "category", "source", "importance", "credibility", "label"]
                     writer = csv.DictWriter(f, fieldnames=fieldnames)
                     writer.writeheader()
 
@@ -773,18 +747,13 @@ def setup_logging():
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(
-                "logs/dataset_builder.log",
-                mode="a")],
+        handlers=[logging.StreamHandler(), logging.FileHandler("logs/dataset_builder.log", mode="a")],
     )
 
 
 def main():
     """Main function for baseline dataset building."""
-    parser = argparse.ArgumentParser(
-        description="Build baseline dataset for PulseAI Self-Tuning Predictor")
+    parser = argparse.ArgumentParser(description="Build baseline dataset for PulseAI Self-Tuning Predictor")
     parser.add_argument("--dry-run", action="store_true", help="Run without saving files")
     parser.add_argument("--config", type=str, help="Path to configuration file")
 

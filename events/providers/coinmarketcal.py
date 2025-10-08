@@ -5,9 +5,8 @@ This provider fetches cryptocurrency events from CoinMarketCal API
 including token launches, mainnet releases, and protocol updates.
 """
 
-import asyncio
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 
 import aiohttp

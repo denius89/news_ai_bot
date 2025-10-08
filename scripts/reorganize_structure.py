@@ -12,6 +12,7 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+
 class StructureReorganizer:
     def __init__(self, project_root="."):
         self.project_root = Path(project_root)
@@ -19,7 +20,7 @@ class StructureReorganizer:
         self.guides_dir = self.docs_dir / "guides"
         self.technical_dir = self.docs_dir / "technical"
         self.archive_dir = self.docs_dir / "archive"
-        
+
     def create_directories(self):
         """Создает новую структуру директорий"""
         self.docs_dir.mkdir(exist_ok=True)
@@ -27,7 +28,7 @@ class StructureReorganizer:
         self.technical_dir.mkdir(exist_ok=True)
         self.archive_dir.mkdir(exist_ok=True)
         print("✅ Создана новая структура директорий")
-        
+
     def create_main_docs_readme(self):
         """Создает главный README.md для docs/"""
         content = f"""# 📚 PulseAI Documentation
@@ -94,11 +95,11 @@ class StructureReorganizer:
 
 *Эта документация организована для удобства навигации и поиска информации*
 """
-        
+
         with open(self.docs_dir / "README.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создан главный README.md для docs/")
-        
+
     def create_infrastructure_guide(self):
         """Создает объединенное руководство по инфраструктуре"""
         content = f"""# 🌐 PulseAI Infrastructure Guide
@@ -208,47 +209,38 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 
 *Это руководство объединяет информацию из CLOUDFLARE_CONFIG.md, DEPLOY.md и DATABASE_MAINTENANCE.md*
 """
-        
+
         with open(self.guides_dir / "INFRASTRUCTURE.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создано guides/INFRASTRUCTURE.md")
-        
+
     def move_files_to_structure(self):
         """Перемещает файлы в новую структуру"""
-        
+
         # Основные файлы в docs/
-        main_files = [
-            "MASTER_FILE.md",
-            "TASKS.md", 
-            "CODEMAP.md",
-            "CONTRIBUTING.md"
-        ]
-        
+        main_files = ["MASTER_FILE.md", "TASKS.md", "CODEMAP.md", "CONTRIBUTING.md"]
+
         for file_name in main_files:
             src = self.project_root / file_name
             if src.exists():
                 dst = self.docs_dir / file_name
                 shutil.move(str(src), str(dst))
                 print(f"✅ Перемещен {file_name} в docs/")
-        
+
         # Руководства в docs/guides/
-        guide_files = [
-            "DEVELOPMENT.md",
-            "CODE_QUALITY.md",
-            "FRONTEND.md"
-        ]
-        
+        guide_files = ["DEVELOPMENT.md", "CODE_QUALITY.md", "FRONTEND.md"]
+
         for file_name in guide_files:
             src = self.docs_dir / file_name
             if src.exists():
                 dst = self.guides_dir / file_name
                 shutil.move(str(src), str(dst))
                 print(f"✅ Перемещен {file_name} в docs/guides/")
-        
+
         # Техническая документация в docs/technical/
         technical_files = [
             "ARCHITECTURE.md",
-            "DATABASE_MAINTENANCE.md", 
+            "DATABASE_MAINTENANCE.md",
             "TOKENS.md",
             "DIGESTS.md",
             "PARSERS.md",
@@ -257,33 +249,33 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
             "VISION.md",
             "COMMUNICATION.md",
             "AI_OPTIMIZATION.md",
-            "CLOUDFLARE_CONFIG.md"
+            "CLOUDFLARE_CONFIG.md",
         ]
-        
+
         for file_name in technical_files:
             src = self.docs_dir / file_name
             if src.exists():
                 dst = self.technical_dir / file_name
                 shutil.move(str(src), str(dst))
                 print(f"✅ Перемещен {file_name} в docs/technical/")
-        
+
         # Архив уже создан
         print("✅ Архив уже в правильном месте")
-        
+
     def backup_root_files(self):
         """Создает резервную копию файлов из корня"""
         backup_dir = self.project_root / "backup_root_md_files"
         backup_dir.mkdir(exist_ok=True)
-        
+
         # Находим все MD файлы в корне
         root_md_files = list(self.project_root.glob("*.md"))
-        
+
         for file_path in root_md_files:
             dst = backup_dir / file_path.name
             shutil.copy2(file_path, dst)
-            
+
         print(f"✅ Создана резервная копия {len(root_md_files)} файлов в {backup_dir}")
-        
+
     def update_main_readme(self):
         """Обновляет основной README.md в корне"""
         content = f"""# PulseAI
@@ -381,31 +373,31 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 
 *PulseAI - AI-powered news and events platform* 🚀
 """
-        
+
         with open(self.project_root / "README.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Обновлен основной README.md")
-        
+
     def reorganize_structure(self):
         """Основная функция реорганизации"""
         print("🗂️ Начинаем реорганизацию структуры PulseAI...")
-        
+
         # Создаем структуру директорий
         self.create_directories()
-        
+
         # Создаем резервную копию
         self.backup_root_files()
-        
+
         # Создаем новые файлы
         self.create_main_docs_readme()
         self.create_infrastructure_guide()
-        
+
         # Перемещаем файлы
         self.move_files_to_structure()
-        
+
         # Обновляем основной README
         self.update_main_readme()
-        
+
         print("\n✅ Реорганизация завершена!")
         print("📁 Новая структура:")
         print("  - docs/README.md - Главная документация")
@@ -418,6 +410,7 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
         print("  2. Обновите ссылки в коде")
         print("  3. Удалите избыточные файлы")
         print("  4. Протестируйте навигацию")
+
 
 if __name__ == "__main__":
     reorganizer = StructureReorganizer()

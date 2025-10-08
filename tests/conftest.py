@@ -37,8 +37,7 @@ def prepare_test_environment():
 
     # Если есть критические предупреждения, прерываем тесты
     # Исключаем предупреждения о порте 5000 (системный процесс ControlCenter)
-    critical_warnings = [w for w in result["warnings"]
-                         if "не удалось найти свободный порт" in w and "5000" not in w]
+    critical_warnings = [w for w in result["warnings"] if "не удалось найти свободный порт" in w and "5000" not in w]
 
     if critical_warnings:
         print("\n❌ Критические ошибки при подготовке окружения:")

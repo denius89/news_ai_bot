@@ -12,18 +12,19 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 
+
 class DocumentationOptimizer:
     def __init__(self, project_root="."):
         self.project_root = Path(project_root)
         self.docs_dir = self.project_root / "docs"
         self.archive_dir = self.project_root / "archive"
-        
+
     def create_directories(self):
         """Создает необходимые директории"""
         self.docs_dir.mkdir(exist_ok=True)
         self.archive_dir.mkdir(exist_ok=True)
         print("✅ Директории созданы")
-        
+
     def create_development_guide(self):
         """Создает объединенное руководство по разработке"""
         content = f"""# 🛠️ PulseAI Development Guide
@@ -136,11 +137,11 @@ make strict-check
 
 *Это руководство объединяет информацию из DEVELOPMENT_GUIDE.md, DEPLOYMENT_GUIDE.md и PORTS.md*
 """
-        
+
         with open(self.docs_dir / "DEVELOPMENT.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создано docs/DEVELOPMENT.md")
-        
+
     def create_code_quality_guide(self):
         """Создает объединенное руководство по качеству кода"""
         content = f"""# 🔧 PulseAI Code Quality Guide
@@ -235,11 +236,11 @@ pip install isort  # Для сортировки импортов
 
 *Это руководство объединяет информацию из SMART_PUSH_GUIDE.md и DETAILED_CODE_QUALITY_GUIDE.md*
 """
-        
+
         with open(self.docs_dir / "CODE_QUALITY.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создано docs/CODE_QUALITY.md")
-        
+
     def create_frontend_guide(self):
         """Создает объединенное руководство по фронтенду"""
         content = f"""# 🎨 PulseAI Frontend Guide
@@ -334,11 +335,11 @@ static/css/
 
 *Это руководство объединяет информацию из CSS_SYSTEM_GUIDE.md, CSS_REFACTOR_FINAL_REPORT.md, CSS_OPTIMIZATION_REPORT.md, CSS_AUDIT_REPORT.md, README_CSS.md и FRONTEND_FIX_REPORT.md*
 """
-        
+
         with open(self.docs_dir / "FRONTEND.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создано docs/FRONTEND.md")
-        
+
     def create_archive_reports(self):
         """Создает архив всех отчетов"""
         content = f"""# 📊 PulseAI Development Reports Archive
@@ -412,19 +413,19 @@ static/css/
 
 *Этот архив содержит все исторические отчеты о разработке PulseAI. Для актуальной информации см. основные руководства в docs/*
 """
-        
+
         with open(self.archive_dir / "REPORTS.md", "w", encoding="utf-8") as f:
             f.write(content)
         print("✅ Создано archive/REPORTS.md")
-        
+
     def backup_files(self):
         """Создает резервную копию файлов перед удалением"""
         backup_dir = self.project_root / "backup_md_files"
         backup_dir.mkdir(exist_ok=True)
-        
+
         files_to_backup = [
             "DEVELOPMENT_GUIDE.md",
-            "DEPLOYMENT_GUIDE.md", 
+            "DEPLOYMENT_GUIDE.md",
             "PORTS.md",
             "docs/SMART_PUSH_GUIDE.md",
             "docs/DETAILED_CODE_QUALITY_GUIDE.md",
@@ -445,38 +446,38 @@ static/css/
             "DATA_LOADING_REPORT.md",
             "SELF_TUNING_PREDICTOR_REPORT.md",
             "AUTO_LEARNING_FILTER_REPORT.md",
-            "ADAPTIVE_THRESHOLDS_TTL_REPORT.md"
+            "ADAPTIVE_THRESHOLDS_TTL_REPORT.md",
         ]
-        
+
         for file_path in files_to_backup:
             src = self.project_root / file_path
             if src.exists():
                 dst = backup_dir / file_path
                 dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(src, dst)
-                
+
         print(f"✅ Создана резервная копия в {backup_dir}")
-        
+
     def optimize_documentation(self):
         """Основная функция оптимизации"""
         print("🚀 Начинаем оптимизацию документации PulseAI...")
-        
+
         # Создаем директории
         self.create_directories()
-        
+
         # Создаем резервную копию
         self.backup_files()
-        
+
         # Создаем объединенные руководства
         self.create_development_guide()
         self.create_code_quality_guide()
         self.create_frontend_guide()
         self.create_archive_reports()
-        
+
         print("\n✅ Оптимизация завершена!")
         print("📁 Созданы объединенные руководства:")
         print("  - docs/DEVELOPMENT.md")
-        print("  - docs/CODE_QUALITY.md") 
+        print("  - docs/CODE_QUALITY.md")
         print("  - docs/FRONTEND.md")
         print("  - archive/REPORTS.md")
         print("\n💡 Следующие шаги:")
@@ -484,6 +485,7 @@ static/css/
         print("  2. Обновите ссылки в коде")
         print("  3. Удалите избыточные файлы")
         print("  4. Обновите README.md")
+
 
 if __name__ == "__main__":
     optimizer = DocumentationOptimizer()

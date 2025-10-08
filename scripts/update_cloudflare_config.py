@@ -20,10 +20,9 @@ def update_vite_config():
     # Запускаем генератор конфига
     import subprocess
 
-    result = subprocess.run([sys.executable,
-                             str(project_root / "scripts" / "generate_vite_config.py")],
-                            capture_output=True,
-                            text=True)
+    result = subprocess.run(
+        [sys.executable, str(project_root / "scripts" / "generate_vite_config.py")], capture_output=True, text=True
+    )
 
     if result.returncode == 0:
         print("✅ Конфигурация Vite обновлена")

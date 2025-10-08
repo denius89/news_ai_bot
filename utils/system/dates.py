@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 import logging
+import sys
+import os
 from datetime import datetime, timezone
 from typing import Optional, Union
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 try:
     # stdlib c Python 3.9+: без внешних зависимостей

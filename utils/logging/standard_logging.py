@@ -13,10 +13,7 @@ from typing import Callable, Dict, Optional, Union
 logger = logging.getLogger("performance")
 
 
-def log_function_call(
-        level: int = logging.INFO,
-        include_args: bool = False,
-        include_result: bool = False):
+def log_function_call(level: int = logging.INFO, include_args: bool = False, include_result: bool = False):
     """
     Decorator for logging function calls.
 
@@ -48,8 +45,7 @@ def log_function_call(
                 if include_result and result is not None:
                     result_str = f" -> {result}"
 
-                func_logger.log(
-                    level, f"✅ {func.__name__} completed in {duration:.3f}s{result_str}")
+                func_logger.log(level, f"✅ {func.__name__} completed in {duration:.3f}s{result_str}")
 
                 # Log performance metrics
                 logger.info(f"Function {func.__name__} took {duration:.3f}s")

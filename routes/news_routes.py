@@ -110,8 +110,7 @@ def api_latest_news():
             if published_at:
                 if isinstance(published_at, str):
                     try:
-                        published_at = datetime.datetime.fromisoformat(
-                            published_at.replace("Z", "+00:00"))
+                        published_at = datetime.datetime.fromisoformat(published_at.replace("Z", "+00:00"))
                     except BaseException:
                         published_at = now
                 hours_ago = (now - published_at).total_seconds() / 3600
@@ -172,15 +171,18 @@ def api_latest_news_weighted():
     try:
         from database.db_models import get_latest_news
         from services.categories import get_categories
-        from utils.ai.news_distribution import distribute_news_weighted, get_distribution_statistics, get_category_weights
+        from utils.ai.news_distribution import (
+            distribute_news_weighted,
+            get_distribution_statistics,
+            get_category_weights,
+        )
 
         # Получаем параметры
         page = int(request.args.get("page", 1))
         limit = int(request.args.get("limit", 20))
         distribution_mode = request.args.get("mode", "weighted")  # weighted, balanced, round_robin
 
-        logger.info(
-            f"📊 Запрос взвешенного распределения: page={page}, limit={limit}, mode={distribution_mode}")
+        logger.info(f"📊 Запрос взвешенного распределения: page={page}, limit={limit}, mode={distribution_mode}")
 
         # Получаем новости по категориям
         news_by_category = {}
@@ -188,8 +190,7 @@ def api_latest_news_weighted():
 
         for category in all_categories:
             try:
-                category_news = get_latest_news(
-                    categories=[category], limit=100)  # ИСПРАВЛЕНО: передаем список
+                category_news = get_latest_news(categories=[category], limit=100)  # ИСПРАВЛЕНО: передаем список
                 news_by_category[category] = category_news
                 logger.debug(f"Категория {category}: {len(category_news)} новостей")
             except Exception as e:
@@ -219,37 +220,45 @@ def api_latest_news_weighted():
             f"✅ Распределено {len(distributed_news)} новостей, возвращаем {len(paginated_news)} для страницы {page}"
         )
 
-        return jsonify({"status": "success",
-                        "data": [{"id": n.get("id"),
-                                  "title": n.get("title"),
-                                  "content": n.get("content"),
-                                  "source": n.get("source"),
-                                  "url": n.get("link"),
-                                  "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
-                                  "category": n.get("category"),
-                                  "credibility": n.get("credibility"),
-                                  "importance": n.get("importance"),
-                                  } for n in paginated_news],
-                        "pagination": {"page": page,
-                                       "limit": limit,
-                                       "total": total_distributed,
-                                       "total_pages": (total_distributed + limit - 1) // limit,
-                                       "has_next": end_idx < total_distributed,
-                                       "has_prev": page > 1,
-                                       },
-                        "distribution": {"mode": distribution_mode,
-                                         "statistics": distribution_stats,
-                                         "category_weights": get_category_weights(),
-                                         },
-                        })
+        return jsonify(
+            {
+                "status": "success",
+                "data": [
+                    {
+                        "id": n.get("id"),
+                        "title": n.get("title"),
+                        "content": n.get("content"),
+                        "source": n.get("source"),
+                        "url": n.get("link"),
+                        "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
+                        "category": n.get("category"),
+                        "credibility": n.get("credibility"),
+                        "importance": n.get("importance"),
+                    }
+                    for n in paginated_news
+                ],
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total_distributed,
+                    "total_pages": (total_distributed + limit - 1) // limit,
+                    "has_next": end_idx < total_distributed,
+                    "has_prev": page > 1,
+                },
+                "distribution": {
+                    "mode": distribution_mode,
+                    "statistics": distribution_stats,
+                    "category_weights": get_category_weights(),
+                },
+            }
+        )
 
     except Exception as e:
         logger.error(f"Ошибка взвешенного распределения новостей: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-def distribute_news_balanced(
-        news_by_category: Dict[str, List[Dict]], total_limit: int = 20) -> List[Dict]:
+def distribute_news_balanced(news_by_category: Dict[str, List[Dict]], total_limit: int = 20) -> List[Dict]:
     """
     Равномерное распределение новостей по категориям (Round Robin).
 
@@ -337,26 +346,18 @@ def api_distribution_stats():
                     "recommended_weights": recommended_weights,
                     "distribution_efficiency": {
                         "crypto_ratio": (
-                            category_stats.get(
-                                "crypto",
-                                {}).get(
-                                "count",
-                                0) / total_news if total_news > 0 else 0),
+                            category_stats.get("crypto", {}).get("count", 0) / total_news if total_news > 0 else 0
+                        ),
                         "tech_ratio": (
-                            category_stats.get(
-                                "tech",
-                                {}).get(
-                                "count",
-                                0) / total_news if total_news > 0 else 0),
+                            category_stats.get("tech", {}).get("count", 0) / total_news if total_news > 0 else 0
+                        ),
                         "world_ratio": (
-                            category_stats.get(
-                                "world",
-                                {}).get(
-                                "count",
-                                0) / total_news if total_news > 0 else 0),
+                            category_stats.get("world", {}).get("count", 0) / total_news if total_news > 0 else 0
+                        ),
                     },
                 },
-            })
+            }
+        )
 
     except Exception as e:
         logger.error(f"Ошибка получения статистики распределения: {e}")

@@ -6,13 +6,12 @@ and improve the local predictor model.
 """
 
 import csv
-import json
 import logging
 import re
 from collections import Counter
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Optional, Any
 
 import yaml
 
@@ -228,8 +227,7 @@ class SelfTuningCollector:
 
         # Title-specific features
         title_words = title.lower().split()
-        features["title_important_words"] = sum(
-            1 for word in title_words if word in important_words)
+        features["title_important_words"] = sum(1 for word in title_words if word in important_words)
         features["title_spam_words"] = sum(1 for word in title_words if word in spam_words)
 
         return features
@@ -552,10 +550,8 @@ class SelfTuningCollector:
             stats["categories"] = dict(category_counts)
 
             # Average scores
-            stats["avg_importance_score"] = sum(ex["importance_score"]
-                                                for ex in examples) / len(examples)
-            stats["avg_credibility_score"] = sum(
-                ex["credibility_score"] for ex in examples) / len(examples)
+            stats["avg_importance_score"] = sum(ex["importance_score"] for ex in examples) / len(examples)
+            stats["avg_credibility_score"] = sum(ex["credibility_score"] for ex in examples) / len(examples)
 
         return stats
 

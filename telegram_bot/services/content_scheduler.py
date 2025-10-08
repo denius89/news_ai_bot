@@ -172,8 +172,7 @@ class ContentScheduler:
             # Check category against current window
             category = digest.get("category", "unknown").lower()
             if not self._is_category_in_current_window(category):
-                logger.debug(
-                    f"Skipping digest {digest_id}: category '{category}' not in current window")
+                logger.debug(f"Skipping digest {digest_id}: category '{category}' not in current window")
                 self.metrics.increment_autopublish_skipped_out_of_window()
                 return True
 
@@ -242,8 +241,7 @@ class ContentScheduler:
                 recent_list = list(self.recently_published)
                 self.recently_published = set(recent_list[-50:])
 
-            logger.debug(
-                f"Marked digest {digest_id} as published in window '{self.current_window}'")
+            logger.debug(f"Marked digest {digest_id} as published in window '{self.current_window}'")
 
         except Exception as e:
             logger.error(f"Error marking digest {digest_id} as published: {e}")

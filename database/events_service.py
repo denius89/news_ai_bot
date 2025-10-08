@@ -231,11 +231,11 @@ class EventsService:
             Number of events removed
         """
         try:
-            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_to_keep)
+            # cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_to_keep)
 
             # Delete old events
-            query = "DELETE FROM events WHERE starts_at < %s"
-            params = [cutoff_date]
+            # query = "DELETE FROM events WHERE starts_at < %s"
+            # params = [cutoff_date]
 
             # Execute query (this would need to be implemented in the database service)
             # For now, we'll simulate the cleanup
@@ -337,12 +337,9 @@ class EventsService:
                     title="Ethereum Network Upgrade",
                     category="crypto",
                     subcategory="ethereum",
-                    starts_at=datetime.combine(
-                        today,
-                        datetime.min.time().replace(
-                            hour=14,
-                            minute=0)).replace(
-                        tzinfo=timezone.utc),
+                    starts_at=datetime.combine(today, datetime.min.time().replace(hour=14, minute=0)).replace(
+                        tzinfo=timezone.utc
+                    ),
                     ends_at=None,
                     source="coinmarketcal.com",
                     link="https://coinmarketcal.com/event/ethereum-upgrade",
@@ -351,7 +348,8 @@ class EventsService:
                     location=None,
                     organizer="Ethereum Foundation",
                     created_at=now,
-                ))
+                )
+            )
 
         return events
 
@@ -372,8 +370,7 @@ class EventsService:
 
         return events
 
-    async def _get_mock_events_for_date(
-            self, date, category: Optional[str] = None) -> List[EventRecord]:
+    async def _get_mock_events_for_date(self, date, category: Optional[str] = None) -> List[EventRecord]:
         """Get mock events for a specific date."""
         events = []
 
@@ -385,12 +382,9 @@ class EventsService:
                     title=f"Weekly Market Analysis - {date.strftime('%Y-%m-%d')}",
                     category="markets",
                     subcategory="analysis",
-                    starts_at=datetime.combine(
-                        date,
-                        datetime.min.time().replace(
-                            hour=9,
-                            minute=0)).replace(
-                        tzinfo=timezone.utc),
+                    starts_at=datetime.combine(date, datetime.min.time().replace(hour=9, minute=0)).replace(
+                        tzinfo=timezone.utc
+                    ),
                     ends_at=None,
                     source="investing.com",
                     link="https://investing.com/analysis",
@@ -398,9 +392,9 @@ class EventsService:
                     description="Weekly market analysis and outlook",
                     location=None,
                     organizer="Investment Firm",
-                    created_at=datetime.now(
-                        timezone.utc),
-                ))
+                    created_at=datetime.now(timezone.utc),
+                )
+            )
 
         return events
 

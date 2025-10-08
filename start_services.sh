@@ -49,7 +49,7 @@ fi
 WEBAPP_URL=$(python3 -c "
 import sys
 sys.path.append('/Users/denisfedko/news_ai_bot')
-from config.cloudflare import get_webapp_url
+from config.core.cloudflare import get_webapp_url
 print(get_webapp_url())
 ")
 

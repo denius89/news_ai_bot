@@ -167,8 +167,7 @@ class TelegramDigestHandler:
             Escaped text
         """
         # Characters that need escaping in Markdown v2
-        escape_chars = ["_", "*", "[", "]", "(", ")", "~", "`",
-                        ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+        escape_chars = ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
 
         for char in escape_chars:
             text = text.replace(char, f"\\{char}")
@@ -234,8 +233,7 @@ class TelegramDigestHandler:
                 max_why = 100
 
                 summary = summary[:max_summary] + "..." if len(summary) > max_summary else summary
-                why_important = why_important[:max_why] + \
-                    "..." if len(why_important) > max_why else why_important
+                why_important = why_important[:max_why] + "..." if len(why_important) > max_why else why_important
 
                 message_parts = [
                     f"{emoji} *{title}*",
@@ -407,8 +405,7 @@ class TelegramDigestHandler:
                 break
 
             except Exception as e:
-                logger.error(
-                    f"Unexpected error sending message (attempt {attempt + 1}/{retries}): {e}")
+                logger.error(f"Unexpected error sending message (attempt {attempt + 1}/{retries}): {e}")
                 if attempt < retries - 1:
                     await asyncio.sleep(2**attempt)
                     continue
@@ -433,10 +430,7 @@ class TelegramDigestHandler:
             # Check if autopublish is enabled
             if not self.enabled:
                 publish_logger.info("Autopublish is disabled")
-                return {
-                    "success": False,
-                    "reason": "disabled",
-                    "message": "Autopublish is disabled"}
+                return {"success": False, "reason": "disabled", "message": "Autopublish is disabled"}
 
             # Get unpublished digests
             digests = await self._get_unpublished_digests()
@@ -466,8 +460,7 @@ class TelegramDigestHandler:
                     message = self._format_digest_message(digest)
 
                     if self.dry_run:
-                        publish_logger.info(
-                            f"DRY RUN: Would publish digest #{digest['id']} → {self.channel_id}")
+                        publish_logger.info(f"DRY RUN: Would publish digest #{digest['id']} → {self.channel_id}")
                         publish_logger.info(f"Message preview: {message[:100]}...")
 
                         # In dry run, just mark as published for testing
@@ -484,11 +477,9 @@ class TelegramDigestHandler:
 
                             # Update metrics
                             self.metrics.increment_digests_published_total()
-                            self.metrics.update_last_digest_published_timestamp(
-                                datetime.now(timezone.utc).isoformat())
+                            self.metrics.update_last_digest_published_timestamp(datetime.now(timezone.utc).isoformat())
 
-                            publish_logger.info(
-                                f"Published digest #{digest['id']} → {self.channel_id}")
+                            publish_logger.info(f"Published digest #{digest['id']} → {self.channel_id}")
                             published_count += 1
 
                         else:

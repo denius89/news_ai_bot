@@ -5,7 +5,6 @@ This module provides a foundation for future automatic generation
 of probable events based on patterns and trends analysis.
 """
 
-import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any

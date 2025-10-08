@@ -13,7 +13,7 @@ from ai_modules.importance import evaluate_importance as original_evaluate_impor
 from ai_modules.prefilter import filter_news_item
 from ai_modules.cache import get_cached_evaluation, cache_evaluation, get_cache
 from ai_modules.local_predictor import predict_news_item
-from ai_modules.metrics import get_metrics, track_ai_call
+from ai_modules.metrics import get_metrics
 from ai_modules.adaptive_thresholds import get_adaptive_thresholds
 
 logger = logging.getLogger("optimized_importance")
@@ -59,7 +59,7 @@ def evaluate_importance(news_item: Dict) -> float:
 
             # Check if cache entry needs refresh (partial update)
             if cache.needs_refresh(cached_entry):
-                logger.info(f"[CACHE] entry needs refresh, performing partial update")
+                logger.info("[CACHE] entry needs refresh, performing partial update")
                 metrics.increment_partial_updates()
 
                 # Perform partial update - re-evaluate importance only
@@ -120,12 +120,10 @@ def evaluate_importance(news_item: Dict) -> float:
 
             if importance >= importance_threshold:
                 metrics.increment_adaptive_thresholds_applied()
-                logger.debug(
-                    f"[THRESHOLD] category={category} importance>{importance_threshold} - PASSED")
+                logger.debug(f"[THRESHOLD] category={category} importance>{importance_threshold} - PASSED")
             else:
                 metrics.increment_adaptive_thresholds_skipped()
-                logger.debug(
-                    f"[THRESHOLD] category={category} importance<{importance_threshold} - FAILED")
+                logger.debug(f"[THRESHOLD] category={category} importance<{importance_threshold} - FAILED")
                 return 0.0
         else:
             metrics.increment_adaptive_thresholds_skipped()
@@ -146,16 +144,14 @@ def evaluate_importance(news_item: Dict) -> float:
         # Fallback to local prediction if available
         try:
             local_pred = predict_news_item(news_item)
-            logger.warning(
-                f"Using local predictor fallback for importance: {local_pred.importance}")
+            logger.warning(f"Using local predictor fallback for importance: {local_pred.importance}")
             return local_pred.importance
         except Exception:
             logger.error("Both AI and local predictor failed for importance")
             return 0.0
 
 
-def evaluate_importance_with_cache(news_item: Dict,
-                                   cache_importance: Optional[float] = None) -> float:
+def evaluate_importance_with_cache(news_item: Dict, cache_importance: Optional[float] = None) -> float:
     """
     Evaluate importance with explicit cache value.
 

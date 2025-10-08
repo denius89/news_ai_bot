@@ -19,8 +19,7 @@ async def send_events(
         text = "⚠️ Нет свежих событий"
     else:
         filtered = [e for e in events if (e.get("importance") or 0) >= min_importance]
-        text = "⚠️ Нет событий с нужным приоритетом" if not filtered else format_events(
-            filtered, limit=limit)
+        text = "⚠️ Нет событий с нужным приоритетом" if not filtered else format_events(filtered, limit=limit)
 
     if isinstance(target, types.Message):
         await target.answer(

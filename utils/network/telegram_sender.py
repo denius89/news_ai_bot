@@ -80,10 +80,7 @@ class TelegramSender:
 
         except TelegramForbiddenError as e:
             # Пользователь заблокировал бота или удалил чат
-            self.logger.warning(
-                "❌ Пользователь %d заблокировал бота или удалил чат: %s",
-                chat_id,
-                str(e))
+            self.logger.warning("❌ Пользователь %d заблокировал бота или удалил чат: %s", chat_id, str(e))
             return False
 
         except TelegramBadRequest as e:
@@ -105,14 +102,10 @@ class TelegramSender:
 
         except Exception as e:
             # Неожиданная ошибка
-            self.logger.error(
-                "❌ Неожиданная ошибка при отправке сообщения пользователю %d: %s",
-                chat_id,
-                str(e))
+            self.logger.error("❌ Неожиданная ошибка при отправке сообщения пользователю %d: %s", chat_id, str(e))
             return False
 
-    async def send_digest(self, chat_id: int, digest_text: str,
-                          title: str = "📰 Дайджест новостей") -> bool:
+    async def send_digest(self, chat_id: int, digest_text: str, title: str = "📰 Дайджест новостей") -> bool:
         """
         Отправить дайджест пользователю с красивым форматированием.
 
@@ -156,10 +149,7 @@ class TelegramSender:
             return await self.send_message(chat_id=chat_id, text=error_message, parse_mode=ParseMode.HTML)
 
         except Exception as e:
-            self.logger.error(
-                "❌ Ошибка отправки сообщения об ошибке пользователю %d: %s",
-                chat_id,
-                str(e))
+            self.logger.error("❌ Ошибка отправки сообщения об ошибке пользователю %d: %s", chat_id, str(e))
             return False
 
     async def send_help_message(self, chat_id: int, help_text: str) -> bool:

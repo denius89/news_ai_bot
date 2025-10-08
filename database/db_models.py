@@ -139,10 +139,8 @@ def upsert_news(items: List[Dict]):
 
             enriched = enrich_news_with_ai(item)
 
-            title = (enriched.get("title") or "").strip(
-            ) or enriched.get("source") or "Без названия"
-            content = (enriched.get("content") or "").strip() or (
-                enriched.get("summary") or "").strip() or title
+            title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
+            content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
             uid = make_uid(enriched.get("url", ""), title)
 
             row = {
@@ -301,10 +299,7 @@ def get_latest_news(
 # --- USER MANAGEMENT FUNCTIONS ---
 
 
-def upsert_user_by_telegram(
-        telegram_id: int,
-        username: str | None = None,
-        locale: str = "ru") -> str:
+def upsert_user_by_telegram(telegram_id: int, username: str | None = None, locale: str = "ru") -> str:
     """
     Создает или обновляет пользователя по Telegram ID.
 
@@ -322,8 +317,7 @@ def upsert_user_by_telegram(
 
     try:
         # Сначала пытаемся найти существующего пользователя
-        existing_user = supabase.table("users").select(
-            "id").eq("telegram_id", telegram_id).execute()
+        existing_user = supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
 
         if existing_user.data:
             user_id = existing_user.data[0]["id"]
@@ -392,8 +386,7 @@ def add_subscription(user_id: str, category: str) -> bool:
         return False
 
     try:
-        result = supabase.table("subscriptions").insert(
-            {"user_id": user_id, "category": category}).execute()
+        result = supabase.table("subscriptions").insert({"user_id": user_id, "category": category}).execute()
 
         if result.data:
             logger.info("Добавлена подписка: user_id=%d, category=%s", user_id, category)
@@ -423,8 +416,7 @@ def remove_subscription(user_id: str, category: str) -> int:
         return 0
 
     try:
-        result = supabase.table("subscriptions").delete().eq(
-            "user_id", user_id).eq("category", category).execute()
+        result = supabase.table("subscriptions").delete().eq("user_id", user_id).eq("category", category).execute()
 
         deleted_count = len(result.data) if result.data else 0
         if deleted_count > 0:
@@ -534,8 +526,7 @@ def list_notifications(user_id: str) -> list[dict]:
 # --- USER NOTIFICATIONS FUNCTIONS ---
 
 
-def get_user_notifications(user_id: Union[int, str],
-                           limit: int = 50, offset: int = 0) -> List[Dict]:
+def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: int = 0) -> List[Dict]:
     """
     Получает уведомления пользователя.
 
@@ -613,8 +604,7 @@ def create_user_notification(
 
         if result.data and len(result.data) > 0:
             notification_id = result.data[0].get("id")
-            logger.info(
-                f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}")
+            logger.info(f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}")
             return str(notification_id)
         else:
             logger.error(f"❌ Не удалось создать уведомление для user_id={user_id}")
@@ -641,10 +631,7 @@ def mark_notification_read(user_id: Union[int, str], notification_id: Union[int,
         return False
 
     try:
-        logger.info(
-            "Marking notification as read: user_id=%s, notification_id=%s",
-            user_id,
-            notification_id)
+        logger.info("Marking notification as read: user_id=%s, notification_id=%s", user_id, notification_id)
         result = (
             supabase.table("user_notifications")
             .update({"read": True})

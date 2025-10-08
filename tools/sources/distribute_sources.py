@@ -215,7 +215,8 @@ def distribute_sources_to_subcategories():
             matching_sources = []
             for source in all_sources:
                 source_text = (
-                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower())
+                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower()
+                )
 
                 # Проверяем совпадение с ключевыми словами
                 if any(keyword in source_text for keyword in keywords):
@@ -237,12 +238,7 @@ def distribute_sources_to_subcategories():
 
     # Сохраняем обновленную конфигурацию
     with open("config/data/sources.yaml", "w", encoding="utf-8") as f:
-        yaml.dump(
-            distributed_sources,
-            f,
-            default_flow_style=False,
-            allow_unicode=True,
-            sort_keys=False)
+        yaml.dump(distributed_sources, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
     # Подсчитываем статистику
     total_sources = 0
@@ -389,7 +385,8 @@ def smart_distribute_sources():
 
             for source in all_sources:
                 source_text = (
-                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower())
+                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower()
+                )
 
                 # Проверяем точное совпадение с приоритетными ключевыми словами
                 for keyword in priority_keywords:
