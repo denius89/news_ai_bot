@@ -24,9 +24,15 @@ class TestRejectionAnalyzer:
         """Set up test fixtures."""
         self.test_config = {
             "features": {
-                "auto_learn_enabled": True}, "rejection_analysis": {
-                "top_words_limit": 10, "top_sources_limit": 5, "frequency_threshold": 0.1}, "features": {
-                "auto_learn_min_samples": 5}, }
+                "auto_learn_enabled": True,
+                "auto_learn_min_samples": 5
+            },
+            "rejection_analysis": {
+                "top_words_limit": 10,
+                "top_sources_limit": 5,
+                "frequency_threshold": 0.1
+            }
+        }
 
         # Create temporary config file
         self.temp_config = tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False)

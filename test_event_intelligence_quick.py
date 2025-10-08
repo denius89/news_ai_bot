@@ -199,12 +199,9 @@ async def test_event_context_generation():
             "importance": 0.9,
             "source": "ethereum.org",
             "link": "https://ethereum.org/merge",
-            "starts_at": datetime.now(
-        timezone.utc)
-        + timedelta(
-            days=10),
+            "starts_at": datetime.now(timezone.utc) + timedelta(days=10),
             "ends_at": None,
-            }
+        }
 
         print(f"Generating context for: {test_event['title']}")
 

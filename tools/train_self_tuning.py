@@ -11,6 +11,9 @@ from ai_modules.self_tuning_trainer import get_self_tuning_trainer
 from ai_modules.self_tuning_collector import get_self_tuning_collector
 import sys
 import logging
+
+# Настройка логгера
+logger = logging.getLogger(__name__)
 from pathlib import Path
 
 # Add project root to path
