@@ -23,12 +23,12 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
-from utils.dates import ensure_utc_iso  # noqa: E402
+from utils.system.dates import ensure_utc_iso  # noqa: E402
 
 logger = logging.getLogger("database.service")
 
 # Load environment variables
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
@@ -196,7 +196,7 @@ class DatabaseService:
             # Add formatted dates for backward compatibility
             for item in news_items:
                 if item.get("published_at"):
-                    from utils.dates import format_datetime
+                    from utils.system.dates import format_datetime
 
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
@@ -295,7 +295,7 @@ class DatabaseService:
             # Add formatted dates for backward compatibility
             for item in news_items:
                 if item.get("published_at"):
-                    from utils.dates import format_datetime
+                    from utils.system.dates import format_datetime
 
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 

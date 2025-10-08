@@ -12,7 +12,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent

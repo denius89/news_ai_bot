@@ -24,7 +24,7 @@ if [ -f .bot.pid ]; then
 fi
 
 # Принудительная остановка по имени процесса
-pkill -f "python3 webapp.py" 2>/dev/null
+pkill -f "python3 src/webapp.py" 2>/dev/null
 pkill -f "python3 telegram_bot/bot.py" 2>/dev/null
 pkill -f "python3 -m telegram_bot.bot" 2>/dev/null
 

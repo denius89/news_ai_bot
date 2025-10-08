@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 # Путь к файлу источников
-SOURCES_FILE = Path(__file__).parent.parent / "config" / "sources.yaml"
+SOURCES_FILE = Path(__file__).parent.parent / "config" / "data" / "sources.yaml"
 
 # Кэш для загруженных данных
 _sources_cache: Optional[Dict] = None

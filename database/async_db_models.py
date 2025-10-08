@@ -15,13 +15,13 @@ from supabase import create_async_client, AsyncClient
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from utils.dates import format_datetime  # noqa: E402
+from utils.system.dates import format_datetime  # noqa: E402
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database.async")
 
 # --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 

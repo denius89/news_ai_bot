@@ -6,7 +6,7 @@ echo "🚀 Запуск PulseAI сервисов..."
 
 # Убиваем старые процессы
 echo "🔄 Остановка старых процессов..."
-pkill -f "python3 webapp.py" 2>/dev/null
+pkill -f "python3 src/webapp.py" 2>/dev/null
 pkill -f "python3 telegram_bot/bot.py" 2>/dev/null
 sleep 2
 
@@ -15,7 +15,7 @@ export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
 
 # Запускаем Flask
 echo "🌐 Запуск Flask WebApp..."
-PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH" python3 webapp.py &
+PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH" python3 src/webapp.py &
 FLASK_PID=$!
 
 # Ждем запуска Flask

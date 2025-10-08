@@ -1,5 +1,5 @@
 import logging
-from utils.ai_client import ask
+from utils.ai.ai_client import ask
 
 logger = logging.getLogger("importance")
 

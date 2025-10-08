@@ -3,7 +3,7 @@
 Скрипт для обновления всех конфигураций Cloudflare Tunnel.
 """
 
-from config.cloudflare import get_deployment_info, validate_cloudflare_config, CLOUDFLARE_TUNNEL_URL
+from config.core.cloudflare import get_deployment_info, validate_cloudflare_config, CLOUDFLARE_TUNNEL_URL
 import sys
 import os
 from pathlib import Path

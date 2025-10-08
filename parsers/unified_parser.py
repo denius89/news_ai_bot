@@ -19,7 +19,7 @@ from dateutil import parser as date_parser
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from services.categories import get_all_sources
-from utils.clean_text import clean_text
+from utils.text.clean_text import clean_text
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
 from database.service import get_sync_service, get_async_service

@@ -21,10 +21,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
-from utils.dates import ensure_utc_iso  # noqa: E402
+from utils.system.dates import ensure_utc_iso  # noqa: E402
 
-# from utils.cache import get_news_cache, cached  # noqa: E402
-from config.settings import SUPABASE_URL, SUPABASE_KEY  # noqa: E402
+# from utils.system.cache import get_news_cache, cached  # noqa: E402
+from config.core.settings import SUPABASE_URL, SUPABASE_KEY  # noqa: E402
 
 logger = logging.getLogger("database.service")
 
@@ -192,7 +192,7 @@ class DatabaseService:
             # Add formatted dates for backward compatibility
             for item in news_items:
                 if item.get("published_at"):
-                    from utils.dates import format_datetime
+                    from utils.system.dates import format_datetime
 
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
@@ -291,7 +291,7 @@ class DatabaseService:
             # Add formatted dates for backward compatibility
             for item in news_items:
                 if item.get("published_at"):
-                    from utils.dates import format_datetime
+                    from utils.system.dates import format_datetime
 
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 

@@ -13,7 +13,7 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 from telegram_bot.keyboards import back_inline_keyboard
-from config.settings import WEBAPP_URL
+from config.core.settings import WEBAPP_URL
 
 logger = logging.getLogger(__name__)
 router = Router()

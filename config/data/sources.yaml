@@ -1,0 +1,460 @@
+crypto:
+  bitcoin:
+    icon: btc
+    sources:
+      - name: Bitcoin Magazine
+        url: https://bitcoinmagazine.com/feed
+      - name: CoinTelegraph BTC
+        url: https://cointelegraph.com/rss/tag/bitcoin
+      - name: BTC Times
+        url: https://btctimes.com/rss
+      - name: NewsBTC
+        url: https://www.newsbtc.com/feed/
+  ethereum:
+    icon: eth
+    sources:
+      - name: Ethereum Blog
+        url: https://blog.ethereum.org/feed.xml
+      - name: CoinTelegraph ETH
+        url: https://cointelegraph.com/rss/tag/ethereum
+      - name: ETHHub
+        url: https://ethhub.substack.com/feed
+      - name: Decrypt ETH
+        url: https://decrypt.co/feed
+  altcoins:
+    icon: altcoin
+    sources:
+      - name: Decrypt Altcoins
+        url: https://decrypt.co/feed
+      - name: CoinDesk Altcoins
+        url: https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml&tag=altcoin
+      - name: CryptoSlate Altcoins
+        url: https://cryptoslate.com/feed/
+  defi:
+    icon: defi
+    sources:
+      - name: DefiLlama
+        url: https://defillama.com/news/rss
+      - name: Bankless
+        url: https://banklesshq.substack.com/feed
+      - name: The Defiant
+        url: https://thedefiant.io/feed
+      - name: CoinDesk DeFi
+        url: https://www.coindesk.com/tag/defi/rss
+  nft:
+    icon: nft
+    sources:
+      - name: NFT Now
+        url: https://nftnow.com/feed
+      - name: CoinTelegraph NFT
+        url: https://cointelegraph.com/rss/tag/nft
+      - name: Decrypt NFT
+        url: https://decrypt.co/feed
+      - name: OpenSea Blog
+        url: https://opensea.io/blog/rss
+  gamefi:
+    icon: gamefi
+    sources:
+      - name: PlayToEarn
+        url: https://playtoearn.net/rss
+      - name: Decrypt GameFi
+        url: https://decrypt.co/feed
+      - name: CoinTelegraph GameFi
+        url: https://cointelegraph.com/rss/tag/gamefi
+  exchanges:
+    icon: exchange
+    sources:
+      - name: Binance Blog
+        url: https://www.binance.com/en/blog/rss
+      - name: OKX Blog
+        url: https://www.okx.com/rss
+      - name: Bybit Blog
+        url: https://blog.bybit.com/en-US/rss
+      - name: Coinbase Blog
+        url: https://blog.coinbase.com/feed
+  regulation:
+    icon: regulation
+    sources:
+      - name: CoinDesk Policy
+        url: https://www.coindesk.com/policy/rss/
+      - name: Decrypt Regulation
+        url: https://decrypt.co/feed
+      - name: CryptoSlate Regulation
+        url: https://cryptoslate.com/feed/
+  security:
+    icon: security
+    sources:
+      - name: PeckShield Blog
+        url: https://blog.peckshield.com/feed
+      - name: Rekt News
+        url: https://rekt.news/index.xml
+      - name: SlowMist
+        url: https://slowmist.medium.com/feed
+  market_trends:
+    icon: market_trends
+    sources:
+      - name: Glassnode Blog
+        url: https://glassnode.com/rss
+      - name: CryptoQuant Blog
+        url: https://cryptoquant.com/rss
+      - name: IntoTheBlock
+        url: https://intotheblock.com/feed
+
+sports:
+  football:
+    icon: football
+    sources:
+      - name: UEFA
+        url: https://www.uefa.com/rssfeed/news/rss.xml
+      - name: FIFA
+        url: https://www.fifa.com/rss-feeds/news
+      - name: Goal.com
+        url: https://www.goal.com/feeds/en/news
+      - name: ESPN Soccer
+        url: https://www.espn.com/espn/rss/soccer/news
+  basketball:
+    icon: basketball
+    sources:
+      - name: NBA
+        url: https://www.nba.com/rss/nba_rss.xml
+      - name: Euroleague
+        url: https://www.euroleaguebasketball.net/rss
+      - name: Bleacher Report NBA
+        url: https://bleacherreport.com/articles/nba.rss
+      - name: ESPN NBA
+        url: https://www.espn.com/espn/rss/nba/news
+  tennis:
+    icon: tennis
+    sources:
+      - name: ATP
+        url: https://www.atptour.com/en/media/rss-feed/xml-feed
+      - name: WTA
+        url: https://www.wtatennis.com/rss
+      - name: ESPN Tennis
+        url: https://www.espn.com/espn/rss/tennis/news
+  ufc_mma:
+    icon: ufc
+    sources:
+      - name: MMA Fighting
+        url: https://www.mmafighting.com/rss/current
+      - name: Bloody Elbow
+        url: https://www.bloodyelbow.com/rss/current
+      - name: ESPN MMA
+        url: https://www.espn.com/espn/rss/mma/news
+  cricket:
+    icon: cricket
+    sources:
+      - name: Wisden
+        url: https://wisden.com/feed
+      - name: CricBuzz
+        url: https://www.cricbuzz.com/rss/news
+      - name: ICC
+        url: https://www.icc-cricket.com/rss/news
+  baseball:
+    icon: baseball
+    sources:
+      - name: MLB
+        url: http://mlb.mlb.com/partnerxml/gen/news/rss/mlb.xml
+      - name: ESPN MLB
+        url: https://www.espn.com/espn/rss/mlb/news
+  badminton:
+    icon: badminton
+    sources:
+      - name: Badminton England
+        url: https://www.badmintonengland.co.uk/rss/news
+      - name: BWF
+        url: https://bwfbadminton.com/feed/
+  table_tennis:
+    icon: table_tennis
+    sources:
+      - name: TableTennisDaily
+        url: https://www.tabletennisdaily.com/rss.xml
+      - name: ESPN Table Tennis
+        url: https://www.espn.com/espn/rss/tabletennis/news
+  esports:
+    icon: esports
+    sources:
+      - name: Liquipedia
+        url: https://liquipedia.net/rss
+      - name: ESPN Esports
+        url: https://www.espn.com/espn/rss/esports/news
+  other:
+    icon: sports_other
+    sources:
+      - name: F1
+        url: https://www.formula1.com/rss
+      - name: MotoGP
+        url: https://www.motogp.com/en/news/rss
+      - name: Olympics
+        url: https://olympics.com/en/news/rss
+      - name: World Athletics
+        url: https://worldathletics.org/rss
+
+markets:
+  stocks:
+    icon: stocks
+    sources:
+      - name: Bloomberg Markets
+        url: https://www.bloomberg.com/feeds/podcasts/markets.rss
+      - name: Reuters Markets
+        url: https://feeds.reuters.com/reuters/businessNews
+      - name: MarketWatch Stocks
+        url: https://www.marketwatch.com/feeds/stocks
+      - name: Yahoo Finance
+        url: https://feeds.finance.yahoo.com/rss/2.0/headline
+  bonds:
+    icon: bonds
+    sources:
+      - name: CNBC Bonds
+        url: https://www.cnbc.com/id/10000139/device/rss/rss.html
+      - name: MarketWatch Bonds
+        url: https://www.marketwatch.com/feeds/bonds
+      - name: Reuters Bonds
+        url: https://feeds.reuters.com/news/bonds
+  forex:
+    icon: forex
+    sources:
+      - name: DailyFX
+        url: https://www.dailyfx.com/feeds/market-news
+      - name: Reuters FX
+        url: https://feeds.reuters.com/news/forex
+      - name: FXStreet
+        url: https://www.fxstreet.com/rss
+  commodities:
+    icon: commodities
+    sources:
+      - name: Reuters Commodities
+        url: https://feeds.reuters.com/news/commodities
+      - name: MarketWatch Commodities
+        url: https://www.marketwatch.com/feeds/commodities
+      - name: OilPrice
+        url: https://oilprice.com/rss
+  ipos:
+    icon: ipos
+    sources:
+      - name: Nasdaq IPO Calendar
+        url: https://api.nasdaq.com/api/ipo/calendar
+      - name: Renaissance Capital
+        url: https://www.renaissancecapital.com/rss/ipo
+      - name: MarketWatch IPO
+        url: https://www.marketwatch.com/rss/ipo
+      - name: Yahoo IPO
+        url: https://finance.yahoo.com/calendar/ipo
+  earnings:
+    icon: earnings
+    sources:
+      - name: Zacks
+        url: https://www.zacks.com/rss/earnings_news.xml
+      - name: Yahoo Earnings
+        url: https://finance.yahoo.com/calendar/earnings
+      - name: MarketWatch Earnings
+        url: https://www.marketwatch.com/rss/earnings
+  funds_etfs:
+    icon: etf
+    sources:
+      - name: ETF.com
+        url: https://www.etf.com/rss.xml
+      - name: Yahoo ETFs
+        url: https://finance.yahoo.com/etfs/rss
+      - name: Morningstar ETFs
+        url: https://www.morningstar.com/rss
+  economic_data:
+    icon: economic_data
+    sources:
+      - name: OECD
+        url: https://oecd.github.io/newsfeed/rss.xml
+      - name: TradingEconomics
+        url: https://tradingeconomics.com/rss
+      - name: FRED
+        url: https://fred.stlouisfed.org/feeds
+      - name: IMF
+        url: https://www.imf.org/external/rss/feeds.aspx
+  central_banks:
+    icon: central_banks
+    sources:
+      - name: Bank of England
+        url: https://www.bankofengland.co.uk/news/rss
+      - name: Federal Reserve
+        url: https://www.federalreserve.gov/feeds/press_all.xml
+
+tech:
+  ai:
+    icon: ai
+    sources:
+      - name: VentureBeat AI
+        url: https://venturebeat.com/category/ai/feed
+      - name: AI News
+        url: https://artificialintelligence-news.com/feed/
+      - name: MIT Technology Review AI
+        url: https://www.technologyreview.com/feed/
+      - name: OpenAI Blog
+        url: https://openai.com/blog/rss.xml
+  bigtech:
+    icon: bigtech
+    sources:
+      - name: Bloomberg Tech
+        url: https://www.bloomberg.com/feeds/podcasts/tech.rss
+      - name: TechCrunch
+        url: https://techcrunch.com/feed/
+      - name: Ars Technica
+        url: https://feeds.arstechnica.com/arstechnica/index/
+      - name: The Verge
+        url: https://www.theverge.com/rss/index.xml
+  hardware:
+    icon: hardware
+    sources:
+      - name: Ars Technica Hardware
+        url: http://feeds.arstechnica.com/arstechnica/hardware
+      - name: AnandTech
+        url: https://www.anandtech.com/rss
+      - name: Tom's Hardware
+        url: https://www.tomshardware.com/feeds/all
+      - name: PCWorld
+        url: https://www.pcworld.com/index.rss
+  software:
+    icon: software
+    sources:
+      - name: InfoWorld
+        url: https://www.infoworld.com/index.rss
+      - name: Computerworld
+        url: https://www.computerworld.com/news/rss2.xml
+      - name: ZDNet
+        url: https://www.zdnet.com/topic/software/rss.xml
+  cybersecurity:
+    icon: cybersecurity
+    sources:
+      - name: CSO Online
+        url: https://www.csoonline.com/index.rss
+      - name: Krebs on Security
+        url: https://krebsonsecurity.com/feed/
+      - name: Dark Reading
+        url: https://www.darkreading.com/rss.xml
+      - name: Threatpost
+        url: https://threatpost.com/feed/
+  blockchain_tech:
+    icon: blockchain
+    sources:
+      - name: CoinDesk Tech
+        url: https://www.coindesk.com/tech/rss/
+      - name: Consensys Blog
+        url: https://consensys.net/blog/feed/
+      - name: Ethereum Foundation
+        url: https://blog.ethereum.org/feed.xml
+  startups:
+    icon: startups
+    sources:
+      - name: Crunchbase
+        url: https://news.crunchbase.com/feed/
+      - name: TechCrunch Startups
+        url: https://techcrunch.com/category/startups/feed/
+      - name: VentureBeat
+        url: https://venturebeat.com/feed/
+  conferences:
+    icon: conferences
+    sources:
+      - name: WebSummit
+        url: https://websummit.com/feed
+      - name: CES Blog
+        url: https://www.ces.tech/rss.aspx
+      - name: Eventbrite Tech
+        url: https://www.eventbrite.com/d/online/technology--events/rss/
+
+world:
+  conflicts:
+    icon: conflicts
+    sources:
+      - name: Reuters World
+        url: https://feeds.reuters.com/Reuters/worldNews
+      - name: BBC World
+        url: http://feeds.bbci.co.uk/news/world/rss.xml
+      - name: DW World
+        url: https://rss.dw.com/rdf/rss-en-world
+      - name: Al Jazeera
+        url: https://www.aljazeera.com/xml/rss/all.xml
+  elections:
+    icon: elections
+    sources:
+      - name: Politico Elections
+        url: https://www.politico.com/rss/politics08.xml
+      - name: BBC Politics
+        url: http://feeds.bbci.co.uk/news/politics/rss.xml
+      - name: Reuters Politics
+        url: https://feeds.reuters.com/Reuters/politicsNews
+  energy:
+    icon: energy
+    sources:
+      - name: Reuters Energy
+        url: https://feeds.reuters.com/reuters/energyNews
+      - name: OilPrice Energy
+        url: https://oilprice.com/rss/energy
+      - name: IEA
+        url: https://www.iea.org/rss/news.xml
+      - name: Energy Post
+        url: https://energypost.eu/feed/
+  geopolitics:
+    icon: geopolitics
+    sources:
+      - name: Stratfor
+        url: https://worldview.stratfor.com/rss
+      - name: CFR
+        url: https://www.cfr.org/rss/news
+      - name: Carnegie Endowment
+        url: https://carnegieendowment.org/rss
+      - name: Foreign Affairs
+        url: https://www.foreignaffairs.com/rss.xml
+  diplomacy:
+    icon: diplomacy
+    sources:
+      - name: US State Dept Press
+        url: https://www.state.gov/feed/
+      - name: EU External Action
+        url: https://www.eeas.europa.eu/eeas-news_en?format=rss
+      - name: UN News
+        url: https://news.un.org/en/rss
+  sanctions:
+    icon: sanctions
+    sources:
+      - name: Reuters Sanctions
+        url: https://www.reuters.com/news/archive/sanctionsNews?rpc=401&feedType=rss
+      - name: BBC Sanctions
+        url: http://feeds.bbci.co.uk/news/topics/c40rjmqd4w7t/rss.xml
+      - name: CFR Sanctions
+        url: https://www.cfr.org/taxonomy/term/1018/feed
+  organizations:
+    icon: organizations
+    sources:
+      - name: IMF
+        url: https://www.imf.org/external/rss/feeds.aspx?category=News
+      - name: WTO
+        url: https://www.wto.org/library/rss_e.htm
+      - name: World Bank
+        url: https://www.worldbank.org/en/news/all?format=rss
+      - name: OECD News
+        url: https://www.oecd.org/newsroom/index.rdf
+  migration:
+    icon: migration
+    sources:
+      - name: IOM
+        url: https://www.iom.int/rss.xml
+      - name: UNHCR
+        url: https://www.unhcr.org/rss.xml
+      - name: Migration Policy
+        url: https://www.migrationpolicy.org/rss.xml
+  climate:
+    icon: climate
+    sources:
+      - name: UNFCCC
+        url: https://unfccc.int/rss.xml
+      - name: Climate Home
+        url: https://www.climatechangenews.com/feed/
+      - name: Carbon Brief
+        url: https://www.carbonbrief.org/feed
+  global_risks:
+    icon: global_risks
+    sources:
+      - name: WEF Agenda
+        url: https://www.weforum.org/agenda/feed
+      - name: Chatham House
+        url: https://www.chathamhouse.org/rss.xml
+      - name: World Bank Blogs (Dev)
+        url: https://blogs.worldbank.org/feed

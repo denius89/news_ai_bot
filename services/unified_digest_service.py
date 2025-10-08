@@ -10,8 +10,8 @@ from typing import List, Dict, Optional
 
 from database.service import get_sync_service, get_async_service
 from digests.ai_service import DigestAIService
-from utils.formatters import format_news
-from utils.clean_text import clean_for_telegram
+from utils.text.formatters import format_news
+from utils.text.clean_text import clean_for_telegram
 
 logger = logging.getLogger("unified_digest_service")
 
@@ -133,7 +133,7 @@ class UnifiedDigestService:
             # Use AI service for generation
             cat_display = categories[0] if categories else category or "all"
             # For sync version, use fallback digest
-            from utils.formatters import format_news
+            from utils.text.formatters import format_news
 
             ai_digest = format_news(news_items, limit=limit)
 

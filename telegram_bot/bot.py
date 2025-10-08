@@ -5,9 +5,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-from config.settings import TELEGRAM_BOT_TOKEN
+from config.core.settings import TELEGRAM_BOT_TOKEN
 from telegram_bot.handlers import routers
-from utils.logging_setup import setup_logging
+from utils.logging.logging_setup import setup_logging
 from database.service import get_async_service
 
 # --- ЛОГИРОВАНИЕ ---

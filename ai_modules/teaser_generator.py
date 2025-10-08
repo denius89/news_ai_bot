@@ -15,7 +15,7 @@ from pathlib import Path
 
 from ai_modules.metrics import get_metrics
 
-# from utils.ai_client import get_ai_client
+# from utils.ai.ai_client import get_ai_client
 
 logger = logging.getLogger("teaser_generator")
 
