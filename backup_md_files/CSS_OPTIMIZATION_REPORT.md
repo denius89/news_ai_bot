@@ -1,0 +1,379 @@
+# CSS Optimization Report
+
+**Дата:** 2025-10-06 16:50:05
+
+## 📊 Статистика
+
+- **Всего CSS классов:** 399
+- **Используемых классов:** 501
+- **Неиспользуемых классов:** 281
+- **Эффективность использования:** 125.6%
+
+## 🗑️ Неиспользуемые классы
+
+- `.absolute`
+- `.alert`
+- `.alert-danger`
+- `.alert-info`
+- `.alert-success`
+- `.alert-warning`
+- `.badge-danger`
+- `.badge-gray`
+- `.badge-info`
+- `.badge-lg`
+- `.badge-primary`
+- `.badge-secondary`
+- `.badge-sm`
+- `.badge-success`
+- `.badge-warning`
+- `.bg-danger`
+- `.bg-info`
+- `.bg-primary`
+- `.bg-secondary`
+- `.bg-success`
+- `.bg-warning`
+- `.border-danger`
+- `.border-info`
+- `.border-primary`
+- `.border-secondary`
+- `.border-success`
+- `.border-warning`
+- `.bottom-0`
+- `.bounce`
+- `.breadcrumb`
+- `.breadcrumb-item`
+- `.breadcrumb-link`
+- `.btn-danger`
+- `.btn-ghost`
+- `.btn-lg`
+- `.btn-success`
+- `.btn-xl`
+- `.card`
+- `.card-body`
+- `.card-footer`
+- `.card-header`
+- `.card-lg`
+- `.card-sm`
+- `.code-block`
+- `.code-comment`
+- `.code-keyword`
+- `.code-string`
+- `.col-span-1`
+- `.col-span-12`
+- `.col-span-2`
+- `.col-span-3`
+- `.col-span-4`
+- `.col-span-6`
+- `.credibility-bar`
+- `.credibility-fill`
+- `.credibility-fill-high`
+- `.credibility-fill-low`
+- `.credibility-fill-medium`
+- `.credibility-fill-verified`
+- `.critical`
+- `.dropdown`
+- `.event-notification`
+- `.fade-in`
+- `.fade-out`
+- `.fixed`
+- `.flash`
+- `.flex`
+- `.flex-1`
+- `.flex-auto`
+- `.flex-col`
+- `.flex-initial`
+- `.flex-none`
+- `.flex-nowrap`
+- `.flex-row`
+- `.flex-wrap`
+- `.focus-ring`
+- `.font-bold`
+- `.font-light`
+- `.font-medium`
+- `.font-normal`
+- `.font-semibold`
+- `.form-error`
+- `.form-group`
+- `.form-help`
+- `.form-input`
+- `.form-label`
+- `.form-select`
+- `.form-textarea`
+- `.gap-1`
+- `.gap-2`
+- `.gap-3`
+- `.gap-4`
+- `.gap-6`
+- `.gap-8`
+- `.grid`
+- `.grid-cols-1`
+- `.grid-cols-12`
+- `.grid-cols-2`
+- `.grid-cols-3`
+- `.grid-cols-4`
+- `.grid-cols-6`
+- `.h-auto`
+- `.h-fit`
+- `.h-full`
+- `.h-screen`
+- `.hljs`
+- `.hover-glow`
+- `.hover-lift`
+- `.hover-scale`
+- `.importance-fill-critical`
+- `.importance-fill-high`
+- `.importance-fill-low`
+- `.importance-fill-medium`
+- `.inline`
+- `.inline-block`
+- `.inline-flex`
+- `.inset-0`
+- `.is-scrolled`
+- `.items-center`
+- `.items-end`
+- `.items-start`
+- `.items-stretch`
+- `.justify-around`
+- `.justify-between`
+- `.justify-center`
+- `.justify-end`
+- `.justify-start`
+- `.left-0`
+- `.loading-skeleton`
+- `.low`
+- `.m-0`
+- `.m-1`
+- `.m-2`
+- `.m-3`
+- `.m-4`
+- `.m-6`
+- `.m-8`
+- `.max-w-2xl`
+- `.max-w-3xl`
+- `.max-w-4xl`
+- `.max-w-5xl`
+- `.max-w-6xl`
+- `.max-w-7xl`
+- `.max-w-full`
+- `.max-w-lg`
+- `.max-w-md`
+- `.max-w-none`
+- `.max-w-sm`
+- `.max-w-xl`
+- `.max-w-xs`
+- `.medium`
+- `.metric-card`
+- `.metric-change`
+- `.modal-backdrop`
+- `.modal-backdrop-enter`
+- `.modal-content`
+- `.modal-content-enter`
+- `.mx-0`
+- `.mx-1`
+- `.mx-2`
+- `.mx-3`
+- `.mx-4`
+- `.mx-auto`
+- `.my-0`
+- `.my-1`
+- `.my-2`
+- `.my-3`
+- `.my-4`
+- `.my-6`
+- `.my-8`
+- `.nav`
+- `.nav-item`
+- `.nav-link`
+- `.overflow-auto`
+- `.overflow-hidden`
+- `.overflow-scroll`
+- `.overflow-visible`
+- `.overflow-x-auto`
+- `.overflow-x-hidden`
+- `.overflow-x-scroll`
+- `.overflow-y-auto`
+- `.overflow-y-hidden`
+- `.overflow-y-scroll`
+- `.p-0`
+- `.p-1`
+- `.p-2`
+- `.p-3`
+- `.p-4`
+- `.p-6`
+- `.p-8`
+- `.page-footer`
+- `.page-header`
+- `.page-layout`
+- `.page-main`
+- `.popover`
+- `.processing`
+- `.progress-bar`
+- `.progress-bar-fill`
+- `.progress-circle`
+- `.progress-circle-bg`
+- `.progress-circle-fill`
+- `.progress-circle-text`
+- `.progress-fill`
+- `.progress-fill-danger`
+- `.progress-fill-info`
+- `.progress-fill-primary`
+- `.progress-fill-secondary`
+- `.progress-fill-success`
+- `.progress-fill-warning`
+- `.pulse-soft`
+- `.px-0`
+- `.px-1`
+- `.px-2`
+- `.px-3`
+- `.px-4`
+- `.px-6`
+- `.px-8`
+- `.py-0`
+- `.py-1`
+- `.py-2`
+- `.py-3`
+- `.py-4`
+- `.py-6`
+- `.py-8`
+- `.reactor-connected`
+- `.reactor-disconnected`
+- `.reactor-fade-in`
+- `.reactor-hidden`
+- `.reactor-loading`
+- `.reactor-notification`
+- `.reactor-slide-up`
+- `.reactor-visible`
+- `.relative`
+- `.right-0`
+- `.rotate`
+- `.rotate-slow`
+- `.scale-in`
+- `.scale-out`
+- `.shake`
+- `.slide-down`
+- `.slide-in`
+- `.slide-out`
+- `.slide-up`
+- `.spinner-lg`
+- `.spinner-sm`
+- `.status-disconnected`
+- `.status-processing`
+- `.status-warning`
+- `.sticky`
+- `.table`
+- `.table-bordered`
+- `.text-2xl`
+- `.text-3xl`
+- `.text-base`
+- `.text-danger`
+- `.text-info`
+- `.text-left`
+- `.text-lg`
+- `.text-primary`
+- `.text-right`
+- `.text-secondary`
+- `.text-sm`
+- `.text-success`
+- `.text-warning`
+- `.text-xl`
+- `.text-xs`
+- `.theme-transition`
+- `.toast`
+- `.toast-enter`
+- `.toast-exit`
+- `.top-0`
+- `.verified`
+- `.w-auto`
+- `.w-fit`
+- `.w-full`
+- `.z-0`
+- `.z-10`
+- `.z-20`
+- `.z-30`
+- `.z-40`
+- `.z-50`
+
+
+## 🔄 Дублирующиеся селекторы
+
+- `.btn` (4 раз)
+- `.btn-outline` (2 раз)
+- `.btn-primary` (3 раз)
+- `.btn-primary:hover` (3 раз)
+- `.btn-secondary` (3 раз)
+- `.btn-secondary:hover` (2 раз)
+- `.card-title` (2 раз)
+- `.container` (7 раз)
+- `.dashboard-card` (2 раз)
+- `.dashboard-card:hover` (2 раз)
+- `.dashboard-grid` (2 раз)
+- `.dashboard-title` (2 раз)
+- `.event-item` (5 раз)
+- `.event-item.error` (3 раз)
+- `.event-item.info` (2 раз)
+- `.event-item.new` (3 раз)
+- `.event-item.warning` (2 раз)
+- `.event-item.welcome` (2 раз)
+- `.event-item:hover` (2 раз)
+- `.event-time` (5 раз)
+- `.event-title` (5 раз)
+- `.events-container` (2 раз)
+- `.events-counter` (2 раз)
+- `.feature-card` (5 раз)
+- `.feature-card:hover` (2 раз)
+- `.feature-icon` (3 раз)
+- `.features-grid` (2 раз)
+- `.features-title` (3 раз)
+- `.hero-description` (2 раз)
+- `.hero-subtitle` (3 раз)
+- `.hero-title` (3 раз)
+- `.importance-fill` (2 раз)
+- `.metric-item` (3 раз)
+- `.metric-item:hover` (2 раз)
+- `.metric-label` (4 раз)
+- `.metric-value` (5 раз)
+- `.metrics-grid` (3 раз)
+- `.notification-close` (2 раз)
+- `.notification-close:hover` (2 раз)
+- `.notification-message` (3 раз)
+- `.notification-title` (3 раз)
+- `.reactor-notification` (3 раз)
+- `.status-connected` (3 раз)
+- `.status-disconnected` (3 раз)
+- `.status-indicator` (2 раз)
+- `0%` (7 раз)
+- `0%, 100%` (3 раз)
+- `100%` (7 раз)
+- `50%` (6 раз)
+- `:root` (3 раз)
+- `:root[data-theme="dark"]` (2 раз)
+- `@keyframes pulse` (2 раз)
+- `@keyframes slideIn` (2 раз)
+- `@keyframes slideUp` (2 раз)
+- `@media (min-width: 1024px)` (5 раз)
+- `@media (min-width: 640px)` (4 раз)
+- `@media (min-width: 768px)` (5 раз)
+- `@media (prefers-color-scheme: dark)` (2 раз)
+- `[data-reactor="digest-status"].error` (2 раз)
+- `[data-reactor="digest-status"].processing` (2 раз)
+- `[data-reactor="digest-status"].ready` (2 раз)
+- `from` (20 раз)
+- `to` (20 раз)
+
+
+## 💡 Рекомендации по оптимизации
+
+1. **Удалить неиспользуемые классы** - уменьшит размер CSS
+2. **Объединить дублирующиеся стили** - улучшит читаемость
+3. **Использовать CSS минификацию** в продакшене
+4. **Регулярно проверять использование** классов при рефакторинге
+
+## 🎯 Цели оптимизации
+
+- Уменьшить размер CSS на 10-20%
+- Устранить дублирование стилей
+- Улучшить производительность загрузки
+- Упростить поддержку кода
+
+---
+*Отчёт сгенерирован автоматически CSS Optimizer*
