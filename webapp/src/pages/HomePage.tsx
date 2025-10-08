@@ -187,7 +187,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                 </h1>
                 <p className="text-muted-strong text-lg mb-6 max-w-2xl mx-auto">
                   {telegramUser ? 
-                    "Ваш умный помощник для персональных новостей" : 
+                    "Ваш AI уже анализирует новости и готовит персональные дайджесты" : 
                     "Добро пожаловать в PulseAI — новости, которые работают на вас"
                   }
                 </p>
@@ -196,7 +196,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                   className="btn-primary hover:scale-105 transition-transform duration-200"
                   onClick={() => onNavigate?.('news')}
                 >
-                  Начать с PulseAI
+                  {telegramUser ? "Поехали!" : "Начать с PulseAI"}
                 </Button>
               </CardContent>
             </Card>
