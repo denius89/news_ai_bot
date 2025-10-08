@@ -133,7 +133,8 @@ class SelfTuningTrainer:
             logger.error(f"Error loading dataset: {e}")
             raise
 
-    def _evaluate_model(self, model, X_test: pd.DataFrame, y_test: pd.Series, task_name: str) -> Dict[str, float]:
+    def _evaluate_model(self, model, X_test: pd.DataFrame, y_test: pd.Series,
+                        task_name: str) -> Dict[str, float]:
         """
         Evaluate model performance.
 
@@ -149,7 +150,8 @@ class SelfTuningTrainer:
         try:
             # Make predictions
             y_pred = model.predict(X_test)
-            y_pred_proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else None
+            y_pred_proba = model.predict_proba(X_test)[:, 1] if hasattr(
+                model, "predict_proba") else None
 
             # Calculate metrics
             f1 = f1_score(y_test, y_pred, average="weighted")
@@ -173,7 +175,8 @@ class SelfTuningTrainer:
                 metrics["cv_f1_mean"] = f1
                 metrics["cv_f1_std"] = 0.0
 
-            logger.info(f"{task_name} model evaluation: F1={f1:.3f}, AUC={metrics.get('auc', 0.0):.3f}")
+            logger.info(
+                f"{task_name} model evaluation: F1={f1:.3f}, AUC={metrics.get('auc', 0.0):.3f}")
 
             return metrics
 
@@ -260,8 +263,7 @@ class SelfTuningTrainer:
 
             # Split data
             X_train, X_test, y_train, y_test = train_test_split(
-                features_df, labels_df, test_size=0.2, random_state=42, stratify=labels_df["importance_label"]
-            )
+                features_df, labels_df, test_size=0.2, random_state=42, stratify=labels_df["importance_label"])
 
             # Scale features
             X_train_scaled = self.scaler.fit_transform(X_train)
@@ -279,15 +281,13 @@ class SelfTuningTrainer:
 
             # Train importance model
             importance_result = self._train_importance_model(
-                X_train_scaled, X_test_scaled, y_train["importance_label"], y_test["importance_label"]
-            )
+                X_train_scaled, X_test_scaled, y_train["importance_label"], y_test["importance_label"])
             results["models_trained"].append("importance")
             results["improvements"]["importance"] = importance_result
 
             # Train credibility model
             credibility_result = self._train_credibility_model(
-                X_train_scaled, X_test_scaled, y_train["credibility_label"], y_test["credibility_label"]
-            )
+                X_train_scaled, X_test_scaled, y_train["credibility_label"], y_test["credibility_label"])
             results["models_trained"].append("credibility")
             results["improvements"]["credibility"] = credibility_result
 
@@ -307,7 +307,8 @@ class SelfTuningTrainer:
             self.metrics.increment_self_tuning_runs()
             self.metrics.increment_self_tuning_models_trained(2)  # Two models trained
 
-            total_improvements = sum(result.get("improvement", 0) for result in results["improvements"].values())
+            total_improvements = sum(result.get("improvement", 0)
+                                     for result in results["improvements"].values())
             if total_improvements > 0:
                 self.metrics.increment_self_tuning_models_replaced()
 
@@ -352,7 +353,8 @@ class SelfTuningTrainer:
         if existing_metrics:
             improvement = new_metrics["f1_score"] - existing_metrics.get("f1_score", 0.0)
             should_replace = improvement >= self.replace_threshold
-            logger.info(f"Importance model improvement: {improvement:.3f} (threshold: {self.replace_threshold})")
+            logger.info(
+                f"Importance model improvement: {improvement:.3f} (threshold: {self.replace_threshold})")
         else:
             should_replace = True  # No existing model
             logger.info("No existing importance model found, using new model")
@@ -365,7 +367,8 @@ class SelfTuningTrainer:
             self._save_model(model, self.importance_model_path)
             self.importance_model = model
 
-            logger.info(f"[SELF-TUNING] Importance model replaced (F1: {new_metrics['f1_score']:.3f})")
+            logger.info(
+                f"[SELF-TUNING] Importance model replaced (F1: {new_metrics['f1_score']:.3f})")
         else:
             logger.info(f"[SELF-TUNING] Importance model not replaced (improvement too small)")
 
@@ -410,7 +413,8 @@ class SelfTuningTrainer:
         if existing_metrics:
             improvement = new_metrics["f1_score"] - existing_metrics.get("f1_score", 0.0)
             should_replace = improvement >= self.replace_threshold
-            logger.info(f"Credibility model improvement: {improvement:.3f} (threshold: {self.replace_threshold})")
+            logger.info(
+                f"Credibility model improvement: {improvement:.3f} (threshold: {self.replace_threshold})")
         else:
             should_replace = True  # No existing model
             logger.info("No existing credibility model found, using new model")
@@ -423,7 +427,8 @@ class SelfTuningTrainer:
             self._save_model(model, self.credibility_model_path)
             self.credibility_model = model
 
-            logger.info(f"[SELF-TUNING] Credibility model replaced (F1: {new_metrics['f1_score']:.3f})")
+            logger.info(
+                f"[SELF-TUNING] Credibility model replaced (F1: {new_metrics['f1_score']:.3f})")
         else:
             logger.info(f"[SELF-TUNING] Credibility model not replaced (improvement too small)")
 

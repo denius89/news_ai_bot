@@ -80,7 +80,7 @@ def show_status():
             print("✅ Telegram бот: Запущен")
         else:
             print("❌ Telegram бот: Остановлен")
-    except:
+    except BaseException:
         print("❌ Telegram бот: Статус неизвестен")
 
     # Проверяем веб-приложение
@@ -90,7 +90,7 @@ def show_status():
             print("✅ WebApp: Запущен")
         else:
             print("❌ WebApp: Остановлен")
-    except:
+    except BaseException:
         print("❌ WebApp: Статус неизвестен")
 
     # Проверяем порты
@@ -100,7 +100,7 @@ def show_status():
             print("✅ WebApp доступен на порту 8001")
         else:
             print("❌ WebApp недоступен на порту 8001")
-    except:
+    except BaseException:
         print("❓ Статус порта 8001 неизвестен")
 
 

@@ -6,14 +6,13 @@ This script tests the baseline dataset building system with
 synthetic and real data sources.
 """
 
+from ai_modules.metrics import get_metrics
+from tools.build_baseline_dataset import BaselineDatasetBuilder
 import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from tools.build_baseline_dataset import BaselineDatasetBuilder
-from ai_modules.metrics import get_metrics
 
 
 def test_baseline_dataset_builder():
@@ -160,7 +159,8 @@ def test_dataset_quality():
         label_counts = df["label"].value_counts()
         print(f"Label distribution: {label_counts.to_dict()}")
 
-        balance_ratio = label_counts[1] / label_counts[0] if 0 in label_counts and 1 in label_counts else 0
+        balance_ratio = label_counts[1] / \
+            label_counts[0] if 0 in label_counts and 1 in label_counts else 0
         if 0.4 <= balance_ratio <= 0.6:
             print("✅ Dataset is well balanced")
         else:

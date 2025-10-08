@@ -176,7 +176,10 @@ def distribute_news_weighted(
 
     for category in available_categories:
         weight = normalized_weights[category]
-        category_limit = max(MIN_NEWS_PER_CATEGORY, min(MAX_NEWS_PER_CATEGORY, int(total_limit * weight)))
+        category_limit = max(
+            MIN_NEWS_PER_CATEGORY, min(
+                MAX_NEWS_PER_CATEGORY, int(
+                    total_limit * weight)))
 
         # Берем лучшие новости из категории
         category_news = news_by_category[category][:category_limit]
@@ -186,7 +189,11 @@ def distribute_news_weighted(
 
     # Если не хватает новостей, добавляем из категорий с наибольшим количеством
     if len(distributed_news) < total_limit:
-        for category in sorted(available_categories, key=lambda x: len(news_by_category[x]), reverse=True):
+        for category in sorted(
+                available_categories,
+                key=lambda x: len(
+                    news_by_category[x]),
+                reverse=True):
             if len(distributed_news) >= total_limit:
                 break
 

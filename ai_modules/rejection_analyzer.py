@@ -34,8 +34,12 @@ class RejectionAnalyzer:
 
         # Configuration parameters
         self.top_words_limit = self.config.get("rejection_analysis", {}).get("top_words_limit", 50)
-        self.top_sources_limit = self.config.get("rejection_analysis", {}).get("top_sources_limit", 20)
-        self.frequency_threshold = self.config.get("rejection_analysis", {}).get("frequency_threshold", 0.02)
+        self.top_sources_limit = self.config.get(
+            "rejection_analysis", {}).get(
+            "top_sources_limit", 20)
+        self.frequency_threshold = self.config.get(
+            "rejection_analysis", {}).get(
+            "frequency_threshold", 0.02)
         self.min_samples = self.config.get("features", {}).get("auto_learn_min_samples", 100)
 
     def _load_config(self, config_path: Optional[str] = None) -> Dict:
@@ -216,7 +220,8 @@ class RejectionAnalyzer:
         rejected_items = self._parse_rejected_log()
 
         if len(rejected_items) < self.min_samples:
-            logger.info(f"Not enough samples for analysis: {len(rejected_items)} < {self.min_samples}")
+            logger.info(
+                f"Not enough samples for analysis: {len(rejected_items)} < {self.min_samples}")
             return self._create_empty_analysis()
 
         # Initialize counters
@@ -292,7 +297,7 @@ class RejectionAnalyzer:
                     try:
                         dt = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
                         timestamps.append(dt)
-                    except:
+                    except BaseException:
                         continue
 
             if len(timestamps) < 2:
@@ -341,8 +346,11 @@ class RejectionAnalyzer:
         return frequency_analysis
 
     def _generate_recommendations(
-        self, word_counter: Counter, source_counter: Counter, reason_counter: Counter, total_items: int
-    ) -> Dict:
+            self,
+            word_counter: Counter,
+            source_counter: Counter,
+            reason_counter: Counter,
+            total_items: int) -> Dict:
         """Generate recommendations based on analysis."""
         recommendations = {
             "add_stop_markers": [],

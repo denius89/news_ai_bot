@@ -70,9 +70,8 @@ def categories_inline_keyboard(action: str = "subscribe") -> types.InlineKeyboar
     buttons = []
     for category in categories:
         emoji = get_emoji_icon(category, "")  # Базовый emoji для категории
-        buttons.append(
-            [types.InlineKeyboardButton(text=f"{emoji} {category.title()}", callback_data=f"{action}:{category}")]
-        )
+        buttons.append([types.InlineKeyboardButton(
+            text=f"{emoji} {category.title()}", callback_data=f"{action}:{category}")])
 
     # Добавляем кнопку "Назад"
     buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
@@ -80,7 +79,8 @@ def categories_inline_keyboard(action: str = "subscribe") -> types.InlineKeyboar
     return types.InlineKeyboardMarkup(inline_keyboard=buttons)
 
 
-def subcategories_inline_keyboard(category: str, action: str = "subscribe") -> types.InlineKeyboardMarkup:
+def subcategories_inline_keyboard(category: str,
+                                  action: str = "subscribe") -> types.InlineKeyboardMarkup:
     """Динамическая клавиатура подкатегорий для выбранной категории"""
     subcategories = get_subcategories(category)
 
@@ -113,9 +113,8 @@ def digest_categories_inline_keyboard() -> types.InlineKeyboardMarkup:
     # Кнопки по категориям
     for category in categories:
         emoji = get_emoji_icon(category, "")
-        buttons.append(
-            [types.InlineKeyboardButton(text=f"{emoji} {category.title()}", callback_data=f"digest:{category}")]
-        )
+        buttons.append([types.InlineKeyboardButton(
+            text=f"{emoji} {category.title()}", callback_data=f"digest:{category}")])
 
     # Добавляем кнопку "Назад"
     buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])

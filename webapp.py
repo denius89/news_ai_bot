@@ -71,7 +71,7 @@ def serve_react(path=""):
             response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
             response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             return response
-        except:
+        except BaseException:
             # React Router fallback - все неизвестные пути ведут на index.html
             response = send_from_directory(REACT_DIST_PATH, "index.html")
             # Добавляем заголовки для Telegram WebApp

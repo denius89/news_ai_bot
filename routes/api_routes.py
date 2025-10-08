@@ -176,7 +176,9 @@ def update_subscription():
         if enabled:
             # For demo users, create user with a fake telegram_id
             demo_telegram_id = 999999999
-            created_user_id = run_async(subscription_service.get_or_create_user(demo_telegram_id, "demo-user", "en"))
+            created_user_id = run_async(
+                subscription_service.get_or_create_user(
+                    demo_telegram_id, "demo-user", "en"))
 
             # Add subscription using the created user_id
             success = run_async(subscription_service.add(created_user_id, category))
@@ -270,8 +272,10 @@ def get_user_notifications_api():
                 {
                     "id": notification["id"],
                     "title": notification["title"],
-                    "text": notification.get("message", notification.get("text", "")),  # Use message field
-                    "created_at": notification.get("created_at", "2025-10-03T00:00:00Z"),  # Default timestamp
+                    # Use message field
+                    "text": notification.get("message", notification.get("text", "")),
+                    # Default timestamp
+                    "created_at": notification.get("created_at", "2025-10-03T00:00:00Z"),
                     "read": notification["read"],
                 }
             )
@@ -603,7 +607,8 @@ def get_upcoming_events():
         formatted_events = []
         for event in events:
             # Определяем категорию на основе источника или других данных
-            event_category = event.get("category", "markets")  # По умолчанию markets для экономических событий
+            # По умолчанию markets для экономических событий
+            event_category = event.get("category", "markets")
 
             formatted_event = {
                 "id": event.get("id", f"event_{hash(event.get('title', ''))}"),

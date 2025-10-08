@@ -111,18 +111,23 @@ class ESPNProvider:
                         title="NFL Sunday Games",
                         category="sports",
                         subcategory="football",
-                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=17, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
-                        ends_at=datetime.combine(date, datetime.min.time().replace(hour=23, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
+                        starts_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=17,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
+                        ends_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=23,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
                         source="espn.com",
                         link="https://www.espn.com/nfl/schedule",
                         importance=0.7,
                         description="NFL regular season games",
-                    )
-                )
+                    ))
 
             # Soccer matches (weekends)
             events.append(
@@ -130,18 +135,23 @@ class ESPNProvider:
                     title="Premier League Matches",
                     category="sports",
                     subcategory="soccer",
-                    starts_at=datetime.combine(date, datetime.min.time().replace(hour=14, minute=30)).replace(
-                        tzinfo=timezone.utc
-                    ),
-                    ends_at=datetime.combine(date, datetime.min.time().replace(hour=17, minute=0)).replace(
-                        tzinfo=timezone.utc
-                    ),
+                    starts_at=datetime.combine(
+                        date,
+                        datetime.min.time().replace(
+                            hour=14,
+                            minute=30)).replace(
+                        tzinfo=timezone.utc),
+                    ends_at=datetime.combine(
+                        date,
+                        datetime.min.time().replace(
+                            hour=17,
+                            minute=0)).replace(
+                        tzinfo=timezone.utc),
                     source="espn.com",
                     link="https://www.espn.com/soccer/schedule",
                     importance=0.6,
                     description="English Premier League fixtures",
-                )
-            )
+                ))
 
         # Weekday events
         else:
@@ -152,18 +162,23 @@ class ESPNProvider:
                         title="NBA Regular Season Games",
                         category="sports",
                         subcategory="basketball",
-                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=19, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
-                        ends_at=datetime.combine(date, datetime.min.time().replace(hour=22, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
+                        starts_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=19,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
+                        ends_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=22,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
                         source="espn.com",
                         link="https://www.espn.com/nba/schedule",
                         importance=0.6,
                         description="NBA regular season games",
-                    )
-                )
+                    ))
 
             # Tennis tournaments (weekdays)
             if date.day % 7 == 1:  # First week of month
@@ -172,18 +187,23 @@ class ESPNProvider:
                         title="ATP/WTA Tournament",
                         category="sports",
                         subcategory="tennis",
-                        starts_at=datetime.combine(date, datetime.min.time().replace(hour=10, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
-                        ends_at=datetime.combine(date, datetime.min.time().replace(hour=18, minute=0)).replace(
-                            tzinfo=timezone.utc
-                        ),
+                        starts_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=10,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
+                        ends_at=datetime.combine(
+                            date,
+                            datetime.min.time().replace(
+                                hour=18,
+                                minute=0)).replace(
+                            tzinfo=timezone.utc),
                         source="espn.com",
                         link="https://www.espn.com/tennis/schedule",
                         importance=0.5,
                         description="Professional tennis tournament",
-                    )
-                )
+                    ))
 
         # Special events (monthly)
         if date.day == 15:  # Mid-month
@@ -192,18 +212,23 @@ class ESPNProvider:
                     title="Championship Finals",
                     category="sports",
                     subcategory="general",
-                    starts_at=datetime.combine(date, datetime.min.time().replace(hour=20, minute=0)).replace(
-                        tzinfo=timezone.utc
-                    ),
-                    ends_at=datetime.combine(date, datetime.min.time().replace(hour=23, minute=0)).replace(
-                        tzinfo=timezone.utc
-                    ),
+                    starts_at=datetime.combine(
+                        date,
+                        datetime.min.time().replace(
+                            hour=20,
+                            minute=0)).replace(
+                        tzinfo=timezone.utc),
+                    ends_at=datetime.combine(
+                        date,
+                        datetime.min.time().replace(
+                            hour=23,
+                            minute=0)).replace(
+                        tzinfo=timezone.utc),
                     source="espn.com",
                     link="https://www.espn.com/",
                     importance=0.9,
                     description="Major championship finals",
-                )
-            )
+                ))
 
         return events
 
@@ -239,12 +264,22 @@ class ESPNProvider:
 
         # Check for championship/playoff keywords
         if any(
-            keyword in title_lower for keyword in ["championship", "final", "playoff", "world series", "stanley cup"]
-        ):
+            keyword in title_lower for keyword in [
+                "championship",
+                "final",
+                "playoff",
+                "world series",
+                "stanley cup"]):
             return 0.9
 
         # Check for major league keywords
-        if any(keyword in title_lower for keyword in ["nfl", "nba", "mlb", "nhl", "premier league"]):
+        if any(
+            keyword in title_lower for keyword in [
+                "nfl",
+                "nba",
+                "mlb",
+                "nhl",
+                "premier league"]):
             return 0.6
 
         # Default importance

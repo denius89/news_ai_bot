@@ -116,7 +116,8 @@ async def cb_mark_read(query: types.CallbackQuery):
         )
 
         if not success:
-            logger.warning(f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}")
+            logger.warning(
+                f"⚠️ Failed to mark notification {notification_id} as read for user {query.from_user.id}")
 
     except Exception as e:
         logger.error(f"❌ Error handling mark_read callback: {e}")

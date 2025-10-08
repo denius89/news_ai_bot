@@ -52,7 +52,8 @@ class OptimizedParser(AdvancedParser):
 
             # Apply thresholds
             if importance < self.min_importance_threshold:
-                logger.debug(f"News filtered by importance threshold: {importance} < {self.min_importance_threshold}")
+                logger.debug(
+                    f"News filtered by importance threshold: {importance} < {self.min_importance_threshold}")
                 self.metrics.increment_ai_skipped_local_pred()  # Count as filtered by threshold
                 return None
 
@@ -111,7 +112,8 @@ class OptimizedParser(AdvancedParser):
 
                     if enhanced_item is not None:
                         processed_items.append(enhanced_item)
-                        logger.debug(f"Processed news: {enhanced_item.get('title', 'No title')[:50]}...")
+                        logger.debug(
+                            f"Processed news: {enhanced_item.get('title', 'No title')[:50]}...")
 
                 except Exception as e:
                     logger.error(f"Error processing individual news item: {e}")

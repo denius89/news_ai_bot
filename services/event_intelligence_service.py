@@ -139,7 +139,8 @@ class EventIntelligenceService:
                         )
 
                         intelligent_events.append(intelligent_event)
-                        logger.debug(f"Analyzed event: {event_record.title} (score: {intelligence_score:.2f})")
+                        logger.debug(
+                            f"Analyzed event: {event_record.title} (score: {intelligence_score:.2f})")
 
                 except Exception as e:
                     logger.error(f"Error analyzing event {event_record.id}: {e}")
@@ -210,7 +211,8 @@ class EventIntelligenceService:
 
             # Add summary
             if len(intelligent_events) > max_events:
-                digest_lines.append(f"\n_Всего проанализировано: {len(intelligent_events)} событий_")
+                digest_lines.append(
+                    f"\n_Всего проанализировано: {len(intelligent_events)} событий_")
 
             digest_content = "\n".join(digest_lines)
 
@@ -237,9 +239,13 @@ class EventIntelligenceService:
 
         except Exception as e:
             logger.error(f"Error generating AI event digest: {e}")
-            return {"content": "📅 Ошибка при анализе предстоящих событий.", "events_count": 0, "total_analyzed": 0}
+            return {
+                "content": "📅 Ошибка при анализе предстоящих событий.",
+                "events_count": 0,
+                "total_analyzed": 0}
 
-    async def export_to_calendar_json(self, days_ahead: int = 30, category: Optional[str] = None) -> Dict[str, Any]:
+    async def export_to_calendar_json(self, days_ahead: int = 30,
+                                      category: Optional[str] = None) -> Dict[str, Any]:
         """
         Export intelligent events data for UI components.
 
@@ -313,11 +319,17 @@ class EventIntelligenceService:
                 "events_by_date": events_by_date,
                 "total_events": len(intelligent_events),
                 "date_range": {
-                    "start": datetime.now(timezone.utc).date().isoformat(),
-                    "end": (datetime.now(timezone.utc) + timedelta(days=days_ahead)).date().isoformat(),
+                    "start": datetime.now(
+                        timezone.utc).date().isoformat(),
+                    "end": (
+                        datetime.now(
+                            timezone.utc)
+                        + timedelta(
+                            days=days_ahead)).date().isoformat(),
                 },
                 "categories": self._get_available_categories(intelligent_events),
-                "exported_at": datetime.now(timezone.utc).isoformat(),
+                "exported_at": datetime.now(
+                    timezone.utc).isoformat(),
             }
 
         except Exception as e:
@@ -340,7 +352,11 @@ class EventIntelligenceService:
 
     def _get_impact_emoji(self, impact: ImpactType) -> str:
         """Get emoji for forecast impact."""
-        emojis = {ImpactType.POSITIVE: "📈", ImpactType.NEGATIVE: "📉", ImpactType.NEUTRAL: "⚖️", ImpactType.MIXED: "🔄"}
+        emojis = {
+            ImpactType.POSITIVE: "📈",
+            ImpactType.NEGATIVE: "📉",
+            ImpactType.NEUTRAL: "⚖️",
+            ImpactType.MIXED: "🔄"}
         return emojis.get(impact, "❓")
 
     def _get_impact_text(self, impact: ImpactType) -> str:
@@ -374,8 +390,10 @@ def get_event_intelligence_service() -> EventIntelligenceService:
 
 
 async def analyze_upcoming_events(
-    days_ahead: int = 30, category: Optional[str] = None, min_importance: float = 0.0, min_confidence: float = 0.6
-) -> List[IntelligentEvent]:
+        days_ahead: int = 30,
+        category: Optional[str] = None,
+        min_importance: float = 0.0,
+        min_confidence: float = 0.6) -> List[IntelligentEvent]:
     """
     Convenience function to analyze upcoming events.
 

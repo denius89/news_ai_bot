@@ -170,9 +170,13 @@ class LocalPredictor:
         # Calculate confidence based on feature completeness
         confidence = self._calculate_ml_confidence(features, news_item)
 
-        logger.debug(f"ML prediction: importance={importance_score:.3f}, credibility={credibility_score:.3f}")
+        logger.debug(
+            f"ML prediction: importance={importance_score:.3f}, credibility={credibility_score:.3f}")
 
-        return PredictionResult(importance=importance_score, credibility=credibility_score, confidence=confidence)
+        return PredictionResult(
+            importance=importance_score,
+            credibility=credibility_score,
+            confidence=confidence)
 
     def _extract_features_for_ml(self, news_item: Dict) -> Dict[str, float]:
         """
@@ -274,7 +278,8 @@ class LocalPredictor:
 
         # Title-specific features
         title_words = title.lower().split()
-        features["title_important_words"] = sum(1 for word in title_words if word in important_words)
+        features["title_important_words"] = sum(
+            1 for word in title_words if word in important_words)
         features["title_spam_words"] = sum(1 for word in title_words if word in spam_words)
 
         return features

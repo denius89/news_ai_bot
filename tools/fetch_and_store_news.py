@@ -10,6 +10,7 @@
     python tools/fetch_and_store_news.py --min-importance 0.5 --max-concurrent 5
 """
 
+from parsers.advanced_parser import AdvancedParser
 import asyncio
 import argparse
 import logging
@@ -19,7 +20,6 @@ from pathlib import Path
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from parsers.advanced_parser import AdvancedParser
 
 # Настраиваем логирование
 logging.basicConfig(
@@ -57,7 +57,8 @@ async def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     logger.info("🚀 Запуск продвинутого парсера новостей")
-    logger.info(f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}")
+    logger.info(
+        f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}")
 
     try:
         async with AdvancedParser(

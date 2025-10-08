@@ -99,14 +99,26 @@ class PostSelector:
 
             # Apply category bonuses
             category = digest.get("category", "").lower()
-            category_bonuses = {"crypto": 0.05, "tech": 0.03, "world": 0.02, "markets": 0.04, "sports": 0.01}
+            category_bonuses = {
+                "crypto": 0.05,
+                "tech": 0.03,
+                "world": 0.02,
+                "markets": 0.04,
+                "sports": 0.01}
 
             if category in category_bonuses:
                 priority_score += category_bonuses[category]
 
             # Apply source reputation bonus
             source = digest.get("source", "").lower()
-            if any(reputable in source for reputable in ["reuters", "bloomberg", "wsj", "ft", "bbc", "cnn"]):
+            if any(
+                reputable in source for reputable in [
+                    "reuters",
+                    "bloomberg",
+                    "wsj",
+                    "ft",
+                    "bbc",
+                    "cnn"]):
                 priority_score += 0.03
 
             # Normalize to 0.0-1.0 range
@@ -212,7 +224,8 @@ class PostSelector:
 
             # Update metrics
             self.metrics.update_smart_priority_avg_score(avg_score)
-            self.metrics.increment_smart_priority_skipped_total(len(digests) - len(selected_digests))
+            self.metrics.increment_smart_priority_skipped_total(
+                len(digests) - len(selected_digests))
 
             logger.info(
                 f"Selected {len(selected_digests)} digests from {len(digests)} available (avg score: {avg_score:.3f})"
@@ -228,8 +241,10 @@ class PostSelector:
         except Exception as e:
             logger.error(f"Error selecting digests: {e}")
             return SelectionResult(
-                selected_digests=[], skipped_count=len(digests), selection_reason="selection_error", avg_score=0.0
-            )
+                selected_digests=[],
+                skipped_count=len(digests),
+                selection_reason="selection_error",
+                avg_score=0.0)
 
     def mark_digest_published(self, digest_id: int) -> None:
         """

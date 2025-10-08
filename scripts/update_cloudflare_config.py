@@ -3,6 +3,7 @@
 Скрипт для обновления всех конфигураций Cloudflare Tunnel.
 """
 
+from config.cloudflare import get_deployment_info, validate_cloudflare_config, CLOUDFLARE_TUNNEL_URL
 import sys
 import os
 from pathlib import Path
@@ -10,8 +11,6 @@ from pathlib import Path
 # Добавляем путь к проекту
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from config.cloudflare import get_deployment_info, validate_cloudflare_config, CLOUDFLARE_TUNNEL_URL
 
 
 def update_vite_config():
@@ -21,9 +20,10 @@ def update_vite_config():
     # Запускаем генератор конфига
     import subprocess
 
-    result = subprocess.run(
-        [sys.executable, str(project_root / "scripts" / "generate_vite_config.py")], capture_output=True, text=True
-    )
+    result = subprocess.run([sys.executable,
+                             str(project_root / "scripts" / "generate_vite_config.py")],
+                            capture_output=True,
+                            text=True)
 
     if result.returncode == 0:
         print("✅ Конфигурация Vite обновлена")

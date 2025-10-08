@@ -120,8 +120,7 @@ def smart_distribute_sources():
 
             for source in all_sources:
                 source_text = (
-                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower()
-                )
+                    f"{source.get('name', '')} {source.get('url', '')} {source.get('description', '')}".lower())
 
                 # Проверяем точное совпадение с приоритетными ключевыми словами
                 for keyword in priority_keywords:

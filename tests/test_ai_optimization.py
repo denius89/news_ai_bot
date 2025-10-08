@@ -239,10 +239,15 @@ class TestLocalPredictor:
     def setup_method(self):
         """Set up test fixtures."""
         self.test_config = {
-            "features": {"local_predictor_enabled": True},
+            "features": {
+                "local_predictor_enabled": True},
             "local_predictor": {
                 "model_type": "rules",
-                "weights": {"title_length": 0.2, "source_reputation": 0.3, "category_match": 0.2, "keyword_match": 0.3},
+                "weights": {
+                    "title_length": 0.2,
+                    "source_reputation": 0.3,
+                    "category_match": 0.2,
+                    "keyword_match": 0.3},
             },
         }
 
@@ -423,7 +428,8 @@ class TestOptimizedEvaluation:
     @patch("ai_modules.optimized_importance.original_evaluate_importance")
     @patch("ai_modules.optimized_importance.get_cached_evaluation")
     @patch("ai_modules.optimized_importance.filter_news_item")
-    def test_evaluate_importance_with_prefilter_reject(self, mock_filter, mock_cache, mock_original):
+    def test_evaluate_importance_with_prefilter_reject(
+            self, mock_filter, mock_cache, mock_original):
         """Test importance evaluation with prefilter rejection."""
         # Setup mocks
         mock_filter.return_value = Mock(passed=False, reason="pre_filter")
@@ -457,7 +463,12 @@ class TestOptimizedEvaluation:
     @patch("ai_modules.optimized_credibility.original_evaluate_credibility")
     @patch("ai_modules.optimized_credibility.get_cached_evaluation")
     @patch("ai_modules.optimized_credibility.filter_news_item")
-    def test_evaluate_both_with_optimization(self, mock_filter, mock_cache, mock_orig_imp, mock_orig_cred):
+    def test_evaluate_both_with_optimization(
+            self,
+            mock_filter,
+            mock_cache,
+            mock_orig_imp,
+            mock_orig_cred):
         """Test combined importance and credibility evaluation."""
         # Setup mocks
         mock_filter.return_value = Mock(passed=True, reason="prefilter_pass")

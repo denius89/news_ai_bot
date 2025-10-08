@@ -101,7 +101,10 @@ class FeedbackTracker:
                 return
 
             # Create reaction data
-            reaction_data = ReactionData(digest_id=digest_id, last_updated=datetime.now(timezone.utc))
+            reaction_data = ReactionData(
+                digest_id=digest_id,
+                last_updated=datetime.now(
+                    timezone.utc))
 
             # Store tracking data
             self.tracked_posts[digest_id] = reaction_data
@@ -249,8 +252,8 @@ class FeedbackTracker:
             del self.tracked_posts[digest_id]
 
             logger.info(
-                f"Finalized tracking for digest {digest_id}: " f"final_score={reaction_data.engagement_score:.3f}"
-            )
+                f"Finalized tracking for digest {digest_id}: "
+                f"final_score={reaction_data.engagement_score:.3f}")
 
         except Exception as e:
             logger.error(f"Error finalizing tracking for digest {digest_id}: {e}")

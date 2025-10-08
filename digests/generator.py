@@ -134,8 +134,8 @@ async def generate_digest(
         logger.error(f"Ошибка при создании дайджеста: {e}")
         # Эмитим событие об ошибке
         reactor.emit_sync(
-            Events.DIGEST_CREATED, {"title": "Ошибка создания дайджеста", "error": str(e), "status": "error"}
-        )
+            Events.DIGEST_CREATED, {
+                "title": "Ошибка создания дайджеста", "error": str(e), "status": "error"})
         raise
 
 
@@ -156,7 +156,12 @@ def main():
     args = parser.parse_args()
 
     # Generate digest
-    digest = asyncio.run(generate_digest(limit=args.limit, category=args.category, ai=args.ai, style=args.style))
+    digest = asyncio.run(
+        generate_digest(
+            limit=args.limit,
+            category=args.category,
+            ai=args.ai,
+            style=args.style))
 
     print(digest)
 

@@ -73,7 +73,16 @@ def cleanup_css_file(file_path, used_classes, dry_run=True):
             selector = selector.strip()
 
             # Пропускаем специальные селекторы
-            if any(skip in selector for skip in ["@", ":", "html", "body", "root", "svg", "path", "line"]):
+            if any(
+                skip in selector for skip in [
+                    "@",
+                    ":",
+                    "html",
+                    "body",
+                    "root",
+                    "svg",
+                    "path",
+                    "line"]):
                 continue
 
             # Извлекаем классы из селектора

@@ -211,11 +211,16 @@ class ReactorCore:
     def get_metrics(self) -> Dict[str, Any]:
         """Получение метрик Reactor."""
         return {
-            "events_emitted": sum(self._metrics.values()),
-            "event_types": len(self._metrics),
-            "listeners_count": sum(len(listeners) for listeners in self._listeners.values()),
+            "events_emitted": sum(
+                self._metrics.values()),
+            "event_types": len(
+                self._metrics),
+            "listeners_count": sum(
+                len(listeners) for listeners in self._listeners.values()),
             "event_breakdown": self._metrics.copy(),
-            "listeners_breakdown": {name: len(listeners) for name, listeners in self._listeners.items()},
+            "listeners_breakdown": {
+                name: len(listeners) for name,
+                listeners in self._listeners.items()},
         }
 
     def get_health(self) -> Dict[str, Any]:

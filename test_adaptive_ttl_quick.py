@@ -6,15 +6,14 @@ This script tests the new adaptive thresholds and TTL cache features
 with synthetic data.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.cache import get_cache
+from ai_modules.adaptive_thresholds import get_adaptive_thresholds
 import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from ai_modules.adaptive_thresholds import get_adaptive_thresholds
-from ai_modules.cache import get_cache
-from ai_modules.metrics import get_metrics
 
 
 def test_adaptive_thresholds_and_ttl():
@@ -75,7 +74,8 @@ def test_adaptive_thresholds_and_ttl():
     # Get cache entry
     entry = cache.get(test_news)
     if entry:
-        print(f"   ✅ Cache hit: importance={entry.ai_importance}, credibility={entry.ai_credibility}")
+        print(
+            f"   ✅ Cache hit: importance={entry.ai_importance}, credibility={entry.ai_credibility}")
         print(f"      TTL expires: {entry.ttl_expires_at}")
 
         # Test needs refresh

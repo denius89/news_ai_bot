@@ -1,4 +1,5 @@
 # config/settings.py
+from config.cloudflare import CLOUDFLARE_TUNNEL_URL
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -22,7 +23,6 @@ WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8001"))
 
 # Импортируем Cloudflare конфигурацию
-from config.cloudflare import CLOUDFLARE_TUNNEL_URL
 
 WEBAPP_URL = CLOUDFLARE_TUNNEL_URL
 

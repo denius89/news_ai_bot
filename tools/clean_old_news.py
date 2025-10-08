@@ -3,6 +3,7 @@
 Скрипт для очистки старых новостей из базы данных PulseAI.
 """
 
+from database.service import get_async_service
 import asyncio
 import logging
 import sys
@@ -12,10 +13,11 @@ from datetime import datetime, timedelta
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from database.service import get_async_service
 
 # Настраиваем логирование
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 logger = logging.getLogger(__name__)
 

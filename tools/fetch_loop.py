@@ -6,6 +6,9 @@ This script runs a continuous loop to fetch news, generate digests,
 and automatically post them to Telegram channels.
 """
 
+from ai_modules.metrics import get_metrics
+from telegram_bot.handlers.digest_handler import get_digest_handler, auto_post_digest
+from parsers.optimized_parser import run_optimized_parser
 import asyncio
 import argparse
 import logging
@@ -17,9 +20,6 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from parsers.optimized_parser import run_optimized_parser
-from telegram_bot.handlers.digest_handler import get_digest_handler, auto_post_digest
-from ai_modules.metrics import get_metrics
 
 # Setup logging
 logging.basicConfig(
@@ -58,7 +58,8 @@ class FetchLoop:
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
-        logger.info(f"FetchLoop initialized: interval={interval}s, ai_filter={ai_filter}, auto_post={auto_post}")
+        logger.info(
+            f"FetchLoop initialized: interval={interval}s, ai_filter={ai_filter}, auto_post={auto_post}")
 
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals."""
@@ -93,7 +94,8 @@ class FetchLoop:
             saved = result.get("saved", 0)
             ai_calls = result.get("ai_calls", 0)
 
-            logger.info(f"Fetch cycle completed: processed={processed}, saved={saved}, ai_calls={ai_calls}")
+            logger.info(
+                f"Fetch cycle completed: processed={processed}, saved={saved}, ai_calls={ai_calls}")
 
             # Run auto-posting if enabled
             if self.auto_post:
@@ -104,7 +106,8 @@ class FetchLoop:
                     published = post_result.get("published_count", 0)
                     logger.info(f"Auto-posting completed: published={published} digests")
                 else:
-                    logger.warning(f"Auto-posting failed: {post_result.get('reason', 'Unknown error')}")
+                    logger.warning(
+                        f"Auto-posting failed: {post_result.get('reason', 'Unknown error')}")
 
             # Calculate cycle time
             cycle_time = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -161,15 +164,25 @@ class FetchLoop:
 async def main():
     """Main function."""
     parser = argparse.ArgumentParser(description="Fetch loop with auto-posting")
-    parser.add_argument("--interval", type=int, default=30, help="Interval between cycles in seconds (default: 30)")
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=30,
+        help="Interval between cycles in seconds (default: 30)")
     parser.add_argument("--ai-filter", action="store_true", help="Enable AI filtering")
     parser.add_argument("--auto-post", action="store_true", help="Enable auto-posting to Telegram")
-    parser.add_argument("--once", action="store_true", help="Run only once instead of continuous loop")
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Run only once instead of continuous loop")
 
     args = parser.parse_args()
 
     # Create fetch loop
-    fetch_loop = FetchLoop(interval=args.interval, ai_filter=args.ai_filter, auto_post=args.auto_post)
+    fetch_loop = FetchLoop(
+        interval=args.interval,
+        ai_filter=args.ai_filter,
+        auto_post=args.auto_post)
 
     try:
         if args.once:

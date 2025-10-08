@@ -3,6 +3,8 @@
 Обновление новостей с использованием нового универсального RSS парсера.
 """
 
+from database.service import get_async_service
+from parsers.universal_rss_parser import UniversalRSSParser
 import sys
 from pathlib import Path
 import logging
@@ -12,8 +14,6 @@ from datetime import datetime
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from parsers.universal_rss_parser import UniversalRSSParser
-from database.service import get_async_service
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -58,7 +58,8 @@ async def update_news_with_universal_parser():
                     print(f"   💾 Сохранено {saved_count} новостей...")
 
             except Exception as e:
-                logger.warning(f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}")
+                logger.warning(
+                    f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}")
                 continue
 
         print(f"✅ Успешно сохранено {saved_count} новостей")

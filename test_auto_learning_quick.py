@@ -5,15 +5,14 @@ Quick test for Auto-Learning Filter functionality.
 This script tests the auto-learning system with synthetic data.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.auto_rule_manager import get_auto_rule_manager
+from ai_modules.rejection_analyzer import get_rejection_analyzer
 import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from ai_modules.rejection_analyzer import get_rejection_analyzer
-from ai_modules.auto_rule_manager import get_auto_rule_manager
-from ai_modules.metrics import get_metrics
 
 
 def create_sample_rejected_log():
@@ -152,12 +151,14 @@ def test_auto_learning_system():
         if recommendations["add_stop_markers"]:
             print("\n📝 Stop markers to add:")
             for rec in recommendations["add_stop_markers"][:5]:
-                print(f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(
+                    f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
 
         if recommendations["source_blacklist"]:
             print("\n🚫 Sources to blacklist:")
             for rec in recommendations["source_blacklist"][:3]:
-                print(f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(
+                    f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
 
         print()
 
@@ -226,7 +227,8 @@ def test_analysis_only_mode():
         analysis = analyzer.analyze_rejections()
 
         print(f"✅ Analysis completed: {analysis['total_rejected_items']} items")
-        print(f"   Recommendations: {len(analysis['recommendations']['add_stop_markers'])} stop markers")
+        print(
+            f"   Recommendations: {len(analysis['recommendations']['add_stop_markers'])} stop markers")
 
         # Restore environment
         if original_env is not None:

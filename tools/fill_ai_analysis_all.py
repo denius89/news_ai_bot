@@ -46,9 +46,8 @@ def update_news_ai_analysis(news_id: int, importance: float, credibility: float)
         return False
 
     try:
-        safe_execute(
-            supabase.table("news").update({"importance": importance, "credibility": credibility}).eq("id", news_id)
-        )
+        safe_execute(supabase.table("news").update(
+            {"importance": importance, "credibility": credibility}).eq("id", news_id))
         return True
     except Exception as e:
         logger.error(f"Ошибка обновления новости {news_id}: {e}")
@@ -96,7 +95,8 @@ def main():
                 # Обновляем в базе данных
                 if update_news_ai_analysis(news_item["id"], importance, credibility):
                     total_updated += 1
-                    logger.info(f"✅ {news_item['id']}: importance={importance:.2f}, credibility={credibility:.2f}")
+                    logger.info(
+                        f"✅ {news_item['id']}: importance={importance:.2f}, credibility={credibility:.2f}")
                 else:
                     logger.error(f"❌ Не удалось обновить новость {news_item['id']}")
 

@@ -57,10 +57,8 @@ class HTTPConnectionManager:
             timeout = aiohttp.ClientTimeout(total=30, connect=10, sock_read=10)
 
             self._aiohttp_session = aiohttp.ClientSession(
-                connector=connector,
-                timeout=timeout,
-                headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"},
-            )
+                connector=connector, timeout=timeout, headers={
+                    "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"}, )
             logger.info("Created new aiohttp session with connection pooling")
 
         return self._aiohttp_session
@@ -69,13 +67,14 @@ class HTTPConnectionManager:
     def httpx_client(self) -> httpx.Client:
         """Get or create httpx sync client."""
         if self._httpx_client is None or self._httpx_client.is_closed:
-            limits = httpx.Limits(max_keepalive_connections=100, max_connections=100, keepalive_expiry=30.0)
+            limits = httpx.Limits(
+                max_keepalive_connections=100,
+                max_connections=100,
+                keepalive_expiry=30.0)
 
             self._httpx_client = httpx.Client(
-                limits=limits,
-                timeout=30.0,
-                headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"},
-            )
+                limits=limits, timeout=30.0, headers={
+                    "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"}, )
             logger.info("Created new httpx sync client with connection pooling")
 
         return self._httpx_client
@@ -84,13 +83,14 @@ class HTTPConnectionManager:
     def async_httpx_client(self) -> httpx.AsyncClient:
         """Get or create httpx async client."""
         if self._async_httpx_client is None or self._async_httpx_client.is_closed:
-            limits = httpx.Limits(max_keepalive_connections=100, max_connections=100, keepalive_expiry=30.0)
+            limits = httpx.Limits(
+                max_keepalive_connections=100,
+                max_connections=100,
+                keepalive_expiry=30.0)
 
             self._async_httpx_client = httpx.AsyncClient(
-                limits=limits,
-                timeout=30.0,
-                headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"},
-            )
+                limits=limits, timeout=30.0, headers={
+                    "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"}, )
             logger.info("Created new httpx async client with connection pooling")
 
         return self._async_httpx_client

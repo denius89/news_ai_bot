@@ -6,6 +6,10 @@ This script tests the smart posting system components
 including scheduler, teaser generator, and analytics.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.teaser_generator import get_teaser_generator
+from telegram_bot.services.post_selector import get_post_selector
+from telegram_bot.services.content_scheduler import get_content_scheduler
 import sys
 import asyncio
 from pathlib import Path
@@ -13,11 +17,6 @@ from datetime import datetime, timezone
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from telegram_bot.services.content_scheduler import get_content_scheduler
-from telegram_bot.services.post_selector import get_post_selector
-from ai_modules.teaser_generator import get_teaser_generator
-from ai_modules.metrics import get_metrics
 
 
 def test_content_scheduler():
@@ -211,7 +210,8 @@ def test_metrics_integration():
         print(f"  Posts today: {summary.get('digests_published_today', 0)}")
         print(f"  Current window: {summary.get('autopublish_window_current', 'unknown')}")
         print(f"  Window posts total: {summary.get('autopublish_window_posts_total', 0)}")
-        print(f"  Skipped out of window: {summary.get('autopublish_skipped_out_of_window_total', 0)}")
+        print(
+            f"  Skipped out of window: {summary.get('autopublish_skipped_out_of_window_total', 0)}")
         print(f"  Smart priority avg score: {summary.get('smart_priority_avg_score', 0.0):.3f}")
         print(f"  Smart priority skipped: {summary.get('smart_priority_skipped_total', 0)}")
         print(f"  Teaser generated total: {summary.get('teaser_generated_total', 0)}")
@@ -247,41 +247,37 @@ def test_integration_workflow():
         generator = get_teaser_generator()
 
         # Mock digests
-        mock_digests = [
-            {
-                "id": 1,
-                "title": "Bitcoin ETF approved by SEC",
-                "summary": "The SEC has approved the first Bitcoin ETF, marking a historic milestone for cryptocurrency adoption.",
-                "importance": 0.95,
-                "credibility": 0.9,
-                "category": "crypto",
-                "published": False,
-                "status": "ready",
-                "source": "reuters.com",
-            },
-            {
-                "id": 2,
-                "title": "Apple releases new MacBook Pro",
-                "summary": "Apple has unveiled its latest MacBook Pro with M3 chip and improved performance.",
-                "importance": 0.8,
-                "credibility": 0.85,
-                "category": "tech",
-                "published": False,
-                "status": "ready",
-                "source": "apple.com",
-            },
-            {
-                "id": 3,
-                "title": "Low quality spam content",
-                "summary": "This is clearly spam content with no real value.",
-                "importance": 0.1,
-                "credibility": 0.2,
-                "category": "unknown",
-                "published": False,
-                "status": "ready",
-                "source": "spam-site.com",
-            },
-        ]
+        mock_digests = [{"id": 1,
+                         "title": "Bitcoin ETF approved by SEC",
+                         "summary": "The SEC has approved the first Bitcoin ETF, marking a historic milestone for cryptocurrency adoption.",
+                         "importance": 0.95,
+                         "credibility": 0.9,
+                         "category": "crypto",
+                         "published": False,
+                         "status": "ready",
+                         "source": "reuters.com",
+                         },
+                        {"id": 2,
+                         "title": "Apple releases new MacBook Pro",
+                         "summary": "Apple has unveiled its latest MacBook Pro with M3 chip and improved performance.",
+                         "importance": 0.8,
+                         "credibility": 0.85,
+                         "category": "tech",
+                         "published": False,
+                         "status": "ready",
+                         "source": "apple.com",
+                         },
+                        {"id": 3,
+                         "title": "Low quality spam content",
+                         "summary": "This is clearly spam content with no real value.",
+                         "importance": 0.1,
+                         "credibility": 0.2,
+                         "category": "unknown",
+                         "published": False,
+                         "status": "ready",
+                         "source": "spam-site.com",
+                         },
+                        ]
 
         print(f"Starting with {len(mock_digests)} digests")
 

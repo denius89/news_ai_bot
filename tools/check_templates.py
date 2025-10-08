@@ -28,7 +28,12 @@ def check_templates():
             continue
 
         # Проверки
-        checks = [check_doctype, check_includes, check_base_extend, check_inline_styles, check_meta_tags]
+        checks = [
+            check_doctype,
+            check_includes,
+            check_base_extend,
+            check_inline_styles,
+            check_meta_tags]
 
         for check_func in checks:
             result = check_func(html_file, content)

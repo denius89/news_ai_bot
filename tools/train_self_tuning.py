@@ -6,16 +6,15 @@ This tool trains and updates the local predictor models using
 collected training data from the database and rejected logs.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.self_tuning_trainer import get_self_tuning_trainer
+from ai_modules.self_tuning_collector import get_self_tuning_collector
 import sys
 import logging
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ai_modules.self_tuning_collector import get_self_tuning_collector
-from ai_modules.self_tuning_trainer import get_self_tuning_trainer
-from ai_modules.metrics import get_metrics
 
 
 def setup_logging():
@@ -104,7 +103,8 @@ def main():
             replaced = result.get("replaced", False)
 
             status = "✅ REPLACED" if replaced else "⏸️ NOT REPLACED"
-            print(f"   {model_name.title()} model: F1={f1_score:.3f}, improvement={improvement:.3f} ({status})")
+            print(
+                f"   {model_name.title()} model: F1={f1_score:.3f}, improvement={improvement:.3f} ({status})")
 
         print()
 

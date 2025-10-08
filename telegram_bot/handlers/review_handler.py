@@ -154,13 +154,10 @@ class ReviewHandler:
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="✅ Опубликовать", callback_data=f"approve_{review_request.digest_id}"
-                        ),
-                        InlineKeyboardButton(text="❌ Пропустить", callback_data=f"reject_{review_request.digest_id}"),
-                    ],
-                    [InlineKeyboardButton(text="✏️ Редактировать", callback_data=f"edit_{review_request.digest_id}")],
-                ]
-            )
+                            text="✅ Опубликовать", callback_data=f"approve_{review_request.digest_id}"), InlineKeyboardButton(
+                            text="❌ Пропустить", callback_data=f"reject_{review_request.digest_id}"), ], [
+                        InlineKeyboardButton(
+                            text="✏️ Редактировать", callback_data=f"edit_{review_request.digest_id}")], ])
 
             # Add expiration info to message
             preview_text = f"📋 **Предпросмотр поста**\n\n{review_request.message_text}\n\n⏰ Автопубликация через {self.auto_post_timeout_min} мин."
