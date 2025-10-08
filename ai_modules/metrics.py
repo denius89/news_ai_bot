@@ -567,16 +567,19 @@ class MetricsCollector:
                 "uptime_seconds": round(uptime_seconds, 2),
                 "news_per_second": round(self.metrics.news_processed_total / max(1, uptime_seconds), 2),
             }
-            
+
             # Эмитим событие об обновлении метрик
-            reactor.emit_sync(Events.AI_METRICS_UPDATED, {
-                'credibility': ai_calls_saved_percentage / 100,  # Нормализуем к 0-1
-                'importance': (1 - ai_error_rate),  # Инвертируем ошибки
-                'timestamp': time.time(),
-                'news_processed': self.metrics.news_processed_total,
-                'ai_calls_saved': self.metrics.ai_calls_saved_total,
-                'uptime_seconds': uptime_seconds
-            })
+            reactor.emit_sync(
+                Events.AI_METRICS_UPDATED,
+                {
+                    "credibility": ai_calls_saved_percentage / 100,  # Нормализуем к 0-1
+                    "importance": (1 - ai_error_rate),  # Инвертируем ошибки
+                    "timestamp": time.time(),
+                    "news_processed": self.metrics.news_processed_total,
+                    "ai_calls_saved": self.metrics.ai_calls_saved_total,
+                    "uptime_seconds": uptime_seconds,
+                },
+            )
 
     def reset_metrics(self) -> None:
         """Reset all metrics to zero."""

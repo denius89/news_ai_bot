@@ -174,15 +174,18 @@ class OptimizedParser(AdvancedParser):
                 db_service = get_async_service()
                 saved_count = await db_service.async_upsert_news(processed_items)
                 logger.info(f"Saved {saved_count} news items to database")
-                
+
                 # Эмитим событие о обработке новостей
-                reactor.emit_sync(Events.NEWS_PROCESSED, {
-                    'count': saved_count,
-                    'processed_total': len(processed_items),
-                    'processing_time': round(time.time() - start_time, 2),
-                    'timestamp': time.time()
-                })
-                
+                reactor.emit_sync(
+                    Events.NEWS_PROCESSED,
+                    {
+                        "count": saved_count,
+                        "processed_total": len(processed_items),
+                        "processing_time": round(time.time() - start_time, 2),
+                        "timestamp": time.time(),
+                    },
+                )
+
             except Exception as e:
                 logger.error(f"Error saving to database: {e}")
 

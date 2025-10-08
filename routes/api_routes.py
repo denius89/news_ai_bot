@@ -573,12 +573,12 @@ def validate_categories_api():
 def get_upcoming_events():
     """
     API endpoint для получения предстоящих событий для календаря.
-    
+
     Query parameters:
         - days: количество дней вперед (по умолчанию 7)
         - category: фильтр по категории (опционально)
         - min_importance: минимальная важность (по умолчанию 0)
-    
+
     Returns:
         JSON с событиями в формате для календаря
     """
@@ -586,24 +586,25 @@ def get_upcoming_events():
         days = int(request.args.get("days", 7))
         category = request.args.get("category")
         min_importance = float(request.args.get("min_importance", 0))
-        
+
         # Получаем события из базы данных
         from database.db_models import get_latest_events
+
         events = get_latest_events(limit=100)
-        
+
         # Фильтруем по категории если указана
         if category:
             events = [e for e in events if e.get("category") == category]
-        
+
         # Фильтруем по важности
         events = [e for e in events if (e.get("importance") or 0) >= min_importance]
-        
+
         # Преобразуем в формат для календаря
         formatted_events = []
         for event in events:
             # Определяем категорию на основе источника или других данных
             event_category = event.get("category", "markets")  # По умолчанию markets для экономических событий
-            
+
             formatted_event = {
                 "id": event.get("id", f"event_{hash(event.get('title', ''))}"),
                 "title": event.get("title", "Без названия"),
@@ -619,18 +620,20 @@ def get_upcoming_events():
                 "link": None,  # Пока нет ссылок в базе
             }
             formatted_events.append(formatted_event)
-        
-        return jsonify({
-            "status": "success",
-            "data": {
-                "events": formatted_events,
-                "total_count": len(formatted_events),
-                "days": days,
-                "category": category,
-                "min_importance": min_importance,
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "events": formatted_events,
+                    "total_count": len(formatted_events),
+                    "days": days,
+                    "category": category,
+                    "min_importance": min_importance,
+                },
             }
-        })
-        
+        )
+
     except Exception as e:
         logger.error(f"Ошибка получения событий: {e}")
         return jsonify({"status": "error", "message": "Ошибка получения событий"}), 500

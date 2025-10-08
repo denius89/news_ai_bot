@@ -23,6 +23,7 @@ WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8001"))
 
 # Импортируем Cloudflare конфигурацию
 from config.cloudflare import CLOUDFLARE_TUNNEL_URL
+
 WEBAPP_URL = CLOUDFLARE_TUNNEL_URL
 
 # Supabase настройки

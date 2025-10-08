@@ -23,7 +23,7 @@ NC = \033[0m # No Color
 # 🎯 ОСНОВНЫЕ КОМАНДЫ
 # =============================================================================
 
-.PHONY: help start stop restart check-ports logs clean cloudflare-config update-config
+.PHONY: help start stop restart check-ports logs clean cloudflare-config update-config smart-push
 
 # Показать справку
 help:
@@ -45,6 +45,9 @@ help:
 	@echo "$(GREEN)Cloudflare конфигурация:$(NC)"
 	@echo "  $(YELLOW)make cloudflare-config$(NC) - Показать текущую конфигурацию Cloudflare"
 	@echo "  $(YELLOW)make update-config$(NC)    - Обновить все конфигурации"
+	@echo ""
+	@echo "$(GREEN)Git и качество кода:$(NC)"
+	@echo "  $(YELLOW)make smart-push$(NC)       - Умный push с проверками качества кода"
 	@echo ""
 	@echo "$(GREEN)Архитектура:$(NC)"
 	@echo "  $(YELLOW)Flask (порт $(FLASK_PORT)):$(NC)   React статика + API"
@@ -269,6 +272,10 @@ update-config:
 	@echo "$(BLUE)🔄 Обновление конфигураций Cloudflare...$(NC)"
 	@python3 scripts/update_cloudflare_config.py
 	@echo "$(GREEN)✅ Все конфигурации обновлены!$(NC)"
+
+smart-push:
+	@echo "$(BLUE)🚀 Умный push с проверками качества кода...$(NC)"
+	@./scripts/smart_push.sh
 
 # =============================================================================
 # 🎯 ДЕФОЛТНАЯ КОМАНДА

@@ -21,11 +21,7 @@ router = APIRouter(prefix="/ws")
 active_connections: Set[WebSocket] = set()
 
 # PULSE-WS: Connection statistics
-ws_stats = {
-    "connected_clients": 0,
-    "events_emitted_total": 0,
-    "last_event_timestamp": None
-}
+ws_stats = {"connected_clients": 0, "events_emitted_total": 0, "last_event_timestamp": None}
 
 
 @router.websocket("/stream")
@@ -34,53 +30,47 @@ async def stream(websocket: WebSocket):
     await websocket.accept()
     active_connections.add(websocket)
     ws_stats["connected_clients"] = len(active_connections)
-    
+
     client_id = id(websocket)
     logger.info(f"PULSE-WS: Client connected: {client_id}")
     logger.info(f"PULSE-WS: Total connected clients: {len(active_connections)}")
-    
+
     # PULSE-WS: Send welcome message
-    await websocket.send_json({
-        "type": "reactor_connected",
-        "data": {
-            "message": "Connected to PulseAI Reactor",
-            "client_id": client_id,
-            "timestamp": time.time()
+    await websocket.send_json(
+        {
+            "type": "reactor_connected",
+            "data": {"message": "Connected to PulseAI Reactor", "client_id": client_id, "timestamp": time.time()},
         }
-    })
-    
+    )
+
     try:
         while True:
             # PULSE-WS: Handle incoming messages
             data = await websocket.receive_text()
-            
+
             if data == "ping":
                 # PULSE-WS: Heartbeat response
                 await websocket.send_text("pong")
             elif data.startswith("subscribe:"):
                 # PULSE-WS: Event subscription (future feature)
                 events = data.split(":", 1)[1].split(",")
-                await websocket.send_json({
-                    "type": "reactor_subscribed",
-                    "data": {
-                        "events": events,
-                        "message": f"Subscribed to events: {events}"
+                await websocket.send_json(
+                    {
+                        "type": "reactor_subscribed",
+                        "data": {"events": events, "message": f"Subscribed to events: {events}"},
                     }
-                })
+                )
             else:
                 # PULSE-WS: Echo back unknown messages
-                await websocket.send_json({
-                    "type": "echo",
-                    "data": {"message": data}
-                })
-                
+                await websocket.send_json({"type": "echo", "data": {"message": data}})
+
     except WebSocketDisconnect:
         active_connections.discard(websocket)
         ws_stats["connected_clients"] = len(active_connections)
-        
+
         logger.info(f"PULSE-WS: Client disconnected: {client_id}")
         logger.info(f"PULSE-WS: Total connected clients: {len(active_connections)}")
-        
+
         # PULSE-WS: Emit disconnect event to reactor
         try:
             reactor.emit_sync(Events.WEBSOCKET_DISCONNECTED, client_id=client_id)
@@ -96,23 +86,23 @@ async def ws_broadcast(event: dict):
     """PULSE-WS: Broadcast event to all connected WebSocket clients."""
     if not active_connections:
         return
-    
+
     dead_connections = []
     ws_stats["events_emitted_total"] += 1
     ws_stats["last_event_timestamp"] = time.time()
-    
+
     for connection in list(active_connections):
         try:
             await connection.send_json(event)
         except Exception as e:
             logger.warning(f"PULSE-WS: Failed to send to client {id(connection)}: {e}")
             dead_connections.append(connection)
-    
+
     # PULSE-WS: Clean up dead connections
     for connection in dead_connections:
         active_connections.discard(connection)
         ws_stats["connected_clients"] = len(active_connections)
-    
+
     logger.debug(f"PULSE-WS: Event '{event.get('type', 'unknown')}' sent to {len(active_connections)} clients")
 
 
@@ -125,13 +115,13 @@ async def websocket_status():
         "stats": ws_stats,
         "reactor_events": [
             "AI_METRICS_UPDATED",
-            "NEWS_PROCESSED", 
+            "NEWS_PROCESSED",
             "DIGEST_CREATED",
             "EVENT_DETECTED",
             "USER_ACTION",
             "SYSTEM_HEALTH_CHECK",
-            "REACTOR_HEARTBEAT"
-        ]
+            "REACTOR_HEARTBEAT",
+        ],
     }
 
 
@@ -143,7 +133,7 @@ async def websocket_stats():
         "ws_active_connections": len(active_connections),
         "ws_events_emitted_total": ws_stats["events_emitted_total"],
         "ws_last_event_ts": ws_stats["last_event_timestamp"],
-        "reactor_events_subscribed": 7
+        "reactor_events_subscribed": 7,
     }
 
 
@@ -153,22 +143,16 @@ async def reactor_health():
     try:
         health_data = {
             "reactor": reactor.get_health(),
-            "websocket": {
-                "active_connections": len(active_connections),
-                "stats": ws_stats
-            },
-            "timestamp": time.time()
+            "websocket": {"active_connections": len(active_connections), "stats": ws_stats},
+            "timestamp": time.time(),
         }
         return health_data
     except Exception as e:
         logger.error(f"PULSE-WS: Health check error: {e}")
         return {
             "reactor": {"status": "error", "error": str(e)},
-            "websocket": {
-                "active_connections": len(active_connections),
-                "stats": ws_stats
-            },
-            "timestamp": time.time()
+            "websocket": {"active_connections": len(active_connections), "stats": ws_stats},
+            "timestamp": time.time(),
         }
 
 
@@ -185,7 +169,7 @@ def get_websocket_stats() -> dict:
         "ws_events_emitted_total": ws_stats["events_emitted_total"],
         "ws_last_event_ts": ws_stats["last_event_timestamp"],
         "socketio_initialized": False,  # Compatibility flag
-        "reactor_events_subscribed": 7
+        "reactor_events_subscribed": 7,
     }
 
 
