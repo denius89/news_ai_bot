@@ -13,7 +13,7 @@ deepl>=1.22.0
 deprecation>=2.1.0
 distro>=1.9.0
 feedparser>=6.0.12
-# PULSE-WS: Flask dependencies removed for FastAPI migration
+# PULSE-WS: Flask dependencies restored - using Flask only
 h11>=0.16.0
 h2>=4.3.0
 hpack>=4.1.0
@@ -54,11 +54,13 @@ typing-inspection>=0.4.1
 typing_extensions>=4.15.0
 urllib3>=2.5.0
 websockets>=15.0.1
-# PULSE-WS: Werkzeug removed for FastAPI migration
+# PULSE-WS: Werkzeug restored - using Flask only
 
-# FastAPI WebSocket dependencies
-fastapi>=0.111,<1.0
-uvicorn[standard]>=0.30,<1.0
+# Flask dependencies
+Flask>=3.0.0,<4.0
+Werkzeug>=3.0.0,<4.0
+
+# PULSE-WS: FastAPI dependencies removed - using Flask only
 
 # Reactor Core dependencies
 aiofiles>=24.1.0

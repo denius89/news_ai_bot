@@ -14,9 +14,9 @@ from typing import List, Union
 
 from openai import OpenAI
 from digests.prompts import PROMPTS
-from utils.formatters import format_digest_output
+from utils.text.formatters import format_digest_output
 from models.news import NewsItem
-from utils.clean_text import clean_for_telegram
+from utils.text.clean_text import clean_for_telegram
 
 logger = logging.getLogger("ai_summary")
 

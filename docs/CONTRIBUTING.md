@@ -53,7 +53,7 @@ pip install -r requirements.txt
 pytest -m "not integration"
 
 # Start web application
-python webapp.py
+python src/webapp.py
 
 # Run Telegram bot
 python -m telegram_bot.bot

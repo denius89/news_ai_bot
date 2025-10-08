@@ -11,14 +11,14 @@ from supabase import create_client, Client
 
 from ai_modules.credibility import evaluate_credibility
 from ai_modules.importance import evaluate_importance
-from config.settings import COUNTRY_MAP
-from utils.dates import format_datetime, ensure_utc_iso
+from config.core.settings import COUNTRY_MAP
+from utils.system.dates import format_datetime, ensure_utc_iso
 
 # --- ЛОГИРОВАНИЕ ---
 logger = logging.getLogger("database")
 
 # --- ПОДКЛЮЧЕНИЕ К SUPABASE ---
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 

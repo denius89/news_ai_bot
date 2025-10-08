@@ -4,7 +4,7 @@ import sys
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from tools.port_manager import PortManager
+from tools.management.port_manager import PortManager
 
 # Добавляем корневую директорию проекта в путь
 project_root = Path(__file__).parent.parent

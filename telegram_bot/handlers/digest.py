@@ -4,7 +4,7 @@ from aiogram.filters import Command
 from aiogram.exceptions import TelegramBadRequest
 from services.unified_digest_service import get_async_digest_service
 from services.categories import get_categories
-from utils.clean_text import clean_for_telegram
+from utils.text.clean_text import clean_for_telegram
 from models.news import NewsItem
 
 router = Router()

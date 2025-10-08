@@ -12,8 +12,8 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 
 from models.news import NewsItem
-from utils.formatters import format_date
-from utils.ai_client import ask_async
+from utils.text.formatters import format_date
+from utils.ai.ai_client import ask_async
 from digests.prompts import get_prompt_for_category
 
 logger = logging.getLogger(__name__)

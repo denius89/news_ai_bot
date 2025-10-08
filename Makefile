@@ -119,7 +119,7 @@ start-react:
 
 start-flask:
 	@echo "$(BLUE)🐍 Запуск Flask API...$(NC)"
-	@python3 webapp.py > logs/flask.log 2>&1 &
+	@python3 src/webapp.py > logs/flask.log 2>&1 &
 	@echo "$$!" > logs/flask.pid
 	@sleep 3
 	@if curl -s http://localhost:$(FLASK_PORT)/api/health > /dev/null; then \
@@ -130,7 +130,7 @@ start-flask:
 
 start-bot:
 	@echo "$(BLUE)🤖 Запуск Telegram Bot...$(NC)"
-	@python3 bot.py > logs/bot.log 2>&1 &
+	@python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
 	@echo "$$!" > logs/bot.pid
 	@sleep 2
 	@echo "$(GREEN)✅ Telegram Bot запущен$(NC)"

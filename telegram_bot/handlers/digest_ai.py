@@ -8,8 +8,8 @@ from services.categories import get_categories
 from services.subscription_service import get_async_subscription_service
 from services.notification_service import get_async_notification_service
 from digests.configs import PERIODS, STYLES
-from utils.clean_text import clean_for_telegram
-from utils.progress_animation import (
+from utils.text.clean_text import clean_for_telegram
+from utils.system.progress_animation import (
     show_generation_progress,
     show_quick_progress,
     build_digest_actions_keyboard,

@@ -3,7 +3,7 @@
 Генератор конфигурации Vite из Python конфига Cloudflare.
 """
 
-from config.cloudflare import get_vite_allowed_hosts
+from config.core.cloudflare import get_vite_allowed_hosts
 import sys
 import os
 from pathlib import Path

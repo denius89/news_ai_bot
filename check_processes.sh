@@ -34,7 +34,7 @@ check_process() {
 echo "🔍 Проверка запущенных процессов PulseAI..."
 
 # Проверяем Flask WebApp
-check_process "python3 webapp.py" ".flask.pid"
+check_process "python3 src/webapp.py" ".flask.pid"
 flask_running=$?
 
 # Проверяем Telegram Bot

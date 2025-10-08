@@ -32,7 +32,7 @@ from autoscraper import AutoScraper
 from database.service import get_async_service
 from ai_modules.importance import evaluate_importance
 from ai_modules.credibility import evaluate_credibility
-from utils.clean_text import clean_text
+from utils.text.clean_text import clean_text
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class AdvancedParser:
 
     async def _load_sources_config(self):
         """Загрузка конфигурации источников из YAML."""
-        config_path = Path("config/sources.yaml")
+        config_path = Path("config/data/sources.yaml")
         if not config_path.exists():
             logger.error("Файл config/sources.yaml не найден")
             self.sources_config = {}

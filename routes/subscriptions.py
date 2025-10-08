@@ -9,7 +9,7 @@ from aiogram import Router, types
 from aiogram.filters import Command
 
 from services.subscription_service import SubscriptionService
-from config.constants import CATEGORIES
+from config.core.constants import CATEGORIES
 
 router = Router()
 svc = SubscriptionService()

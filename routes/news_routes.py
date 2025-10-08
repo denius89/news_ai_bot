@@ -172,7 +172,7 @@ def api_latest_news_weighted():
     try:
         from database.db_models import get_latest_news
         from services.categories import get_categories
-        from utils.news_distribution import distribute_news_weighted, get_distribution_statistics, get_category_weights
+        from utils.ai.news_distribution import distribute_news_weighted, get_distribution_statistics, get_category_weights
 
         # Получаем параметры
         page = int(request.args.get("page", 1))
@@ -263,7 +263,7 @@ def distribute_news_balanced(
     if not news_by_category:
         return []
 
-    from utils.news_distribution import calculate_news_score
+    from utils.ai.news_distribution import calculate_news_score
 
     # Сортируем новости в каждой категории по качеству
     for category in news_by_category:
@@ -288,7 +288,7 @@ def api_distribution_stats():
     """API endpoint для получения статистики распределения новостей."""
     try:
         from services.categories import get_categories
-        from utils.news_distribution import get_category_weights, get_distribution_statistics
+        from utils.ai.news_distribution import get_category_weights, get_distribution_statistics
         from database.db_models import get_latest_news
 
         # Получаем статистику по категориям

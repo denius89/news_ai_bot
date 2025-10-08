@@ -77,26 +77,26 @@ Complete guide for local setup and deployment of PulseAI.
 ```bash
 # Load environment variables and run services
 ENV=.env python -m telegram_bot.bot    # Start Telegram bot
-ENV=.env python webapp.py             # Start web application
-ENV=.env python main.py --digest 5    # Generate digest manually
+ENV=config_files/.env python src/webapp.py             # Start web application
+ENV=config_files/.env python src/main.py --digest 5    # Generate digest manually
 ```
 
 ### Web Application
 ```bash
-python webapp.py
+python src/webapp.py
 ```
 Access at: [http://localhost:5000](http://localhost:5000)
 
 ### CLI Application
 ```bash
 # Process news from all sources
-python main.py --source all --limit 20
+python src/main.py --source all --limit 20
 
 # Generate digest
-python main.py --digest 5
+python src/main.py --digest 5
 
 # Generate AI digest
-python main.py --digest 5 --ai
+python src/main.py --digest 5 --ai
 ```
 
 ### Development Commands (Makefile)
