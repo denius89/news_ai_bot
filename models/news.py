@@ -53,7 +53,7 @@ class NewsItem(BaseModel):
         Форматированная дата публикации для обратной совместимости.
         Использует utils.formatters.format_date.
         """
-        from utils.formatters import format_date
+        from utils.text.formatters import format_date
 
         return format_date(self.published_at)
 

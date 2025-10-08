@@ -659,3 +659,346 @@ def mark_notification_read(user_id: Union[int, str], notification_id: Union[int,
     except Exception as e:
         logger.error("Ошибка при отметке уведомления как прочитанного: %s", e)
         return False
+
+
+# --- DIGEST FUNCTIONS ---
+
+
+def save_digest(
+    user_id: str,
+    summary: str,
+    category: str = "all",
+    style: str = "analytical",
+    period: str = "today",
+    limit_count: int = 10,
+    metadata: dict = None,
+) -> str:
+    """
+    Сохраняет дайджест в базу данных.
+
+    Args:
+        user_id: ID пользователя
+        summary: Текст дайджеста
+        category: Категория новостей (crypto, sports, markets, tech, world, all)
+        style: Стиль генерации (analytical, business, meme)
+        period: Период (today, 7d, 30d)
+        limit_count: Количество новостей в дайджесте
+        metadata: Дополнительные метаданные
+
+    Returns:
+        ID созданного дайджеста или пустую строку в случае ошибки
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return ""
+
+    try:
+        # Полная версия с новыми колонками после миграции
+        digest_data = {
+            "user_id": str(user_id),
+            "summary": summary,
+            "category": category,
+            "style": style,
+            "period": period,
+            "limit_count": limit_count,
+            "deleted_at": None,
+            "archived": False,
+            "metadata": metadata or {},
+        }
+
+        result = supabase.table("digests").insert(digest_data).execute()
+
+        if result.data:
+            digest_id = result.data[0]["id"]
+            logger.info(
+                "Дайджест сохранен: ID=%s, user_id=%s, category=%s, style=%s",
+                digest_id,
+                user_id,
+                category,
+                style,
+            )
+            return digest_id
+        else:
+            logger.error("Не удалось сохранить дайджест")
+            return ""
+
+    except Exception as e:
+        logger.error("Ошибка при сохранении дайджеста: %s", e)
+        return ""
+
+
+def get_user_digests(
+    user_id: str, limit: int = 20, offset: int = 0, include_deleted: bool = False, include_archived: bool = False
+) -> List[Dict]:
+    """
+    Получает историю дайджестов пользователя с поддержкой мягкого удаления и архивирования.
+    Полная версия с новыми колонками после миграции.
+
+    Args:
+        user_id: ID пользователя
+        limit: Максимальное количество дайджестов
+        offset: Смещение для пагинации
+        include_deleted: Включать ли удаленные дайджесты
+        include_archived: Включать ли архивированные дайджесты
+
+    Returns:
+        Список дайджестов пользователя
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+
+    try:
+        query = supabase.table("digests").select("*").eq("user_id", user_id)
+
+        # Фильтрация по статусу с новыми колонками
+        if not include_deleted:
+            query = query.is_("deleted_at", "null")
+
+        if not include_archived:
+            # Включаем только не архивированные (FALSE или NULL)
+            query = query.or_("archived.is.null,archived.eq.false")
+
+        result = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
+
+        return result.data or []
+
+    except Exception as e:
+        logger.error("Ошибка при получении дайджестов пользователя: %s", e)
+        return []
+
+
+def get_digest_by_id(digest_id: str, user_id: str = None) -> Dict:
+    """
+    Получает дайджест по ID.
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя (опционально, для проверки принадлежности)
+
+    Returns:
+        Данные дайджеста или None если не найден
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return None
+
+    try:
+        query = supabase.table("digests").select("*").eq("id", digest_id)
+
+        if user_id:
+            query = query.eq("user_id", user_id)
+
+        result = query.execute()
+
+        if result.data:
+            return result.data[0]
+        else:
+            logger.warning("Дайджест не найден: ID=%s", digest_id)
+            return None
+
+    except Exception as e:
+        logger.error("Ошибка при получении дайджеста: %s", e)
+        return None
+
+
+def soft_delete_digest(digest_id: str, user_id: str) -> bool:
+    """
+    Мягко удаляет дайджест пользователя (устанавливает deleted_at).
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя
+
+    Returns:
+        True если дайджест удален, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        from datetime import datetime
+
+        result = (
+            supabase.table("digests")
+            .update({"deleted_at": datetime.utcnow().isoformat()})
+            .eq("id", digest_id)
+            .eq("user_id", user_id)
+            .is_("deleted_at", "null")  # Только если еще не удален
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Дайджест мягко удален: ID=%s, user_id=%s", digest_id, user_id)
+            return True
+        else:
+            logger.warning(
+                "Дайджест не найден, не принадлежит пользователю или уже удален: ID=%s, user_id=%s",
+                digest_id,
+                user_id,
+            )
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при мягком удалении дайджеста: %s", e)
+        return False
+
+
+def restore_digest(digest_id: str, user_id: str) -> bool:
+    """
+    Восстанавливает мягко удаленный дайджест.
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя
+
+    Returns:
+        True если дайджест восстановлен, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        result = (
+            supabase.table("digests")
+            .update({"deleted_at": None})
+            .eq("id", digest_id)
+            .eq("user_id", user_id)
+            .not_.is_("deleted_at", "null")  # Только если удален
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Дайджест восстановлен: ID=%s, user_id=%s", digest_id, user_id)
+            return True
+        else:
+            logger.warning(
+                "Дайджест не найден, не принадлежит пользователю или не удален: ID=%s, user_id=%s",
+                digest_id,
+                user_id,
+            )
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при восстановлении дайджеста: %s", e)
+        return False
+
+
+def archive_digest(digest_id: str, user_id: str) -> bool:
+    """
+    Архивирует дайджест пользователя.
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя
+
+    Returns:
+        True если дайджест архивирован, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        result = (
+            supabase.table("digests")
+            .update({"archived": True})
+            .eq("id", digest_id)
+            .eq("user_id", user_id)
+            .eq("archived", False)  # Только если не архивирован
+            .is_("deleted_at", "null")  # Только если не удален
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Дайджест архивирован: ID=%s, user_id=%s", digest_id, user_id)
+            return True
+        else:
+            logger.warning(
+                "Дайджест не найден, не принадлежит пользователю, уже архивирован или удален: ID=%s, user_id=%s",
+                digest_id,
+                user_id,
+            )
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при архивировании дайджеста: %s", e)
+        return False
+
+
+def unarchive_digest(digest_id: str, user_id: str) -> bool:
+    """
+    Разархивирует дайджест пользователя.
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя
+
+    Returns:
+        True если дайджест разархивирован, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        result = (
+            supabase.table("digests")
+            .update({"archived": False})
+            .eq("id", digest_id)
+            .eq("user_id", user_id)
+            .eq("archived", True)  # Только если архивирован
+            .is_("deleted_at", "null")  # Только если не удален
+            .execute()
+        )
+
+        if result.data:
+            logger.info("Дайджест разархивирован: ID=%s, user_id=%s", digest_id, user_id)
+            return True
+        else:
+            logger.warning(
+                "Дайджест не найден, не принадлежит пользователю или не архивирован: ID=%s, user_id=%s",
+                digest_id,
+                user_id,
+            )
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при разархивировании дайджеста: %s", e)
+        return False
+
+
+def permanent_delete_digest(digest_id: str, user_id: str) -> bool:
+    """
+    Окончательно удаляет дайджест пользователя (физическое удаление).
+
+    Args:
+        digest_id: ID дайджеста
+        user_id: ID пользователя
+
+    Returns:
+        True если дайджест удален, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        result = supabase.table("digests").delete().eq("id", digest_id).eq("user_id", user_id).execute()
+
+        if result.data:
+            logger.info("Дайджест окончательно удален: ID=%s, user_id=%s", digest_id, user_id)
+            return True
+        else:
+            logger.warning(
+                "Дайджест не найден или не принадлежит пользователю: ID=%s, user_id=%s",
+                digest_id,
+                user_id,
+            )
+            return False
+
+    except Exception as e:
+        logger.error("Ошибка при окончательном удалении дайджеста: %s", e)
+        return False

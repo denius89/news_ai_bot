@@ -4,6 +4,7 @@ from flask import Flask, render_template, send_from_directory, redirect
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config.core.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
@@ -11,6 +12,7 @@ from routes.news_routes import news_bp
 
 # webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
+from routes.dashboard_api import dashboard_api
 
 # WebSocket routes removed - using FastAPI now
 # from routes.ws_routes import ws_bp, init_socketio
@@ -53,7 +55,7 @@ from config.paths import get_path, setup_pythonpath
 setup_pythonpath()
 
 # Путь к собранному React
-REACT_DIST_PATH = get_path('webapp_dist')
+REACT_DIST_PATH = get_path("webapp_dist")
 
 
 # React статические файлы
@@ -111,6 +113,7 @@ def index():
 app.register_blueprint(news_bp)
 # webapp_bp удален - конфликтовал с serve_react()
 app.register_blueprint(api_bp)
+app.register_blueprint(dashboard_api)
 # WebSocket blueprint removed - using FastAPI now
 # app.register_blueprint(ws_bp)
 app.register_blueprint(metrics_bp)
