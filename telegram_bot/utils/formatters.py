@@ -121,7 +121,7 @@ def format_events(events: list[dict], limit: int = 5) -> str:
         # важность (нормализуем 0-3 в 0-1)
         importance_raw = float(ev.get("importance") or 0)
         importance = importance_raw / 3.0 if importance_raw > 0 else 0
-        
+
         # Определяем уровень важности
         if importance >= 0.8:
             importance_text = "Высокая"

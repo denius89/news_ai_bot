@@ -4,8 +4,10 @@ from flask import Flask, render_template, send_from_directory, redirect
 
 from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from routes.news_routes import news_bp
+
 # webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
+
 # WebSocket routes removed - using FastAPI now
 # from routes.ws_routes import ws_bp, init_socketio
 from routes.metrics_routes import metrics_bp
@@ -18,14 +20,11 @@ logger = logging.getLogger("news_ai_bot")
 app = Flask(__name__)
 app.config["VERSION"] = VERSION
 
+
 # Добавляем REACTOR_ENABLED в контекст шаблонов
 @app.context_processor
 def inject_config():
-    return {
-        'config': {
-            'REACTOR_ENABLED': REACTOR_ENABLED
-        }
-    }
+    return {"config": {"REACTOR_ENABLED": REACTOR_ENABLED}}
 
 
 # 🔥 Фильтр для отображения иконок важности
@@ -44,53 +43,58 @@ app.jinja_env.filters["importance_icon"] = importance_icon
 
 
 # Путь к собранному React
-REACT_DIST_PATH = os.path.join(os.path.dirname(__file__), 'webapp', 'dist')
+REACT_DIST_PATH = os.path.join(os.path.dirname(__file__), "webapp", "dist")
+
 
 # React статические файлы
-@app.route('/webapp')
-@app.route('/webapp/')
-@app.route('/webapp/<path:path>')
-def serve_react(path=''):
+@app.route("/webapp")
+@app.route("/webapp/")
+@app.route("/webapp/<path:path>")
+def serve_react(path=""):
     """Обслуживает React приложение как статику"""
     logger.info(f"🎯 serve_react() вызвана с path='{path}'")
     try:
-        if path == '' or path == '/':
+        if path == "" or path == "/":
             logger.info("📄 Отдаем index.html")
-            response = send_from_directory(REACT_DIST_PATH, 'index.html')
+            response = send_from_directory(REACT_DIST_PATH, "index.html")
             # Добавляем заголовки для Telegram WebApp
-            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             return response
-        
+
         # Попробовать отдать статический файл
         try:
             response = send_from_directory(REACT_DIST_PATH, path)
             # Добавляем заголовки для Telegram WebApp
-            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             return response
         except:
             # React Router fallback - все неизвестные пути ведут на index.html
-            response = send_from_directory(REACT_DIST_PATH, 'index.html')
+            response = send_from_directory(REACT_DIST_PATH, "index.html")
             # Добавляем заголовки для Telegram WebApp
-            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
-            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Opener-Policy"] = "unsafe-none"
+            response.headers["Cross-Origin-Resource-Policy"] = "cross-origin"
             return response
     except FileNotFoundError:
         # Если папка dist не существует, показать сообщение
-        return f"""
+        return (
+            f"""
         <h1>React не собран</h1>
         <p>Запустите: <code>cd webapp && npm run build</code></p>
         <p>Папка {REACT_DIST_PATH} не найдена.</p>
-        """, 404
+        """,
+            404,
+        )
+
 
 # Главная страница перенаправляет на React
 @app.route("/")
 def index():
-    return redirect('/webapp')
+    return redirect("/webapp")
 
 
 # Регистрируем маршруты
@@ -143,7 +147,7 @@ if __name__ == "__main__":
     # else:
     #     # Обычный Flask запуск
     #     app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
-    
+
     # Запускаем обычный Flask без WebSocket
     logger.info("⚠️ WebSocket отключен, запускаем обычный Flask")
     app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)

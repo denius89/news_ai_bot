@@ -122,28 +122,34 @@ class EventsParser:
             deduplicated_events = self._deduplicate_events(normalized_events)
 
             logger.info(f"Total events after normalization and deduplication: {len(deduplicated_events)}")
-            
+
             # Эмитим событие о получении событий
             if deduplicated_events:
-                reactor.emit_sync(Events.EVENT_DETECTED, {
-                    'events_count': len(deduplicated_events),
-                    'providers_used': providers,
-                    'start_date': start_date.isoformat(),
-                    'end_date': end_date.isoformat(),
-                    'timestamp': datetime.utcnow().isoformat()
-                })
-                
+                reactor.emit_sync(
+                    Events.EVENT_DETECTED,
+                    {
+                        "events_count": len(deduplicated_events),
+                        "providers_used": providers,
+                        "start_date": start_date.isoformat(),
+                        "end_date": end_date.isoformat(),
+                        "timestamp": datetime.utcnow().isoformat(),
+                    },
+                )
+
                 # Эмитим каждое важное событие отдельно
                 for event in deduplicated_events:
                     if event.importance > 0.7:  # Только важные события
-                        reactor.emit_sync(Events.EVENT_DETECTED, {
-                            'title': event.title,
-                            'category': event.category,
-                            'importance': event.importance,
-                            'starts_at': event.starts_at.isoformat(),
-                            'source': event.source,
-                            'link': event.link
-                        })
+                        reactor.emit_sync(
+                            Events.EVENT_DETECTED,
+                            {
+                                "title": event.title,
+                                "category": event.category,
+                                "importance": event.importance,
+                                "starts_at": event.starts_at.isoformat(),
+                                "source": event.source,
+                                "link": event.link,
+                            },
+                        )
 
             return deduplicated_events
 

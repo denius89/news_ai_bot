@@ -13,15 +13,16 @@ sys.path.insert(0, str(project_root))
 
 from config.cloudflare import get_vite_allowed_hosts
 
+
 def generate_vite_config():
     """Генерирует конфигурацию Vite с актуальными хостами."""
-    
+
     allowed_hosts = get_vite_allowed_hosts()
-    
+
     # Формируем строку с хостами
     hosts_str = ",\n          ".join([f"'{host}'" for host in allowed_hosts])
-    
-    vite_config = f'''import {{ defineConfig }} from 'vite'
+
+    vite_config = f"""import {{ defineConfig }} from 'vite'
 import react from '@vitejs/plugin-react'
 import {{ resolve }} from 'path'
 import {{ fileURLToPath, URL }} from 'node:url'
@@ -81,18 +82,19 @@ export default defineConfig(({{ command, mode }}) => {{
     }}),
   }}
 }})
-'''
-    
+"""
+
     return vite_config
+
 
 if __name__ == "__main__":
     config_content = generate_vite_config()
-    
+
     # Записываем в файл
     vite_config_path = project_root / "webapp" / "vite.config.ts"
-    
-    with open(vite_config_path, 'w', encoding='utf-8') as f:
+
+    with open(vite_config_path, "w", encoding="utf-8") as f:
         f.write(config_content)
-    
+
     print(f"✅ Конфигурация Vite обновлена: {vite_config_path}")
     print(f"📋 Разрешенные хосты: {get_vite_allowed_hosts()}")

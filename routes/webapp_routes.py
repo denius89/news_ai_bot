@@ -12,5 +12,6 @@ def live_dashboard():
     """Live Reactor Dashboard route"""
     return render_template("pages/live_dashboard.html", active_page="live")
 
+
 # УДАЛЕН: Конфликтующий маршрут /app
 # Теперь используется serve_react() из webapp.py

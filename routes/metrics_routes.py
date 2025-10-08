@@ -40,7 +40,7 @@ def get_metrics_endpoint():
         cache = get_cache()
         cache_stats = cache.get_stats()
         metrics_data["cache"] = cache_stats
-        
+
         # Add Reactor metrics
         reactor_stats = reactor.get_metrics()
         metrics_data["reactor"] = reactor_stats
@@ -56,7 +56,7 @@ def get_metrics_endpoint():
 def reactor_health_check():
     """
     Comprehensive health check for Reactor system.
-    
+
     Returns health status of Reactor Core and WebSocket connections.
     """
     try:
@@ -64,28 +64,21 @@ def reactor_health_check():
             "status": "healthy",
             "timestamp": time.time(),
             "reactor": reactor.get_health(),
-            "websocket": {
-                "status": "active",
-                "connected_clients": 0  # Will be updated by WebSocket routes
-            },
+            "websocket": {"status": "active", "connected_clients": 0},  # Will be updated by WebSocket routes
             "events": {
                 "total_emitted": reactor.get_metrics().get("events_emitted", 0),
-                "event_types": reactor.get_metrics().get("event_types", 0)
-            }
+                "event_types": reactor.get_metrics().get("event_types", 0),
+            },
         }
-        
+
         # Эмитим событие о проверке здоровья
         reactor.emit_sync(Events.SYSTEM_HEALTH_CHECK, health_data)
-        
+
         return jsonify(health_data), 200
-        
+
     except Exception as e:
         logger.error(f"Error in health check: {e}")
-        return jsonify({
-            "status": "unhealthy",
-            "error": str(e),
-            "timestamp": time.time()
-        }), 500
+        return jsonify({"status": "unhealthy", "error": str(e), "timestamp": time.time()}), 500
 
 
 @metrics_bp.route("/metrics/reset")
