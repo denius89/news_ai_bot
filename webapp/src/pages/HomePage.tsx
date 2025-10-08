@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/ui/Header';
 import { Rocket, Bot, Calendar, Settings, BarChart3, Newspaper, Sparkles } from 'lucide-react';
+import { useTelegramUser } from '../hooks/useTelegramUser';
 
 interface HomePageProps {
   theme: 'light' | 'dark';
@@ -33,6 +34,7 @@ interface DashboardStats {
 const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { telegramUser, isTelegramWebApp } = useTelegramUser();
 
   useEffect(() => {
     fetchDashboardStats();
@@ -42,6 +44,27 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
     
     return () => clearInterval(interval);
   }, []);
+
+  // Функция для персонализированного приветствия
+  const getPersonalizedGreeting = () => {
+    if (!telegramUser) {
+      return "Добро пожаловать в PulseAI";
+    }
+    
+    const firstName = telegramUser.first_name;
+    const timeOfDay = new Date().getHours();
+    
+    let greeting = "";
+    if (timeOfDay < 12) {
+      greeting = "Доброе утро";
+    } else if (timeOfDay < 18) {
+      greeting = "Добрый день";
+    } else {
+      greeting = "Добрый вечер";
+    }
+    
+    return `${greeting}, ${firstName}!`;
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -160,10 +183,13 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                   <Rocket className="w-16 h-16 text-primary" />
                 </div>
                 <h1 className="text-3xl font-bold text-text mb-2">
-                  Добро пожаловать в PulseAI — новости, которые работают на вас
+                  {getPersonalizedGreeting()}
                 </h1>
                 <p className="text-muted-strong text-lg mb-6 max-w-2xl mx-auto">
-                  Ваш умный помощник для персональных новостей
+                  {telegramUser ? 
+                    "Ваш умный помощник для персональных новостей" : 
+                    "Добро пожаловать в PulseAI — новости, которые работают на вас"
+                  }
                 </p>
                 <Button 
                   size="lg" 
