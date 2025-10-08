@@ -17,6 +17,17 @@ export const TelegramWebApp: React.FC<TelegramWebAppProps> = ({ children }) => {
       if (window.Telegram?.WebApp) {
         console.log('✅ Telegram WebApp detected!');
         
+        // Log user information
+        const user = window.Telegram.WebApp.user || window.Telegram.WebApp.initDataUnsafe?.user;
+        if (user) {
+          console.log('👤 Telegram User:', {
+            id: user.id,
+            first_name: user.first_name,
+            username: user.username,
+            language_code: user.language_code
+          });
+        }
+        
         try {
           // Initialize WebApp
           window.Telegram.WebApp.ready();
@@ -37,7 +48,8 @@ export const TelegramWebApp: React.FC<TelegramWebAppProps> = ({ children }) => {
         }
         
       } else {
-        console.log('❌ Not running in Telegram WebApp - regular browser');
+        console.log('🌐 Not running in Telegram WebApp - using fallback mode');
+        console.log('📝 Fallback mode: Using demo user for development');
         
         // Test API connectivity anyway
         testAPIConnectivity();

@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
+import { 
+  Newspaper, 
+  Cpu, 
+  Globe, 
+  TrendingUp, 
+  Coins, 
+  Trophy, 
+  ExternalLink,
+  X,
+  CheckCircle,
+  Star
+} from 'lucide-react';
 
 interface NewsItem {
   id: string;
@@ -22,6 +34,16 @@ interface NewsPageProps {
   onNavigate?: (page: string) => void;
 }
 
+// Утилита для склонения чисел
+function getNewsLabel(count: number) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return "новость";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+    return "новости";
+  return "новостей";
+}
+
 const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,12 +54,12 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const [hasMoreNews, setHasMoreNews] = useState(true);
 
   const categories = [
-    { id: 'all', label: 'Все', icon: '📰' },
-    { id: 'crypto', label: 'Криптовалюты', icon: '₿' },
-    { id: 'tech', label: 'Технологии', icon: '🤖' },
-    { id: 'sports', label: 'Спорт', icon: '⚽' },
-    { id: 'world', label: 'Мир', icon: '🌍' },
-    { id: 'markets', label: 'Рынки', icon: '📈' },
+    { id: 'all', label: 'Все', icon: <Newspaper className="w-4 h-4" /> },
+    { id: 'crypto', label: 'Криптовалюты', icon: <Coins className="w-4 h-4" /> },
+    { id: 'tech', label: 'AI и технологии', icon: <Cpu className="w-4 h-4" /> },
+    { id: 'sports', label: 'Спорт и события', icon: <Trophy className="w-4 h-4" /> },
+    { id: 'world', label: 'Новости мира', icon: <Globe className="w-4 h-4" /> },
+    { id: 'markets', label: 'Финансы', icon: <TrendingUp className="w-4 h-4" /> },
   ];
 
 
@@ -205,10 +227,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     return matchesCategory;
   });
 
-  const getCredibilityColor = (credibility: number) => {
-    if (credibility >= 0.9) return 'text-success';
-    if (credibility >= 0.7) return 'text-warning';
-    return 'text-error';
+  const truncateText = (text: string, maxLength: number = 200): string => {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength).trim() + '...';
   };
 
   const getImportanceStars = (importance: number) => {
@@ -262,7 +285,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="Новости" 
-        subtitle={`${filteredNews.length} новостей`}
+        subtitle={`${filteredNews.length} ${getNewsLabel(filteredNews.length)}`}
       />
       
       <main className="container-main">
@@ -288,19 +311,25 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
           <motion.section variants={itemVariants}>
             <Card>
               <CardContent className="pt-6">
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 overflow-x-auto">
                   {categories.map((category) => (
-                    <Button
+                    <button
                       key={category.id}
-                      variant={selectedCategory === category.id ? 'primary' : 'secondary'}
-                      size="sm"
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center ${
+                        selectedCategory === category.id
+                          ? "bg-gradient-to-r from-[#00BFA6]/10 to-[#00E3BE]/10 text-primary shadow-[0_0_6px_rgba(0,191,166,0.2)]"
+                          : "border border-border text-gray-600 dark:text-gray-300 hover:text-primary hover:border-primary/50"
+                      }`}
                       onClick={() => setSelectedCategory(category.id)}
                     >
-                      <span className="mr-1">{category.icon}</span>
+                      <span className="mr-2">{category.icon}</span>
                       {category.label}
-                    </Button>
+                    </button>
                   ))}
                 </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
+                  PulseAI отбирает новости с наибольшей вероятностью интереса.
+                </p>
               </CardContent>
             </Card>
           </motion.section>
@@ -314,61 +343,49 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                   variants={itemVariants}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="hover-lift">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg leading-tight mb-2">
-                            {item.title}
-                          </CardTitle>
-                          <CardDescription>
-                            {item.url ? (
-                              <a 
-                                href={item.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-primary hover:text-primary/80 underline"
-                              >
-                                {item.source}
-                              </a>
-                            ) : (
-                              item.source
-                            )} • {new Date(item.publishedAt).toLocaleDateString('ru-RU')}
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center space-x-2 ml-4">
-                          <div className={`text-xs ${getCredibilityColor(item.credibility)}`}>
-                            {Math.round(item.credibility * 100)}%
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent>
-                      <p className="text-text text-sm leading-relaxed mb-4">
-                        {item.content}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="text-xs text-muted-strong">
-                            Важность: {getImportanceStars(item.importance)}
-                          </div>
-                          <div className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                            {categories.find(c => c.id === item.category)?.label}
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => setSelectedNews(item)}
+                  <div className="bg-white dark:bg-surface-alt rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-[1.01] p-5">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-lg font-semibold text-text dark:text-white leading-snug">
+                        {truncateText(item.title, 100)}
+                      </h3>
+                      <span className="ml-2 text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">
+                        {Math.round(item.importance * 100)}%
+                      </span>
+                    </div>
+
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {item.url ? (
+                        <a 
+                          href={item.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80 underline"
                         >
-                          Читать далее
-                        </Button>
+                          {item.source}
+                        </a>
+                      ) : (
+                        item.source
+                      )} • {new Date(item.publishedAt).toLocaleDateString('ru-RU')}
+                    </p>
+
+                    <p className="mt-2 text-[15px] text-text/90 leading-relaxed line-clamp-3">
+                      {truncateText(item.content, 200)}
+                    </p>
+
+                    <div className="mt-4 flex justify-between items-center text-sm">
+                      <div className="flex items-center gap-1">
+                        {getImportanceStars(item.importance)}
                       </div>
-                    </CardContent>
-                  </Card>
+                      <span className="text-gray-500 dark:text-gray-400">{categories.find(c => c.id === item.category)?.label}</span>
+                      <button 
+                        className="text-primary font-medium hover:underline flex items-center gap-1"
+                        onClick={() => setSelectedNews(item)}
+                      >
+                        Читать
+                        <ExternalLink className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -415,7 +432,9 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                 {/* Empty State */}
                 {filteredNews.length === 0 && (
                   <motion.section variants={itemVariants} className="text-center py-20">
-                    <div className="text-6xl mb-4">📰</div>
+                    <div className="flex justify-center mb-4">
+                      <Newspaper className="w-16 h-16 text-muted" />
+                    </div>
                     <h3 className="text-xl font-semibold text-text mb-2">
                       Новости не найдены
                     </h3>
@@ -435,73 +454,73 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
       {/* News Modal */}
       {selectedNews && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-surface rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="w-full max-w-2xl max-h-[75vh] 
+                       bg-white/95 dark:bg-surface-alt/95 
+                       backdrop-blur-lg rounded-3xl 
+                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] 
+                       p-6 
+                       overflow-hidden flex flex-col"
           >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm bg-primary/10 text-primary px-2 py-1 rounded-full">
-                    {categories.find(c => c.id === selectedNews.category)?.label}
-                  </span>
-                  <span className="text-sm text-muted-strong">
-                    {selectedNews.url ? (
-                      <a 
-                        href={selectedNews.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:text-primary/80 underline"
-                      >
-                        {selectedNews.source}
-                      </a>
-                    ) : (
-                      selectedNews.source
-                    )}
-                  </span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedNews(null)}
+            {/* Close button */}
+            <button 
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              onClick={() => setSelectedNews(null)}
+            >
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            </button>
+
+            {/* Category and source */}
+            <div className="flex gap-2 text-sm mb-3">
+              <span className="text-primary font-medium">
+                {categories.find(c => c.id === selectedNews.category)?.label}
+              </span>
+              <span className="text-gray-400 dark:text-gray-500">•</span>
+              {selectedNews.url ? (
+                <a 
+                  href={selectedNews.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary/80 hover:text-primary font-medium underline-offset-2"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </Button>
-              </div>
-              
-              <h2 className="text-xl font-semibold text-text mb-4">
-                {selectedNews.title}
-              </h2>
-              
-              <div className="prose prose-sm max-w-none text-text mb-6">
-                <p className="leading-relaxed">
-                  {selectedNews.content}
-                </p>
-              </div>
-              
-              <div className="flex items-center justify-between pt-4 border-t border-border">
-                <div className="flex items-center space-x-4">
-                  <div className="text-xs text-muted-strong">
-                    Достоверность: {Math.round(selectedNews.credibility * 100)}%
-                  </div>
-                  <div className="text-xs text-muted-strong">
-                    Важность: {'⭐'.repeat(Math.round(selectedNews.importance * 5))}
-                  </div>
+                  {selectedNews.source}
+                </a>
+              ) : (
+                <span className="text-gray-500 dark:text-gray-400">{selectedNews.source}</span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl md:text-2xl font-semibold text-text dark:text-white tracking-tight leading-snug mb-3">
+              {selectedNews.title}
+            </h2>
+
+            {/* Content - scrollable */}
+            <div className="flex-1 overflow-y-auto mb-5">
+              <p className="text-[15px] leading-relaxed text-text/90 dark:text-gray-300 whitespace-pre-wrap">
+                {selectedNews.content}
+              </p>
+            </div>
+
+            {/* Footer - simplified */}
+            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span>{Math.round(selectedNews.credibility * 100)}%</span>
                 </div>
-                <div className="text-xs text-muted-strong">
-                  {new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-amber-400" />
+                  <span>{Math.round(selectedNews.importance * 100)}%</span>
                 </div>
+              </div>
+              <div className="text-gray-400 dark:text-gray-500">
+                {new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU')}
               </div>
             </div>
           </motion.div>
