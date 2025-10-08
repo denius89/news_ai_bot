@@ -27,7 +27,7 @@ make start
 ### **1. Обновить URL в настройках:**
 ```python
 # config/settings.py
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-domain.trycloudflare.com")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://immunology-restructuring-march-same.trycloudflare.com")
 ```
 
 ### **2. Запустить Cloudflare Tunnel:**
@@ -36,7 +36,7 @@ cloudflared tunnel --url http://localhost:8001
 ```
 
 ### **3. Обновить URL в настройках:**
-Заменить `your-domain.trycloudflare.com` на реальный URL туннеля
+Заменить `postcards-simple-investigators-negotiation.trycloudflare.com` на реальный URL туннеля
 
 ### **4. Перезапустить сервисы:**
 ```bash

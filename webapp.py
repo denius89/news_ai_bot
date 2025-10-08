@@ -4,7 +4,7 @@ from flask import Flask, render_template, send_from_directory, redirect
 
 from config.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from routes.news_routes import news_bp
-from routes.webapp_routes import webapp_bp
+# webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
 # WebSocket routes removed - using FastAPI now
 # from routes.ws_routes import ws_bp, init_socketio
@@ -52,16 +52,33 @@ REACT_DIST_PATH = os.path.join(os.path.dirname(__file__), 'webapp', 'dist')
 @app.route('/webapp/<path:path>')
 def serve_react(path=''):
     """Обслуживает React приложение как статику"""
+    logger.info(f"🎯 serve_react() вызвана с path='{path}'")
     try:
         if path == '' or path == '/':
-            return send_from_directory(REACT_DIST_PATH, 'index.html')
+            logger.info("📄 Отдаем index.html")
+            response = send_from_directory(REACT_DIST_PATH, 'index.html')
+            # Добавляем заголовки для Telegram WebApp
+            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            return response
         
         # Попробовать отдать статический файл
         try:
-            return send_from_directory(REACT_DIST_PATH, path)
+            response = send_from_directory(REACT_DIST_PATH, path)
+            # Добавляем заголовки для Telegram WebApp
+            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            return response
         except:
             # React Router fallback - все неизвестные пути ведут на index.html
-            return send_from_directory(REACT_DIST_PATH, 'index.html')
+            response = send_from_directory(REACT_DIST_PATH, 'index.html')
+            # Добавляем заголовки для Telegram WebApp
+            response.headers['Cross-Origin-Embedder-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Opener-Policy'] = 'unsafe-none'
+            response.headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
+            return response
     except FileNotFoundError:
         # Если папка dist не существует, показать сообщение
         return f"""
@@ -78,7 +95,7 @@ def index():
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)
-app.register_blueprint(webapp_bp)
+# webapp_bp удален - конфликтовал с serve_react()
 app.register_blueprint(api_bp)
 # WebSocket blueprint removed - using FastAPI now
 # app.register_blueprint(ws_bp)
