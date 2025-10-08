@@ -561,6 +561,50 @@ def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: in
         return []
 
 
+def create_user(telegram_id: int, username: str = None, locale: str = "ru") -> str:
+    """
+    Создает нового пользователя в базе данных.
+    
+    Args:
+        telegram_id: ID пользователя в Telegram
+        username: Имя пользователя (опционально)
+        locale: Локаль пользователя (по умолчанию 'ru')
+    
+    Returns:
+        UUID нового пользователя или пустую строку при ошибке
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return ""
+    
+    try:
+        import uuid
+        
+        # Генерируем новый UUID для пользователя
+        new_user_id = str(uuid.uuid4())
+        
+        # Создаем пользователя
+        result = supabase.table("users").insert({
+            "id": new_user_id,
+            "telegram_id": telegram_id,
+            "username": username,
+            "locale": locale,
+            "created_at": "now()",
+            "updated_at": "now()"
+        }).execute()
+        
+        if result.data:
+            logger.info(f"Новый пользователь создан: ID={new_user_id}, telegram_id={telegram_id}")
+            return new_user_id
+        else:
+            logger.error("Не удалось создать пользователя")
+            return ""
+            
+    except Exception as e:
+        logger.error(f"Ошибка при создании пользователя: {e}")
+        return ""
+
+
 def create_user_notification(
     user_id: Union[int, str],
     title: str,
