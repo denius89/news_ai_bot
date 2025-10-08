@@ -56,10 +56,27 @@ digests/
 ```sql
 -- Новая структура таблицы digests
 ALTER TABLE digests ADD COLUMN user_id UUID;
-ALTER TABLE digests ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
-ALTER TABLE digests ADD COLUMN is_archived BOOLEAN DEFAULT FALSE;
-ALTER TABLE digests ADD COLUMN deleted_at TIMESTAMP;
-ALTER TABLE digests ADD COLUMN archived_at TIMESTAMP;
+ALTER TABLE digests ADD COLUMN deleted_at TIMESTAMPTZ NULL;
+ALTER TABLE digests ADD COLUMN archived BOOLEAN DEFAULT FALSE;
+
+-- Индексы для производительности
+CREATE INDEX idx_digests_deleted ON digests(deleted_at);
+CREATE INDEX idx_digests_archived ON digests(archived);
+CREATE INDEX idx_digests_active ON digests(user_id, created_at DESC) 
+WHERE deleted_at IS NULL AND archived = FALSE;
+```
+
+### Логика восстановления дайджестов
+```sql
+-- Восстановление из корзины (полное восстановление)
+UPDATE digests 
+SET deleted_at = NULL, archived = FALSE 
+WHERE id = ? AND user_id = ? AND deleted_at IS NOT NULL;
+
+-- Восстановление из архива (полное восстановление)  
+UPDATE digests 
+SET archived = FALSE, deleted_at = NULL 
+WHERE id = ? AND user_id = ? AND archived = TRUE;
 ```
 
 ## 🎨 UI/UX Improvements
@@ -139,10 +156,26 @@ Cloudflare: туннель активен
 ```sql
 -- Примененные миграции
 1. Добавление user_id в digests
-2. Добавление is_deleted, is_archived
-3. Добавление deleted_at, archived_at
+2. Добавление deleted_at TIMESTAMPTZ NULL
+3. Добавление archived BOOLEAN DEFAULT FALSE
 4. Создание индексов для производительности
 5. Добавление NOT NULL и CHECK constraints
+6. Исправление логики восстановления дайджестов
+```
+
+### Critical Fixes Applied
+```sql
+-- Исправление логики восстановления
+-- Проблема: дайджесты попадали в несколько списков после восстановления
+-- Решение: полное восстановление обоих флагов
+
+-- Восстановление из корзины
+UPDATE digests SET deleted_at = NULL, archived = FALSE 
+WHERE deleted_at IS NOT NULL;
+
+-- Восстановление из архива  
+UPDATE digests SET archived = FALSE, deleted_at = NULL 
+WHERE archived = TRUE;
 ```
 
 ### Code Changes
@@ -178,6 +211,9 @@ Cloudflare: туннель активен
 - [x] Code Quality (0 linter errors)
 - [x] Production Deployment
 - [x] Documentation Update
+- [x] **Логика восстановления дайджестов исправлена**
+- [x] **Проблема с дублированием решена**
+- [x] **Полное восстановление (deleted_at + archived)**
 
 ## 🏆 Conclusion
 

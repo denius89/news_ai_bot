@@ -752,11 +752,20 @@ def get_user_digests(
         query = supabase.table("digests").select("*").eq("user_id", user_id)
 
         # Фильтрация по статусу с новыми колонками
-        if not include_deleted:
+        if include_deleted and include_archived:
+            # Все дайджесты (включая удаленные и архивированные)
+            pass
+        elif include_deleted and not include_archived:
+            # Только удаленные (не архивированные)
+            query = query.not_.is_("deleted_at", "null")
+            query = query.or_("archived.is.null,archived.eq.false")
+        elif not include_deleted and include_archived:
+            # Только архивированные (не удаленные)
             query = query.is_("deleted_at", "null")
-
-        if not include_archived:
-            # Включаем только не архивированные (FALSE или NULL)
+            query = query.eq("archived", True)
+        else:  # not include_deleted and not include_archived
+            # Только активные (не удаленные и не архивированные)
+            query = query.is_("deleted_at", "null")
             query = query.or_("archived.is.null,archived.eq.false")
 
         result = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
@@ -863,10 +872,13 @@ def restore_digest(digest_id: str, user_id: str) -> bool:
     try:
         result = (
             supabase.table("digests")
-            .update({"deleted_at": None})
+            .update({
+                "deleted_at": None,
+                "archived": False  # Также убираем архивирование при восстановлении
+            })
             .eq("id", digest_id)
             .eq("user_id", user_id)
-            .not_.is_("deleted_at", "null")  # Только если удален
+            .not_.is_("deleted_at", "null")  # Только если удален (deleted_at IS NOT NULL)
             .execute()
         )
 
@@ -946,11 +958,13 @@ def unarchive_digest(digest_id: str, user_id: str) -> bool:
     try:
         result = (
             supabase.table("digests")
-            .update({"archived": False})
+            .update({
+                "archived": False,
+                "deleted_at": None  # Также убираем удаление при разархивировании
+            })
             .eq("id", digest_id)
             .eq("user_id", user_id)
             .eq("archived", True)  # Только если архивирован
-            .is_("deleted_at", "null")  # Только если не удален
             .execute()
         )
 
