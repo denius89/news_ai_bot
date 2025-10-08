@@ -23,7 +23,7 @@ NC = \033[0m # No Color
 # 🎯 ОСНОВНЫЕ КОМАНДЫ
 # =============================================================================
 
-.PHONY: help start stop restart check-ports logs clean
+.PHONY: help start stop restart check-ports logs clean cloudflare-config update-config
 
 # Показать справку
 help:
@@ -41,6 +41,10 @@ help:
 	@echo "  $(YELLOW)make flask$(NC)        - Запустить Flask + React (порт $(FLASK_PORT))"
 	@echo "  $(YELLOW)make bot$(NC)          - Запустить только Telegram Bot"
 	@echo "  $(YELLOW)make build$(NC)        - Собрать React для production"
+	@echo ""
+	@echo "$(GREEN)Cloudflare конфигурация:$(NC)"
+	@echo "  $(YELLOW)make cloudflare-config$(NC) - Показать текущую конфигурацию Cloudflare"
+	@echo "  $(YELLOW)make update-config$(NC)    - Обновить все конфигурации"
 	@echo ""
 	@echo "$(GREEN)Архитектура:$(NC)"
 	@echo "  $(YELLOW)Flask (порт $(FLASK_PORT)):$(NC)   React статика + API"
@@ -252,6 +256,19 @@ status:
 	@if [ -f logs/react.pid ]; then echo "$(GREEN)✅ React: запущен$(NC)"; else echo "$(RED)❌ React: остановлен$(NC)"; fi
 	@if [ -f logs/flask.pid ]; then echo "$(GREEN)✅ Flask: запущен$(NC)"; else echo "$(RED)❌ Flask: остановлен$(NC)"; fi
 	@if [ -f logs/bot.pid ]; then echo "$(GREEN)✅ Bot: запущен$(NC)"; else echo "$(RED)❌ Bot: остановлен$(NC)"; fi
+
+# =============================================================================
+# 🎯 CLOUDFLARE КОНФИГУРАЦИЯ
+# =============================================================================
+
+cloudflare-config:
+	@echo "$(BLUE)🌐 Конфигурация Cloudflare Tunnel:$(NC)"
+	@python3 -c "import sys; sys.path.append('.'); from config.cloudflare import get_deployment_info, validate_cloudflare_config; info = get_deployment_info(); print(''); [print(f'$(YELLOW){k:20}:$(NC) {v}') for k, v in info.items()]; print(''); print('$(GREEN)✅ Конфигурация корректна$(NC)' if validate_cloudflare_config() else '$(RED)❌ Конфигурация содержит ошибки$(NC)')"
+
+update-config:
+	@echo "$(BLUE)🔄 Обновление конфигураций Cloudflare...$(NC)"
+	@python3 scripts/update_cloudflare_config.py
+	@echo "$(GREEN)✅ Все конфигурации обновлены!$(NC)"
 
 # =============================================================================
 # 🎯 ДЕФОЛТНАЯ КОМАНДА

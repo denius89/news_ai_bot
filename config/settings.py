@@ -20,7 +20,10 @@ VERSION = os.getenv("VERSION", "0.1.0")
 # Настройки webapp
 WEBAPP_HOST = os.getenv("WEBAPP_HOST", "0.0.0.0")
 WEBAPP_PORT = int(os.getenv("WEBAPP_PORT", "8001"))
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://inputs-endless-designers-stakeholders.trycloudflare.com")
+
+# Импортируем Cloudflare конфигурацию
+from config.cloudflare import CLOUDFLARE_TUNNEL_URL
+WEBAPP_URL = CLOUDFLARE_TUNNEL_URL
 
 # Supabase настройки
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")

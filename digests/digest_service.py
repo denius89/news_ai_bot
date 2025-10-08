@@ -5,8 +5,8 @@ This module re-exports the new DigestAIService and related components
 to maintain backward compatibility with existing code.
 """
 
-# Re-export main components from ai_service
-from digests.ai_service import (
+# Re-export main components from digest_ai_service
+from services.digest_ai_service import (
     DigestAIService,
     DigestConfig,
     generate_ai_digest,

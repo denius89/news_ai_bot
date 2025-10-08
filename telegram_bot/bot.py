@@ -38,9 +38,22 @@ async def main():
 
     logger.info("🚀 Telegram bot started")
     try:
-        await dp.start_polling(bot)
-    except Exception:
-        logger.exception("❌ Ошибка в Telegram-боте")
+        # Настройки polling с ограничениями
+        await dp.start_polling(
+            bot,
+            allowed_updates=["message", "callback_query", "inline_query"],
+            drop_pending_updates=True,  # Игнорируем старые обновления
+            timeout=30,  # Таймаут для получения обновлений
+            request_timeout=30,  # Таймаут для запросов к API
+            close_bot_session=True,  # Закрывать сессию при завершении
+        )
+    except Exception as e:
+        logger.exception(f"❌ Ошибка в Telegram-боте: {e}")
+        # При конфликте завершаем работу
+        if "Conflict" in str(e):
+            logger.error("❌ Конфликт: другой экземпляр бота уже запущен")
+            logger.error("💡 Остановите другие экземпляры: ./stop_services.sh")
+        raise
     finally:
         await bot.session.close()
 

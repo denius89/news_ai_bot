@@ -30,7 +30,6 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreNews, setHasMoreNews] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const categories = [
     { id: 'all', label: 'Все', icon: '📰' },
@@ -45,7 +44,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const fetchNews = async (page: number = 1, isRefresh: boolean = false) => {
     try {
       if (isRefresh) {
-        setIsRefreshing(true);
+        // setIsRefreshing удален
       } else if (page === 1) {
         setLoading(true);
       } else {
@@ -139,7 +138,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     } finally {
       setLoading(false);
       setLoadingMore(false);
-      setIsRefreshing(false);
+      // setIsRefreshing удален
     }
   };
 
@@ -148,61 +147,57 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   }, []);
 
   const loadMoreNews = async () => {
-    if (!hasMoreNews || loadingMore) return;
+    if (!hasMoreNews || loadingMore) {
+      console.log('🚫 Load more blocked:', { hasMoreNews, loadingMore });
+      return;
+    }
     
+    console.log('📰 Loading more news, current page:', currentPage);
     const nextPage = currentPage + 1;
     await fetchNews(nextPage);
   };
 
-  const handleRefresh = async () => {
-    await fetchNews(1, true);
-  };
-
-  // Pull-to-refresh and infinite scroll functionality
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
-  const [startY, setStartY] = useState(0);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setStartY(e.touches[0].clientY);
-    setIsPulling(false);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const currentY = e.touches[0].clientY;
-    const distance = currentY - startY; // Исправлено: нормальная логика для свайпа снизу
-    
-    // Проверяем что мы внизу страницы (scrollY близко к максимальному значению)
-    const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10;
-    
-    if (distance > 0 && isAtBottom) {
-      setIsPulling(true);
-      setPullDistance(Math.min(distance, 100)); // Max pull distance
-    }
-  };
-
-  const handleTouchEnd = () => {
-    if (pullDistance > 50 && !isRefreshing) {
-      handleRefresh();
-    }
-    setPullDistance(0);
-    setIsPulling(false);
-  };
+  // Убрали свайп - оставляем только infinite scroll вниз
 
   // Infinite scroll functionality
   useEffect(() => {
     const handleScroll = () => {
-      // Проверяем что мы близко к низу страницы
-      const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      // Более точная проверка достижения низа
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
       
-      // Загружаем следующую страницу если есть еще новости и не идет загрузка
-      if (isAtBottom && hasMoreNews && !loadingMore && !loading) {
+      // Загружаем когда дошли до 200px от низа
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
+      
+      console.log('📜 Scroll check:', { 
+        scrollTop, 
+        clientHeight, 
+        scrollHeight,
+        isNearBottom,
+        hasMoreNews,
+        loadingMore,
+        loading 
+      });
+      
+      if (isNearBottom && hasMoreNews && !loadingMore && !loading) {
+        console.log('🔄 Triggering load more via infinite scroll');
         loadMoreNews();
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Добавляем throttling для производительности
+    let timeoutId: NodeJS.Timeout;
+    const throttledHandleScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      clearTimeout(timeoutId);
+    };
   }, [hasMoreNews, loadingMore, loading]);
 
   const filteredNews = news.filter(item => {
@@ -270,36 +265,17 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
         subtitle={`${filteredNews.length} новостей`}
       />
       
-      <main 
-        className="container-main"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Pull-to-refresh indicator - positioned at bottom */}
-        {isPulling && (
-          <div 
-            className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center bg-primary/10 backdrop-blur-sm"
-            style={{ height: `${Math.max(pullDistance, 60)}px` }}
-          >
-            <div className="flex items-center space-x-2 text-primary">
-              {isRefreshing ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Обновление...</span>
-                </>
-              ) : (
-                <>
-                  <svg className={`h-5 w-5 transition-transform ${pullDistance > 50 ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                  </svg>
-                  <span>{pullDistance > 50 ? 'Отпустите для обновления' : 'Потяните вверх для обновления'}</span>
-                </>
-              )}
-            </div>
+      <main className="container-main">
+        {/* Убрали индикатор свайпа - теперь только infinite scroll */}
+
+        {/* Debug info - показываем состояние загрузки */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="fixed top-4 right-4 bg-black/80 text-white text-xs p-2 rounded-lg z-50">
+            <div>Новостей: {news.length}</div>
+            <div>Страница: {currentPage}</div>
+            <div>Есть еще: {hasMoreNews ? 'Да' : 'Нет'}</div>
+            <div>Загрузка: {loadingMore ? 'Да' : 'Нет'}</div>
+            <div>Режим: Infinite Scroll</div>
           </div>
         )}
         <motion.div
@@ -431,7 +407,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
               <p>Все новости загружены</p>
-              <p className="text-sm mt-1">Потяните вверх для обновления</p>
+              <p className="text-sm mt-1">Обновите страницу для получения новых новостей</p>
             </div>
           </motion.section>
         )}
