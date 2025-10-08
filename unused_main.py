@@ -30,7 +30,7 @@ VERSION = "0.1.0"
 DEBUG = True
 WEBAPP_PORT = 8001
 WEBAPP_HOST = "0.0.0.0"
-REACTOR_ENABLED = False
+# REACTOR_ENABLED = False  # Удалено дублирование
 
 # PULSE-WS: Create FastAPI app
 app = FastAPI(

@@ -218,11 +218,9 @@ class NotificationService:
             Number of deleted notifications
         """
         try:
-            cutoff_date = datetime.now(
-                timezone.utc).replace(
-                day=datetime.now(
-                    timezone.utc).day -
-                days_old)
+            cutoff_date = datetime.now(timezone.utc).replace(
+                day=datetime.now(timezone.utc).day - days_old
+            )
 
             if self.async_mode:
                 client = await self.db_service._get_async_client()
