@@ -86,7 +86,11 @@ export const useTelegramUser = (): UseTelegramUserReturn => {
           // Получаем user_id по telegram_id
           console.log('🔄 Fetching user data for telegram_id:', tgUser.id);
           
-          const response = await fetch(`/api/users/by-telegram-id/${tgUser.id}`);
+          const response = await fetch(`/api/users/by-telegram-id/${tgUser.id}`, {
+            headers: {
+              'X-Telegram-User-Data': JSON.stringify(tgUser)
+            }
+          });
           const data = await response.json();
 
           if (data.status === 'success') {
@@ -111,7 +115,11 @@ export const useTelegramUser = (): UseTelegramUserReturn => {
             
           } else {
             console.error('❌ Failed to fetch user data:', data.message);
-            setError(data.message || 'Failed to authenticate user');
+            // Более понятное сообщение об ошибке
+            const errorMessage = data.message?.includes('Database') ? 
+              'Проблема с подключением к серверу. Попробуйте позже.' :
+              data.message || 'Ошибка аутентификации пользователя';
+            setError(errorMessage);
           }
 
         } else {
