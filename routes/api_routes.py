@@ -1033,7 +1033,11 @@ def get_user_by_telegram_id(telegram_id):
             return jsonify({"status": "error", "message": "Database not initialized"}), 500
 
         # Ищем пользователя по telegram_id
-        result = supabase.table("users").select("id, username, locale").eq("telegram_id", telegram_id).execute()
+        try:
+            result = supabase.table("users").select("id, username, locale").eq("telegram_id", telegram_id).execute()
+        except Exception as db_error:
+            logger.error(f"Database error in get_user_by_telegram_id: {db_error}")
+            return jsonify({"status": "error", "message": f"Database connection error: {str(db_error)}"}), 500
 
         if result.data:
             user_data = result.data[0]
@@ -1051,8 +1055,50 @@ def get_user_by_telegram_id(telegram_id):
                 }
             )
         else:
-            logger.warning(f"User not found by telegram_id: {telegram_id}")
-            return jsonify({"status": "error", "message": "User not found", "code": "USER_NOT_FOUND"}), 404
+            logger.info(f"User not found by telegram_id: {telegram_id}, creating new user")
+            
+            # Создаем нового пользователя
+            try:
+                from database.db_models import create_user
+                
+                # Получаем данные пользователя из Telegram WebApp
+                tg_user_data = request.headers.get('X-Telegram-User-Data')
+                tg_user = None
+                if tg_user_data:
+                    import json
+                    try:
+                        tg_user = json.loads(tg_user_data)
+                    except:
+                        pass
+                
+                # Создаем пользователя
+                new_user_id = create_user(
+                    telegram_id=telegram_id,
+                    username=tg_user.get('username') if tg_user else None,
+                    locale=tg_user.get('language_code', 'ru') if tg_user else 'ru'
+                )
+                
+                if new_user_id:
+                    logger.info(f"New user created: {new_user_id} for telegram_id: {telegram_id}")
+                    
+                    return jsonify(
+                        {
+                            "status": "success",
+                            "data": {
+                                "user_id": new_user_id,
+                                "telegram_id": telegram_id,
+                                "username": tg_user.get('username') if tg_user else None,
+                                "locale": tg_user.get('language_code', 'ru') if tg_user else 'ru',
+                            },
+                        }
+                    )
+                else:
+                    logger.error(f"Failed to create user for telegram_id: {telegram_id}")
+                    return jsonify({"status": "error", "message": "Failed to create user"}), 500
+                    
+            except Exception as create_error:
+                logger.error(f"Error creating user for telegram_id {telegram_id}: {create_error}")
+                return jsonify({"status": "error", "message": f"Failed to create user: {str(create_error)}"}), 500
 
     except Exception as e:
         logger.error(f"Error getting user by telegram_id {telegram_id}: {e}")
