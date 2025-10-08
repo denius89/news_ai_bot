@@ -378,7 +378,8 @@ class TestAdvancedParserIntegration:
                 assert "binance" in html_content
 
                 # Пытаемся извлечь контент
-                extracted = parser._extract_content_cascade("https://www.binance.com/en/blog", content)
+                extracted = parser._extract_content_cascade(
+                    "https://www.binance.com/en/blog", content)
 
                 if extracted:
                     assert "title" in extracted

@@ -3,6 +3,7 @@
 Генератор конфигурации Vite из Python конфига Cloudflare.
 """
 
+from config.cloudflare import get_vite_allowed_hosts
 import sys
 import os
 from pathlib import Path
@@ -10,8 +11,6 @@ from pathlib import Path
 # Добавляем путь к проекту
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from config.cloudflare import get_vite_allowed_hosts
 
 
 def generate_vite_config():
@@ -30,7 +29,7 @@ import {{ fileURLToPath, URL }} from 'node:url'
 // https://vitejs.dev/config/
 export default defineConfig(({{ command, mode }}) => {{
   const isProduction = mode === 'production' || command === 'build'
-  
+
   return {{
     plugins: [react()],
     base: '/webapp',

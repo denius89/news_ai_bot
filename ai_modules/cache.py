@@ -255,7 +255,11 @@ class AICache:
         cache_key = self._generate_cache_key(news_item)
 
         # Create cache entry with TTL
-        entry = CacheEntry(ai_importance=importance, ai_credibility=credibility, ai_summary=summary, ai_model=model)
+        entry = CacheEntry(
+            ai_importance=importance,
+            ai_credibility=credibility,
+            ai_summary=summary,
+            ai_model=model)
 
         # Set TTL expiration time
         if self.is_ttl_enabled():
@@ -361,8 +365,11 @@ def get_cached_evaluation(news_item: Dict) -> Optional[CacheEntry]:
 
 
 def cache_evaluation(
-    news_item: Dict, importance: float, credibility: float, summary: Optional[str] = None, model: str = "gpt-4o-mini"
-) -> None:
+        news_item: Dict,
+        importance: float,
+        credibility: float,
+        summary: Optional[str] = None,
+        model: str = "gpt-4o-mini") -> None:
     """
     Convenience function to cache AI evaluation.
 

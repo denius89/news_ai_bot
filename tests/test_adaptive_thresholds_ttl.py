@@ -282,7 +282,8 @@ class TestOptimizedEvaluationWithAdaptiveThresholds:
     @patch("ai_modules.optimized_importance.original_evaluate_importance")
     @patch("ai_modules.optimized_importance.get_cached_evaluation")
     @patch("ai_modules.optimized_importance.filter_news_item")
-    def test_importance_with_adaptive_thresholds_crypto(self, mock_filter, mock_cache, mock_original):
+    def test_importance_with_adaptive_thresholds_crypto(
+            self, mock_filter, mock_cache, mock_original):
         """Test importance evaluation with adaptive thresholds for crypto."""
         # Setup mocks
         mock_filter.return_value = Mock(passed=True, reason="prefilter_pass")
@@ -304,7 +305,8 @@ class TestOptimizedEvaluationWithAdaptiveThresholds:
     @patch("ai_modules.optimized_importance.original_evaluate_importance")
     @patch("ai_modules.optimized_importance.get_cached_evaluation")
     @patch("ai_modules.optimized_importance.filter_news_item")
-    def test_importance_with_adaptive_thresholds_below_threshold(self, mock_filter, mock_cache, mock_original):
+    def test_importance_with_adaptive_thresholds_below_threshold(
+            self, mock_filter, mock_cache, mock_original):
         """Test importance evaluation below adaptive threshold."""
         # Setup mocks
         mock_filter.return_value = Mock(passed=True, reason="prefilter_pass")
@@ -327,7 +329,8 @@ class TestOptimizedEvaluationWithAdaptiveThresholds:
     @patch("ai_modules.optimized_credibility.original_evaluate_credibility")
     @patch("ai_modules.optimized_credibility.get_cached_evaluation")
     @patch("ai_modules.optimized_credibility.filter_news_item")
-    def test_both_evaluation_with_adaptive_thresholds(self, mock_filter, mock_cache, mock_orig_imp, mock_orig_cred):
+    def test_both_evaluation_with_adaptive_thresholds(
+            self, mock_filter, mock_cache, mock_orig_imp, mock_orig_cred):
         """Test combined evaluation with adaptive thresholds."""
         # Setup mocks
         mock_filter.return_value = Mock(passed=True, reason="prefilter_pass")

@@ -23,10 +23,10 @@ class TestRejectionAnalyzer:
     def setup_method(self):
         """Set up test fixtures."""
         self.test_config = {
-            "features": {"auto_learn_enabled": True},
-            "rejection_analysis": {"top_words_limit": 10, "top_sources_limit": 5, "frequency_threshold": 0.1},
-            "features": {"auto_learn_min_samples": 5},
-        }
+            "features": {
+                "auto_learn_enabled": True}, "rejection_analysis": {
+                "top_words_limit": 10, "top_sources_limit": 5, "frequency_threshold": 0.1}, "features": {
+                "auto_learn_min_samples": 5}, }
 
         # Create temporary config file
         self.temp_config = tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False)
@@ -150,7 +150,8 @@ class TestRejectionAnalyzer:
         assert any(rec["word"] == "giveaway" for rec in recommendations["add_stop_markers"])
 
         # Should have high confidence for frequent words
-        bitcoin_rec = next(rec for rec in recommendations["add_stop_markers"] if rec["word"] == "bitcoin")
+        bitcoin_rec = next(
+            rec for rec in recommendations["add_stop_markers"] if rec["word"] == "bitcoin")
         assert bitcoin_rec["confidence"] >= 0.5
 
     def test_is_enabled(self):
@@ -170,7 +171,10 @@ class TestAutoRuleManager:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.test_config = {"features": {"auto_learn_enabled": True, "auto_learn_backup_enabled": True}}
+        self.test_config = {
+            "features": {
+                "auto_learn_enabled": True,
+                "auto_learn_backup_enabled": True}}
 
         # Create temporary config file
         self.temp_config = tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False)
@@ -337,7 +341,11 @@ class TestAutoLearningIntegration:
         self.temp_config.close()
 
         # Write initial rules
-        initial_rules = {"stop_markers": ["existing"], "auto_generated": {"stop_markers": [], "source_blacklist": []}}
+        initial_rules = {
+            "stop_markers": ["existing"],
+            "auto_generated": {
+                "stop_markers": [],
+                "source_blacklist": []}}
         yaml.dump(initial_rules, self.temp_rules)
         self.temp_rules.close()
 

@@ -70,7 +70,8 @@ def test_ai_filters_and_auto_learning():
         # Test Adaptive Thresholds
         thresholds = AdaptiveThresholds()
         importance_thresh, credibility_thresh = thresholds.get_thresholds("crypto")
-        print(f"✅ Adaptive Thresholds: crypto thresholds = {importance_thresh:.2f}, {credibility_thresh:.2f}")
+        print(
+            f"✅ Adaptive Thresholds: crypto thresholds = {importance_thresh:.2f}, {credibility_thresh:.2f}")
 
         # Test TTL functionality
         ttl_expired = cache._is_expired(cache_key)
@@ -111,7 +112,8 @@ def test_self_tuning_predictor():
 
         if hasattr(predictor, "predict"):
             result = predictor.predict(test_news)
-            print(f"✅ Prediction: importance={result.importance:.3f}, credibility={result.credibility:.3f}")
+            print(
+                f"✅ Prediction: importance={result.importance:.3f}, credibility={result.credibility:.3f}")
 
         # Check if models exist
         model_files = [
@@ -200,7 +202,8 @@ async def test_events_intelligence():
 
         # Test AI digest generation
         digest = await intelligence_service.generate_ai_event_digest(days_ahead=7, max_events=3)
-        print(f"✅ AI Event Digest: {digest['events_count']} events, {digest['total_analyzed']} analyzed")
+        print(
+            f"✅ AI Event Digest: {digest['events_count']} events, {digest['total_analyzed']} analyzed")
 
         # Test calendar export
         calendar_data = await intelligence_service.export_to_calendar_json(days_ahead=14)

@@ -6,6 +6,11 @@ This script tests the AI Event Intelligence System components
 including context generation, forecasting, and integration.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.event_generator import get_event_generator
+from services.event_intelligence_service import get_event_intelligence_service
+from ai_modules.event_forecast import get_event_forecast_engine, ImpactType
+from ai_modules.event_context import get_event_context_engine
 import sys
 import asyncio
 from pathlib import Path
@@ -13,12 +18,6 @@ from datetime import datetime, timezone, timedelta
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from ai_modules.event_context import get_event_context_engine
-from ai_modules.event_forecast import get_event_forecast_engine, ImpactType
-from services.event_intelligence_service import get_event_intelligence_service
-from ai_modules.event_generator import get_event_generator
-from ai_modules.metrics import get_metrics
 
 
 def test_event_context_engine():
@@ -121,7 +120,8 @@ async def test_event_intelligence_service():
         calendar_data = await service.export_to_calendar_json(days_ahead=14)
 
         print(f"Calendar export: {calendar_data['total_events']} events")
-        print(f"Date range: {calendar_data['date_range']['start']} to {calendar_data['date_range']['end']}")
+        print(
+            f"Date range: {calendar_data['date_range']['start']} to {calendar_data['date_range']['end']}")
 
         if calendar_data["categories"]:
             print(f"Categories: {', '.join(calendar_data['categories'])}")
@@ -199,9 +199,12 @@ async def test_event_context_generation():
             "importance": 0.9,
             "source": "ethereum.org",
             "link": "https://ethereum.org/merge",
-            "starts_at": datetime.now(timezone.utc) + timedelta(days=10),
+            "starts_at": datetime.now(
+        timezone.utc)
+        + timedelta(
+            days=10),
             "ends_at": None,
-        }
+            }
 
         print(f"Generating context for: {test_event['title']}")
 

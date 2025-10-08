@@ -144,7 +144,10 @@ def test_fetch_recent_news_formats_dates(monkeypatch):
     # Import after monkeypatch
     import digests.generator as generator
 
-    monkeypatch.setattr(generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})())
+    monkeypatch.setattr(
+        generator, "supabase", type(
+            "Supa", (), {
+                "table": lambda *_: FakeQuery()})())
 
     result = generator.fetch_recent_news(limit=2, category="test")
     assert isinstance(result, list)
@@ -183,7 +186,10 @@ def test_fetch_recent_news_contains_expected_titles(monkeypatch):
     # Import after monkeypatch
     import digests.generator as generator
 
-    monkeypatch.setattr(generator, "supabase", type("Supa", (), {"table": lambda *_: FakeQuery()})())
+    monkeypatch.setattr(
+        generator, "supabase", type(
+            "Supa", (), {
+                "table": lambda *_: FakeQuery()})())
 
     result = generator.fetch_recent_news(limit=3)
     titles = [row.title for row in result]

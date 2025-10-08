@@ -142,8 +142,7 @@ def format_events(events: list[dict], limit: int = 5) -> str:
             f"\n<b>{i}. {title}</b>\n"
             f"📅 {when}\n"
             f"{importance_icon} <b>Важность:</b> {importance_text}\n"
-            f"📊 <b>Фактическое:</b> {fact} · <b>Прогноз:</b> {forecast} · <b>Предыдущее:</b> {previous}"
-        )
+            f"📊 <b>Фактическое:</b> {fact} · <b>Прогноз:</b> {forecast} · <b>Предыдущее:</b> {previous}")
 
     return _clamp_tg("\n".join(lines))
 

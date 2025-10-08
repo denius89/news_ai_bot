@@ -6,6 +6,8 @@ This script tests the auto-posting system with mock data
 and validates the PulseDigest 2.0 formatting.
 """
 
+from ai_modules.metrics import get_metrics
+from telegram_bot.handlers.digest_handler import TelegramDigestHandler
 import sys
 import asyncio
 from pathlib import Path
@@ -13,9 +15,6 @@ from datetime import datetime, timezone
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from telegram_bot.handlers.digest_handler import TelegramDigestHandler
-from ai_modules.metrics import get_metrics
 
 
 def test_message_formatting():
@@ -194,7 +193,8 @@ def test_metrics_integration():
 
         print(f"Digests published total: {summary.get('digests_published_total', 0)}")
         print(f"Digests publish errors total: {summary.get('digests_publish_errors_total', 0)}")
-        print(f"Autopublish skipped no content: {summary.get('autopublish_skipped_no_content_total', 0)}")
+        print(
+            f"Autopublish skipped no content: {summary.get('autopublish_skipped_no_content_total', 0)}")
         print(f"Last digest published: {summary.get('last_digest_published_timestamp', 'Never')}")
         print(f"Autopublish avg latency: {summary.get('autopublish_avg_latency_ms', 0)} ms")
 

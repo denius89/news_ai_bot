@@ -6,6 +6,8 @@ This script tests the auto-posting system with mock data
 and demonstrates the PulseDigest 2.0 formatting.
 """
 
+from ai_modules.metrics import get_metrics
+from telegram_bot.handlers.digest_handler import TelegramDigestHandler
 import sys
 import asyncio
 from pathlib import Path
@@ -13,9 +15,6 @@ from datetime import datetime, timezone
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from telegram_bot.handlers.digest_handler import TelegramDigestHandler
-from ai_modules.metrics import get_metrics
 
 
 async def test_autopublish_dry_run():
@@ -89,7 +88,8 @@ async def test_autopublish_dry_run():
         summary = metrics.get_metrics_summary()
         print("📊 Metrics Summary:")
         print(f"  Digests published total: {summary.get('digests_published_total', 0)}")
-        print(f"  Autopublish skipped no content: {summary.get('autopublish_skipped_no_content_total', 0)}")
+        print(
+            f"  Autopublish skipped no content: {summary.get('autopublish_skipped_no_content_total', 0)}")
         print(f"  Autopublish avg latency: {summary.get('autopublish_avg_latency_ms', 0)} ms")
         print()
 
@@ -112,29 +112,25 @@ def test_message_formatting_examples():
     try:
         handler = TelegramDigestHandler()
 
-        test_cases = [
-            {
-                "title": "Apple announces new M3 chips with advanced AI capabilities",
-                "summary": "Apple has unveiled its latest M3 processor lineup featuring significant improvements in AI performance and energy efficiency.",
-                "why_important": "The M3 chips represent a major leap in mobile computing power and could accelerate AI adoption in consumer devices.",
-                "category": "tech",
-                "source": "https://apple.com/newsroom/m3-chips-announcement?utm_source=press&utm_campaign=launch",
-            },
-            {
-                "title": "Manchester City wins Champions League final",
-                "summary": "Manchester City secured their first-ever Champions League title with a 2-1 victory over Real Madrid in the final.",
-                "why_important": "This victory completes Manchester City's quest for European glory and cements their status as one of Europe's elite clubs.",
-                "category": "sports",
-                "source": "https://uefa.com/champions-league/final-result",
-            },
-            {
-                "title": "Federal Reserve announces interest rate decision",
-                "summary": "The Federal Reserve has decided to maintain current interest rates while signaling potential future adjustments based on economic indicators.",
-                "why_important": "Interest rate decisions have significant impact on global markets, inflation, and economic growth prospects.",
-                "category": "markets",
-                "source": "https://federalreserve.gov/monetary-policy/decision",
-            },
-        ]
+        test_cases = [{"title": "Apple announces new M3 chips with advanced AI capabilities",
+                       "summary": "Apple has unveiled its latest M3 processor lineup featuring significant improvements in AI performance and energy efficiency.",
+                       "why_important": "The M3 chips represent a major leap in mobile computing power and could accelerate AI adoption in consumer devices.",
+                       "category": "tech",
+                       "source": "https://apple.com/newsroom/m3-chips-announcement?utm_source=press&utm_campaign=launch",
+                       },
+                      {"title": "Manchester City wins Champions League final",
+                       "summary": "Manchester City secured their first-ever Champions League title with a 2-1 victory over Real Madrid in the final.",
+                       "why_important": "This victory completes Manchester City's quest for European glory and cements their status as one of Europe's elite clubs.",
+                       "category": "sports",
+                       "source": "https://uefa.com/champions-league/final-result",
+                       },
+                      {"title": "Federal Reserve announces interest rate decision",
+                       "summary": "The Federal Reserve has decided to maintain current interest rates while signaling potential future adjustments based on economic indicators.",
+                       "why_important": "Interest rate decisions have significant impact on global markets, inflation, and economic growth prospects.",
+                       "category": "markets",
+                       "source": "https://federalreserve.gov/monetary-policy/decision",
+                       },
+                      ]
 
         for i, test_case in enumerate(test_cases, 1):
             print(f"Example {i} - {test_case['category'].upper()}:")

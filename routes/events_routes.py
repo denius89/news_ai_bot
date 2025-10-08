@@ -45,12 +45,19 @@ def get_events():
         # Parse dates
         if from_date_str:
             try:
-                from_date = datetime.strptime(from_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                from_date = datetime.strptime(
+                    from_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
             except ValueError:
-                return jsonify({"success": False, "error": "Invalid from date format. Use YYYY-MM-DD"}), 400
+                return jsonify(
+                    {"success": False, "error": "Invalid from date format. Use YYYY-MM-DD"}), 400
         else:
             # Default to today
-            from_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            from_date = datetime.now(
+                timezone.utc).replace(
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0)
 
         if to_date_str:
             try:
@@ -58,18 +65,21 @@ def get_events():
                     hour=23, minute=59, second=59, microsecond=999999, tzinfo=timezone.utc
                 )
             except ValueError:
-                return jsonify({"success": False, "error": "Invalid to date format. Use YYYY-MM-DD"}), 400
+                return jsonify(
+                    {"success": False, "error": "Invalid to date format. Use YYYY-MM-DD"}), 400
         else:
             # Default to 30 days from start date
             to_date = from_date + timedelta(days=30)
 
         # Validate date range
         if from_date > to_date:
-            return jsonify({"success": False, "error": "From date must be before or equal to to date"}), 400
+            return jsonify(
+                {"success": False, "error": "From date must be before or equal to to date"}), 400
 
         # Validate parameters
         if min_importance < 0 or min_importance > 1:
-            return jsonify({"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
+            return jsonify(
+                {"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
 
         if limit <= 0 or limit > 1000:
             return jsonify({"success": False, "error": "limit must be between 1 and 1000"}), 400
@@ -110,17 +120,16 @@ def get_events():
             }
             events_data.append(event_data)
 
-        return jsonify(
-            {
-                "success": True,
-                "data": {
-                    "events": events_data,
-                    "count": len(events_data),
-                    "date_range": {"from": from_date.isoformat(), "to": to_date.isoformat()},
-                    "filters": {"category": category, "subcategory": subcategory, "min_importance": min_importance},
-                },
-            }
-        )
+        return jsonify({"success": True,
+                        "data": {"events": events_data,
+                                 "count": len(events_data),
+                                 "date_range": {"from": from_date.isoformat(),
+                                                "to": to_date.isoformat()},
+                                 "filters": {"category": category,
+                                             "subcategory": subcategory,
+                                             "min_importance": min_importance},
+                                 },
+                        })
 
     except Exception as e:
         logger.error(f"Error getting events: {e}")
@@ -149,7 +158,8 @@ def get_upcoming_events():
             return jsonify({"success": False, "error": "days must be between 1 and 365"}), 400
 
         if min_importance < 0 or min_importance > 1:
-            return jsonify({"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
+            return jsonify(
+                {"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
 
         # Get events service
         events_service = get_events_service()

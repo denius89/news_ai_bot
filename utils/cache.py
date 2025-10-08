@@ -98,7 +98,8 @@ class MemoryCache:
         """Get cache statistics."""
         current_time = time.time()
         total_entries = len(self.cache)
-        expired_entries = sum(1 for entry in self.cache.values() if entry["expires"] <= current_time)
+        expired_entries = sum(1 for entry in self.cache.values()
+                              if entry["expires"] <= current_time)
 
         return {
             "total_entries": total_entries,

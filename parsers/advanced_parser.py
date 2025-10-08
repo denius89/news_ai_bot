@@ -257,13 +257,13 @@ class AdvancedParser:
                         maintext = ""
 
                         if "title" in result and result["title"]:
-                            title = (
-                                str(result["title"][0]) if isinstance(result["title"], list) else str(result["title"])
-                            )
+                            title = (str(result["title"][0]) if isinstance(
+                                result["title"], list) else str(result["title"]))
 
                         if "content" in result and result["content"]:
                             if isinstance(result["content"], list):
-                                maintext = " ".join([str(item) for item in result["content"][:5]])  # Первые 5 элементов
+                                # Первые 5 элементов
+                                maintext = " ".join([str(item) for item in result["content"][:5]])
                             else:
                                 maintext = str(result["content"])
 
@@ -312,7 +312,8 @@ class AdvancedParser:
         logger.warning(f"Не удалось извлечь контент из {url}")
         return None
 
-    async def _process_source(self, category: str, subcategory: str, name: str, url: str) -> Dict[str, Any]:
+    async def _process_source(self, category: str, subcategory: str,
+                              name: str, url: str) -> Dict[str, Any]:
         """
         Обработка одного источника новостей.
 
@@ -385,7 +386,8 @@ class AdvancedParser:
                     credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
                     if importance < self.min_importance:
-                        logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                        logger.debug(
+                            f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                         continue
 
                     # Сохраняем в БД
@@ -405,7 +407,8 @@ class AdvancedParser:
                     await db_service.async_upsert_news([news_item])
                     saved_count += 1
 
-                    logger.debug(f"[{category}/{subcategory}] {title} -> SAVED (importance: {importance:.2f})")
+                    logger.debug(
+                        f"[{category}/{subcategory}] {title} -> SAVED (importance: {importance:.2f})")
 
                 except Exception as e:
                     logger.error(f"Ошибка обработки RSS записи: {e}")
@@ -444,7 +447,8 @@ class AdvancedParser:
             credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
             if importance < self.min_importance:
-                logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                logger.debug(
+                    f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                 return {"success": False, "reason": "low_importance", "importance": importance}
 
             # Сохраняем в БД
@@ -463,7 +467,8 @@ class AdvancedParser:
             db_service = get_async_service()
             await db_service.async_upsert_news([news_item])
 
-            logger.info(f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
+            logger.info(
+                f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
 
             return {
                 "success": True,

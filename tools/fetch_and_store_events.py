@@ -5,6 +5,9 @@ Fetch and Store Events Tool for PulseAI.
 This tool fetches events from various providers and stores them in the database.
 """
 
+from ai_modules.metrics import get_metrics
+from database.events_service import get_events_service
+from events.events_parser import get_events_parser
 import asyncio
 import argparse
 import logging
@@ -16,9 +19,6 @@ from typing import List, Dict, Any
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from events.events_parser import get_events_parser
-from database.events_service import get_events_service
-from ai_modules.metrics import get_metrics
 
 # Set up logging
 logging.basicConfig(
@@ -69,7 +69,8 @@ async def fetch_and_store_events(
 
             # Log sample events
             for i, event in enumerate(events[:5]):
-                logger.info(f"Sample event {i+1}: {event.title} ({event.category}) - {event.starts_at}")
+                logger.info(
+                    f"Sample event {i+1}: {event.title} ({event.category}) - {event.starts_at}")
 
             return {
                 "success": True,
@@ -184,9 +185,17 @@ def main():
     """Main function for command-line usage."""
     parser = argparse.ArgumentParser(description="Fetch and store events for PulseAI")
 
-    parser.add_argument("--since", type=int, default=7, help="Number of days to look back (default: 7)")
+    parser.add_argument(
+        "--since",
+        type=int,
+        default=7,
+        help="Number of days to look back (default: 7)")
 
-    parser.add_argument("--until", type=int, default=30, help="Number of days to look ahead (default: 30)")
+    parser.add_argument(
+        "--until",
+        type=int,
+        default=30,
+        help="Number of days to look ahead (default: 30)")
 
     parser.add_argument(
         "--providers",
@@ -197,7 +206,8 @@ def main():
 
     parser.add_argument("--dry-run", action="store_true", help="Fetch events but don't store them")
 
-    parser.add_argument("--cleanup", type=int, metavar="DAYS", help="Clean up events older than specified days")
+    parser.add_argument("--cleanup", type=int, metavar="DAYS",
+                        help="Clean up events older than specified days")
 
     parser.add_argument("--info", action="store_true", help="Show provider information")
 

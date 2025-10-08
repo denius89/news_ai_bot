@@ -5,6 +5,14 @@
 Проверяет все компоненты после рефакторинга этапов 1-3.
 """
 
+from config.settings import WEBAPP_URL, SUPABASE_URL
+from utils.standard_logging import PerformanceTimer, get_structured_logger
+from utils.cache import get_news_cache
+from parsers.unified_parser import get_sync_parser, get_async_parser
+from services.notification_service import get_async_notification_service
+from services.subscription_service import get_async_subscription_service
+from services.unified_digest_service import get_sync_digest_service, get_async_digest_service
+from database.service import get_sync_service, get_async_service
 import asyncio
 import logging
 import sys
@@ -13,14 +21,6 @@ from pathlib import Path
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
 
-from database.service import get_sync_service, get_async_service
-from services.unified_digest_service import get_sync_digest_service, get_async_digest_service
-from services.subscription_service import get_async_subscription_service
-from services.notification_service import get_async_notification_service
-from parsers.unified_parser import get_sync_parser, get_async_parser
-from utils.cache import get_news_cache
-from utils.standard_logging import PerformanceTimer, get_structured_logger
-from config.settings import WEBAPP_URL, SUPABASE_URL
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +62,8 @@ async def test_services_layer():
         # Тест асинхронного сервиса дайджестов
         async_digest = get_async_digest_service()
         async_digest_text = await async_digest.async_build_daily_digest(limit=3)
-        logger.info(f"✅ Async Digest Service: сгенерирован дайджест ({len(async_digest_text)} символов)")
+        logger.info(
+            f"✅ Async Digest Service: сгенерирован дайджест ({len(async_digest_text)} символов)")
 
         # Тест AI дайджеста
         ai_digest = sync_digest.build_ai_digest(category="crypto", style="analytical", limit=3)
@@ -237,12 +238,14 @@ async def test_error_handling():
         # Тест обработки несуществующих данных
         sync_db = get_sync_service()
         empty_news = sync_db.get_latest_news(categories=["nonexistent"], limit=1)
-        logger.info(f"✅ Error Handling: корректно обработана пустая выборка ({len(empty_news)} новостей)")
+        logger.info(
+            f"✅ Error Handling: корректно обработана пустая выборка ({len(empty_news)} новостей)")
 
         # Тест обработки несуществующих пользователей
         subscription_service = get_async_subscription_service()
         empty_subscriptions = await subscription_service.get_user_subscriptions(999999)
-        logger.info(f"✅ Error Handling: корректно обработаны пустые подписки ({empty_subscriptions})")
+        logger.info(
+            f"✅ Error Handling: корректно обработаны пустые подписки ({empty_subscriptions})")
 
         return True
 

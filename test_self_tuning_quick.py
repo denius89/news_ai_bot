@@ -5,16 +5,15 @@ Quick test for Self-Tuning Predictor functionality.
 This script tests the self-tuning system with synthetic data.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.local_predictor import get_predictor
+from ai_modules.self_tuning_trainer import get_self_tuning_trainer
+from ai_modules.self_tuning_collector import get_self_tuning_collector
 import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from ai_modules.self_tuning_collector import get_self_tuning_collector
-from ai_modules.self_tuning_trainer import get_self_tuning_trainer
-from ai_modules.local_predictor import get_predictor
-from ai_modules.metrics import get_metrics
 
 
 def create_sample_training_data():
@@ -174,7 +173,8 @@ def test_self_tuning_system():
             replaced = result.get("replaced", False)
 
             status = "✅ REPLACED" if replaced else "⏸️ NOT REPLACED"
-            print(f"   {model_name.title()} model: F1={f1_score:.3f}, improvement={improvement:.3f} ({status})")
+            print(
+                f"   {model_name.title()} model: F1={f1_score:.3f}, improvement={improvement:.3f} ({status})")
 
             if replaced:
                 total_improvements += 1
@@ -267,7 +267,8 @@ def test_prediction_comparison():
 
         # Rule-based prediction
         rule_prediction = predictor.predict(test_item)
-        print(f"Rule-based: importance={rule_prediction.importance:.3f}, credibility={rule_prediction.credibility:.3f}")
+        print(
+            f"Rule-based: importance={rule_prediction.importance:.3f}, credibility={rule_prediction.credibility:.3f}")
 
         # ML model prediction (if available)
         predictor.self_tuning_enabled = original_enabled
@@ -282,7 +283,8 @@ def test_prediction_comparison():
                 importance_diff = abs(ml_prediction.importance - rule_prediction.importance)
                 credibility_diff = abs(ml_prediction.credibility - rule_prediction.credibility)
 
-                print(f"Difference:  importance={importance_diff:.3f}, credibility={credibility_diff:.3f}")
+                print(
+                    f"Difference:  importance={importance_diff:.3f}, credibility={credibility_diff:.3f}")
             except Exception as e:
                 print(f"ML prediction failed: {e}")
         else:

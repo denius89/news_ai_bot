@@ -478,9 +478,8 @@ class MetricsCollector:
             uptime_seconds = time.time() - self.start_time
 
             # Calculate averages
-            ai_avg_latency = (
-                sum(self.metrics.ai_latency_ms) / len(self.metrics.ai_latency_ms) if self.metrics.ai_latency_ms else 0
-            )
+            ai_avg_latency = (sum(self.metrics.ai_latency_ms)
+                              / len(self.metrics.ai_latency_ms) if self.metrics.ai_latency_ms else 0)
 
             prefilter_avg_latency = (
                 sum(self.metrics.prefilter_latency_ms) / len(self.metrics.prefilter_latency_ms)

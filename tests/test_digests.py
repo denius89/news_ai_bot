@@ -105,8 +105,8 @@ async def test_build_digest_many_news():
     # Мокаем AI вызов
     with patch.object(service, "_llm_summarize") as mock_llm:
         mock_llm.return_value = (
-            "📰 <b>Сводка новостей</b>\n\nАнализ показывает...\n\n" "<b>Почему это важно:</b>\n1. Важно для рынка"
-        )
+            "📰 <b>Сводка новостей</b>\n\nАнализ показывает...\n\n"
+            "<b>Почему это важно:</b>\n1. Важно для рынка")
 
         result = await service.build_digest(news_items, "analytical")
 

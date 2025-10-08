@@ -2,6 +2,7 @@
 PULSE-WS: FastAPI application with WebSocket support for PulseAI Reactor.
 """
 
+from config.settings import REACTOR_ENABLED
 import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +33,11 @@ WEBAPP_HOST = "0.0.0.0"
 REACTOR_ENABLED = False
 
 # PULSE-WS: Create FastAPI app
-app = FastAPI(title="PulseAI", description="AI-Powered News & Events with Reactor Core", version=VERSION, debug=DEBUG)
+app = FastAPI(
+    title="PulseAI",
+    description="AI-Powered News & Events with Reactor Core",
+    version=VERSION,
+    debug=DEBUG)
 
 # PULSE-WS: Configure CORS for WebSocket
 app.add_middleware(
@@ -66,7 +71,6 @@ def url_for(request: Request, name: str, **path_params):
 templates.env.globals["url_for"] = url_for
 
 # PULSE-WS: Add config to template context
-from config.settings import REACTOR_ENABLED
 
 templates.env.globals["config"] = type("Config", (), {"REACTOR_ENABLED": REACTOR_ENABLED})()
 
@@ -185,10 +189,14 @@ async def digest(request: Request):
 @app.get("/events", response_class=HTMLResponse)
 async def events(request: Request):
     """PULSE-WS: Events endpoint."""
-    return templates.TemplateResponse(
-        "events.html",
-        {"request": request, "title": "Events", "url_for": lambda name, **kwargs: url_for(request, name, **kwargs)},
-    )
+    return templates.TemplateResponse("events.html",
+                                      {"request": request,
+                                       "title": "Events",
+                                       "url_for": lambda name,
+                                       **kwargs: url_for(request,
+                                                         name,
+                                                         **kwargs)},
+                                      )
 
 
 @app.get("/live", response_class=HTMLResponse)
@@ -318,7 +326,10 @@ async def get_user_notifications_api(user_id: str = None, limit: int = 50, offse
         # Get notifications
         from database.db_models import get_user_notifications
 
-        logger.info("Calling get_user_notifications with user_id=%s, limit=%d", final_user_id, limit)
+        logger.info(
+            "Calling get_user_notifications with user_id=%s, limit=%d",
+            final_user_id,
+            limit)
 
         notifications = get_user_notifications(user_id=final_user_id, limit=limit, offset=offset)
         logger.info("get_user_notifications returned %d notifications", len(notifications))
@@ -350,8 +361,10 @@ if REACTOR_ENABLED:
                     "data": event.data,
                     "source": event.source,
                     "timestamp": (
-                        event.timestamp.isoformat() if hasattr(event.timestamp, "isoformat") else str(event.timestamp)
-                    ),
+                        event.timestamp.isoformat() if hasattr(
+                            event.timestamp,
+                            "isoformat") else str(
+                            event.timestamp)),
                     "id": event.id,
                 }
                 await ws_broadcast(event_data)

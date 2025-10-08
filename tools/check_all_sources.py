@@ -26,9 +26,8 @@ class SourceChecker:
         self.invalid_sources = 0
 
     async def __aenter__(self):
-        self.session = aiohttp.ClientSession(
-            timeout=aiohttp.ClientTimeout(total=10), headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI Bot)"}
-        )
+        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers={
+            "User-Agent": "Mozilla/5.0 (compatible; PulseAI Bot)"})
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -110,7 +109,7 @@ class SourceChecker:
                         content_type = response.headers.get("content-type", "").lower()
                         if "xml" in content_type or "rss" in content_type:
                             return f"🔄 Try: {alt_url}"
-            except:
+            except BaseException:
                 continue
 
         return "❌ No RSS alternatives found"
@@ -194,9 +193,8 @@ class SourceChecker:
         )
 
         # Топ 5 невалидных источников
-        invalid_results = [
-            (cat, sub, name, url, result) for cat, sub, name, url, result in self.results if "❌" in result
-        ]
+        invalid_results = [(cat, sub, name, url, result)
+                           for cat, sub, name, url, result in self.results if "❌" in result]
 
         if invalid_results:
             print(f"\n🔴 ТОП-5 НЕВАЛИДНЫХ ИСТОЧНИКОВ:")

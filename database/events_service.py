@@ -115,7 +115,7 @@ class EventsService:
             query = """
                 SELECT id, title, category, subcategory, starts_at, ends_at,
                        source, link, importance, description, location, organizer, created_at
-                FROM events 
+                FROM events
                 WHERE starts_at >= %s AND starts_at <= %s
                 AND importance >= %s
             """
@@ -157,7 +157,7 @@ class EventsService:
             query = """
                 SELECT id, title, category, subcategory, starts_at, ends_at,
                        source, link, importance, description, location, organizer, created_at
-                FROM events 
+                FROM events
                 WHERE starts_at >= %s AND starts_at <= %s
             """
             params = [start_of_day, end_of_day]
@@ -198,7 +198,7 @@ class EventsService:
             query = """
                 SELECT id, title, category, subcategory, starts_at, ends_at,
                        source, link, importance, description, location, organizer, created_at
-                FROM events 
+                FROM events
                 WHERE starts_at >= %s AND starts_at <= %s
             """
             params = [start_date, end_date]
@@ -337,9 +337,12 @@ class EventsService:
                     title="Ethereum Network Upgrade",
                     category="crypto",
                     subcategory="ethereum",
-                    starts_at=datetime.combine(today, datetime.min.time().replace(hour=14, minute=0)).replace(
-                        tzinfo=timezone.utc
-                    ),
+                    starts_at=datetime.combine(
+                        today,
+                        datetime.min.time().replace(
+                            hour=14,
+                            minute=0)).replace(
+                        tzinfo=timezone.utc),
                     ends_at=None,
                     source="coinmarketcal.com",
                     link="https://coinmarketcal.com/event/ethereum-upgrade",
@@ -348,8 +351,7 @@ class EventsService:
                     location=None,
                     organizer="Ethereum Foundation",
                     created_at=now,
-                )
-            )
+                ))
 
         return events
 
@@ -370,7 +372,8 @@ class EventsService:
 
         return events
 
-    async def _get_mock_events_for_date(self, date, category: Optional[str] = None) -> List[EventRecord]:
+    async def _get_mock_events_for_date(
+            self, date, category: Optional[str] = None) -> List[EventRecord]:
         """Get mock events for a specific date."""
         events = []
 
@@ -382,9 +385,12 @@ class EventsService:
                     title=f"Weekly Market Analysis - {date.strftime('%Y-%m-%d')}",
                     category="markets",
                     subcategory="analysis",
-                    starts_at=datetime.combine(date, datetime.min.time().replace(hour=9, minute=0)).replace(
-                        tzinfo=timezone.utc
-                    ),
+                    starts_at=datetime.combine(
+                        date,
+                        datetime.min.time().replace(
+                            hour=9,
+                            minute=0)).replace(
+                        tzinfo=timezone.utc),
                     ends_at=None,
                     source="investing.com",
                     link="https://investing.com/analysis",
@@ -392,9 +398,9 @@ class EventsService:
                     description="Weekly market analysis and outlook",
                     location=None,
                     organizer="Investment Firm",
-                    created_at=datetime.now(timezone.utc),
-                )
-            )
+                    created_at=datetime.now(
+                        timezone.utc),
+                ))
 
         return events
 

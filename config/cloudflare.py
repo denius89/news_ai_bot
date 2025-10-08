@@ -22,7 +22,9 @@ CLOUDFLARE_TUNNEL_URL = os.getenv(
 CLOUDFLARE_LOCAL_URL = os.getenv("CLOUDFLARE_LOCAL_URL", "http://localhost:8001")
 
 # Команда для запуска Cloudflare Tunnel
-CLOUDFLARE_TUNNEL_COMMAND = os.getenv("CLOUDFLARE_TUNNEL_COMMAND", f"cloudflared tunnel --url {CLOUDFLARE_LOCAL_URL}")
+CLOUDFLARE_TUNNEL_COMMAND = os.getenv(
+    "CLOUDFLARE_TUNNEL_COMMAND",
+    f"cloudflared tunnel --url {CLOUDFLARE_LOCAL_URL}")
 
 # ---- URLS FOR DIFFERENT SERVICES ----
 

@@ -121,7 +121,8 @@ class EventsParser:
             normalized_events = self._normalize_events(all_events)
             deduplicated_events = self._deduplicate_events(normalized_events)
 
-            logger.info(f"Total events after normalization and deduplication: {len(deduplicated_events)}")
+            logger.info(
+                f"Total events after normalization and deduplication: {len(deduplicated_events)}")
 
             # Эмитим событие о получении событий
             if deduplicated_events:
@@ -346,7 +347,8 @@ def get_events_parser() -> EventsParser:
     return _parser_instance
 
 
-async def fetch_events(start_date: datetime, end_date: datetime, providers: Optional[List[str]] = None) -> List[Event]:
+async def fetch_events(start_date: datetime, end_date: datetime,
+                       providers: Optional[List[str]] = None) -> List[Event]:
     """
     Convenience function to fetch events.
 

@@ -444,7 +444,11 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_missing_user_id(self, client):
         """Test POST /api/subscriptions/update without user_id."""
-        response = client.post("/api/subscriptions/update", json={"category": "crypto", "enabled": True})
+        response = client.post(
+            "/api/subscriptions/update",
+            json={
+                "category": "crypto",
+                "enabled": True})
         assert response.status_code == 400
         data = response.get_json()
         assert data["status"] == "error"
@@ -452,7 +456,11 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_missing_category(self, client):
         """Test POST /api/subscriptions/update without category."""
-        response = client.post("/api/subscriptions/update", json={"user_id": "test-user-123", "enabled": True})
+        response = client.post(
+            "/api/subscriptions/update",
+            json={
+                "user_id": "test-user-123",
+                "enabled": True})
         assert response.status_code == 400
         data = response.get_json()
         assert data["status"] == "error"
@@ -460,7 +468,11 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_missing_enabled(self, client):
         """Test POST /api/subscriptions/update without enabled field."""
-        response = client.post("/api/subscriptions/update", json={"user_id": "test-user-123", "category": "crypto"})
+        response = client.post(
+            "/api/subscriptions/update",
+            json={
+                "user_id": "test-user-123",
+                "category": "crypto"})
         assert response.status_code == 400
         data = response.get_json()
         assert data["status"] == "error"
@@ -468,7 +480,10 @@ class TestSubscriptionsAPI:
 
     def test_update_subscription_invalid_json(self, client):
         """Test POST /api/subscriptions/update with invalid JSON."""
-        response = client.post("/api/subscriptions/update", data="invalid json", content_type="application/json")
+        response = client.post(
+            "/api/subscriptions/update",
+            data="invalid json",
+            content_type="application/json")
         assert response.status_code == 400
         # Flask returns None for invalid JSON, so we just check the status code
 

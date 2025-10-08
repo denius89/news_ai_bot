@@ -46,7 +46,8 @@ async def init_async_supabase():
             logger.error("❌ Ошибка инициализации Async Supabase: %s", e)
             return False
     else:
-        logger.warning("⚠️ Async Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
+        logger.warning(
+            "⚠️ Async Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
         return False
 
 
@@ -77,7 +78,11 @@ async def async_get_latest_news(
         logger.warning("⚠️ Async Supabase не подключён, async_get_latest_news не работает.")
         return []
 
-    logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+    logger.debug(
+        "async_get_latest_news: source=%s, categories=%s, limit=%s",
+        source,
+        categories,
+        limit)
 
     query = (
         async_supabase.table("news")
@@ -208,7 +213,10 @@ async def async_get_user_subscriptions(user_id: int) -> Dict:
         return {"categories": [], "sources": []}
 
 
-async def async_update_user_subscriptions(user_id: int, categories: List[str], sources: List[str]) -> bool:
+async def async_update_user_subscriptions(
+        user_id: int,
+        categories: List[str],
+        sources: List[str]) -> bool:
     """Асинхронно обновляет подписки пользователя."""
     if not async_supabase:
         return False

@@ -136,14 +136,16 @@ class TestUserNotificationsAPI:
         mock_get_user.return_value = {"id": "uuid-123"}
         mock_mark_read.return_value = True
 
-        response = client.post("/api/user_notifications/mark_read", json={"notification_id": "notif-1"})
+        response = client.post("/api/user_notifications/mark_read",
+                               json={"notification_id": "notif-1"})
         assert response.status_code == 200
         data = response.get_json()
         assert data["status"] == "success"
 
     def test_mark_notification_read_missing_notification_id(self, client):
         """Test POST /api/user_notifications/mark_read without notification_id."""
-        response = client.post("/api/user_notifications/mark_read", json={"user_id": "test-user-123"})
+        response = client.post("/api/user_notifications/mark_read",
+                               json={"user_id": "test-user-123"})
         assert response.status_code == 400
         data = response.get_json()
         assert data["status"] == "error"
@@ -234,7 +236,12 @@ class TestUserNotificationsAPI:
     @patch("routes.api_routes.get_user_notifications")
     @patch("database.db_models.mark_notification_read")
     @patch("database.db_models.get_user_by_telegram")
-    def test_integration_scenario(self, mock_get_user, mock_mark_read, mock_get_notifications, client):
+    def test_integration_scenario(
+            self,
+            mock_get_user,
+            mock_mark_read,
+            mock_get_notifications,
+            client):
         """Test integration scenario: create -> get -> mark read -> get again."""
         # Mock initial state (unread notification)
         mock_get_notifications.return_value = [

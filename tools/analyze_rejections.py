@@ -6,16 +6,15 @@ This tool analyzes rejected news items and applies auto-learning
 recommendations to improve prefilter rules.
 """
 
+from ai_modules.metrics import get_metrics
+from ai_modules.auto_rule_manager import get_auto_rule_manager
+from ai_modules.rejection_analyzer import get_rejection_analyzer
 import sys
 import logging
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ai_modules.rejection_analyzer import get_rejection_analyzer
-from ai_modules.auto_rule_manager import get_auto_rule_manager
-from ai_modules.metrics import get_metrics
 
 
 def setup_logging():
@@ -179,13 +178,15 @@ def main():
         if recommendations["add_stop_markers"]:
             print("📝 Stop markers to add:")
             for rec in recommendations["add_stop_markers"][:5]:
-                print(f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(
+                    f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
             print()
 
         if recommendations["source_blacklist"]:
             print("🚫 Sources to blacklist:")
             for rec in recommendations["source_blacklist"][:3]:
-                print(f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(
+                    f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
             print()
 
         # Apply recommendations

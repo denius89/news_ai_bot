@@ -7,7 +7,10 @@ from models.news import NewsItem
 from models.event import EventItem
 
 
-def format_date(dt: Optional[datetime], fmt: str = "%d %b %Y, %H:%M", tz: str = "Europe/Warsaw") -> str:
+def format_date(
+        dt: Optional[datetime],
+        fmt: str = "%d %b %Y, %H:%M",
+        tz: str = "Europe/Warsaw") -> str:
     """
     Format datetime object to human-readable string with timezone support.
 
@@ -103,7 +106,10 @@ def format_news_item(item: Union[NewsItem, Dict[str, Any]], index: Optional[int]
     )
 
 
-def format_news(news_list: List[NewsItem], limit: Optional[int] = None, with_header: bool = True) -> str:
+def format_news(
+        news_list: List[NewsItem],
+        limit: Optional[int] = None,
+        with_header: bool = True) -> str:
     """
     Современный дайджест в стиле BBC/Bloomberg с разделителями между новостями.
     """

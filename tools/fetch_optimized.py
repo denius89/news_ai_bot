@@ -11,6 +11,8 @@ Example usage:
     python tools/fetch_optimized.py --enable-local-predictor --disable-cache
 """
 
+from ai_modules.metrics import get_metrics
+from parsers.optimized_parser import run_optimized_parser
 import asyncio
 import argparse
 import logging
@@ -20,8 +22,6 @@ from pathlib import Path
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from parsers.optimized_parser import run_optimized_parser
-from ai_modules.metrics import get_metrics
 
 # Настраиваем логирование
 logging.basicConfig(
@@ -123,10 +123,13 @@ async def main():
             metrics_summary = result.get("metrics", {})
             logger.info("📈 Метрики оптимизации:")
             logger.info(f"   🤖 AI вызовов: {metrics_summary.get('ai_calls_total', 0)}")
-            logger.info(f"   🚫 Пропущено предфильтром: {metrics_summary.get('ai_skipped_prefilter_total', 0)}")
+            logger.info(
+                f"   🚫 Пропущено предфильтром: {metrics_summary.get('ai_skipped_prefilter_total', 0)}")
             logger.info(f"   💾 Пропущено кэшем: {metrics_summary.get('ai_skipped_cache_total', 0)}")
-            logger.info(f"   🧠 Пропущено предиктором: {metrics_summary.get('ai_skipped_local_pred_total', 0)}")
-            logger.info(f"   💰 Всего сэкономлено вызовов: {metrics_summary.get('ai_calls_saved_total', 0)}")
+            logger.info(
+                f"   🧠 Пропущено предиктором: {metrics_summary.get('ai_skipped_local_pred_total', 0)}")
+            logger.info(
+                f"   💰 Всего сэкономлено вызовов: {metrics_summary.get('ai_calls_saved_total', 0)}")
             logger.info(f"   📊 Экономия: {metrics_summary.get('ai_calls_saved_percentage', 0)}%")
 
             if args.show_metrics:

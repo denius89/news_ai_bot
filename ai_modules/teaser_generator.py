@@ -238,7 +238,8 @@ class TeaserGenerator:
 
             # Create result
             result = TeaserResult(
-                teaser=teaser, hashtags=hashtags[:3], confidence=confidence, category=category  # Limit to 3 hashtags
+                # Limit to 3 hashtags
+                teaser=teaser, hashtags=hashtags[:3], confidence=confidence, category=category
             )
 
             # Cache the result
@@ -274,7 +275,14 @@ class TeaserGenerator:
             confidence -= 0.2
 
         # Check for engaging words
-        engaging_words = ["новый", "прорыв", "исторический", "рекорд", "важный", "ключевой", "значимый"]
+        engaging_words = [
+            "новый",
+            "прорыв",
+            "исторический",
+            "рекорд",
+            "важный",
+            "ключевой",
+            "значимый"]
         if any(word in teaser.lower() for word in engaging_words):
             confidence += 0.1
 
@@ -288,7 +296,8 @@ class TeaserGenerator:
 
         return min(1.0, max(0.0, confidence))
 
-    def format_teaser_post(self, teaser_result: TeaserResult, original_digest: Dict[str, any]) -> str:
+    def format_teaser_post(self, teaser_result: TeaserResult,
+                           original_digest: Dict[str, any]) -> str:
         """
         Format teaser result into a complete post.
 

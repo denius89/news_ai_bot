@@ -103,7 +103,8 @@ async def ws_broadcast(event: dict):
         active_connections.discard(connection)
         ws_stats["connected_clients"] = len(active_connections)
 
-    logger.debug(f"PULSE-WS: Event '{event.get('type', 'unknown')}' sent to {len(active_connections)} clients")
+    logger.debug(
+        f"PULSE-WS: Event '{event.get('type', 'unknown')}' sent to {len(active_connections)} clients")
 
 
 @router.get("/status")

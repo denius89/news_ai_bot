@@ -6,6 +6,9 @@ This script tests the events system components
 including parsers, providers, database service, and API.
 """
 
+from ai_modules.metrics import get_metrics
+from database.events_service import get_events_service
+from events.events_parser import get_events_parser
 import sys
 import asyncio
 from pathlib import Path
@@ -13,10 +16,6 @@ from datetime import datetime, timezone, timedelta
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
-
-from events.events_parser import get_events_parser
-from database.events_service import get_events_service
-from ai_modules.metrics import get_metrics
 
 
 def test_events_parser():

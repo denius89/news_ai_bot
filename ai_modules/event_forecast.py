@@ -168,7 +168,8 @@ class EventForecastEngine:
             self.metrics.increment_event_forecasts_total()
             self.metrics.update_event_forecast_confidence_avg(confidence)
 
-            logger.info(f"Generated forecast for event {event_id}: impact={impact.value}, confidence={confidence:.2f}")
+            logger.info(
+                f"Generated forecast for event {event_id}: impact={impact.value}, confidence={confidence:.2f}")
 
             return forecast
 
@@ -188,7 +189,12 @@ class EventForecastEngine:
                 generated_at=datetime.now(timezone.utc),
             )
 
-    def _predict_impact(self, title: str, category: str, description: str, importance: float) -> ImpactType:
+    def _predict_impact(
+            self,
+            title: str,
+            category: str,
+            description: str,
+            importance: float) -> ImpactType:
         """Predict the impact of an event."""
         text = f"{title} {description}".lower()
 
@@ -257,7 +263,12 @@ class EventForecastEngine:
 
         return min(1.0, max(0.0, confidence))
 
-    def _generate_summary(self, title: str, category: str, impact: ImpactType, confidence: float) -> str:
+    def _generate_summary(
+            self,
+            title: str,
+            category: str,
+            impact: ImpactType,
+            confidence: float) -> str:
         """Generate forecast summary."""
         confidence_percent = int(confidence * 100)
 
@@ -278,17 +289,16 @@ class EventForecastEngine:
         if importance >= 0.8:
             reaction = reactions[0] if reactions else "Значительное влияние на рынки."
         elif importance >= 0.6:
-            reaction = (
-                reactions[1] if len(reactions) > 1 else reactions[0] if reactions else "Умеренное влияние на рынки."
-            )
+            reaction = (reactions[1] if len(reactions) > 1 else reactions[0]
+                        if reactions else "Умеренное влияние на рынки.")
         else:
-            reaction = (
-                reactions[2] if len(reactions) > 2 else reactions[0] if reactions else "Ограниченное влияние на рынки."
-            )
+            reaction = (reactions[2] if len(reactions) > 2 else reactions[0]
+                        if reactions else "Ограниченное влияние на рынки.")
 
         return reaction
 
-    def _generate_probability_outcomes(self, title: str, category: str, impact: ImpactType) -> List[Tuple[str, float]]:
+    def _generate_probability_outcomes(
+            self, title: str, category: str, impact: ImpactType) -> List[Tuple[str, float]]:
         """Generate probability outcomes for the event."""
         outcomes = []
 
@@ -364,7 +374,8 @@ class EventForecastEngine:
 
         # Category-specific opportunities
         if category == "crypto":
-            opportunities.extend(["Раннее инвестирование в новые технологии", "DeFi и NFT возможности"])
+            opportunities.extend(
+                ["Раннее инвестирование в новые технологии", "DeFi и NFT возможности"])
         elif category == "markets":
             opportunities.extend(["Арбитражные возможности", "Хеджирование позиций"])
         elif category == "sports":

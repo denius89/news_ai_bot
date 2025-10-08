@@ -6,6 +6,8 @@
 удаляет неработающие и добавляет новые из GitHub-репозиториев.
 """
 
+from database.service import get_async_service
+from parsers.advanced_parser import AdvancedParser
 import asyncio
 import logging
 import yaml
@@ -20,8 +22,6 @@ import sys
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from parsers.advanced_parser import AdvancedParser
-from database.service import get_async_service
 
 # Настраиваем логирование
 logging.basicConfig(
@@ -358,7 +358,8 @@ class RSSUpdater:
                 self.stats["removed"] += len(sources)
                 self.stats["updated_categories"].add(f"{category}/{subcategory}")
 
-                logger.info(f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}")
+                logger.info(
+                    f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}")
 
     async def _add_new_sources(self):
         """Добавление новых RSS-источников из GitHub."""
