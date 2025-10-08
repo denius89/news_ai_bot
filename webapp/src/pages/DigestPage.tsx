@@ -94,7 +94,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       console.log('🔄 Loading digest history for user:', userId);
       
-      // Загружаем активные дайджесты
+      // Загружаем активные дайджесты (не удаленные и не архивированные)
       const activeResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=false`);
       const activeData = await activeResponse.json();
       
