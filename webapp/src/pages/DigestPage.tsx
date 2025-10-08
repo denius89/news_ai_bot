@@ -260,12 +260,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       const data = await response.json();
       if (data.status === 'success') {
-        // Обновляем списки
-        setDeletedDigests(prev => prev.filter(d => d.id !== digestId));
-        // Перезагружаем историю
+        // Показываем уведомление
+        showNotification('success', 'Дайджест восстановлен из корзины');
+        // Перезагружаем историю (без локального обновления)
         setTimeout(() => loadDigestHistory(), 500);
       } else {
         console.error('Failed to restore digest:', data.message);
+        showNotification('error', `Ошибка восстановления: ${data.message}`);
       }
     } catch (error) {
       console.error('Error restoring digest:', error);
@@ -323,10 +324,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (data.status === 'success') {
         // Обновляем списки
         setArchivedDigests(prev => prev.filter(d => d.id !== digestId));
+        // Показываем уведомление
+        showNotification('success', 'Дайджест восстановлен из архива');
         // Перезагружаем историю
         setTimeout(() => loadDigestHistory(), 500);
       } else {
         console.error('Failed to unarchive digest:', data.message);
+        showNotification('error', `Ошибка восстановления: ${data.message}`);
       }
     } catch (error) {
       console.error('Error unarchiving digest:', error);
