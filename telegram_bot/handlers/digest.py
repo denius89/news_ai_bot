@@ -34,8 +34,7 @@ def categories_keyboard() -> types.InlineKeyboardMarkup:
         [types.InlineKeyboardButton(text=f"{get_emoji_icon(cat, '')} {cat.title()}", callback_data=f"digest:{cat}")]
         for cat in categories
     ]
-    keyboard.append([types.InlineKeyboardButton(
-        text="🌐 Все категории", callback_data="digest:all")])
+    keyboard.append([types.InlineKeyboardButton(text="🌐 Все категории", callback_data="digest:all")])
     keyboard.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])
     return types.InlineKeyboardMarkup(inline_keyboard=keyboard)
 

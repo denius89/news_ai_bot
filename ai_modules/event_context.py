@@ -5,7 +5,6 @@ This module provides AI-powered context generation for events,
 explaining their significance and connecting them to current trends.
 """
 
-import asyncio
 import logging
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
@@ -81,19 +80,8 @@ class EventContextEngine:
 
         # Trend keywords by category
         self.trend_keywords = {
-            "crypto": [
-                "DeFi",
-                "NFT",
-                "Web3",
-                "Institutional adoption",
-                "Regulation",
-                "Scalability"],
-            "markets": [
-                "Inflation",
-                "Interest rates",
-                "Economic recovery",
-                "Central bank policy",
-                "Market volatility"],
+            "crypto": ["DeFi", "NFT", "Web3", "Institutional adoption", "Regulation", "Scalability"],
+            "markets": ["Inflation", "Interest rates", "Economic recovery", "Central bank policy", "Market volatility"],
             "sports": [
                 "Digital transformation",
                 "Fan engagement",
@@ -101,12 +89,7 @@ class EventContextEngine:
                 "Esports growth",
                 "Sustainability",
             ],
-            "tech": [
-                "AI advancement",
-                "Cloud computing",
-                "Cybersecurity",
-                "IoT expansion",
-                "Quantum computing"],
+            "tech": ["AI advancement", "Cloud computing", "Cybersecurity", "IoT expansion", "Quantum computing"],
             "world": [
                 "Geopolitical shifts",
                 "Climate action",
@@ -184,12 +167,7 @@ class EventContextEngine:
                 generated_at=datetime.now(timezone.utc),
             )
 
-    async def _generate_context_text(
-            self,
-            title: str,
-            category: str,
-            description: str,
-            importance: float) -> str:
+    async def _generate_context_text(self, title: str, category: str, description: str, importance: float) -> str:
         """Generate contextual text for the event."""
         try:
             # Determine event type from title
@@ -357,11 +335,7 @@ class EventContextEngine:
         # Limit to 3 most relevant trends
         return trends[:3]
 
-    def _generate_significance_explanation(
-            self,
-            title: str,
-            category: str,
-            importance: float) -> str:
+    def _generate_significance_explanation(self, title: str, category: str, importance: float) -> str:
         """Generate explanation of event significance."""
         if importance >= 0.9:
             return "Событие критически важно и может кардинально изменить ситуацию в отрасли."

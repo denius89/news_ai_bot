@@ -66,8 +66,7 @@ async def main():
         logging.getLogger().setLevel(logging.DEBUG)
 
     logger.info("🚀 Запуск продвинутого парсера новостей")
-    logger.info(
-        f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}")
+    logger.info(f"📊 Параметры: min_importance={args.min_importance}, max_concurrent={args.max_concurrent}")
 
     try:
         async with AdvancedParser(
@@ -177,8 +176,7 @@ class FetchLoop:
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
-        logger.info(
-            f"FetchLoop initialized: interval={interval}s, ai_filter={ai_filter}, auto_post={auto_post}")
+        logger.info(f"FetchLoop initialized: interval={interval}s, ai_filter={ai_filter}, auto_post={auto_post}")
 
     def _signal_handler(self, signum, frame):
         """Handle shutdown signals."""
@@ -213,8 +211,7 @@ class FetchLoop:
             saved = result.get("saved", 0)
             ai_calls = result.get("ai_calls", 0)
 
-            logger.info(
-                f"Fetch cycle completed: processed={processed}, saved={saved}, ai_calls={ai_calls}")
+            logger.info(f"Fetch cycle completed: processed={processed}, saved={saved}, ai_calls={ai_calls}")
 
             # Run auto-posting if enabled
             if self.auto_post:
@@ -225,8 +222,7 @@ class FetchLoop:
                     published = post_result.get("published_count", 0)
                     logger.info(f"Auto-posting completed: published={published} digests")
                 else:
-                    logger.warning(
-                        f"Auto-posting failed: {post_result.get('reason', 'Unknown error')}")
+                    logger.warning(f"Auto-posting failed: {post_result.get('reason', 'Unknown error')}")
 
             # Calculate cycle time
             cycle_time = (datetime.now(timezone.utc) - start_time).total_seconds()
@@ -283,25 +279,15 @@ class FetchLoop:
 async def main():
     """Main function."""
     parser = argparse.ArgumentParser(description="Fetch loop with auto-posting")
-    parser.add_argument(
-        "--interval",
-        type=int,
-        default=30,
-        help="Interval between cycles in seconds (default: 30)")
+    parser.add_argument("--interval", type=int, default=30, help="Interval between cycles in seconds (default: 30)")
     parser.add_argument("--ai-filter", action="store_true", help="Enable AI filtering")
     parser.add_argument("--auto-post", action="store_true", help="Enable auto-posting to Telegram")
-    parser.add_argument(
-        "--once",
-        action="store_true",
-        help="Run only once instead of continuous loop")
+    parser.add_argument("--once", action="store_true", help="Run only once instead of continuous loop")
 
     args = parser.parse_args()
 
     # Create fetch loop
-    fetch_loop = FetchLoop(
-        interval=args.interval,
-        ai_filter=args.ai_filter,
-        auto_post=args.auto_post)
+    fetch_loop = FetchLoop(interval=args.interval, ai_filter=args.ai_filter, auto_post=args.auto_post)
 
     try:
         if args.once:
@@ -463,13 +449,10 @@ async def main():
             metrics_summary = result.get("metrics", {})
             logger.info("📈 Метрики оптимизации:")
             logger.info(f"   🤖 AI вызовов: {metrics_summary.get('ai_calls_total', 0)}")
-            logger.info(
-                f"   🚫 Пропущено предфильтром: {metrics_summary.get('ai_skipped_prefilter_total', 0)}")
+            logger.info(f"   🚫 Пропущено предфильтром: {metrics_summary.get('ai_skipped_prefilter_total', 0)}")
             logger.info(f"   💾 Пропущено кэшем: {metrics_summary.get('ai_skipped_cache_total', 0)}")
-            logger.info(
-                f"   🧠 Пропущено предиктором: {metrics_summary.get('ai_skipped_local_pred_total', 0)}")
-            logger.info(
-                f"   💰 Всего сэкономлено вызовов: {metrics_summary.get('ai_calls_saved_total', 0)}")
+            logger.info(f"   🧠 Пропущено предиктором: {metrics_summary.get('ai_skipped_local_pred_total', 0)}")
+            logger.info(f"   💰 Всего сэкономлено вызовов: {metrics_summary.get('ai_calls_saved_total', 0)}")
             logger.info(f"   📊 Экономия: {metrics_summary.get('ai_calls_saved_percentage', 0)}%")
 
             if args.show_metrics:

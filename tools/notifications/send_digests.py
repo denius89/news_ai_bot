@@ -203,10 +203,7 @@ async def generate_personalized_digest(
         return fallback_text
 
 
-async def send_personalized_digest(
-        user: Dict,
-        subs_svc: SubscriptionService,
-        telegram_sender: TelegramSender) -> bool:
+async def send_personalized_digest(user: Dict, subs_svc: SubscriptionService, telegram_sender: TelegramSender) -> bool:
     """
     Отправить персонализированный дайджест пользователю.
 

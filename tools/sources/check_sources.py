@@ -35,8 +35,9 @@ class SourceChecker:
         self.invalid_sources = 0
 
     async def __aenter__(self):
-        self.session = aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=10), headers={
-            "User-Agent": "Mozilla/5.0 (compatible; PulseAI Bot)"})
+        self.session = aiohttp.ClientSession(
+            timeout=aiohttp.ClientTimeout(total=10), headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI Bot)"}
+        )
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -202,8 +203,9 @@ class SourceChecker:
         )
 
         # Топ 5 невалидных источников
-        invalid_results = [(cat, sub, name, url, result)
-                           for cat, sub, name, url, result in self.results if "❌" in result]
+        invalid_results = [
+            (cat, sub, name, url, result) for cat, sub, name, url, result in self.results if "❌" in result
+        ]
 
         if invalid_results:
             print(f"\n🔴 ТОП-5 НЕВАЛИДНЫХ ИСТОЧНИКОВ:")
@@ -277,12 +279,7 @@ def check_templates():
             continue
 
         # Проверки
-        checks = [
-            check_doctype,
-            check_includes,
-            check_base_extend,
-            check_inline_styles,
-            check_meta_tags]
+        checks = [check_doctype, check_includes, check_base_extend, check_inline_styles, check_meta_tags]
 
         for check_func in checks:
             result = check_func(html_file, content)

@@ -55,8 +55,7 @@ class UnifiedDigestService:
             Formatted digest text
         """
         try:
-            news_items = self.db_service.get_latest_news(
-                source=source, categories=categories, limit=limit)
+            news_items = self.db_service.get_latest_news(source=source, categories=categories, limit=limit)
 
             if not news_items:
                 return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
@@ -231,9 +230,7 @@ class UnifiedDigestService:
             )
 
             # Filter by importance
-            filtered_items = [
-                item for item in news_items if item.get(
-                    "importance", 0) >= min_importance]
+            filtered_items = [item for item in news_items if item.get("importance", 0) >= min_importance]
 
             return filtered_items[:limit]
 
@@ -264,9 +261,7 @@ class UnifiedDigestService:
             )
 
             # Filter by importance
-            filtered_items = [
-                item for item in news_items if item.get(
-                    "importance", 0) >= min_importance]
+            filtered_items = [item for item in news_items if item.get("importance", 0) >= min_importance]
 
             return filtered_items[:limit]
 

@@ -367,8 +367,7 @@ class RSSUpdater:
                 self.stats["removed"] += len(sources)
                 self.stats["updated_categories"].add(f"{category}/{subcategory}")
 
-                logger.info(
-                    f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}")
+                logger.info(f"Удалено {len(sources)} невалидных источников из {category}/{subcategory}")
 
     async def _add_new_sources(self):
         """Добавление новых RSS-источников из GitHub."""
@@ -704,8 +703,7 @@ def validate_all_sources():
     print(f"\n📊 Результаты валидации:")
     print(f"   ✅ Валидных источников: {len(valid_sources)}")
     print(f"   ❌ Невалидных источников: {len(invalid_sources)}")
-    print(
-        f"   📈 Успешность: {len(valid_sources)/(len(valid_sources)+len(invalid_sources))*100:.1f}%")
+    print(f"   📈 Успешность: {len(valid_sources)/(len(valid_sources)+len(invalid_sources))*100:.1f}%")
 
     # Группировка по статусам
     status_counts = {}
@@ -760,11 +758,7 @@ def test_parser_with_valid_sources():
     for source in test_sources:
         print(f"\n📰 Тестируем: {source['name']}")
         try:
-            news_items = parser.parse_source(
-                source["url"],
-                source["category"],
-                source["subcategory"],
-                source["name"])
+            news_items = parser.parse_source(source["url"], source["category"], source["subcategory"], source["name"])
 
             if news_items:
                 total_news += len(news_items)

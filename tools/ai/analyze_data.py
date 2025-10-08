@@ -178,15 +178,13 @@ def main():
         if recommendations["add_stop_markers"]:
             print("📝 Stop markers to add:")
             for rec in recommendations["add_stop_markers"][:5]:
-                print(
-                    f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(f"   '{rec['word']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
             print()
 
         if recommendations["source_blacklist"]:
             print("🚫 Sources to blacklist:")
             for rec in recommendations["source_blacklist"][:3]:
-                print(
-                    f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
+                print(f"   '{rec['source']}' (confidence: {rec['confidence']:.2f}, count: {rec['count']})")
             print()
 
         # Apply recommendations

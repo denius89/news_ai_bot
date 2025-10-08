@@ -6,10 +6,9 @@ unnecessary API requests while maintaining quality.
 """
 
 import logging
-import re
 import yaml
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
 from dataclasses import dataclass
 
 logger = logging.getLogger("prefilter")
@@ -66,7 +65,6 @@ class Prefilter:
         """
         title = news_item.get("title", "").strip()
         content = news_item.get("content", "") or news_item.get("summary", "")
-        source = news_item.get("source", "").lower()
         category = news_item.get("category", "").lower()
 
         # Check minimum title length

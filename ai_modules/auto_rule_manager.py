@@ -104,8 +104,7 @@ class AutoRuleManager:
         metadata["last_analysis"] = datetime.now(timezone.utc).isoformat()
         metadata["total_runs"] = metadata.get("total_runs", 0) + 1
         metadata["rules_added"] = metadata.get("rules_added", 0) + changes.get("rules_added", 0)
-        metadata["rules_removed"] = metadata.get(
-            "rules_removed", 0) + changes.get("rules_removed", 0)
+        metadata["rules_removed"] = metadata.get("rules_removed", 0) + changes.get("rules_removed", 0)
         metadata["last_backup"] = datetime.now(timezone.utc).isoformat()
 
     def _add_stop_markers(self, rules: Dict, recommendations: List[Dict]) -> int:
@@ -138,8 +137,7 @@ class AutoRuleManager:
                     }
                 )
                 added_count += 1
-                logger.info(
-                    f"[AUTOLEARN] Added stop marker: '{word}' (confidence: {confidence:.2f})")
+                logger.info(f"[AUTOLEARN] Added stop marker: '{word}' (confidence: {confidence:.2f})")
 
         return added_count
 
@@ -176,8 +174,7 @@ class AutoRuleManager:
                     }
                 )
                 added_count += 1
-                logger.info(
-                    f"[AUTOLEARN] Added to source blacklist: '{source}' (confidence: {confidence:.2f})")
+                logger.info(f"[AUTOLEARN] Added to source blacklist: '{source}' (confidence: {confidence:.2f})")
 
         return added_count
 
@@ -188,14 +185,14 @@ class AutoRuleManager:
         if "auto_generated" not in rules:
             return removed_count
 
-        cutoff_date = datetime.now(timezone.utc).replace(
-            day=1)  # Remove rules older than current month
+        cutoff_date = datetime.now(timezone.utc).replace(day=1)  # Remove rules older than current month
 
         # Clean up old stop markers
         if "stop_markers" in rules["auto_generated"]:
             original_count = len(rules["auto_generated"]["stop_markers"])
-            rules["auto_generated"]["stop_markers"] = [rule for rule in rules["auto_generated"][
-                "stop_markers"] if self._should_keep_rule(rule, cutoff_date)]
+            rules["auto_generated"]["stop_markers"] = [
+                rule for rule in rules["auto_generated"]["stop_markers"] if self._should_keep_rule(rule, cutoff_date)
+            ]
             removed_count += original_count - len(rules["auto_generated"]["stop_markers"])
 
         # Clean up old source blacklist entries
@@ -265,10 +262,7 @@ class AutoRuleManager:
             return {"error": "Failed to load rules"}
 
         # Reset change tracking
-        self.changes_made = {
-            "rules_added": 0,
-            "rules_removed": 0,
-            "backups_created": 1 if backup_path else 0}
+        self.changes_made = {"rules_added": 0, "rules_removed": 0, "backups_created": 1 if backup_path else 0}
 
         try:
             recommendations = analysis.get("recommendations", {})

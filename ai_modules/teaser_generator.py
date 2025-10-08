@@ -7,11 +7,13 @@ for digest posts to increase engagement and reach.
 
 import logging
 import re
-from typing import Dict, List, Optional, Tuple
+import sys
+import os
+from typing import Dict, List, Optional
 from dataclasses import dataclass
-
-import openai
 from pathlib import Path
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from ai_modules.metrics import get_metrics
 
@@ -123,21 +125,21 @@ class TeaserGenerator:
         """
         try:
             # Create prompt for AI
-            prompt = f"""
-Напиши короткий, живой анонс новости в 1 предложении для Telegram, с лёгкой интригой и тоном медиа.
-
-Заголовок: {title}
-Краткое содержание: {summary}
-Категория: {category}
-
-Требования:
-- Максимум 1 предложение
-- Живой, интригующий тон
-- Без эмодзи в начале
-- Фокус на главной интриге новости
-- Стиль медиа-анонса
-
-Анонс:"""
+            # prompt = f"""
+            # Напиши короткий, живой анонс новости в 1 предложении для Telegram, с лёгкой интригой и тоном медиа.
+            #
+            # Заголовок: {title}
+            # Краткое содержание: {summary}
+            # Категория: {category}
+            #
+            # Требования:
+            # - Максимум 1 предложение
+            # - Живой, интригующий тон
+            # - Без эмодзи в начале
+            # - Фокус на главной интриге новости
+            # - Стиль медиа-анонса
+            #
+            # Анонс:"""
 
             # Generate teaser using AI (placeholder for now)
             # response = await self.ai_client.generate_text(
@@ -239,7 +241,10 @@ class TeaserGenerator:
             # Create result
             result = TeaserResult(
                 # Limit to 3 hashtags
-                teaser=teaser, hashtags=hashtags[:3], confidence=confidence, category=category
+                teaser=teaser,
+                hashtags=hashtags[:3],
+                confidence=confidence,
+                category=category,
             )
 
             # Cache the result
@@ -275,14 +280,7 @@ class TeaserGenerator:
             confidence -= 0.2
 
         # Check for engaging words
-        engaging_words = [
-            "новый",
-            "прорыв",
-            "исторический",
-            "рекорд",
-            "важный",
-            "ключевой",
-            "значимый"]
+        engaging_words = ["новый", "прорыв", "исторический", "рекорд", "важный", "ключевой", "значимый"]
         if any(word in teaser.lower() for word in engaging_words):
             confidence += 0.1
 
@@ -296,8 +294,7 @@ class TeaserGenerator:
 
         return min(1.0, max(0.0, confidence))
 
-    def format_teaser_post(self, teaser_result: TeaserResult,
-                           original_digest: Dict[str, any]) -> str:
+    def format_teaser_post(self, teaser_result: TeaserResult, original_digest: Dict[str, any]) -> str:
         """
         Format teaser result into a complete post.
 
@@ -327,10 +324,10 @@ class TeaserGenerator:
             # Create post
             post_parts = [
                 f"🚀 {teaser_result.teaser}",
-                f"",
+                "",
                 f"{emoji} {original_digest.get('title', '')}",
-                f"",
-                f"{hashtag_text}",
+                "",
+                hashtag_text,
             ]
 
             post = "\n".join(post_parts)
@@ -343,10 +340,10 @@ class TeaserGenerator:
 
                 post_parts = [
                     f"🚀 {teaser_result.teaser}",
-                    f"",
+                    "",
                     f"{emoji} {original_digest.get('title', '')}",
-                    f"",
-                    f"{hashtag_text}",
+                    "",
+                    hashtag_text,
                 ]
                 post = "\n".join(post_parts)
 

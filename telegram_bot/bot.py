@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+
 import asyncio
 import logging
 

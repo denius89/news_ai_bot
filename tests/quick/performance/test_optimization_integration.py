@@ -142,9 +142,7 @@ class TestOptimizationIntegration:
         for news_item in test_news:
             # Test both importance and credibility evaluation
             importance, credibility = evaluate_both_with_optimization(news_item)
-            results.append({"news_item": news_item,
-                            "importance": importance,
-                            "credibility": credibility})
+            results.append({"news_item": news_item, "importance": importance, "credibility": credibility})
 
             # Count AI calls (mock calls)
             if mock_orig_imp.called or mock_orig_cred.called:
@@ -179,8 +177,7 @@ class TestOptimizationIntegration:
         print(f"   📰 News items processed: {len(test_news)}")
         print(f"   🤖 AI calls made: {ai_calls_made}")
         print(f"   💰 AI calls saved: {len(test_news) - ai_calls_made}")
-        print(
-            f"   📈 Optimization efficiency: {((len(test_news) - ai_calls_made) / len(test_news)) * 100:.1f}%")
+        print(f"   📈 Optimization efficiency: {((len(test_news) - ai_calls_made) / len(test_news)) * 100:.1f}%")
 
     def test_cache_effectiveness(self):
         """Test cache effectiveness with duplicate news items."""
@@ -223,10 +220,9 @@ class TestOptimizationIntegration:
         prefilter_results = []
         for news_item in test_news:
             result = self.prefilter.filter_news(news_item)
-            prefilter_results.append({"news_item": news_item,
-                                      "passed": result.passed,
-                                      "reason": result.reason,
-                                      "score": result.score})
+            prefilter_results.append(
+                {"news_item": news_item, "passed": result.passed, "reason": result.reason, "score": result.score}
+            )
 
         # Count how many items passed prefilter
         passed_count = sum(1 for r in prefilter_results if r["passed"])
@@ -283,8 +279,7 @@ class TestOptimizationIntegration:
         for i, result in enumerate(predictor_results):
             news = result["news_item"]
             print(f"   {i+1}. {news['title'][:50]}...")
-            print(
-                f"      📊 Importance: {result['importance']:.2f}, Credibility: {result['credibility']:.2f}")
+            print(f"      📊 Importance: {result['importance']:.2f}, Credibility: {result['credibility']:.2f}")
 
     def test_optimization_with_different_configurations(self):
         """Test optimization with different feature configurations."""
@@ -331,8 +326,7 @@ class TestOptimizationIntegration:
         for config, calls in results.items():
             print(f"   {config}: {calls} AI calls")
 
-        print(
-            f"\n📈 Optimization improvement: {((no_optimization - full_optimization) / no_optimization) * 100:.1f}%")
+        print(f"\n📈 Optimization improvement: {((no_optimization - full_optimization) / no_optimization) * 100:.1f}%")
 
 
 if __name__ == "__main__":

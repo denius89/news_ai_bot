@@ -5,6 +5,10 @@ This module provides aiogram v3 handlers for managing user subscriptions
 to news categories.
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from aiogram import Router, types
 from aiogram.filters import Command
 

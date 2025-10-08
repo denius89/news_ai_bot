@@ -34,13 +34,13 @@ export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
 
 # Проверяем, что все зависимости доступны
 echo "🔍 Проверка зависимостей..."
-python3 -c "import utils.ai_client; print('✅ utils.ai_client OK')" || {
-    echo "❌ Ошибка импорта utils.ai_client"
+python3 -c "import utils.ai.ai_client; print('✅ utils.ai.ai_client OK')" || {
+    echo "❌ Ошибка импорта utils.ai.ai_client"
     exit 1
 }
 
-python3 -c "import config.settings; print('✅ config.settings OK')" || {
-    echo "❌ Ошибка импорта config.settings"
+python3 -c "import config.core.settings; print('✅ config.core.settings OK')" || {
+    echo "❌ Ошибка импорта config.core.settings"
     exit 1
 }
 
@@ -64,7 +64,7 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 echo "🚀 Запуск Telegram Bot..."
-python3 -m telegram_bot.bot &
+PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH" python3 -m telegram_bot.bot &
 BOT_PID=$!
 
 # Сохраняем PID

@@ -146,8 +146,7 @@ async def show_quick_progress(
         logger.warning(f"Failed to show quick progress: {e}")
 
 
-def build_digest_actions_keyboard(username: str,
-                                  category: str = None) -> types.InlineKeyboardMarkup:
+def build_digest_actions_keyboard(username: str, category: str = None) -> types.InlineKeyboardMarkup:
     """
     Build inline keyboard with digest actions.
 
@@ -172,8 +171,7 @@ def build_digest_actions_keyboard(username: str,
         )
 
     # Enable auto-digest button
-    buttons.append([types.InlineKeyboardButton(
-        text="🔔 Включить авто-дайджест", callback_data="enable_auto_digest")])
+    buttons.append([types.InlineKeyboardButton(text="🔔 Включить авто-дайджест", callback_data="enable_auto_digest")])
 
     # Back button
     buttons.append([types.InlineKeyboardButton(text="⬅️ Назад", callback_data="back")])

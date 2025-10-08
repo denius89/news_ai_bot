@@ -1,4 +1,9 @@
 import logging
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from utils.ai.ai_client import ask
 
 logger = logging.getLogger("importance")

@@ -1,7 +1,12 @@
 # utils/ai_client.py
 import logging
 import asyncio
+import sys
+import os
 from openai import OpenAI
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from config.core.settings import OPENAI_API_KEY, AI_MODEL_SUMMARY, AI_MAX_TOKENS
 
 logger = logging.getLogger("ai_client")
@@ -34,11 +39,7 @@ def ask(prompt: str, model: str = None, max_tokens: int = None) -> str:
         raise e
 
 
-async def ask_async(
-        prompt: str,
-        model: str = None,
-        max_tokens: int = None,
-        style: str = "analytical") -> str:
+async def ask_async(prompt: str, model: str = None, max_tokens: int = None, style: str = "analytical") -> str:
     """
     Асинхронная функция для обращения к OpenAI ChatCompletion.
     """

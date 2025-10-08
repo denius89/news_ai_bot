@@ -119,11 +119,9 @@ def health_check():
         try:
             db_service = get_async_service()
             # Simple ping to check if service is available
-            health_status["checks"]["database"] = {
-                "status": "healthy", "message": "Database service available"}
+            health_status["checks"]["database"] = {"status": "healthy", "message": "Database service available"}
         except Exception as e:
-            health_status["checks"]["database"] = {
-                "status": "unhealthy", "message": f"Database error: {str(e)}"}
+            health_status["checks"]["database"] = {"status": "unhealthy", "message": f"Database error: {str(e)}"}
             health_status["status"] = "degraded"
 
         # Check cache functionality
@@ -135,8 +133,7 @@ def health_check():
                 "message": f'Cache enabled: {cache_stats["enabled"]}, size: {cache_stats["size"]}',
             }
         except Exception as e:
-            health_status["checks"]["cache"] = {
-                "status": "unhealthy", "message": f"Cache error: {str(e)}"}
+            health_status["checks"]["cache"] = {"status": "unhealthy", "message": f"Cache error: {str(e)}"}
             health_status["status"] = "degraded"
 
         # Check metrics collection
@@ -148,8 +145,7 @@ def health_check():
                 "message": f'Metrics collection active, uptime: {metrics_summary["uptime_seconds"]}s',
             }
         except Exception as e:
-            health_status["checks"]["metrics"] = {
-                "status": "unhealthy", "message": f"Metrics error: {str(e)}"}
+            health_status["checks"]["metrics"] = {"status": "unhealthy", "message": f"Metrics error: {str(e)}"}
             health_status["status"] = "degraded"
 
         # Check configuration
@@ -183,11 +179,10 @@ def health_check():
 
     except Exception as e:
         logger.error(f"Error in health check: {e}")
-        return (jsonify({"status": "unhealthy",
-                         "message": f"Health check failed: {str(e)}",
-                         "timestamp": time.time()}),
-                503,
-                )
+        return (
+            jsonify({"status": "unhealthy", "message": f"Health check failed: {str(e)}", "timestamp": time.time()}),
+            503,
+        )
 
 
 @metrics_bp.route("/health/live")
@@ -224,11 +219,10 @@ def readiness_check():
 
     except Exception as e:
         logger.error(f"Readiness check failed: {e}")
-        return (jsonify({"status": "not_ready",
-                         "message": f"Readiness check failed: {str(e)}",
-                         "timestamp": time.time()}),
-                503,
-                )
+        return (
+            jsonify({"status": "not_ready", "message": f"Readiness check failed: {str(e)}", "timestamp": time.time()}),
+            503,
+        )
 
 
 @metrics_bp.route("/optimization/config")

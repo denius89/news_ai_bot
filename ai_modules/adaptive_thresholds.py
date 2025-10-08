@@ -25,9 +25,7 @@ class AdaptiveThresholds:
         """Initialize adaptive thresholds with configuration."""
         self.config = self._load_config(config_path)
         self.category_thresholds = self.config.get("category_thresholds", {})
-        self.default_thresholds = self.config.get(
-            "default_thresholds", {
-                "importance": 0.6, "credibility": 0.7})
+        self.default_thresholds = self.config.get("default_thresholds", {"importance": 0.6, "credibility": 0.7})
 
         # Override with environment variables if present
         import os
@@ -83,8 +81,7 @@ class AdaptiveThresholds:
             importance = thresholds.get("importance", self.default_thresholds["importance"])
             credibility = thresholds.get("credibility", self.default_thresholds["credibility"])
 
-            logger.debug(
-                f"[THRESHOLD] category={category_lower} importance>{importance} credibility>{credibility}")
+            logger.debug(f"[THRESHOLD] category={category_lower} importance>{importance} credibility>{credibility}")
             return importance, credibility
 
         # Use default thresholds
@@ -108,10 +105,10 @@ class AdaptiveThresholds:
         importance_threshold, credibility_threshold = self.get_thresholds(category)
 
         if importance < importance_threshold:
-            return False, f"importance_below_threshold"
+            return False, "importance_below_threshold"
 
         if credibility < credibility_threshold:
-            return False, f"credibility_below_threshold"
+            return False, "credibility_below_threshold"
 
         return True, "thresholds_passed"
 

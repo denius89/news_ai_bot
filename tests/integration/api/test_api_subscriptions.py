@@ -126,11 +126,7 @@ class TestSubscriptionsAPI:
         """Test successful user creation."""
         mock_get_user.return_value = "user-uuid-123"
 
-        response = client.post(
-            "/api/users",
-            json={
-                "telegram_id": 123456789,
-                "username": "testuser"})
+        response = client.post("/api/users", json={"telegram_id": 123456789, "username": "testuser"})
         assert response.status_code == 200
         data = response.get_json()
         assert data["status"] == "success"

@@ -19,7 +19,6 @@ import asyncio
 import logging
 import time
 from typing import Dict, List, Optional, Tuple, Any
-from urllib.parse import urljoin, urlparse
 import yaml
 from pathlib import Path
 
@@ -70,7 +69,10 @@ class AdvancedParser:
         connector = aiohttp.TCPConnector(limit=100, limit_per_host=10)
 
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            ),
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
             "Accept-Encoding": "gzip, deflate",
@@ -257,8 +259,9 @@ class AdvancedParser:
                         maintext = ""
 
                         if "title" in result and result["title"]:
-                            title = (str(result["title"][0]) if isinstance(
-                                result["title"], list) else str(result["title"]))
+                            title = (
+                                str(result["title"][0]) if isinstance(result["title"], list) else str(result["title"])
+                            )
 
                         if "content" in result and result["content"]:
                             if isinstance(result["content"], list):
@@ -312,8 +315,7 @@ class AdvancedParser:
         logger.warning(f"Не удалось извлечь контент из {url}")
         return None
 
-    async def _process_source(self, category: str, subcategory: str,
-                              name: str, url: str) -> Dict[str, Any]:
+    async def _process_source(self, category: str, subcategory: str, name: str, url: str) -> Dict[str, Any]:
         """
         Обработка одного источника новостей.
 
@@ -386,8 +388,7 @@ class AdvancedParser:
                     credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
                     if importance < self.min_importance:
-                        logger.debug(
-                            f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                        logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                         continue
 
                     # Сохраняем в БД
@@ -407,8 +408,7 @@ class AdvancedParser:
                     await db_service.async_upsert_news([news_item])
                     saved_count += 1
 
-                    logger.debug(
-                        f"[{category}/{subcategory}] {title} -> SAVED (importance: {importance:.2f})")
+                    logger.debug(f"[{category}/{subcategory}] {title} -> SAVED (importance: {importance:.2f})")
 
                 except Exception as e:
                     logger.error(f"Ошибка обработки RSS записи: {e}")
@@ -447,8 +447,7 @@ class AdvancedParser:
             credibility = evaluate_credibility({"title": title, "content": text_for_ai})
 
             if importance < self.min_importance:
-                logger.debug(
-                    f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
+                logger.debug(f"[{category}/{subcategory}] {title} -> SKIP (importance: {importance:.2f})")
                 return {"success": False, "reason": "low_importance", "importance": importance}
 
             # Сохраняем в БД
@@ -467,8 +466,7 @@ class AdvancedParser:
             db_service = get_async_service()
             await db_service.async_upsert_news([news_item])
 
-            logger.info(
-                f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
+            logger.info(f"[{category}/{subcategory}] {url} -> SUCCESS ({method}, importance: {importance:.2f})")
 
             return {
                 "success": True,

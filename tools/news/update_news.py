@@ -58,8 +58,7 @@ async def update_news_with_universal_parser():
                     print(f"   💾 Сохранено {saved_count} новостей...")
 
             except Exception as e:
-                logger.warning(
-                    f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}")
+                logger.warning(f"Ошибка сохранения новости {news_item.get('title', 'Unknown')}: {e}")
                 continue
 
         print(f"✅ Успешно сохранено {saved_count} новостей")

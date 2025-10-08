@@ -146,8 +146,7 @@ class PortManager:
 
             for proc_info in duplicates:
                 age_minutes = proc_info["age"] / 60
-                print(
-                    f"   PID {proc_info['pid']}: {proc_info['cmdline'][:80]}... (возраст: {age_minutes:.1f} мин)")
+                print(f"   PID {proc_info['pid']}: {proc_info['cmdline'][:80]}... (возраст: {age_minutes:.1f} мин)")
 
                 try:
                     process = psutil.Process(proc_info["pid"])
@@ -201,8 +200,7 @@ class PortManager:
                     if self.is_port_free(port):
                         print(f"✅ Порт {port} освобожден")
                     else:
-                        result["warnings"].append(
-                            f"Порт {port} все еще занят после попытки освобождения")
+                        result["warnings"].append(f"Порт {port} все еще занят после попытки освобождения")
                 else:
                     result["warnings"].append(f"Не удалось освободить порт {port}")
             else:
@@ -237,14 +235,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Менеджер портов и процессов PulseAI")
-    parser.add_argument(
-        "--check",
-        action="store_true",
-        help="Проверить состояние портов и процессов")
-    parser.add_argument(
-        "--cleanup",
-        action="store_true",
-        help="Очистить дублирующие процессы и порты")
+    parser.add_argument("--check", action="store_true", help="Проверить состояние портов и процессов")
+    parser.add_argument("--cleanup", action="store_true", help="Очистить дублирующие процессы и порты")
     parser.add_argument("--force", action="store_true", help="Принудительная очистка")
     parser.add_argument("--prepare", action="store_true", help="Подготовить окружение для тестов")
 
@@ -273,8 +265,7 @@ def main():
             print(f"   Найдено {len(duplicates)} дублирующих процессов:")
             for proc in duplicates:
                 age_min = proc["age"] / 60
-                print(
-                    f"   PID {proc['pid']}: {proc['cmdline'][:60]}... (возраст: {age_min:.1f} мин)")
+                print(f"   PID {proc['pid']}: {proc['cmdline'][:60]}... (возраст: {age_min:.1f} мин)")
         else:
             print("   ✅ Дублирующих процессов не найдено")
 
@@ -299,8 +290,7 @@ def main():
 
         # Возвращаем код выхода на основе результата
         # Критическими считаем только предупреждения о невозможности найти свободные порты
-        critical_warnings = [w for w in result["warnings"]
-                             if "не удалось найти свободный порт" in w]
+        critical_warnings = [w for w in result["warnings"] if "не удалось найти свободный порт" in w]
 
         # Если у нас есть свободные порты для всех сервисов, то все хорошо
         if len(result["free_ports"]) >= 3:  # webapp, api, test

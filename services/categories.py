@@ -114,10 +114,7 @@ def get_all_sources() -> List[Tuple[str, str, str, str]]:
         for subcategory, data in subcategories.items():
             sources_list = data.get("sources", [])
             for source in sources_list:
-                all_sources.append(
-                    (category, subcategory, source.get(
-                        "name", ""), source.get(
-                        "url", "")))
+                all_sources.append((category, subcategory, source.get("name", ""), source.get("url", "")))
 
     return all_sources
 
@@ -252,8 +249,7 @@ def validate_sources() -> Tuple[bool, List[str]]:
 
             for i, source in enumerate(sources_list):
                 if not isinstance(source, dict):
-                    errors.append(
-                        f"Источник #{i+1} в '{category}.{subcategory}' должен быть словарем")
+                    errors.append(f"Источник #{i+1} в '{category}.{subcategory}' должен быть словарем")
                     continue
 
                 if "name" not in source:

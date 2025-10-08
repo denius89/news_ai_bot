@@ -1,4 +1,9 @@
+import sys
+sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+
 import logging
+import os
+
 from utils.ai.ai_client import ask
 
 logger = logging.getLogger("credibility")
