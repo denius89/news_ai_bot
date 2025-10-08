@@ -2,4 +2,4 @@
 
 from .ai_client import ask
 
-__all__ = ['ask']
+__all__ = ["ask"]

@@ -642,4 +642,486 @@ def get_upcoming_events():
         return jsonify({"status": "error", "message": "Ошибка получения событий"}), 500
 
 
+# --- Digest API Endpoints ---
+@api_bp.route("/digests/styles", methods=["GET"])
+def get_digest_styles():
+    """Get available digest styles."""
+    try:
+        from digests.configs import STYLES
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "styles": STYLES,
+                    "descriptions": {
+                        "analytical": "Глубокий анализ с экспертной оценкой",
+                        "business": "Деловой тон с фокусом на практические решения",
+                        "meme": "Лёгкий стиль с юмором и мемами",
+                    },
+                },
+            }
+        )
+    except Exception as e:
+        logger.error(f"Ошибка получения стилей дайджеста: {e}")
+        return jsonify({"status": "error", "message": "Ошибка получения стилей"}), 500
+
+
+@api_bp.route("/digests/categories", methods=["GET"])
+def get_digest_categories():
+    """Get available digest categories."""
+    try:
+        from services.categories import get_categories
+
+        # Get real categories from sources.yaml
+        real_categories = get_categories()
+
+        # Map to display names with icons
+        category_display = {
+            "crypto": "₿ Криптовалюты",
+            "sports": "⚽ Спорт",
+            "markets": "📈 Рынки",
+            "tech": "🤖 Технологии",
+            "world": "🌍 Мир",
+        }
+
+        # Build categories dict
+        categories_dict = {}
+        for cat in real_categories:
+            categories_dict[cat] = category_display.get(cat, cat.title())
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "categories": categories_dict,
+                    "periods": {"today": "📅 Сегодня", "7d": "📅 Последние 7 дней", "30d": "📅 Последние 30 дней"},
+                },
+            }
+        )
+    except Exception as e:
+        logger.error(f"Ошибка получения категорий дайджеста: {e}")
+        return jsonify({"status": "error", "message": "Ошибка получения категорий"}), 500
+
+
+@api_bp.route("/digests/generate", methods=["POST"])
+def generate_digest():
+    """Generate AI digest with specified parameters and save it for user."""
+    if not request.is_json:
+        return jsonify({"status": "error", "message": "JSON body is required"}), 400
+
+    data = request.get_json()
+    category = data.get("category", "all")
+    style = data.get("style", "analytical")
+    period = data.get("period", "today")
+    limit = data.get("limit", 10)
+    user_id = data.get("user_id")  # Новый параметр для привязки к пользователю
+    save_digest = data.get("save", True)  # По умолчанию сохраняем
+
+    try:
+        from services.unified_digest_service import get_async_digest_service
+        from digests.configs import STYLES
+        from services.categories import get_categories
+        from database.db_models import save_digest as db_save_digest
+
+        # Get real categories
+        real_categories = get_categories()
+
+        # Validate parameters
+        if style not in STYLES:
+            return jsonify({"status": "error", "message": f"Invalid style: {style}"}), 400
+
+        if category != "all" and category not in real_categories:
+            return jsonify({"status": "error", "message": f"Invalid category: {category}"}), 400
+
+        # Generate digest using async service
+        categories_list = None if category == "all" else [category]
+        digest_service = get_async_digest_service()
+
+        # Use async method to generate AI digest
+        digest_text = run_async(
+            digest_service.async_build_ai_digest(limit=limit, categories=categories_list, style=style)
+        )
+
+        # Category display mapping
+        category_display = {
+            "crypto": "₿ Криптовалюты",
+            "sports": "⚽ Спорт",
+            "markets": "📈 Рынки",
+            "tech": "🤖 Технологии",
+            "world": "🌍 Мир",
+        }
+
+        # Save digest to database if user_id provided and save_digest is True
+        digest_id = None
+        if user_id and save_digest:
+            try:
+                digest_id = db_save_digest(
+                    user_id=str(user_id),
+                    summary=digest_text,
+                    category=category,
+                    style=style,
+                    period=period,
+                    limit_count=limit,
+                    metadata={
+                        "api_generated": True,
+                        "category_name": (
+                            category_display.get(category, "Все категории") if category != "all" else "Все категории"
+                        ),
+                        "style_name": STYLES.get(style, style),
+                    },
+                )
+                logger.info(f"Дайджест сохранен для пользователя {user_id}: {digest_id}")
+            except Exception as save_error:
+                logger.warning(f"Не удалось сохранить дайджест: {save_error}")
+                # Продолжаем выполнение даже если сохранение не удалось
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "digest": digest_text,
+                    "digest_id": digest_id,
+                    "saved": bool(digest_id),
+                    "metadata": {
+                        "category": category,
+                        "style": style,
+                        "period": period,
+                        "limit": limit,
+                        "style_name": STYLES.get(style, style),
+                        "category_name": (
+                            category_display.get(category, "Все категории") if category != "all" else "Все категории"
+                        ),
+                    },
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Ошибка генерации дайджеста: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка генерации: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/history", methods=["GET"])
+def get_digest_history():
+    """Get user's digest history with soft delete support."""
+    user_id = request.args.get("user_id")
+    limit = int(request.args.get("limit", 20))
+    offset = int(request.args.get("offset", 0))
+    include_deleted = request.args.get("include_deleted", "false").lower() == "true"
+    include_archived = request.args.get("include_archived", "false").lower() == "true"
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import get_user_digests
+
+        # Get user's digest history with soft delete support
+        digests = get_user_digests(
+            user_id=str(user_id),
+            limit=limit,
+            offset=offset,
+            include_deleted=include_deleted,
+            include_archived=include_archived,
+        )
+
+        # Format digests for response (updated for new schema after migration)
+        formatted_digests = []
+        for digest in digests:
+            formatted_digest = {
+                "id": digest.get("id"),
+                "user_id": digest.get("user_id"),  # Добавляем user_id
+                "summary": digest.get("summary"),
+                "category": digest.get("category"),
+                "style": digest.get("style"),
+                "period": digest.get("period"),
+                "limit_count": digest.get("limit_count"),
+                "created_at": digest.get("created_at"),
+                "preview": (
+                    digest.get("summary")[:200] + "..."
+                    if len(digest.get("summary", "")) > 200
+                    else digest.get("summary")
+                ),
+                "deleted_at": digest.get("deleted_at"),
+                "archived": digest.get("archived"),
+                "metadata": digest.get("metadata"),
+            }
+            formatted_digests.append(formatted_digest)
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "digests": formatted_digests,
+                    "total": len(formatted_digests),
+                    "limit": limit,
+                    "offset": offset,
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Ошибка получения истории дайджестов: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка получения истории: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/<digest_id>", methods=["GET"])
+def get_digest_by_id(digest_id):
+    """Get specific digest by ID."""
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import get_digest_by_id as db_get_digest_by_id
+
+        # Get digest by ID
+        digest = db_get_digest_by_id(digest_id=str(digest_id), user_id=str(user_id))
+
+        if not digest:
+            return jsonify({"status": "error", "message": "Digest not found"}), 404
+
+        # Parse metadata from summary (temporary solution until migration)
+        summary = digest.get("summary", "")
+        if summary.startswith("[") and "]" in summary:
+            metadata_part = summary.split("]", 1)[0] + "]"
+            clean_summary = summary.split("]", 1)[1].strip()
+
+            # Parse metadata
+            try:
+                metadata = metadata_part[1:-1].split("|")
+                if len(metadata) >= 4:
+                    category, style, period, limit_count = metadata[:4]
+                else:
+                    category, style, period, limit_count = "all", "analytical", "today", "10"
+            except:
+                category, style, period, limit_count = "all", "analytical", "today", "10"
+        else:
+            clean_summary = summary
+            category, style, period, limit_count = "all", "analytical", "today", "10"
+
+        formatted_digest = {
+            "id": digest.get("id"),
+            "summary": clean_summary,
+            "category": category,
+            "style": style,
+            "period": period,
+            "limit": int(limit_count) if limit_count.isdigit() else 10,
+            "created_at": digest.get("created_at"),
+            "user_id": digest.get("user_id"),
+        }
+
+        return jsonify({"status": "success", "data": formatted_digest})
+
+    except Exception as e:
+        logger.error(f"Ошибка получения дайджеста {digest_id}: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка получения дайджеста: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/<digest_id>", methods=["DELETE"])
+def soft_delete_digest(digest_id):
+    """Soft delete specific digest by ID."""
+    user_id = request.args.get("user_id")
+    permanent = request.args.get("permanent", "false").lower() == "true"
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import (
+            soft_delete_digest as db_soft_delete_digest,
+            permanent_delete_digest as db_permanent_delete_digest,
+        )
+
+        if permanent:
+            # Окончательное удаление
+            success = db_permanent_delete_digest(digest_id=str(digest_id), user_id=str(user_id))
+            message = "Digest permanently deleted"
+        else:
+            # Мягкое удаление
+            success = db_soft_delete_digest(digest_id=str(digest_id), user_id=str(user_id))
+            message = "Digest moved to trash"
+
+        if success:
+            return jsonify({"status": "success", "message": message, "deleted": True})
+        else:
+            return jsonify({"status": "error", "message": "Digest not found or access denied"}), 404
+
+    except Exception as e:
+        logger.error(f"Ошибка удаления дайджеста {digest_id}: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка удаления дайджеста: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/<digest_id>/restore", methods=["POST"])
+def restore_digest(digest_id):
+    """Restore soft deleted digest."""
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import restore_digest as db_restore_digest
+
+        success = db_restore_digest(digest_id=str(digest_id), user_id=str(user_id))
+
+        if success:
+            return jsonify({"status": "success", "message": "Digest restored successfully", "restored": True})
+        else:
+            return jsonify({"status": "error", "message": "Digest not found, not deleted, or access denied"}), 404
+
+    except Exception as e:
+        logger.error(f"Ошибка восстановления дайджеста {digest_id}: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка восстановления дайджеста: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/<digest_id>/archive", methods=["POST"])
+def archive_digest(digest_id):
+    """Archive digest."""
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import archive_digest as db_archive_digest
+
+        success = db_archive_digest(digest_id=str(digest_id), user_id=str(user_id))
+
+        if success:
+            return jsonify({"status": "success", "message": "Digest archived successfully", "archived": True})
+        else:
+            return jsonify({"status": "error", "message": "Digest not found, already archived, or access denied"}), 404
+
+    except Exception as e:
+        logger.error(f"Ошибка архивирования дайджеста {digest_id}: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка архивирования дайджеста: {str(e)}"}), 500
+
+
+@api_bp.route("/digests/<digest_id>/unarchive", methods=["POST"])
+def unarchive_digest(digest_id):
+    """Unarchive digest."""
+    user_id = request.args.get("user_id")
+
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+
+    try:
+        from database.db_models import unarchive_digest as db_unarchive_digest
+
+        success = db_unarchive_digest(digest_id=str(digest_id), user_id=str(user_id))
+
+        if success:
+            return jsonify({"status": "success", "message": "Digest unarchived successfully", "unarchived": True})
+        else:
+            return jsonify({"status": "error", "message": "Digest not found, not archived, or access denied"}), 404
+
+    except Exception as e:
+        logger.error(f"Ошибка разархивирования дайджеста {digest_id}: {e}")
+        return jsonify({"status": "error", "message": f"Ошибка разархивирования дайджеста: {str(e)}"}), 500
+
+
+@api_bp.route("/users/by-telegram-id/<int:telegram_id>", methods=["GET"])
+def get_user_by_telegram_id(telegram_id):
+    """Get user_id by telegram_id for Telegram WebApp integration."""
+    try:
+        from database.db_models import supabase
+
+        if not supabase:
+            return jsonify({"status": "error", "message": "Database not initialized"}), 500
+
+        # Ищем пользователя по telegram_id
+        result = supabase.table("users").select("id, username, locale").eq("telegram_id", telegram_id).execute()
+
+        if result.data:
+            user_data = result.data[0]
+            logger.info(f"User found by telegram_id {telegram_id}: {user_data['id']}")
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "data": {
+                        "user_id": user_data["id"],
+                        "telegram_id": telegram_id,
+                        "username": user_data.get("username"),
+                        "locale": user_data.get("locale", "ru"),
+                    },
+                }
+            )
+        else:
+            logger.warning(f"User not found by telegram_id: {telegram_id}")
+            return jsonify({"status": "error", "message": "User not found", "code": "USER_NOT_FOUND"}), 404
+
+    except Exception as e:
+        logger.error(f"Error getting user by telegram_id {telegram_id}: {e}")
+        return jsonify({"status": "error", "message": f"Database error: {str(e)}"}), 500
+
+
+@api_bp.route("/users/telegram-auth", methods=["POST"])
+def telegram_auth():
+    """Authenticate user via Telegram WebApp initData."""
+    try:
+        data = request.get_json()
+        init_data = data.get("initData")
+
+        if not init_data:
+            return jsonify({"status": "error", "message": "initData is required"}), 400
+
+        # Парсим initData для получения telegram_id
+        # Формат: "user=%7B%22id%22%3A123456789%2C%22first_name%22%3A%22John%22%7D&auth_date=1234567890&hash=abc123"
+        import urllib.parse
+
+        parsed_data = urllib.parse.parse_qs(init_data)
+        user_data_str = parsed_data.get("user", [None])[0]
+
+        if not user_data_str:
+            return jsonify({"status": "error", "message": "Invalid initData format"}), 400
+
+        # Декодируем user данные
+        user_data = urllib.parse.unquote(user_data_str)
+        import json
+
+        user_info = json.loads(user_data)
+        telegram_id = user_info.get("id")
+
+        if not telegram_id:
+            return jsonify({"status": "error", "message": "Telegram ID not found in initData"}), 400
+
+        # Ищем пользователя в базе данных
+        from database.db_models import supabase
+
+        if not supabase:
+            return jsonify({"status": "error", "message": "Database not initialized"}), 500
+
+        result = supabase.table("users").select("id, username, locale").eq("telegram_id", telegram_id).execute()
+
+        if result.data:
+            user_data = result.data[0]
+            logger.info(f"Telegram auth successful for telegram_id {telegram_id}: {user_data['id']}")
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "data": {
+                        "user_id": user_data["id"],
+                        "telegram_id": telegram_id,
+                        "username": user_data.get("username"),
+                        "locale": user_data.get("locale", "ru"),
+                        "telegram_user": user_info,
+                    },
+                }
+            )
+        else:
+            logger.warning(f"Telegram auth failed - user not found: {telegram_id}")
+            return jsonify({"status": "error", "message": "User not found", "code": "USER_NOT_FOUND"}), 404
+
+    except json.JSONDecodeError:
+        return jsonify({"status": "error", "message": "Invalid JSON in initData"}), 400
+    except Exception as e:
+        logger.error(f"Error in telegram auth: {e}")
+        return jsonify({"status": "error", "message": f"Authentication error: {str(e)}"}), 500
+
+
 __all__ = ["api_bp"]

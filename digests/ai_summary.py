@@ -11,12 +11,18 @@ import os
 import json
 import logging
 from typing import List, Union
+from pathlib import Path
 
 from openai import OpenAI
 from digests.prompts import PROMPTS
 from utils.text.formatters import format_digest_output
 from models.news import NewsItem
 from utils.text.clean_text import clean_for_telegram
+
+# Загружаем переменные окружения из .env файла
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / "environment" / ".env")
 
 logger = logging.getLogger("ai_summary")
 

@@ -17,7 +17,7 @@ import httpx
 from supabase import create_client, create_async_client, Client, AsyncClient
 
 # Add project root to path
-sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
