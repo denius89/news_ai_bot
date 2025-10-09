@@ -33,8 +33,8 @@ interface DashboardStats {
 
 const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { telegramUser, isTelegramWebApp } = useTelegramUser();
+  const [statsLoading, setStatsLoading] = useState(true);
+  const { telegramUser, userData, loading: userLoading, error } = useTelegramUser();
 
   useEffect(() => {
     fetchDashboardStats();
@@ -47,11 +47,23 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
 
   // Функция для персонализированного приветствия
   const getPersonalizedGreeting = () => {
-    if (!telegramUser) {
+    // Если есть ошибка аутентификации, показываем сообщение об ошибке
+    if (error) {
+      return "Ошибка аутентификации";
+    }
+    
+    // Если пользователь еще загружается
+    if (userLoading) {
+      return "Загрузка...";
+    }
+    
+    // Используем first_name из базы данных, если доступен
+    const firstName = userData?.first_name || telegramUser?.first_name;
+    
+    if (!firstName) {
       return "Добро пожаловать в PulseAI";
     }
     
-    const firstName = telegramUser.first_name;
     const timeOfDay = new Date().getHours();
     
     let greeting = "";
@@ -78,7 +90,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
     } catch (error) {
       console.error('Ошибка загрузки статистики:', error);
     } finally {
-      setLoading(false);
+      setStatsLoading(false);
     }
   };
 
@@ -115,21 +127,21 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
   };
 
   const getChangeColor = (change: number): string => {
-    if (change > 0) return 'text-green-600';
-    if (change < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (change > 0) return 'text-green-600 dark:text-green-400';
+    if (change < 0) return 'text-red-600 dark:text-red-400';
+    return 'text-muted-strong';
   };
 
   const statsData = stats ? [
     { label: 'Новостей сегодня', value: stats.news_today.count.toLocaleString(), trend: formatChange(stats.news_today.change), color: getChangeColor(stats.news_today.change) },
-    { label: 'Активных источников', value: stats.active_sources.count.toString(), trend: stats.active_sources.change > 0 ? `+${stats.active_sources.change}` : stats.active_sources.change < 0 ? `${stats.active_sources.change}` : 'стабильно', color: stats.active_sources.change > 0 ? 'text-green-600' : stats.active_sources.change < 0 ? 'text-red-600' : 'text-gray-600' },
-    { label: 'Категорий', value: stats.categories.count.toString(), trend: 'стабильно', color: 'text-gray-600' },
-    { label: 'AI дайджестов', value: stats.ai_digests.count.toString(), trend: stats.ai_digests.change > 0 ? `+${stats.ai_digests.change}` : stats.ai_digests.change < 0 ? `${stats.ai_digests.change}` : 'стабильно', color: stats.ai_digests.change > 0 ? 'text-green-600' : stats.ai_digests.change < 0 ? 'text-red-600' : 'text-gray-600' },
+    { label: 'Активных источников', value: stats.active_sources.count.toString(), trend: stats.active_sources.change > 0 ? `+${stats.active_sources.change}` : stats.active_sources.change < 0 ? `${stats.active_sources.change}` : 'стабильно', color: getChangeColor(stats.active_sources.change) },
+    { label: 'Категорий', value: stats.categories.count.toString(), trend: 'стабильно', color: 'text-muted-strong' },
+    { label: 'AI дайджестов', value: stats.ai_digests.count.toString(), trend: stats.ai_digests.change > 0 ? `+${stats.ai_digests.change}` : stats.ai_digests.change < 0 ? `${stats.ai_digests.change}` : 'стабильно', color: getChangeColor(stats.ai_digests.change) },
   ] : [
-    { label: 'Новостей сегодня', value: '...', trend: '...', color: 'text-gray-600' },
-    { label: 'Активных источников', value: '...', trend: '...', color: 'text-gray-600' },
-    { label: 'Категорий', value: '...', trend: '...', color: 'text-gray-600' },
-    { label: 'AI дайджестов', value: '...', trend: '...', color: 'text-gray-600' },
+    { label: 'Новостей сегодня', value: '...', trend: '...', color: 'text-muted-strong' },
+    { label: 'Активных источников', value: '...', trend: '...', color: 'text-muted-strong' },
+    { label: 'Категорий', value: '...', trend: '...', color: 'text-muted-strong' },
+    { label: 'AI дайджестов', value: '...', trend: '...', color: 'text-muted-strong' },
   ];
 
   const quickActions = [
@@ -221,7 +233,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                               ${stat.label.length > 25 ? "min-h-[140px]" : "min-h-[120px]"}`}
                 >
                   <div className="text-2xl font-semibold text-text dark:text-white">{stat.value}</div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 leading-tight text-balance">
+                  <p className="text-sm text-muted-strong leading-tight text-balance">
                     {stat.label}
                   </p>
                   {stat.trend && (
@@ -230,8 +242,8 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                 </motion.div>
               ))}
             </div>
-            {loading && (
-              <div className="text-center text-gray-500 dark:text-gray-400 mt-4">
+            {statsLoading && (
+              <div className="text-center text-muted-strong mt-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
                 Загрузка данных...
               </div>

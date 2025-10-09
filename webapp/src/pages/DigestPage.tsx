@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
-import { Bot, Sparkles, Plus, Filter, Trash2, Archive, RotateCcw, Eye, Loader2, ExternalLink, X } from 'lucide-react';
+import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, Loader2, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays } from 'lucide-react';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
 interface DigestItem {
@@ -45,12 +45,11 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [activeTab, setActiveTab] = useState<'active' | 'archived' | 'deleted'>('active');
   const [deletedDigests, setDeletedDigests] = useState<DigestItem[]>([]);
   const [archivedDigests, setArchivedDigests] = useState<DigestItem[]>([]);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [selectedDigest, setSelectedDigest] = useState<DigestItem | null>(null);
   
   // 🚀 Автоматическое получение user_id из Telegram WebApp
-  const { userId, telegramUser, userData, loading: userLoading, error: userError, isTelegramWebApp, isAuthenticated } = useTelegramUser();
+  const { userId, loading: userLoading, error: userError, isAuthenticated } = useTelegramUser();
 
   // Функция для показа уведомлений
   const showNotification = (type: 'success' | 'error', message: string) => {
@@ -65,17 +64,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         const response = await fetch('/api/digests/categories');
         const data = await response.json();
         if (data.status === 'success') {
-          setCategories({ all: '🌐 Все категории', ...data.data.categories });
+          setCategories({ all: 'Все категории', ...data.data.categories });
         }
       } catch (error) {
         console.warn('Failed to load categories, using defaults:', error);
         setCategories({
-          all: '🌐 Все категории',
-          crypto: '₿ Криптовалюты',
-          sports: '⚽ Спорт',
-          markets: '📈 Рынки',
-          tech: '🤖 Технологии',
-          world: '🌍 Мир'
+          all: 'Все категории',
+          crypto: 'Криптовалюты',
+          sports: 'Спорт',
+          markets: 'Рынки',
+          tech: 'Технологии',
+          world: 'Мир'
         });
       }
     };
@@ -166,51 +165,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     }
   }, [userId, userLoading]);
 
-  // Mock data
-  const mockDigests: DigestItem[] = [
-    {
-      id: '1',
-      title: 'Еженедельный дайджест: Криптовалютный рынок',
-      summary: 'Обзор ключевых событий на криптовалютном рынке за последнюю неделю: рост Bitcoin, новые регуляторные инициативы и институциональные инвестиции.',
-      category: 'crypto',
-      sources: ['CoinDesk', 'CoinTelegraph', 'Decrypt'],
-      createdAt: '2025-01-06T08:00:00Z',
-      readTime: 5,
-      keyPoints: [
-        'Bitcoin достиг новых максимумов',
-        'Институциональные инвестиции выросли на 25%',
-        'Новые регуляторные инициативы в ЕС',
-      ],
-    },
-    {
-      id: '2',
-      title: 'Технологический дайджест: ИИ и машинное обучение',
-      summary: 'Последние достижения в области искусственного интеллекта, включая новые модели языковых моделей и применение ИИ в различных отраслях.',
-      category: 'tech',
-      sources: ['TechCrunch', 'The Verge', 'Wired'],
-      createdAt: '2025-01-05T10:30:00Z',
-      readTime: 7,
-      keyPoints: [
-        'Новая архитектура нейронных сетей',
-        'ИИ в медицине: прорыв в диагностике',
-        'Этические вопросы развития ИИ',
-      ],
-    },
-    {
-      id: '3',
-      title: 'Спортивный дайджест: Главные события',
-      summary: 'Обзор ключевых спортивных событий: результаты матчей, трансферы и важные турниры.',
-      category: 'sports',
-      sources: ['ESPN', 'BBC Sport', 'Sky Sports'],
-      createdAt: '2025-01-05T07:15:00Z',
-      readTime: 4,
-      keyPoints: [
-        'Чемпионат мира: полуфиналы завершены',
-        'Зимние Олимпийские игры: подготовка',
-        'Футбольные трансферы: крупные сделки',
-      ],
-    },
-  ];
 
   // Soft delete digest function
   const softDeleteDigest = async (digestId: string) => {
@@ -219,7 +173,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       return;
     }
     
-    setActionLoading(digestId);
     try {
       const response = await fetch(`/api/digests/${digestId}?user_id=${userId}`, {
         method: 'DELETE'
@@ -231,7 +184,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         setDigests(prev => prev.filter(d => d.id !== digestId));
         setArchivedDigests(prev => prev.filter(d => d.id !== digestId));
         // Показываем уведомление
-        showNotification('success', 'Дайджест перемещен в корзину');
+        showNotification('success', 'Дайджест удален');
         // Перезагружаем историю для обновления удаленных
         setTimeout(() => loadDigestHistory(), 500);
       } else {
@@ -240,8 +193,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       }
     } catch (error) {
       console.error('Error deleting digest:', error);
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -252,7 +203,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       return;
     }
     
-    setActionLoading(digestId);
     try {
       const response = await fetch(`/api/digests/${digestId}/restore?user_id=${userId}`, {
         method: 'POST'
@@ -261,7 +211,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       const data = await response.json();
       if (data.status === 'success') {
         // Показываем уведомление
-        showNotification('success', 'Дайджест восстановлен из корзины');
+        showNotification('success', 'Дайджест восстановлен');
         // Перезагружаем историю (без локального обновления)
         setTimeout(() => loadDigestHistory(), 500);
       } else {
@@ -270,8 +220,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       }
     } catch (error) {
       console.error('Error restoring digest:', error);
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -282,7 +230,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       return;
     }
     
-    setActionLoading(digestId);
     try {
       const response = await fetch(`/api/digests/${digestId}/archive?user_id=${userId}`, {
         method: 'POST'
@@ -293,7 +240,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         // Обновляем списки
         setDigests(prev => prev.filter(d => d.id !== digestId));
         // Показываем уведомление
-        showNotification('success', 'Дайджест архивирован');
+        showNotification('success', 'Дайджест скрыт в архив');
         // Перезагружаем историю для обновления архивированных
         setTimeout(() => loadDigestHistory(), 500);
       } else {
@@ -302,8 +249,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       }
     } catch (error) {
       console.error('Error archiving digest:', error);
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -314,7 +259,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       return;
     }
     
-    setActionLoading(digestId);
     try {
       const response = await fetch(`/api/digests/${digestId}/unarchive?user_id=${userId}`, {
         method: 'POST'
@@ -334,8 +278,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       }
     } catch (error) {
       console.error('Error unarchiving digest:', error);
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -367,28 +309,14 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       const data = await response.json();
       
       if (data.status === 'success') {
-        // Add to digests list
-        const newDigest: DigestItem = {
-          id: data.data.digest_id || Date.now().toString(),
-          title: `AI-дайджест: ${data.data.metadata.category_name}`,
-          summary: `Стиль: ${data.data.metadata.style_name} • Период: ${period}`,
-          category: category,
-          sources: ['AI Generated'],
-          createdAt: new Date().toISOString(),
-          readTime: Math.ceil(data.data.digest.length / 1000),
-          keyPoints: [],
-          content: data.data.digest,
-          style: style,
-          period: period,
-          limit: 10,
-          metadata: data.data.metadata
-        };
         
         // Показываем уведомление об успешной генерации
-        showNotification('success', `Дайджест "${data.data.metadata.category_name}" успешно создан!`);
+        showNotification('success', 'Дайджест успешно создан');
         
         // Перезагружаем историю для обновления списка (без дублирования)
         if (data.data.saved) {
+          // Убеждаемся, что модалка просмотра закрыта перед обновлением списка
+          setSelectedDigest(null);
           setTimeout(() => loadDigestHistory(), 1000);
         }
         
@@ -407,7 +335,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
 
   useEffect(() => {
     // Load any existing digests from localStorage or API
-    setLoading(false);
+      setLoading(false);
   }, []);
 
   // Get current digests based on active tab
@@ -466,20 +394,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   };
 
 
-  // Generate subtitle with user info
-  const getSubtitle = () => {
-    const count = filteredDigests.length;
-    const tabName = activeTab === 'active' ? 'активных' : activeTab === 'archived' ? 'архивированных' : 'удаленных';
-    
-    let userInfo = '';
-    if (isTelegramWebApp && telegramUser) {
-      userInfo = ` • ${telegramUser.first_name}`;
-    } else if (userData?.username) {
-      userInfo = ` • ${userData.username}`;
-    }
-    
-    return `${count} ${tabName} дайджестов${userInfo}`;
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -498,7 +412,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: "easeOut" as const,
       },
     },
   };
@@ -533,64 +447,83 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       {notification && (
         <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${
           notification.type === 'success' 
-            ? 'bg-green-500 text-white' 
-            : 'bg-red-500 text-white'
+            ? 'bg-green-500 dark:bg-green-600 text-white' 
+            : 'bg-red-500 dark:bg-red-600 text-white'
         }`}>
           {notification.message}
         </div>
       )}
       
-      <MobileHeader 
-        title="AI Дайджест" 
-        subtitle={getSubtitle()}
-        actions={
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => setIsGeneratorOpen(true)}
-            className="bg-primary/10 hover:bg-primary/20 text-primary"
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
-        }
-      />
-      
-      <main className="container-main">
-        {/* Tabs Navigation - простые кнопки с видимым текстом */}
-        <div className="flex space-x-1 mb-6 bg-surface-alt rounded-xl p-1">
-          <button
+      <main className="pb-32 pt-2 px-4 max-w-md mx-auto">
+        {/* Заголовок */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+              AI Дайджест
+            </h1>
+            {/* Кнопка создания дайджеста - только для активной вкладки */}
+            {activeTab === 'active' && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsGeneratorOpen(true)}
+                className="px-4 py-2 rounded-full font-medium text-sm text-white
+                           bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500
+                           hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] 
+                           active:scale-95 transition-all duration-300 flex items-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Создать
+              </motion.button>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле.
+          </p>
+        </div>
+        {/* Фильтры и вкладки */}
+        <div className="flex space-x-1 mb-6 bg-gray-100/50 dark:bg-gray-800/40 rounded-xl p-1">
+          <motion.button
+            layout
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 250, damping: 20 }}
             onClick={() => setActiveTab('active')}
-            className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'active'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-text dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
             }`}
           >
-            <Eye className="w-3 h-3 inline mr-1" />
+            <Eye className="w-4 h-4 inline mr-2" />
             Активные
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            layout
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 250, damping: 20 }}
             onClick={() => setActiveTab('archived')}
-            className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'archived'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-text dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
             }`}
           >
-            <Archive className="w-3 h-3 inline mr-1" />
+            <Archive className="w-4 h-4 inline mr-2" />
             Архив
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            layout
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 250, damping: 20 }}
             onClick={() => setActiveTab('deleted')}
-            className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'deleted'
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-text dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
             }`}
           >
-            <Trash2 className="w-3 h-3 inline mr-1" />
+            <Trash2 className="w-4 h-4 inline mr-2" />
             Корзина
-          </button>
+          </motion.button>
         </div>
 
         <motion.div
@@ -599,25 +532,39 @@ const DigestPage: React.FC<DigestPageProps> = () => {
           animate="visible"
           className="space-y-6"
         >
-          {/* Category Filters */}
+          {/* Категории */}
           <motion.section variants={itemVariants}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(categories).map(([key, label]) => (
-                    <Button
-                      key={key}
-                      variant={selectedCategory === key ? 'primary' : 'secondary'}
-                      size="sm"
-                      onClick={() => setSelectedCategory(key)}
-                    >
-                      <Filter className="w-4 h-4 mr-1" />
-                      {label}
-                    </Button>
-                  ))}
+            <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 mt-4">
+              {Object.entries(categories).map(([key, label]) => {
+                const getIcon = (categoryKey: string) => {
+                  switch (categoryKey) {
+                    case 'all': return <Filter className="w-4 h-4" />;
+                    case 'crypto': return <Bitcoin className="w-4 h-4" />;
+                    case 'markets': return <LineChart className="w-4 h-4" />;
+                    case 'sports': return <Trophy className="w-4 h-4" />;
+                    case 'tech': return <Cpu className="w-4 h-4" />;
+                    case 'world': return <Globe2 className="w-4 h-4" />;
+                    default: return <Filter className="w-4 h-4" />;
+                  }
+                };
+                
+                return (
+                  <motion.button
+                    key={key}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedCategory(key)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                      selectedCategory === key
+                        ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                        : "bg-white/80 dark:bg-[#161616]/80 text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
+                    }`}
+                  >
+                    {getIcon(key)}
+                    {label}
+                  </motion.button>
+                );
+              })}
                 </div>
-              </CardContent>
-            </Card>
           </motion.section>
 
           {/* Digest List */}
@@ -629,18 +576,24 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                   variants={itemVariants}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <div className="bg-white dark:bg-surface-alt rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-[1.01] p-5">
+                  <motion.div
+                    className="bg-white/80 dark:bg-[#161616]/80 backdrop-blur-md border border-white/10 
+                               rounded-3xl p-5 pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.05)] 
+                               hover:scale-[1.02] transition-transform duration-300 ease-out mt-4"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  >
                     <div className="flex justify-between items-start">
-                      <h3 className="text-lg font-semibold text-text dark:text-white leading-snug">
+                      <h3 className="text-[15px] font-semibold text-gray-900 dark:text-white leading-snug">
                         {truncateText(digest.title || digest.summary, 100)}
                       </h3>
-                    </div>
+                      </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {digest.sources?.join(', ') || 'AI Generated'} • {new Date(digest.createdAt).toLocaleDateString('ru-RU')}
                     </p>
 
-                    <p className="mt-2 text-[15px] text-text/90 leading-relaxed line-clamp-3">
+                    <p className="mt-2 text-[14px] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
                       {truncateText(digest.summary, 200)}
                     </p>
 
@@ -684,65 +637,35 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                           </button>
                         )}
                         <button 
-                          className="text-primary font-medium hover:underline flex items-center gap-1"
+                          className="text-emerald-500 hover:text-emerald-400 font-medium flex items-center gap-1 transition-colors"
                           onClick={() => setSelectedDigest(digest)}
                         >
                           Подробнее
                           <ExternalLink className="w-3 h-3" />
                         </button>
                       </div>
-                    </div>
-                  </div>
+                      </div>
+                  </motion.div>
                 </motion.div>
               ))}
             </div>
           </motion.section>
 
-          {/* Generate New Digest */}
-          <motion.section variants={itemVariants}>
-            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Bot className="w-8 h-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-text mb-2">
-                    Создать AI-дайджест
-                  </h3>
-                  <p className="text-muted-strong mb-6 max-w-md mx-auto">
-                    Выберите категорию, стиль и получите персональный дайджест с анализом от ИИ
-                  </p>
-                  <Button 
-                    variant="primary" 
-                    size="lg"
-                    onClick={() => setIsGeneratorOpen(true)}
-                    className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Создать дайджест
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.section>
 
-          {/* Empty State */}
+          {/* Пустое состояние */}
           {filteredDigests.length === 0 && (
-            <motion.section variants={itemVariants} className="text-center py-20">
-              <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-text mb-2">
-                Дайджесты не найдены
-              </h3>
-              <p className="text-muted-strong mb-6">
-                Попробуйте выбрать другую категорию или создайте новый дайджест
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex flex-col items-center justify-center p-8 rounded-3xl bg-white/80 dark:bg-[#161616]/80 mt-6"
+            >
+              <Bot className="w-10 h-10 text-emerald-400 mb-3" />
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                {activeTab === 'active' && "Пока пусто — но AI уже готов собрать первый дайджест."}
+                {activeTab === 'archived' && "В архиве пока ничего нет."}
+                {activeTab === 'deleted' && "Корзина пуста."}
               </p>
-              <Button 
-                variant="secondary" 
-                onClick={() => setSelectedCategory('all')}
-              >
-                Показать все
-              </Button>
-            </motion.section>
+            </motion.div>
           )}
         </motion.div>
       </main>
@@ -756,16 +679,26 @@ const DigestPage: React.FC<DigestPageProps> = () => {
 
       {/* Digest Detail Modal */}
       {selectedDigest && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+        />
+      )}
+      
+      {selectedDigest && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative w-full max-w-2xl max-h-[75vh] 
-                       bg-white/95 dark:bg-surface-alt/95 
+            className="w-full max-w-2xl max-h-[75vh] 
+                       bg-white dark:bg-surface-alt 
                        backdrop-blur-lg rounded-3xl 
-                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] 
+                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
                        p-6 
                        overflow-hidden flex flex-col"
           >
@@ -777,97 +710,91 @@ const DigestPage: React.FC<DigestPageProps> = () => {
               <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
 
-            {/* Category and source */}
-            <div className="flex gap-2 text-sm mb-3">
-              <span className="text-primary font-medium">
-                {categories[selectedDigest.category] || selectedDigest.category}
-              </span>
-              <span className="text-gray-400 dark:text-gray-500">•</span>
-              <span className="text-gray-500 dark:text-gray-400">
-                {selectedDigest.sources?.join(', ') || 'AI Generated'}
-              </span>
+            {/* Header with badges only */}
+            <div className="mb-4">
+              {/* Category, style and date badges */}
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  {selectedDigest.metadata?.category_name || selectedDigest.category}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                  <Bot className="w-3 h-3 mr-1" />
+                  {selectedDigest.metadata?.style_name || selectedDigest.style}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
+                  <CalendarDays className="w-3 h-3 mr-1" />
+                  {new Date(selectedDigest.createdAt).toLocaleDateString('ru-RU', { 
+                    day: 'numeric', 
+                    month: 'short' 
+                  })} в {new Date(selectedDigest.createdAt).toLocaleTimeString('ru-RU', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </span>
+              </div>
             </div>
-
-            {/* Title */}
-            <h2 className="text-xl md:text-2xl font-semibold text-text dark:text-white tracking-tight leading-snug mb-3">
-              {selectedDigest.title || selectedDigest.summary}
-            </h2>
 
             {/* Content - scrollable */}
             <div className="flex-1 overflow-y-auto mb-5">
-              {selectedDigest.content ? (
-                <div 
-                  className="prose prose-sm max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: selectedDigest.content }}
-                />
-              ) : (
-                <p className="text-[15px] leading-relaxed text-text/90 dark:text-gray-300 whitespace-pre-wrap">
-                  {selectedDigest.summary}
-                </p>
-              )}
+              <div className="text-[15px] leading-relaxed text-text/90 dark:text-gray-300 whitespace-pre-wrap">
+                {selectedDigest.content ? (
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: selectedDigest.content }}
+                  />
+                ) : (
+                  <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+                    {selectedDigest.summary}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Footer - simplified */}
-            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mt-4">
-              <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1">
-                    <Bot className="w-3 h-3 text-blue-500" />
-                    <span>AI Generated</span>
-                  </div>
-                </div>
-                <div className="text-gray-400 dark:text-gray-500">
-                  {new Date(selectedDigest.createdAt).toLocaleDateString('ru-RU')}
-                </div>
-              </div>
-              
-              {/* Action buttons in modal */}
+            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-end text-xs text-gray-400 dark:text-gray-500">
               <div className="flex gap-2">
                 {activeTab === 'active' && (
                   <>
                     <button 
-                      className="flex-1 px-3 py-2 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors flex items-center justify-center gap-1"
+                      className="px-3 py-1 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 rounded-lg text-xs font-medium transition-all"
                       onClick={() => {
                         archiveDigest(selectedDigest.id);
                         setSelectedDigest(null);
                       }}
                     >
-                      <Archive className="w-3 h-3" />
                       В архив
                     </button>
                     <button 
-                      className="flex-1 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors flex items-center justify-center gap-1"
+                      className="px-3 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 rounded-lg text-xs font-medium transition-all"
                       onClick={() => {
                         softDeleteDigest(selectedDigest.id);
                         setSelectedDigest(null);
                       }}
                     >
-                      <Trash2 className="w-3 h-3" />
                       Удалить
                     </button>
                   </>
                 )}
                 {activeTab === 'archived' && (
                   <button 
-                    className="flex-1 px-3 py-2 text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors flex items-center justify-center gap-1"
+                    className="px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 rounded-lg text-xs font-medium transition-all"
                     onClick={() => {
                       unarchiveDigest(selectedDigest.id);
                       setSelectedDigest(null);
                     }}
                   >
-                    <RotateCcw className="w-3 h-3" />
                     Восстановить
                   </button>
                 )}
                 {activeTab === 'deleted' && (
                   <button 
-                    className="flex-1 px-3 py-2 text-xs font-medium text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors flex items-center justify-center gap-1"
+                    className="px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 rounded-lg text-xs font-medium transition-all"
                     onClick={() => {
                       restoreDigest(selectedDigest.id);
                       setSelectedDigest(null);
                     }}
                   >
-                    <RotateCcw className="w-3 h-3" />
                     Восстановить
                   </button>
                 )}

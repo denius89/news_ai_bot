@@ -15,6 +15,7 @@ import { TelegramWebApp } from './components/TelegramWebApp';
 
 // Utils
 import { initializeTheme, toggleTheme, getThemePreference, type Theme } from './utils/theme';
+import { useTelegramUser } from './hooks/useTelegramUser';
 
 // Styles
 import './styles/index.css';
@@ -25,6 +26,9 @@ const App: React.FC = () => {
   const [activePage, setActivePage] = useState('home');
   const [theme, setTheme] = useState<Theme>('light');
   const [unreadNewsCount, setUnreadNewsCount] = useState(0);
+  
+  // Получаем данные пользователя Telegram
+  useTelegramUser();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -39,7 +43,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // Initialize theme system
-    const cleanup = initializeTheme();
+    initializeTheme();
     setTheme(getThemePreference());
     
     // Listen for theme changes from other tabs/windows
@@ -55,7 +59,6 @@ const App: React.FC = () => {
     window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      cleanup?.();
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
@@ -219,7 +222,7 @@ const App: React.FC = () => {
         {/* Desktop Navigation */}
         {!isMobile && (
           <nav className="fixed top-4 right-4 z-50">
-            <div className="flex items-center space-x-2 bg-surface/90 backdrop-blur-sm rounded-xl p-2 shadow-soft border border-border/50">
+            <div className="flex items-center space-x-2 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-xl p-2 shadow-soft border border-border/50">
               {navigationItems.map((item) => (
                 <motion.button
                   key={item.id}

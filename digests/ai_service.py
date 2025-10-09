@@ -145,12 +145,12 @@ class DigestAIService:
         news_text = "\n\n".join(
             [
                 (
-                    f"📰 {item['title']}\n"
-                    f"📅 {item['published_at']} | 🔗 {item['source']}\n"
-                    f"📊 Достоверность: {item['credibility']:.1f} | Важность: {item['importance']:.1f}\n"
-                    f"📝 {item['content'][:200]}..."
+                    f"{item['title']}\n"
+                    f"{item['published_at']} | {item['source']}\n"
+                    f"Достоверность: {item['credibility']:.1f} | Важность: {item['importance']:.1f}\n"
+                    f"{item['content'][:200]}..."
                     if item["content"]
-                    else "📝 Описание недоступно"
+                    else "Описание недоступно"
                 )
                 for item in news_data
             ]

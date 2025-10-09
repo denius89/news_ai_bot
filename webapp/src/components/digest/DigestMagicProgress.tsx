@@ -46,14 +46,13 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
 }) => {
   const persona = personalities[style] || personalities.analytical;
   const [phrase, setPhrase] = useState(persona.phrases[0]);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentIndex(prev => {
-        const nextIndex = (prev + 1) % persona.phrases.length;
-        setPhrase(persona.phrases[nextIndex]);
-        return nextIndex;
+      setPhrase(prev => {
+        const currentIndex = persona.phrases.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % persona.phrases.length;
+        return persona.phrases[nextIndex];
       });
     }, 3000);
     

@@ -101,7 +101,7 @@ async def generate_digest(
     news_items = fetch_recent_news(limit=limit, category=category)
 
     if not news_items:
-        return "📰 <b>Дайджест новостей</b>\n\nСегодня новостей нет."
+        return "<b>Дайджест новостей</b>\n\nСегодня новостей нет."
 
     # Create service with configuration
     config = DigestConfig(max_items=8, include_fallback=True)
