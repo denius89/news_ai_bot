@@ -21,7 +21,7 @@ interface EventsPageProps {
   onThemeToggle: () => void;
 }
 
-const EventsPage: React.FC<EventsPageProps> = ({ theme, onThemeToggle }) => {
+const EventsPage: React.FC<EventsPageProps> = ({ theme }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');

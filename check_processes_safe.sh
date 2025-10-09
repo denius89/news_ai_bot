@@ -108,7 +108,7 @@ import sys
 sys.path.append('/Users/denisfedko/news_ai_bot')
 from config.cloudflare import get_webapp_url
 print(get_webapp_url())
-" 2>/dev/null || echo "https://immunology-restructuring-march-same.trycloudflare.com")
+" 2>/dev/null || echo "https://expressed-nurse-drive-original.trycloudflare.com")
         
         echo -e "   ${CYAN}URL:${NC} $WEBAPP_URL"
         

@@ -14,6 +14,7 @@ from pathlib import Path
 import sys
 
 import httpx
+from httpx import HTTPTransport, AsyncHTTPTransport
 from supabase import create_client, create_async_client, Client, AsyncClient
 
 # Add project root to path
@@ -60,8 +61,13 @@ class DatabaseService:
             return
 
         try:
+            # Принудительно отключаем HTTP/2 для решения pseudo-header ошибки
+            import os
+            os.environ["HTTPX_NO_HTTP2"] = "1"
+            os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
+            
             self.sync_client = create_client(SUPABASE_URL, SUPABASE_KEY)
-            logger.info("✅ Sync Supabase client initialized")
+            logger.info("✅ Sync Supabase client initialized with HTTP/2 disabled via environment")
         except Exception as e:
             logger.error("❌ Failed to initialize Sync Supabase: %s", e)
 
@@ -288,6 +294,73 @@ class DatabaseService:
         except Exception as e:
             logger.error("❌ Error async retrieving news: %s", e)
             return []
+
+    async def async_get_latest_news_with_importance(
+        self,
+        source: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+        limit: int = 10,
+        min_importance: Optional[float] = None,
+    ) -> List[Dict]:
+        """
+        Get latest news with importance filtering (async version).
+
+        Args:
+            source: Filter by source name
+            categories: Filter by categories
+            limit: Maximum number of news items
+            min_importance: Minimum importance threshold
+
+        Returns:
+            List of news dictionaries sorted by importance
+        """
+        try:
+            client = await self._get_async_client()
+        except Exception as e:
+            logger.error("❌ Failed to get async client: %s", e)
+            return []
+
+        logger.debug("async_get_latest_news_with_importance: source=%s, categories=%s, limit=%s, min_importance=%s", 
+                    source, categories, limit, min_importance)
+
+        query = (
+            client.table("news")
+            .select(
+                "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
+            )
+            .order("published_at", desc=True)
+            .limit(limit)
+        )
+
+        if source:
+            query = query.eq("source", source)
+
+        if categories:
+            query = query.in_("category", categories)
+
+        if min_importance is not None:
+            query = query.gte("importance", min_importance)
+
+        try:
+            result = await self.async_safe_execute(query)
+            news_items = result.data or []
+
+            # Add formatted dates for backward compatibility
+            for item in news_items:
+                if item.get("published_at"):
+                    from utils.system.dates import format_datetime
+                    item["published_at_fmt"] = format_datetime(item["published_at"])
+
+            # Sort by importance if not filtered by min_importance
+            if min_importance is None:
+                news_items = sorted(news_items, key=lambda x: x.get("importance", 0), reverse=True)
+
+            logger.info("✅ Async: retrieved %d news items with importance filtering", len(news_items))
+            return news_items
+        except Exception as e:
+            logger.error("❌ Error async retrieving news with importance: %s", e)
+            # Fallback на обычную функцию
+            return await self.async_get_latest_news(source, categories, limit)
 
     async def async_upsert_news(self, items: List[Dict]) -> int:
         """

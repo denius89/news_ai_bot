@@ -8,8 +8,81 @@ to maintain consistency across the application.
 
 import asyncio
 import logging
+import unicodedata
 
 from flask import Blueprint, request, jsonify
+
+def convert_unicode_name(name):
+    """Конвертирует Unicode стилизованные символы в обычные ASCII"""
+    if not name:
+        return name
+    
+    # Специальные случаи испорченных имен
+    corruption_map = {
+        'ÐÐ°Ð½': 'Иван',
+        'ÐÐ°ÑÐ°': 'Маша',
+        'ÐÐ»ÐµÐºÑÐµÐ¹': 'Алексей',
+        # Дважды испорченные имена
+        'Ã\x90Ã\x90Â°Ã\x90Â½': 'Иван',
+        'ÃÐÃÐÂ°ÃÐÂ½': 'Иван',
+    }
+    
+    if name in corruption_map:
+        return corruption_map[name]
+    
+    # Проверяем на двойную кодировку UTF-8
+    try:
+        if 'Ð' in name and len(name) > 0:
+            try:
+                # Кодируем в latin-1, затем декодируем как UTF-8
+                fixed = name.encode('latin-1').decode('utf-8')
+                # Проверяем, что получили кириллицу
+                if any('\u0400' <= c <= '\u04FF' for c in fixed):
+                    return fixed
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                pass
+    except Exception:
+        pass
+    
+    # Маппинг Unicode стилизованных символов на обычные
+    unicode_map = {
+        # Mathematical Bold (𝔸-𝔾)
+        '\U0001D400': 'A', '\U0001D401': 'B', '\U0001D402': 'C', '\U0001D403': 'D', '\U0001D404': 'E', '\U0001D405': 'F', '\U0001D406': 'G',
+        '\U0001D407': 'H', '\U0001D408': 'I', '\U0001D409': 'J', '\U0001D40A': 'K', '\U0001D40B': 'L', '\U0001D40C': 'M', '\U0001D40D': 'N',
+        '\U0001D40E': 'O', '\U0001D40F': 'P', '\U0001D410': 'Q', '\U0001D411': 'R', '\U0001D412': 'S', '\U0001D413': 'T', '\U0001D414': 'U',
+        '\U0001D415': 'V', '\U0001D416': 'W', '\U0001D417': 'X', '\U0001D418': 'Y', '\U0001D419': 'Z',
+        # Mathematical Bold lowercase (𝕒-𝕫)
+        '\U0001D41A': 'a', '\U0001D41B': 'b', '\U0001D41C': 'c', '\U0001D41D': 'd', '\U0001D41E': 'e', '\U0001D41F': 'f', '\U0001D420': 'g',
+        '\U0001D421': 'h', '\U0001D422': 'i', '\U0001D423': 'j', '\U0001D424': 'k', '\U0001D425': 'l', '\U0001D426': 'm', '\U0001D427': 'n',
+        '\U0001D428': 'o', '\U0001D429': 'p', '\U0001D42A': 'q', '\U0001D42B': 'r', '\U0001D42C': 's', '\U0001D42D': 't', '\U0001D42E': 'u',
+        '\U0001D42F': 'v', '\U0001D430': 'w', '\U0001D431': 'x', '\U0001D432': 'y', '\U0001D433': 'z',
+        # Mathematical Double-Struck (𝔸-𝔾)
+        '\U0001D538': 'A', '\U0001D539': 'B', '\U0001D53A': 'C', '\U0001D53B': 'D', '\U0001D53C': 'E', '\U0001D53D': 'F', '\U0001D53E': 'G',
+        '\U0001D53F': 'H', '\U0001D540': 'I', '\U0001D541': 'J', '\U0001D542': 'K', '\U0001D543': 'L', '\U0001D544': 'M', '\U0001D545': 'N',
+        '\U0001D546': 'O', '\U0001D547': 'P', '\U0001D548': 'Q', '\U0001D549': 'R', '\U0001D54A': 'S', '\U0001D54B': 'T', '\U0001D54C': 'U',
+        '\U0001D54D': 'V', '\U0001D54E': 'W', '\U0001D54F': 'X', '\U0001D550': 'Y', '\U0001D551': 'Z',
+        '\U0001D552': 'a', '\U0001D553': 'b', '\U0001D554': 'c', '\U0001D555': 'd', '\U0001D556': 'e', '\U0001D557': 'f', '\U0001D558': 'g',
+        '\U0001D559': 'h', '\U0001D55A': 'i', '\U0001D55B': 'j', '\U0001D55C': 'k', '\U0001D55D': 'l', '\U0001D55E': 'm', '\U0001D55F': 'n',
+        '\U0001D560': 'o', '\U0001D561': 'p', '\U0001D562': 'q', '\U0001D563': 'r', '\U0001D564': 's', '\U0001D565': 't', '\U0001D566': 'u',
+        '\U0001D567': 'v', '\U0001D568': 'w', '\U0001D569': 'x', '\U0001D56A': 'y', '\U0001D56B': 'z',
+    }
+    
+    # Конвертируем символы
+    result = ""
+    for char in name:
+        if char in unicode_map:
+            result += unicode_map[char]
+        else:
+            # Пытаемся нормализовать символ
+            normalized = unicodedata.normalize('NFKD', char)
+            # Если после нормализации получили ASCII символ
+            if len(normalized) == 1 and ord(normalized) < 128:
+                result += normalized
+            else:
+                # Оставляем как есть, если не можем конвертировать
+                result += char
+    
+    return result
 
 from database.db_models import list_notifications, get_user_notifications, mark_notification_read
 from services.subscription_service import SubscriptionService
@@ -676,13 +749,13 @@ def get_digest_categories():
         # Get real categories from sources.yaml
         real_categories = get_categories()
 
-        # Map to display names with icons
+        # Map to display names without emojis (clean for WebApp)
         category_display = {
-            "crypto": "₿ Криптовалюты",
-            "sports": "⚽ Спорт",
-            "markets": "📈 Рынки",
-            "tech": "🤖 Технологии",
-            "world": "🌍 Мир",
+            "crypto": "Криптовалюты",
+            "sports": "Спорт",
+            "markets": "Рынки",
+            "tech": "Технологии",
+            "world": "Мир",
         }
 
         # Build categories dict
@@ -695,7 +768,7 @@ def get_digest_categories():
                 "status": "success",
                 "data": {
                     "categories": categories_dict,
-                    "periods": {"today": "📅 Сегодня", "7d": "📅 Последние 7 дней", "30d": "📅 Последние 30 дней"},
+                    "periods": {"today": "Сегодня", "7d": "Последние 7 дней", "30d": "Последние 30 дней"},
                 },
             }
         )
@@ -717,12 +790,26 @@ def generate_digest():
     limit = data.get("limit", 10)
     user_id = data.get("user_id")  # Новый параметр для привязки к пользователю
     save_digest = data.get("save", True)  # По умолчанию сохраняем
+    
+    # НОВЫЕ ПАРАМЕТРЫ ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
+    min_importance = data.get("min_importance", None)  # Минимальная важность новостей
+    enable_smart_filtering = data.get("enable_smart_filtering", True)  # Включить умную фильтрацию
+    use_user_preferences = data.get("use_user_preferences", True)  # Использовать предпочтения пользователя
 
     try:
         from services.unified_digest_service import get_async_digest_service
         from digests.configs import STYLES
         from services.categories import get_categories
         from database.db_models import save_digest as db_save_digest
+        
+        # ИМПОРТЫ ДЛЯ НОВОЙ ФУНКЦИОНАЛЬНОСТИ
+        from database.db_models import (
+            get_user_preferences, 
+            save_user_preferences, 
+            log_digest_generation,
+            get_smart_filter_for_time
+        )
+        import time
 
         # Get real categories
         real_categories = get_categories()
@@ -734,14 +821,50 @@ def generate_digest():
         if category != "all" and category not in real_categories:
             return jsonify({"status": "error", "message": f"Invalid category: {category}"}), 400
 
+        # УМНАЯ ФИЛЬТРАЦИЯ: Получаем предпочтения пользователя
+        user_preferences = None
+        if user_id and use_user_preferences:
+            try:
+                user_preferences = get_user_preferences(user_id)
+                logger.debug(f"Получены предпочтения пользователя {user_id}: {user_preferences}")
+            except Exception as e:
+                logger.warning(f"Не удалось получить предпочтения пользователя {user_id}: {e}")
+
+        # УМНАЯ ФИЛЬТРАЦИЯ: Определяем параметры фильтрации
+        final_min_importance = min_importance
+        if enable_smart_filtering and user_preferences:
+            # Используем предпочтения пользователя
+            if user_preferences.get("enable_smart_filtering", True):
+                final_min_importance = user_preferences.get("min_importance", 0.3)
+                logger.debug(f"Применена умная фильтрация из предпочтений: min_importance={final_min_importance}")
+        elif enable_smart_filtering:
+            # Используем умный фильтр по времени
+            try:
+                smart_filter = get_smart_filter_for_time()
+                final_min_importance = smart_filter.get("min_importance", 0.3)
+                logger.debug(f"Применен умный фильтр по времени: min_importance={final_min_importance}")
+            except Exception as e:
+                logger.warning(f"Не удалось получить умный фильтр: {e}")
+
         # Generate digest using async service
         categories_list = None if category == "all" else [category]
         digest_service = get_async_digest_service()
 
-        # Use async method to generate AI digest
+        # ИЗМЕРЯЕМ ВРЕМЯ ГЕНЕРАЦИИ ДЛЯ АНАЛИТИКИ
+        start_time = time.time()
+
+        # Use async method to generate AI digest with smart filtering
         digest_text = run_async(
-            digest_service.async_build_ai_digest(limit=limit, categories=categories_list, style=style)
+            digest_service.async_build_ai_digest(
+                limit=limit, 
+                categories=categories_list, 
+                style=style,
+                min_importance=final_min_importance  # Передаем параметр фильтрации
+            )
         )
+
+        # ВРЕМЯ ГЕНЕРАЦИИ ДЛЯ АНАЛИТИКИ
+        generation_time_ms = int((time.time() - start_time) * 1000)
 
         # Category display mapping
         category_display = {
@@ -769,12 +892,49 @@ def generate_digest():
                             category_display.get(category, "Все категории") if category != "all" else "Все категории"
                         ),
                         "style_name": STYLES.get(style, style),
+                        "min_importance": final_min_importance,  # Добавляем информацию о фильтрации
+                        "smart_filtering_enabled": enable_smart_filtering,
                     },
                 )
                 logger.info(f"Дайджест сохранен для пользователя {user_id}: {digest_id}")
             except Exception as save_error:
                 logger.warning(f"Не удалось сохранить дайджест: {save_error}")
                 # Продолжаем выполнение даже если сохранение не удалось
+
+        # СОХРАНЯЕМ ПРЕДПОЧТЕНИЯ ПОЛЬЗОВАТЕЛЯ
+        if user_id and use_user_preferences:
+            try:
+                save_user_preferences(
+                    user_id=str(user_id),
+                    preferred_category=category,
+                    preferred_style=style,
+                    preferred_period=period,
+                    min_importance=final_min_importance or 0.3,
+                    enable_smart_filtering=enable_smart_filtering
+                )
+                logger.debug(f"Предпочтения пользователя {user_id} обновлены")
+            except Exception as pref_error:
+                logger.warning(f"Не удалось сохранить предпочтения пользователя {user_id}: {pref_error}")
+
+        # ЛОГИРУЕМ АНАЛИТИКУ ГЕНЕРАЦИИ
+        if user_id:
+            try:
+                # Подсчитываем количество новостей в дайджесте (примерно)
+                news_count = digest_text.count('\n') if digest_text else 0
+                
+                log_digest_generation(
+                    user_id=str(user_id),
+                    category=category,
+                    style=style,
+                    period=period,
+                    min_importance=final_min_importance,
+                    generation_time_ms=generation_time_ms,
+                    success=True,
+                    news_count=news_count
+                )
+                logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
+            except Exception as analytics_error:
+                logger.warning(f"Не удалось залогировать аналитику для пользователя {user_id}: {analytics_error}")
 
         return jsonify(
             {
@@ -792,6 +952,10 @@ def generate_digest():
                         "category_name": (
                             category_display.get(category, "Все категории") if category != "all" else "Все категории"
                         ),
+                        "min_importance": final_min_importance,  # Информация о фильтрации
+                        "smart_filtering_enabled": enable_smart_filtering,
+                        "generation_time_ms": generation_time_ms,  # Время генерации
+                        "user_preferences_applied": bool(user_preferences),  # Применены ли предпочтения
                     },
                 },
             }
@@ -1027,35 +1191,123 @@ def unarchive_digest(digest_id):
 def get_user_by_telegram_id(telegram_id):
     """Get user_id by telegram_id for Telegram WebApp integration."""
     try:
+        logger.info(f"🔍 API request for telegram_id: {telegram_id}")
+        logger.info(f"🔍 Request headers: {dict(request.headers)}")
         from database.db_models import supabase
-
+        
+        logger.info(f"🔍 Supabase connection check: {supabase is not None}")
         if not supabase:
+            logger.error("❌ Supabase not initialized!")
             return jsonify({"status": "error", "message": "Database not initialized"}), 500
 
-        # Ищем пользователя по telegram_id
-        try:
-            result = supabase.table("users").select("id, username, locale").eq("telegram_id", telegram_id).execute()
-        except Exception as db_error:
-            logger.error(f"Database error in get_user_by_telegram_id: {db_error}")
-            return jsonify({"status": "error", "message": f"Database connection error: {str(db_error)}"}), 500
+        # Ищем пользователя по telegram_id с retry логикой
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"🔍 Database query attempt {attempt + 1} for telegram_id: {telegram_id}")
+                result = supabase.table("users").select("id, username, locale, first_name").eq("telegram_id", telegram_id).execute()
+                logger.info(f"✅ Database query successful on attempt {attempt + 1}")
+                break
+            except Exception as db_error:
+                logger.error(f"❌ Database error attempt {attempt + 1}: {db_error}")
+                if attempt == max_retries - 1:
+                    logger.error(f"❌ All {max_retries} attempts failed")
+                    return jsonify({"status": "error", "message": f"Database connection error: {str(db_error)}"}), 500
+                else:
+                    import time
+                    time.sleep(0.5)  # Небольшая пауза перед retry
 
         if result.data:
             user_data = result.data[0]
             logger.info(f"User found by telegram_id {telegram_id}: {user_data['id']}")
+            logger.info(f"🔍 User data: first_name='{user_data.get('first_name')}', username='{user_data.get('username')}'")
+            
+            # Проверяем, нужно ли обновить данные пользователя
+            tg_user_data = request.headers.get('X-Telegram-User-Data')
+            logger.info(f"🔍 X-Telegram-User-Data header: {tg_user_data}")
+            tg_user = None
+            if tg_user_data:
+                import json
+                try:
+                    logger.info(f"🔍 Raw tg_user_data: {repr(tg_user_data)}")
+                    tg_user = json.loads(tg_user_data)
+                    logger.info(f"🔍 Parsed tg_user: {tg_user}")
+                except Exception as parse_error:
+                    logger.error(f"❌ Failed to parse tg_user_data: {parse_error}")
+                    logger.error(f"❌ Raw data was: {repr(tg_user_data)}")
+                    pass
+            else:
+                logger.warning("⚠️ No X-Telegram-User-Data header found")
+            
+            # Обновляем данные пользователя, если они есть в Telegram данных
+            needs_update = False
+            new_first_name = user_data.get('first_name')
+            new_username = user_data.get('username')
+            
+            if tg_user and tg_user.get('first_name'):
+                if not user_data.get('first_name'):
+                    # Обрабатываем Unicode символы
+                    raw_first_name = tg_user.get('first_name')
+                    # Конвертируем Unicode стилизованные символы в обычные
+                    new_first_name = convert_unicode_name(raw_first_name)
+                    needs_update = True
+                    logger.info(f"Will update first_name for user {user_data['id']}: {raw_first_name} -> {new_first_name}")
+            
+            if tg_user and tg_user.get('username'):
+                if not user_data.get('username'):
+                    new_username = tg_user.get('username')
+                    needs_update = True
+                    logger.info(f"Will update username for user {user_data['id']}: {tg_user.get('username')}")
+            
+            if needs_update:
+                try:
+                    from database.db_models import upsert_user_by_telegram
+                    upsert_user_by_telegram(
+                        telegram_id=telegram_id,
+                        username=new_username,
+                        locale=user_data.get('locale', 'ru'),
+                        first_name=new_first_name
+                    )
+                    # Обновляем данные в ответе
+                    user_data['first_name'] = new_first_name
+                    user_data['username'] = new_username
+                    logger.info(f"Updated user data for {user_data['id']}: first_name={new_first_name}, username={new_username}")
+                except Exception as update_error:
+                    logger.error(f"Failed to update user data for {user_data['id']}: {update_error}")
 
-            return jsonify(
-                {
-                    "status": "success",
-                    "data": {
-                        "user_id": user_data["id"],
-                        "telegram_id": telegram_id,
-                        "username": user_data.get("username"),
-                        "locale": user_data.get("locale", "ru"),
-                    },
-                }
-            )
+            # Детальное логирование ответа
+            response_data = {
+                "status": "success",
+                "data": {
+                    "user_id": user_data["id"],
+                    "telegram_id": telegram_id,
+                    "username": user_data.get("username"),
+                    "locale": user_data.get("locale", "ru"),
+                    "first_name": user_data.get("first_name"),
+                },
+            }
+            
+            logger.info(f"🔍 Response data: {response_data}")
+            logger.info(f"🔍 Response data type: {type(response_data)}")
+            
+            # Проверяем JSON сериализацию
+            try:
+                import json
+                json_str = json.dumps(response_data, ensure_ascii=False)
+                logger.info(f"✅ JSON serialization successful, length: {len(json_str)}")
+            except Exception as e:
+                logger.error(f"❌ JSON serialization error: {e}")
+                return jsonify({"status": "error", "message": f"JSON serialization error: {str(e)}"}), 500
+            
+            response = jsonify(response_data)
+            # Отключаем кэширование для API пользователя
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
         else:
             logger.info(f"User not found by telegram_id: {telegram_id}, creating new user")
+            logger.info(f"🔍 Creating new user for telegram_id: {telegram_id}")
             
             # Создаем нового пользователя
             try:
@@ -1063,19 +1315,30 @@ def get_user_by_telegram_id(telegram_id):
                 
                 # Получаем данные пользователя из Telegram WebApp
                 tg_user_data = request.headers.get('X-Telegram-User-Data')
+                logger.info(f"🔍 Creating new user - X-Telegram-User-Data: {repr(tg_user_data)}")
                 tg_user = None
                 if tg_user_data:
                     import json
                     try:
                         tg_user = json.loads(tg_user_data)
-                    except:
+                        logger.info(f"🔍 Parsed tg_user for new user: {tg_user}")
+                    except Exception as e:
+                        logger.error(f"❌ Failed to parse tg_user_data for new user: {e}")
                         pass
+                else:
+                    logger.warning("⚠️ No X-Telegram-User-Data header for new user creation")
                 
-                # Создаем пользователя
+                # Создаем пользователя с исправленным именем
+                raw_first_name = tg_user.get('first_name') if tg_user else None
+                fixed_first_name = convert_unicode_name(raw_first_name) if raw_first_name else None
+                
+                logger.info(f"🔧 Creating user with name conversion: {repr(raw_first_name)} -> {repr(fixed_first_name)}")
+                
                 new_user_id = create_user(
                     telegram_id=telegram_id,
                     username=tg_user.get('username') if tg_user else None,
-                    locale=tg_user.get('language_code', 'ru') if tg_user else 'ru'
+                    locale=tg_user.get('language_code', 'ru') if tg_user else 'ru',
+                    first_name=fixed_first_name
                 )
                 
                 if new_user_id:
@@ -1089,6 +1352,7 @@ def get_user_by_telegram_id(telegram_id):
                                 "telegram_id": telegram_id,
                                 "username": tg_user.get('username') if tg_user else None,
                                 "locale": tg_user.get('language_code', 'ru') if tg_user else 'ru',
+                                "first_name": tg_user.get('first_name') if tg_user else None,
                             },
                         }
                     )
@@ -1168,6 +1432,142 @@ def telegram_auth():
     except Exception as e:
         logger.error(f"Error in telegram auth: {e}")
         return jsonify({"status": "error", "message": f"Authentication error: {str(e)}"}), 500
+
+
+# =============================================================================
+# USER PREFERENCES API ENDPOINTS
+# =============================================================================
+
+@api_bp.route("/users/preferences", methods=["GET"])
+def get_user_preferences():
+    """Get user preferences."""
+    user_id = request.args.get("user_id")
+    
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+    
+    try:
+        from database.db_models import get_user_preferences
+        
+        preferences = get_user_preferences(user_id)
+        
+        return jsonify({
+            "status": "success",
+            "data": preferences
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting user preferences: {e}")
+        return jsonify({"status": "error", "message": f"Error getting preferences: {str(e)}"}), 500
+
+
+@api_bp.route("/users/preferences", methods=["POST"])
+def save_user_preferences():
+    """Save user preferences."""
+    if not request.is_json:
+        return jsonify({"status": "error", "message": "JSON body is required"}), 400
+    
+    data = request.get_json()
+    user_id = data.get("user_id")
+    
+    if not user_id:
+        return jsonify({"status": "error", "message": "user_id is required"}), 400
+    
+    try:
+        from database.db_models import save_user_preferences
+        
+        success = save_user_preferences(
+            user_id=user_id,
+            preferred_category=data.get("preferred_category", "all"),
+            preferred_style=data.get("preferred_style", "analytical"),
+            preferred_period=data.get("preferred_period", "today"),
+            min_importance=data.get("min_importance", 0.3),
+            enable_smart_filtering=data.get("enable_smart_filtering", True)
+        )
+        
+        if success:
+            return jsonify({
+                "status": "success",
+                "message": "Preferences saved successfully"
+            })
+        else:
+            return jsonify({"status": "error", "message": "Failed to save preferences"}), 500
+            
+    except Exception as e:
+        logger.error(f"Error saving user preferences: {e}")
+        return jsonify({"status": "error", "message": f"Error saving preferences: {str(e)}"}), 500
+
+
+# =============================================================================
+# ANALYTICS API ENDPOINTS
+# =============================================================================
+
+@api_bp.route("/analytics/digest-stats", methods=["GET"])
+def get_digest_analytics():
+    """Get digest generation analytics."""
+    user_id = request.args.get("user_id")  # Optional - если не указан, возвращает общую статистику
+    days = int(request.args.get("days", 30))
+    
+    try:
+        from database.db_models import get_digest_analytics
+        
+        analytics_data = get_digest_analytics(user_id=user_id, days=days)
+        
+        # Подсчитываем статистику
+        total_generations = len(analytics_data)
+        successful_generations = len([a for a in analytics_data if a.get("success", True)])
+        avg_generation_time = sum([a.get("generation_time_ms", 0) for a in analytics_data]) / total_generations if total_generations > 0 else 0
+        
+        # Популярные комбинации
+        category_stats = {}
+        style_stats = {}
+        
+        for item in analytics_data:
+            category = item.get("category", "unknown")
+            style = item.get("style", "unknown")
+            
+            category_stats[category] = category_stats.get(category, 0) + 1
+            style_stats[style] = style_stats.get(style, 0) + 1
+        
+        return jsonify({
+            "status": "success",
+            "data": {
+                "total_generations": total_generations,
+                "successful_generations": successful_generations,
+                "success_rate": successful_generations / total_generations if total_generations > 0 else 0,
+                "avg_generation_time_ms": avg_generation_time,
+                "category_stats": category_stats,
+                "style_stats": style_stats,
+                "period_days": days,
+                "user_id": user_id
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting digest analytics: {e}")
+        return jsonify({"status": "error", "message": f"Error getting analytics: {str(e)}"}), 500
+
+
+# =============================================================================
+# SMART FILTERING API ENDPOINTS
+# =============================================================================
+
+@api_bp.route("/smart-filters/current", methods=["GET"])
+def get_current_smart_filter():
+    """Get current smart filter based on time."""
+    try:
+        from database.db_models import get_smart_filter_for_time
+        
+        smart_filter = get_smart_filter_for_time()
+        
+        return jsonify({
+            "status": "success",
+            "data": smart_filter
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting smart filter: {e}")
+        return jsonify({"status": "error", "message": f"Error getting smart filter: {str(e)}"}), 500
 
 
 __all__ = ["api_bp"]

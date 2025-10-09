@@ -25,8 +25,16 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 supabase: Optional[Client] = None
 if SUPABASE_URL and SUPABASE_KEY:
     try:
+        # Принудительно отключаем HTTP/2 для решения pseudo-header ошибки
+        import os
+        
+        # Устанавливаем переменную окружения для отключения HTTP/2
+        os.environ["HTTPX_NO_HTTP2"] = "1"
+        os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
+        
+        # Стандартная инициализация с отключенным HTTP/2
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-        logger.info("✅ Supabase client initialized")
+        logger.info("✅ Supabase client initialized with HTTP/2 disabled via environment")
     except Exception as e:
         logger.error("❌ Ошибка инициализации Supabase: %s", e)
 else:
@@ -34,18 +42,31 @@ else:
 
 
 # --- SAFE EXECUTE (ретраи) ---
-def safe_execute(query, retries: int = 3, delay: int = 2):
+def safe_execute(query, retries: int = 5, delay: float = 1.0):
     """
     Выполняет запрос с ретраями при сетевых ошибках Supabase/httpx.
+    Увеличено количество попыток и добавлена экспоненциальная задержка.
     """
     for attempt in range(1, retries + 1):
         try:
-            return query.execute()
-        except (httpx.RemoteProtocolError, httpx.ConnectError) as e:
-            logger.warning("⚠️ Попытка %s/%s: ошибка соединения %s", attempt, retries, e)
-            if attempt < retries:
-                time.sleep(delay)
+            logger.info(f"🔍 Database query attempt {attempt}/{retries}")
+            result = query.execute()
+            logger.info(f"✅ Database query successful on attempt {attempt}")
+            return result
+        except Exception as e:
+            error_str = str(e)
+            if "ConnectionTerminated" in error_str or "error_code:9" in error_str:
+                logger.warning(f"⚠️ HTTP/2 connection error attempt {attempt}/{retries}: {e}")
             else:
+                logger.warning(f"⚠️ Database error attempt {attempt}/{retries}: {e}")
+            
+            if attempt < retries:
+                # Экспоненциальная задержка: 1s, 2s, 4s, 8s
+                wait_time = delay * (2 ** (attempt - 1))
+                logger.info(f"⏳ Waiting {wait_time}s before retry...")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"❌ Query failed after {retries} attempts: {e}")
                 raise
 
 
@@ -299,7 +320,7 @@ def get_latest_news(
 # --- USER MANAGEMENT FUNCTIONS ---
 
 
-def upsert_user_by_telegram(telegram_id: int, username: str | None = None, locale: str = "ru") -> str:
+def upsert_user_by_telegram(telegram_id: int, username: str | None = None, locale: str = "ru", first_name: str | None = None) -> str:
     """
     Создает или обновляет пользователя по Telegram ID.
 
@@ -307,6 +328,7 @@ def upsert_user_by_telegram(telegram_id: int, username: str | None = None, local
         telegram_id: Telegram user ID
         username: Telegram username (optional)
         locale: User locale (default: 'ru')
+        first_name: User first name (optional)
 
     Returns:
         User ID from database
@@ -317,23 +339,46 @@ def upsert_user_by_telegram(telegram_id: int, username: str | None = None, local
 
     try:
         # Сначала пытаемся найти существующего пользователя
-        existing_user = supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
+        existing_user = supabase.table("users").select("*").eq("telegram_id", telegram_id).execute()
 
         if existing_user.data:
-            user_id = existing_user.data[0]["id"]
+            user_data = existing_user.data[0]
+            user_id = user_data["id"]
+            
+            # Проверяем, нужно ли обновить данные пользователя
+            update_data = {}
+            if first_name and not user_data.get("first_name"):
+                update_data["first_name"] = first_name
+            if username and not user_data.get("username"):
+                update_data["username"] = username
+            
+            # Обновляем пользователя, если есть новые данные
+            if update_data:
+                update_data["updated_at"] = "now()"
+                supabase.table("users").update(update_data).eq("id", user_id).execute()
+                logger.info("Обновлены данные пользователя: ID=%s, данные=%s", user_id, update_data)
+            
             logger.debug("Найден существующий пользователь: ID=%s", user_id)
             return user_id
 
         # Создаем нового пользователя
+        new_user_data = {
+            "telegram_id": telegram_id, 
+            "username": username, 
+            "locale": locale,
+            "first_name": first_name
+        }
+        
         new_user = (
             supabase.table("users")
-            .insert({"telegram_id": telegram_id, "username": username, "locale": locale})
+            .insert(new_user_data)
             .execute()
         )
 
         if new_user.data:
             user_id = new_user.data[0]["id"]
-            logger.info("Создан новый пользователь: ID=%s, telegram_id=%d", user_id, telegram_id)
+            logger.info("Создан новый пользователь: ID=%s, telegram_id=%d, first_name=%s", 
+                       user_id, telegram_id, first_name)
             return user_id
         else:
             logger.error("Не удалось создать пользователя")
@@ -561,7 +606,7 @@ def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: in
         return []
 
 
-def create_user(telegram_id: int, username: str = None, locale: str = "ru") -> str:
+def create_user(telegram_id: int, username: str = None, locale: str = "ru", first_name: str = None) -> str:
     """
     Создает нового пользователя в базе данных.
     
@@ -569,6 +614,7 @@ def create_user(telegram_id: int, username: str = None, locale: str = "ru") -> s
         telegram_id: ID пользователя в Telegram
         username: Имя пользователя (опционально)
         locale: Локаль пользователя (по умолчанию 'ru')
+        first_name: Имя пользователя (опционально)
     
     Returns:
         UUID нового пользователя или пустую строку при ошибке
@@ -589,12 +635,13 @@ def create_user(telegram_id: int, username: str = None, locale: str = "ru") -> s
             "telegram_id": telegram_id,
             "username": username,
             "locale": locale,
+            "first_name": first_name,
             "created_at": "now()",
             "updated_at": "now()"
         }).execute()
         
         if result.data:
-            logger.info(f"Новый пользователь создан: ID={new_user_id}, telegram_id={telegram_id}")
+            logger.info(f"Новый пользователь создан: ID={new_user_id}, telegram_id={telegram_id}, first_name={first_name}")
             return new_user_id
         else:
             logger.error("Не удалось создать пользователя")
@@ -1060,3 +1107,308 @@ def permanent_delete_digest(digest_id: str, user_id: str) -> bool:
     except Exception as e:
         logger.error("Ошибка при окончательном удалении дайджеста: %s", e)
         return False
+
+
+# =============================================================================
+# USER PREFERENCES FUNCTIONS
+# =============================================================================
+
+def save_user_preferences(
+    user_id: str,
+    preferred_category: str = "all",
+    preferred_style: str = "analytical", 
+    preferred_period: str = "today",
+    min_importance: float = 0.3,
+    enable_smart_filtering: bool = True
+) -> bool:
+    """
+    Сохраняет предпочтения пользователя.
+    
+    Args:
+        user_id: ID пользователя
+        preferred_category: Предпочитаемая категория
+        preferred_style: Предпочитаемый стиль
+        preferred_period: Предпочитаемый период
+        min_importance: Минимальная важность новостей
+        enable_smart_filtering: Включить умную фильтрацию
+        
+    Returns:
+        True если успешно сохранено
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+    
+    try:
+        preferences_data = {
+            "user_id": user_id,
+            "preferred_category": preferred_category,
+            "preferred_style": preferred_style,
+            "preferred_period": preferred_period,
+            "min_importance": min_importance,
+            "enable_smart_filtering": enable_smart_filtering,
+            "last_used_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Используем upsert для обновления существующих предпочтений
+        result = supabase.table("user_preferences").upsert(
+            preferences_data, 
+            on_conflict="user_id"
+        ).execute()
+        
+        logger.info(f"Предпочтения пользователя {user_id} сохранены")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Ошибка при сохранении предпочтений пользователя {user_id}: {e}")
+        return False
+
+
+def get_user_preferences(user_id: str) -> Dict:
+    """
+    Получает предпочтения пользователя.
+    
+    Args:
+        user_id: ID пользователя
+        
+    Returns:
+        Словарь с предпочтениями или значения по умолчанию
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return _get_default_preferences()
+    
+    try:
+        result = supabase.table("user_preferences").select("*").eq("user_id", user_id).execute()
+        
+        if result.data:
+            preferences = result.data[0]
+            logger.debug(f"Найдены предпочтения для пользователя {user_id}")
+            return preferences
+        else:
+            logger.debug(f"Предпочтения для пользователя {user_id} не найдены, возвращаем по умолчанию")
+            return _get_default_preferences()
+            
+    except Exception as e:
+        logger.error(f"Ошибка при получении предпочтений пользователя {user_id}: {e}")
+        return _get_default_preferences()
+
+
+def _get_default_preferences() -> Dict:
+    """Возвращает предпочтения по умолчанию."""
+    return {
+        "preferred_category": "all",
+        "preferred_style": "analytical",
+        "preferred_period": "today",
+        "min_importance": 0.3,
+        "enable_smart_filtering": True
+    }
+
+
+# =============================================================================
+# ANALYTICS FUNCTIONS
+# =============================================================================
+
+def log_digest_generation(
+    user_id: str,
+    category: str,
+    style: str,
+    period: str,
+    min_importance: float = None,
+    generation_time_ms: int = None,
+    success: bool = True,
+    error_message: str = None,
+    news_count: int = 0
+) -> bool:
+    """
+    Логирует генерацию дайджеста для аналитики.
+    
+    Args:
+        user_id: ID пользователя
+        category: Категория дайджеста
+        style: Стиль дайджеста
+        period: Период дайджеста
+        min_importance: Минимальная важность
+        generation_time_ms: Время генерации в миллисекундах
+        success: Успешность генерации
+        error_message: Сообщение об ошибке
+        news_count: Количество новостей в дайджесте
+        
+    Returns:
+        True если успешно залогировано
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+    
+    try:
+        analytics_data = {
+            "user_id": user_id,
+            "category": category,
+            "style": style,
+            "period": period,
+            "min_importance": min_importance,
+            "generation_time_ms": generation_time_ms,
+            "success": success,
+            "error_message": error_message,
+            "news_count": news_count
+        }
+        
+        result = supabase.table("digest_analytics").insert(analytics_data).execute()
+        
+        logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Ошибка при логировании аналитики для пользователя {user_id}: {e}")
+        return False
+
+
+def get_digest_analytics(user_id: str = None, days: int = 30) -> List[Dict]:
+    """
+    Получает аналитику генерации дайджестов.
+    
+    Args:
+        user_id: ID пользователя (опционально)
+        days: Количество дней для анализа
+        
+    Returns:
+        Список записей аналитики
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+    
+    try:
+        # Вычисляем дату начала периода
+        start_date = datetime.now(timezone.utc) - timedelta(days=days)
+        
+        query = supabase.table("digest_analytics").select("*").gte("created_at", start_date.isoformat())
+        
+        if user_id:
+            query = query.eq("user_id", user_id)
+        
+        result = query.order("created_at", desc=True).execute()
+        
+        return result.data or []
+        
+    except Exception as e:
+        logger.error(f"Ошибка при получении аналитики: {e}")
+        return []
+
+
+# =============================================================================
+# SMART FILTERING FUNCTIONS
+# =============================================================================
+
+def get_latest_news_with_importance(
+    source: str = None,
+    categories: List[str] = None,
+    limit: int = 10,
+    min_importance: float = None
+) -> List[Dict]:
+    """
+    Получает последние новости с фильтрацией по важности.
+    
+    Args:
+        source: Источник новостей
+        categories: Список категорий
+        limit: Максимальное количество новостей
+        min_importance: Минимальная важность новостей
+        
+    Returns:
+        Список новостей, отсортированных по важности
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+    
+    try:
+        query = (
+            supabase.table("news")
+            .select("id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance")
+            .order("published_at", desc=True)
+            .limit(limit)
+        )
+        
+        if source:
+            query = query.eq("source", source)
+        
+        if categories:
+            cats = [c.lower() for c in categories]
+            query = query.in_("category", cats)
+        
+        if min_importance is not None:
+            query = query.gte("importance", min_importance)
+        
+        result = query.execute()
+        data = result.data or []
+        
+        # Сортируем по важности (если не указана min_importance)
+        if min_importance is None:
+            data = sorted(data, key=lambda x: x.get("importance", 0), reverse=True)
+        
+        logger.debug(f"Получено {len(data)} новостей с фильтрацией по важности")
+        
+        for row in data:
+            # Парсим published_at в datetime объект
+            row["published_at"] = parse_datetime_from_row(row.get("published_at"))
+            # Добавляем форматированную строку для обратной совместимости
+            row["published_at_fmt"] = format_datetime(row.get("published_at"))
+        
+        return data
+        
+    except Exception as e:
+        logger.error(f"Ошибка при получении новостей с фильтрацией: {e}")
+        # Fallback на старую функцию
+        return get_latest_news(source, categories, limit)
+
+
+def get_smart_filter_for_time() -> Dict:
+    """
+    Получает умный фильтр в зависимости от времени дня.
+    
+    Returns:
+        Словарь с параметрами фильтра
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return _get_default_smart_filter()
+    
+    try:
+        current_hour = datetime.now().hour
+        current_weekday = datetime.now().weekday()
+        
+        # Определяем условие времени
+        if current_weekday >= 5:  # Выходные
+            time_condition = "weekend"
+        elif 6 <= current_hour < 12:  # Утро
+            time_condition = "morning"
+        elif 18 <= current_hour < 23:  # Вечер
+            time_condition = "evening"
+        else:
+            time_condition = "all"
+        
+        result = supabase.table("smart_filters").select("*").eq("time_condition", time_condition).eq("is_active", True).execute()
+        
+        if result.data:
+            filter_data = result.data[0]
+            logger.debug(f"Применен умный фильтр для времени: {time_condition}")
+            return filter_data
+        else:
+            logger.debug(f"Умный фильтр для времени {time_condition} не найден, используем по умолчанию")
+            return _get_default_smart_filter()
+            
+    except Exception as e:
+        logger.error(f"Ошибка при получении умного фильтра: {e}")
+        return _get_default_smart_filter()
+
+
+def _get_default_smart_filter() -> Dict:
+    """Возвращает умный фильтр по умолчанию."""
+    return {
+        "min_importance": 0.3,
+        "max_items": 10,
+        "categories": None,
+        "time_condition": "all"
+    }

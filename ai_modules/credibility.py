@@ -1,9 +1,11 @@
 import sys
+import os
 
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+# Добавляем корневую папку проекта в путь
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 import logging
-import os
 
 from utils.ai.ai_client import ask
 

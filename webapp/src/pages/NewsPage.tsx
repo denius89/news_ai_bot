@@ -12,7 +12,6 @@ import {
   Trophy, 
   ExternalLink,
   X,
-  CheckCircle,
   Star
 } from 'lucide-react';
 
@@ -461,9 +460,9 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="w-full max-w-2xl max-h-[75vh] 
-                       bg-white/95 dark:bg-surface-alt/95 
+                       bg-white dark:bg-surface-alt 
                        backdrop-blur-lg rounded-3xl 
-                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] 
+                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
                        p-6 
                        overflow-hidden flex flex-col"
           >
@@ -508,7 +507,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             </div>
 
             {/* Footer - simplified */}
-            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>

@@ -1,6 +1,7 @@
 import logging
 import os
 from flask import Flask, render_template, send_from_directory, redirect
+from flask_cors import CORS
 
 import sys
 import os
@@ -23,8 +24,41 @@ from utils.logging.logging_setup import setup_logging
 setup_logging()
 logger = logging.getLogger("news_ai_bot")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='dist')
 app.config["VERSION"] = VERSION
+
+# Настройка CORS для Telegram WebApp
+CORS(app, origins=[
+    "https://expressed-nurse-drive-original.trycloudflare.com",
+    "https://*.trycloudflare.com",
+    "https://telegram.org",
+    "https://web.telegram.org"
+])
+
+# Middleware для обработки Telegram WebApp заголовков
+@app.before_request
+def handle_telegram_headers():
+    """Обработка заголовков Telegram WebApp"""
+    from flask import request, g
+    
+    # Логируем заголовки для отладки
+    if request.headers.get('X-Telegram-Bot-Api-Secret-Token'):
+        logger.info("🔍 Telegram WebApp request detected")
+        logger.info(f"Headers: {dict(request.headers)}")
+    
+    # Устанавливаем флаг для Telegram WebApp
+    g.is_telegram_webapp = bool(request.headers.get('X-Telegram-Bot-Api-Secret-Token'))
+
+# Middleware для отключения кэширования API запросов
+@app.after_request
+def disable_api_caching(response):
+    """Отключаем кэширование для всех API запросов"""
+    from flask import request
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 
 # Добавляем REACTOR_ENABLED в контекст шаблонов

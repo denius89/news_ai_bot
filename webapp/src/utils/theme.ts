@@ -101,7 +101,9 @@ export const initializeTheme = (): Theme => {
     };
   }
   
-  return theme as Theme;
+  return () => {
+    mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  };
 };
 
 /**

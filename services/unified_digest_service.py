@@ -149,6 +149,7 @@ class UnifiedDigestService:
         period: str = "daily",
         style: str = "analytical",
         limit: int = 20,
+        min_importance: Optional[float] = None,  # НОВЫЙ ПАРАМЕТР ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
     ) -> str:
         """
         Build AI digest (async version).
@@ -159,6 +160,7 @@ class UnifiedDigestService:
             period: Time period for digest
             style: AI generation style
             limit: Maximum number of news items
+            min_importance: Minimum importance threshold for news filtering
 
         Returns:
             AI-generated digest text
@@ -168,7 +170,16 @@ class UnifiedDigestService:
             if categories is None and category is not None:
                 categories = [category]
 
-            news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit)
+            # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ С ФИЛЬТРАЦИЕЙ ПО ВАЖНОСТИ
+            if min_importance is not None:
+                news_items = await self.db_service.async_get_latest_news_with_importance(
+                    categories=categories, 
+                    limit=limit, 
+                    min_importance=min_importance
+                )
+            else:
+                # Fallback на старую функцию
+                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit)
 
             if not news_items:
                 cat_display = categories[0] if categories else category or "all"

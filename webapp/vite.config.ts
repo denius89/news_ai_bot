@@ -23,7 +23,7 @@ export default defineConfig(({ command, mode }) => {
         allowedHosts: [
           'localhost',
           '127.0.0.1',
-          'immunology-restructuring-march-same.trycloudflare.com',
+          'expressed-nurse-drive-original.trycloudflare.com',
           '.trycloudflare.com'
         ],
         headers: {
