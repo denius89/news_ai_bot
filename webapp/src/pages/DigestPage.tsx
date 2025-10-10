@@ -22,6 +22,7 @@ interface DigestItem {
   limit?: number;
   preview?: string;
   user_id?: string;
+  feedback_score?: number | null; // 0.0 = палец вниз, 1.0 = палец вверх, null = нет отзыва
   metadata?: {
     category: string;
     style: string;
@@ -47,7 +48,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [archivedDigests, setArchivedDigests] = useState<DigestItem[]>([]);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [selectedDigest, setSelectedDigest] = useState<DigestItem | null>(null);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set());
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, 'up' | 'down'>>({});
   
   // 🚀 Гибридный подход: useTelegramUser для UI, useAuth для API
   const { userData } = useTelegramUser();
@@ -63,7 +64,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   // Функция для отправки feedback
   const handleFeedback = async (digestId: string, score: number) => {
     // Проверяем, не отправлен ли уже отзыв для этого дайджеста
-    if (feedbackSubmitted.has(digestId)) {
+    if (feedbackSubmitted[digestId]) {
       showNotification('error', 'Отзыв уже отправлен');
       return;
     }
@@ -79,8 +80,9 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       });
       
       if (response.ok) {
-        // Добавляем digest ID в множество отправленных отзывов
-        setFeedbackSubmitted(prev => new Set([...prev, digestId]));
+        // Сохраняем тип отзыва (палец вверх или вниз)
+        const feedbackType = score === 1 ? 'up' : 'down';
+        setFeedbackSubmitted(prev => ({ ...prev, [digestId]: feedbackType }));
         showNotification('success', 'Спасибо за отзыв!');
       } else {
         const errorData = await response.json();
@@ -148,7 +150,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       const processDigests = (digestsData: any[]) => digestsData.map((digest: any) => ({
         id: digest.id,
-        title: `${digest.category} • ${digest.style}`,
         summary: digest.summary,
         category: digest.category,
         createdAt: digest.created_at,
@@ -157,6 +158,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         limit: digest.limit,
         preview: digest.preview,
         content: digest.summary,
+        feedback_score: digest.feedback_score, // Добавляем поле отзыва
         readTime: Math.ceil(digest.summary.length / 1000), // Примерное время чтения
         sources: ['AI Generated'],
         keyPoints: []
@@ -165,7 +167,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (activeData.status === 'success') {
         const historyDigests = processDigests(activeData.data.digests);
         setDigests(historyDigests); // Используем только реальные данные
-        // Активные дайджесты загружены
+        
+        // Построить мапу отзывов из активных дайджестов
+        const feedbackMap: Record<string, 'up' | 'down'> = {};
+        historyDigests.forEach(digest => {
+          if (digest.feedback_score === 1.0) {
+            feedbackMap[digest.id] = 'up';
+          } else if (digest.feedback_score === 0.0) {
+            feedbackMap[digest.id] = 'down';
+          }
+        });
+        setFeedbackSubmitted(prev => ({ ...prev, ...feedbackMap }));
       } else {
         console.warn('⚠️ Не удалось загрузить активные дайджесты:', activeData.message);
         setDigests([]);
@@ -174,7 +186,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (archivedData.status === 'success') {
         const archivedHistoryDigests = processDigests(archivedData.data.digests);
         setArchivedDigests(archivedHistoryDigests);
-        // Архивированные дайджесты загружены
+        
+        // Добавить отзывы из архивированных дайджестов
+        const archivedFeedbackMap: Record<string, 'up' | 'down'> = {};
+        archivedHistoryDigests.forEach(digest => {
+          if (digest.feedback_score === 1.0) {
+            archivedFeedbackMap[digest.id] = 'up';
+          } else if (digest.feedback_score === 0.0) {
+            archivedFeedbackMap[digest.id] = 'down';
+          }
+        });
+        setFeedbackSubmitted(prev => ({ ...prev, ...archivedFeedbackMap }));
       } else {
         console.warn('⚠️ Не удалось загрузить архивированные дайджесты:', archivedData.message);
         setArchivedDigests([]);
@@ -183,7 +205,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (deletedData.status === 'success') {
         const deletedHistoryDigests = processDigests(deletedData.data.digests);
         setDeletedDigests(deletedHistoryDigests);
-        // Удаленные дайджесты загружены
+        
+        // Добавить отзывы из удаленных дайджестов
+        const deletedFeedbackMap: Record<string, 'up' | 'down'> = {};
+        deletedHistoryDigests.forEach(digest => {
+          if (digest.feedback_score === 1.0) {
+            deletedFeedbackMap[digest.id] = 'up';
+          } else if (digest.feedback_score === 0.0) {
+            deletedFeedbackMap[digest.id] = 'down';
+          }
+        });
+        setFeedbackSubmitted(prev => ({ ...prev, ...deletedFeedbackMap }));
       } else {
         console.warn('⚠️ Не удалось загрузить удаленные дайджесты:', deletedData.message);
         setDeletedDigests([]);
@@ -603,47 +635,73 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     whileHover={{ scale: 1.02 }}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   >
-                    <div className="flex justify-between items-start">
-                      <h3 className="text-[15px] font-semibold text-gray-900 dark:text-white leading-snug">
-                        {truncateText(digest.title || digest.summary, 100)}
-                      </h3>
-                      </div>
+                    {/* Заголовок - извлекаем заголовок из HTML или используем первые слова */}
+                    <h3 className="text-[15px] font-semibold text-gray-900 dark:text-white leading-snug">
+                      {(() => {
+                        // Пытаемся извлечь заголовок из HTML (например, <h1>, <h2>, <b>)
+                        const htmlText = digest.summary;
+                        const titleMatch = htmlText.match(/<(h[1-6]|b|strong)>(.*?)<\/(h[1-6]|b|strong)>/i);
+                        if (titleMatch && titleMatch[2]) {
+                          return truncateText(titleMatch[2].replace(/<[^>]*>/g, ''), 80);
+                        }
+                        // Если нет HTML тегов, берем первые слова до точки
+                        const firstSentence = htmlText.split('.')[0];
+                        return truncateText(firstSentence.replace(/<[^>]*>/g, ''), 80);
+                      })()}
+                    </h3>
 
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {digest.sources?.join(', ') || 'AI Generated'} • {new Date(digest.createdAt).toLocaleDateString('ru-RU')}
-                    </p>
+                    {/* Бейджи в одну строку */}
+                    <div className="flex items-center gap-2 flex-wrap mt-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                        {categories[digest.category] || digest.category}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                        {digest.style}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {new Date(digest.createdAt).toLocaleDateString('ru-RU')}
+                      </span>
+                    </div>
 
-                    <p className="mt-2 text-[14px] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
-                      {truncateText(digest.summary, 200)}
-                    </p>
+                    {/* Preview с HTML-рендерингом */}
+                    <div 
+                      className="mt-3 text-[14px] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3"
+                      dangerouslySetInnerHTML={{ 
+                        __html: truncateText(digest.summary, 200) 
+                      }}
+                    />
 
                     <div className="mt-4 flex justify-between items-center text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">{categories[digest.category] || digest.category}</span>
+                      <span className="text-gray-500 dark:text-gray-400">{digest.sources?.join(', ') || 'AI Generated'}</span>
                       <div className="flex items-center gap-2">
                         {/* Feedback buttons - only for active tab */}
                         {activeTab === 'active' && (
                           <>
                             <button 
                               className={`p-1.5 rounded-lg transition-colors ${
-                                feedbackSubmitted.has(digest.id)
+                                feedbackSubmitted[digest.id] === 'up'
+                                  ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                                  : feedbackSubmitted[digest.id] === 'down'
                                   ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                                   : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
                               }`}
                               onClick={() => handleFeedback(digest.id, 1.0)}
-                              title={feedbackSubmitted.has(digest.id) ? "Отзыв уже отправлен" : "Понравилось"}
-                              disabled={feedbackSubmitted.has(digest.id)}
+                              title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Понравилось"}
+                              disabled={!!feedbackSubmitted[digest.id]}
                             >
                               <ThumbsUp className="w-4 h-4" />
                             </button>
                             <button 
                               className={`p-1.5 rounded-lg transition-colors ${
-                                feedbackSubmitted.has(digest.id)
+                                feedbackSubmitted[digest.id] === 'down'
+                                  ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+                                  : feedbackSubmitted[digest.id] === 'up'
                                   ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                                   : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                               }`}
                               onClick={() => handleFeedback(digest.id, 0.0)}
-                              title={feedbackSubmitted.has(digest.id) ? "Отзыв уже отправлен" : "Не понравилось"}
-                              disabled={feedbackSubmitted.has(digest.id)}
+                              title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Не понравилось"}
+                              disabled={!!feedbackSubmitted[digest.id]}
                             >
                               <ThumbsDown className="w-4 h-4" />
                             </button>
@@ -818,25 +876,29 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                 <div className="flex gap-2">
                   <button 
                     className={`p-2 rounded-lg transition-colors ${
-                      feedbackSubmitted.has(selectedDigest.id)
+                      feedbackSubmitted[selectedDigest.id] === 'up'
+                        ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                        : feedbackSubmitted[selectedDigest.id] === 'down'
                         ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                         : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
                     }`}
                     onClick={() => handleFeedback(selectedDigest.id, 1.0)}
-                    title={feedbackSubmitted.has(selectedDigest.id) ? "Отзыв уже отправлен" : "Понравилось"}
-                    disabled={feedbackSubmitted.has(selectedDigest.id)}
+                    title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Понравилось"}
+                    disabled={!!feedbackSubmitted[selectedDigest.id]}
                   >
                     <ThumbsUp className="w-4 h-4" />
                   </button>
                   <button 
                     className={`p-2 rounded-lg transition-colors ${
-                      feedbackSubmitted.has(selectedDigest.id)
+                      feedbackSubmitted[selectedDigest.id] === 'down'
+                        ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+                        : feedbackSubmitted[selectedDigest.id] === 'up'
                         ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                         : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                     }`}
                     onClick={() => handleFeedback(selectedDigest.id, 0.0)}
-                    title={feedbackSubmitted.has(selectedDigest.id) ? "Отзыв уже отправлен" : "Не понравилось"}
-                    disabled={feedbackSubmitted.has(selectedDigest.id)}
+                    title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Не понравилось"}
+                    disabled={!!feedbackSubmitted[selectedDigest.id]}
                   >
                     <ThumbsDown className="w-4 h-4" />
                   </button>

@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       whileHover: { scale: disabled || loading ? 1 : 1.02 },
       whileTap: { scale: disabled || loading ? 1 : 0.98 },
       transition: { duration: 0.1 },
-    } : {};
+    } : {} as any;
 
     return (
       <Component
