@@ -8,6 +8,7 @@ to maintain consistency across the application.
 
 import asyncio
 import logging
+import os
 import unicodedata
 
 from flask import Blueprint, request, jsonify
@@ -566,14 +567,39 @@ def create_user():
 
 @api_bp.route("/health", methods=["GET"])
 def health_check():
-    """GET /api/health - Health check endpoint"""
-    return jsonify(
-        {
+    """GET /api/health - Health check endpoint with digest v2 status"""
+    try:
+        from database.db_models import get_digest_analytics
+        
+        # Get digest analytics for today
+        analytics = get_digest_analytics()
+        avg_confidence = analytics.get("avg_confidence", 0.0)
+        
+        # Determine digest v2 status
+        if avg_confidence >= 0.7:
+            digest_v2_status = "ok"
+        elif avg_confidence >= 0.5:
+            digest_v2_status = "warning"
+        else:
+            digest_v2_status = "error"
+        
+        return jsonify({
             "status": "success",
             "message": "PulseAI API is healthy",
             "version": "1.0.0",
-        }
-    )
+            "digest_v2_status": digest_v2_status,
+            "avg_confidence": round(avg_confidence, 3),
+            "generated_today": analytics.get("generated_count", 0)
+        })
+        
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return jsonify({
+            "status": "error",
+            "message": "Health check failed",
+            "digest_v2_status": "error",
+            "error": str(e)
+        }), 500
 
 
 @api_bp.route("/categories", methods=["GET"])
@@ -718,25 +744,29 @@ def get_upcoming_events():
 # --- Digest API Endpoints ---
 @api_bp.route("/digests/styles", methods=["GET"])
 def get_digest_styles():
-    """Get available digest styles."""
+    """Get available digest styles v2."""
     try:
-        from digests.configs import STYLES
+        from digests.prompts_v2 import STYLE_CARDS
+
+        # Extract styles and descriptions from v2
+        styles = {}
+        descriptions = {}
+        
+        for key, style_card in STYLE_CARDS.items():
+            styles[key] = style_card["name"]
+            descriptions[key] = style_card["description"]
 
         return jsonify(
             {
                 "status": "success",
                 "data": {
-                    "styles": STYLES,
-                    "descriptions": {
-                        "analytical": "Глубокий анализ с экспертной оценкой",
-                        "business": "Деловой тон с фокусом на практические решения",
-                        "meme": "Лёгкий стиль с юмором и мемами",
-                    },
+                    "styles": styles,
+                    "descriptions": descriptions,
                 },
             }
         )
     except Exception as e:
-        logger.error(f"Ошибка получения стилей дайджеста: {e}")
+        logger.error(f"Ошибка получения стилей дайджеста v2: {e}")
         return jsonify({"status": "error", "message": "Ошибка получения стилей"}), 500
 
 
@@ -791,6 +821,16 @@ def generate_digest():
     user_id = data.get("user_id")  # Новый параметр для привязки к пользователю
     save_digest = data.get("save", True)  # По умолчанию сохраняем
     
+    # ЛОГИРОВАНИЕ ДЛЯ ОТЛАДКИ
+    logger.info(f"🔍 DIGEST GENERATION REQUEST:")
+    logger.info(f"  - category: {category}")
+    logger.info(f"  - style: {style}")
+    logger.info(f"  - period: {period}")
+    logger.info(f"  - limit: {limit}")
+    logger.info(f"  - user_id: {user_id}")
+    logger.info(f"  - save_digest: {save_digest}")
+    logger.info(f"  - Full data: {data}")
+    
     # НОВЫЕ ПАРАМЕТРЫ ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
     min_importance = data.get("min_importance", None)  # Минимальная важность новостей
     enable_smart_filtering = data.get("enable_smart_filtering", True)  # Включить умную фильтрацию
@@ -798,7 +838,7 @@ def generate_digest():
 
     try:
         from services.unified_digest_service import get_async_digest_service
-        from digests.configs import STYLES
+        from digests.prompts_v2 import STYLE_CARDS
         from services.categories import get_categories
         from database.db_models import save_digest as db_save_digest
         
@@ -815,7 +855,7 @@ def generate_digest():
         real_categories = get_categories()
 
         # Validate parameters
-        if style not in STYLES:
+        if style not in STYLE_CARDS:
             return jsonify({"status": "error", "message": f"Invalid style: {style}"}), 400
 
         if category != "all" and category not in real_categories:
@@ -879,6 +919,7 @@ def generate_digest():
         digest_id = None
         if user_id and save_digest:
             try:
+                # user_id уже является UUID строкой, не нужно искать пользователя
                 digest_id = db_save_digest(
                     user_id=str(user_id),
                     summary=digest_text,
@@ -887,14 +928,12 @@ def generate_digest():
                     period=period,
                     limit_count=limit,
                     metadata={
-                        "api_generated": True,
-                        "category_name": (
-                            category_display.get(category, "Все категории") if category != "all" else "Все категории"
-                        ),
-                        "style_name": STYLES.get(style, style),
-                        "min_importance": final_min_importance,  # Добавляем информацию о фильтрации
-                        "smart_filtering_enabled": enable_smart_filtering,
-                    },
+                        "generation_time_ms": generation_time_ms,
+                        "news_count": digest_text.count('\n') if digest_text else 0,
+                        "min_importance": final_min_importance,
+                        "smart_filtering": enable_smart_filtering,
+                        "user_preferences_used": use_user_preferences
+                    }
                 )
                 logger.info(f"Дайджест сохранен для пользователя {user_id}: {digest_id}")
             except Exception as save_error:
@@ -948,7 +987,7 @@ def generate_digest():
                         "style": style,
                         "period": period,
                         "limit": limit,
-                        "style_name": STYLES.get(style, style),
+                        "style_name": STYLE_CARDS.get(style, {}).get("name", style),
                         "category_name": (
                             category_display.get(category, "Все категории") if category != "all" else "Все категории"
                         ),
@@ -969,21 +1008,37 @@ def generate_digest():
 @api_bp.route("/digests/history", methods=["GET"])
 def get_digest_history():
     """Get user's digest history with soft delete support."""
-    user_id = request.args.get("user_id")
+    from flask import g
+    
+    # Получаем данные пользователя из middleware аутентификации
+    if not hasattr(g, 'current_user') or not g.current_user:
+        return jsonify({"status": "error", "message": "Authentication required"}), 401
+    
+    user_id = g.current_user['user_id']
     limit = int(request.args.get("limit", 20))
     offset = int(request.args.get("offset", 0))
     include_deleted = request.args.get("include_deleted", "false").lower() == "true"
     include_archived = request.args.get("include_archived", "false").lower() == "true"
 
-    if not user_id:
-        return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
+    logger.info(f"🔍 Getting digest history for user {user_id} (method: {g.current_user['method']})")
 
     try:
-        from database.db_models import get_user_digests
+        from database.db_models import get_user_digests, get_user_by_telegram
+
+        # Convert telegram_id to UUID if needed
+        if user_id.isdigit() and len(user_id) < 10:
+            # user_id is telegram_id, convert to UUID
+            user_data = get_user_by_telegram(int(user_id))
+            if not user_data:
+                return jsonify({"status": "error", "message": "User not found"}), 404
+            user_uuid = user_data['id']
+        else:
+            # user_id is already UUID
+            user_uuid = user_id
 
         # Get user's digest history with soft delete support
         digests = get_user_digests(
-            user_id=str(user_id),
+            user_id=str(user_uuid),
             limit=limit,
             offset=offset,
             include_deleted=include_deleted,
@@ -1039,10 +1094,21 @@ def get_digest_by_id(digest_id):
         return jsonify({"status": "error", "message": "user_id parameter is required"}), 400
 
     try:
-        from database.db_models import get_digest_by_id as db_get_digest_by_id
+        from database.db_models import get_digest_by_id as db_get_digest_by_id, get_user_by_telegram
+
+        # Convert telegram_id to UUID if needed
+        if user_id.isdigit() and len(user_id) < 10:
+            # user_id is telegram_id, convert to UUID
+            user_data = get_user_by_telegram(int(user_id))
+            if not user_data:
+                return jsonify({"status": "error", "message": "User not found"}), 404
+            user_uuid = user_data['id']
+        else:
+            # user_id is already UUID
+            user_uuid = user_id
 
         # Get digest by ID
-        digest = db_get_digest_by_id(digest_id=str(digest_id), user_id=str(user_id))
+        digest = db_get_digest_by_id(digest_id=str(digest_id), user_id=str(user_uuid))
 
         if not digest:
             return jsonify({"status": "error", "message": "Digest not found"}), 404
@@ -1099,13 +1165,18 @@ def soft_delete_digest(digest_id):
             permanent_delete_digest as db_permanent_delete_digest,
         )
 
+        # Convert telegram_id to UUID if needed
+        user_uuid = convert_user_id_to_uuid(user_id)
+        if not user_uuid:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+
         if permanent:
             # Окончательное удаление
-            success = db_permanent_delete_digest(digest_id=str(digest_id), user_id=str(user_id))
+            success = db_permanent_delete_digest(digest_id=str(digest_id), user_id=str(user_uuid))
             message = "Digest permanently deleted"
         else:
             # Мягкое удаление
-            success = db_soft_delete_digest(digest_id=str(digest_id), user_id=str(user_id))
+            success = db_soft_delete_digest(digest_id=str(digest_id), user_id=str(user_uuid))
             message = "Digest moved to trash"
 
         if success:
@@ -1129,7 +1200,12 @@ def restore_digest(digest_id):
     try:
         from database.db_models import restore_digest as db_restore_digest
 
-        success = db_restore_digest(digest_id=str(digest_id), user_id=str(user_id))
+        # Convert telegram_id to UUID if needed
+        user_uuid = convert_user_id_to_uuid(user_id)
+        if not user_uuid:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+
+        success = db_restore_digest(digest_id=str(digest_id), user_id=str(user_uuid))
 
         if success:
             return jsonify({"status": "success", "message": "Digest restored successfully", "restored": True})
@@ -1152,7 +1228,12 @@ def archive_digest(digest_id):
     try:
         from database.db_models import archive_digest as db_archive_digest
 
-        success = db_archive_digest(digest_id=str(digest_id), user_id=str(user_id))
+        # Convert telegram_id to UUID if needed
+        user_uuid = convert_user_id_to_uuid(user_id)
+        if not user_uuid:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+
+        success = db_archive_digest(digest_id=str(digest_id), user_id=str(user_uuid))
 
         if success:
             return jsonify({"status": "success", "message": "Digest archived successfully", "archived": True})
@@ -1175,7 +1256,12 @@ def unarchive_digest(digest_id):
     try:
         from database.db_models import unarchive_digest as db_unarchive_digest
 
-        success = db_unarchive_digest(digest_id=str(digest_id), user_id=str(user_id))
+        # Convert telegram_id to UUID if needed
+        user_uuid = convert_user_id_to_uuid(user_id)
+        if not user_uuid:
+            return jsonify({"status": "error", "message": "User not found"}), 404
+
+        success = db_unarchive_digest(digest_id=str(digest_id), user_id=str(user_uuid))
 
         if success:
             return jsonify({"status": "success", "message": "Digest unarchived successfully", "unarchived": True})
@@ -1189,16 +1275,29 @@ def unarchive_digest(digest_id):
 
 @api_bp.route("/users/by-telegram-id/<int:telegram_id>", methods=["GET"])
 def get_user_by_telegram_id(telegram_id):
-    """Get user_id by telegram_id for Telegram WebApp integration."""
+    """Get user_id by telegram_id for Telegram WebApp integration (public endpoint)."""
     try:
         logger.info(f"🔍 API request for telegram_id: {telegram_id}")
-        logger.info(f"🔍 Request headers: {dict(request.headers)}")
+        
+        # Импортируем модули
+        from utils.text.name_normalizer import normalize_user_name
         from database.db_models import supabase
         
         logger.info(f"🔍 Supabase connection check: {supabase is not None}")
         if not supabase:
             logger.error("❌ Supabase not initialized!")
             return jsonify({"status": "error", "message": "Database not initialized"}), 500
+
+        # Получаем данные пользователя из заголовков (опционально)
+        tg_user_data = request.headers.get('X-Telegram-User-Data')
+        tg_user = None
+        if tg_user_data:
+            import json
+            try:
+                tg_user = json.loads(tg_user_data)
+                logger.info(f"⚠️ Using userData for user {telegram_id}")
+            except json.JSONDecodeError as e:
+                logger.warning(f"Failed to parse userData: {e}")
 
         # Ищем пользователя по telegram_id с retry логикой
         max_retries = 3
@@ -1222,34 +1321,20 @@ def get_user_by_telegram_id(telegram_id):
             logger.info(f"User found by telegram_id {telegram_id}: {user_data['id']}")
             logger.info(f"🔍 User data: first_name='{user_data.get('first_name')}', username='{user_data.get('username')}'")
             
-            # Проверяем, нужно ли обновить данные пользователя
-            tg_user_data = request.headers.get('X-Telegram-User-Data')
-            logger.info(f"🔍 X-Telegram-User-Data header: {tg_user_data}")
-            tg_user = None
-            if tg_user_data:
-                import json
-                try:
-                    logger.info(f"🔍 Raw tg_user_data: {repr(tg_user_data)}")
-                    tg_user = json.loads(tg_user_data)
-                    logger.info(f"🔍 Parsed tg_user: {tg_user}")
-                except Exception as parse_error:
-                    logger.error(f"❌ Failed to parse tg_user_data: {parse_error}")
-                    logger.error(f"❌ Raw data was: {repr(tg_user_data)}")
-                    pass
-            else:
-                logger.warning("⚠️ No X-Telegram-User-Data header found")
-            
-            # Обновляем данные пользователя, если они есть в Telegram данных
+            # Обновляем данные пользователя с нормализацией имён
             needs_update = False
             new_first_name = user_data.get('first_name')
             new_username = user_data.get('username')
             
             if tg_user and tg_user.get('first_name'):
                 if not user_data.get('first_name'):
-                    # Обрабатываем Unicode символы
+                    # Нормализуем имя пользователя
                     raw_first_name = tg_user.get('first_name')
-                    # Конвертируем Unicode стилизованные символы в обычные
-                    new_first_name = convert_unicode_name(raw_first_name)
+                    new_first_name = normalize_user_name(
+                        raw_name=raw_first_name,
+                        username=tg_user.get('username'),
+                        user_id=telegram_id
+                    )
                     needs_update = True
                     logger.info(f"Will update first_name for user {user_data['id']}: {raw_first_name} -> {new_first_name}")
             
@@ -1309,37 +1394,38 @@ def get_user_by_telegram_id(telegram_id):
             logger.info(f"User not found by telegram_id: {telegram_id}, creating new user")
             logger.info(f"🔍 Creating new user for telegram_id: {telegram_id}")
             
-            # Создаем нового пользователя
+            # Создаем нового пользователя с нормализацией имён
             try:
                 from database.db_models import create_user
                 
-                # Получаем данные пользователя из Telegram WebApp
-                tg_user_data = request.headers.get('X-Telegram-User-Data')
-                logger.info(f"🔍 Creating new user - X-Telegram-User-Data: {repr(tg_user_data)}")
-                tg_user = None
-                if tg_user_data:
-                    import json
-                    try:
-                        tg_user = json.loads(tg_user_data)
-                        logger.info(f"🔍 Parsed tg_user for new user: {tg_user}")
-                    except Exception as e:
-                        logger.error(f"❌ Failed to parse tg_user_data for new user: {e}")
-                        pass
+                # Используем уже полученные данные пользователя из аутентификации
+                if not tg_user:
+                    logger.warning("⚠️ No user data available for new user creation")
+                    # Создаем пользователя с минимальными данными
+                    normalized_name = normalize_user_name(None, None, telegram_id)
+                    new_user_id = create_user(
+                        telegram_id=telegram_id,
+                        username=None,
+                        locale='ru',
+                        first_name=normalized_name
+                    )
                 else:
-                    logger.warning("⚠️ No X-Telegram-User-Data header for new user creation")
-                
-                # Создаем пользователя с исправленным именем
-                raw_first_name = tg_user.get('first_name') if tg_user else None
-                fixed_first_name = convert_unicode_name(raw_first_name) if raw_first_name else None
-                
-                logger.info(f"🔧 Creating user with name conversion: {repr(raw_first_name)} -> {repr(fixed_first_name)}")
-                
-                new_user_id = create_user(
-                    telegram_id=telegram_id,
-                    username=tg_user.get('username') if tg_user else None,
-                    locale=tg_user.get('language_code', 'ru') if tg_user else 'ru',
-                    first_name=fixed_first_name
-                )
+                    # Нормализуем имя пользователя
+                    raw_first_name = tg_user.get('first_name')
+                    normalized_name = normalize_user_name(
+                        raw_name=raw_first_name,
+                        username=tg_user.get('username'),
+                        user_id=telegram_id
+                    )
+                    
+                    logger.info(f"🔧 Creating user with normalized name: {repr(raw_first_name)} -> {repr(normalized_name)}")
+                    
+                    new_user_id = create_user(
+                        telegram_id=telegram_id,
+                        username=tg_user.get('username'),
+                        locale=tg_user.get('language_code', 'ru'),
+                        first_name=normalized_name
+                    )
                 
                 if new_user_id:
                     logger.info(f"New user created: {new_user_id} for telegram_id: {telegram_id}")
@@ -1352,7 +1438,7 @@ def get_user_by_telegram_id(telegram_id):
                                 "telegram_id": telegram_id,
                                 "username": tg_user.get('username') if tg_user else None,
                                 "locale": tg_user.get('language_code', 'ru') if tg_user else 'ru',
-                                "first_name": tg_user.get('first_name') if tg_user else None,
+                                "first_name": normalized_name,
                             },
                         }
                     )
@@ -1568,6 +1654,82 @@ def get_current_smart_filter():
     except Exception as e:
         logger.error(f"Error getting smart filter: {e}")
         return jsonify({"status": "error", "message": f"Error getting smart filter: {str(e)}"}), 500
+
+
+# =============================================================================
+# FEEDBACK API ENDPOINTS
+# =============================================================================
+
+@api_bp.route('/feedback', methods=['POST'])
+def submit_feedback():
+    """
+    Submit feedback for digest.
+    
+    Request body:
+        {
+            "digest_id": "uuid",
+            "score": 0.9  // 0.0-1.0
+        }
+    
+    Returns:
+        JSON with success/error status
+    """
+    try:
+        data = request.get_json()
+        digest_id = data.get('digest_id')
+        score = data.get('score')  # 0.0 - 1.0
+        
+        if not digest_id or score is None:
+            return jsonify({
+                "status": "error",
+                "message": "digest_id and score are required"
+            }), 400
+        
+        if not 0.0 <= score <= 1.0:
+            return jsonify({
+                "status": "error",
+                "message": "score must be between 0.0 and 1.0"
+            }), 400
+        
+        # Update feedback
+        from database.db_models import update_digest_feedback
+        success = update_digest_feedback(digest_id, score)
+        
+        if success:
+            # Update daily analytics
+            from database.db_models import update_daily_analytics
+            update_daily_analytics()
+            
+            return jsonify({
+                "status": "success",
+                "message": "Feedback saved"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Digest not found"
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error submitting feedback: {e}")
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+def convert_user_id_to_uuid(user_id: str):
+    """Convert telegram_id to UUID if needed."""
+    if user_id.isdigit() and len(user_id) < 10:
+        # user_id is telegram_id, convert to UUID
+        from database.db_models import get_user_by_telegram
+        user_data = get_user_by_telegram(int(user_id))
+        if not user_data:
+            return None
+        return user_data['id']
+    else:
+        # user_id is already UUID
+        return user_id
 
 
 __all__ = ["api_bp"]

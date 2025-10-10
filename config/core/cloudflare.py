@@ -16,7 +16,7 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / "config_files" / "en
 
 # Основной URL Cloudflare Tunnel
 CLOUDFLARE_TUNNEL_URL = os.getenv(
-    "CLOUDFLARE_TUNNEL_URL", "https://expressed-nurse-drive-original.trycloudflare.com"
+    "CLOUDFLARE_TUNNEL_URL", "https://vendors-sectors-viewed-inkjet.trycloudflare.com"
 )
 
 # Локальный URL для туннеля

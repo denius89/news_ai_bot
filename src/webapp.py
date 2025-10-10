@@ -1,7 +1,8 @@
 import logging
 import os
-from flask import Flask, render_template, send_from_directory, redirect
+from flask import Flask, render_template, send_from_directory, redirect, session, request, g
 from flask_cors import CORS
+from datetime import timedelta
 
 import sys
 import os
@@ -9,6 +10,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config.core.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
+from utils.auth.telegram_auth import verify_telegram_auth
 from routes.news_routes import news_bp
 
 # webapp_bp удален - конфликтовал с serve_react()
@@ -27,13 +29,96 @@ logger = logging.getLogger("news_ai_bot")
 app = Flask(__name__, static_folder='dist')
 app.config["VERSION"] = VERSION
 
+# Flask session configuration для безопасности
+app.config.update(
+    SECRET_KEY=os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production'),
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=not DEBUG,  # Только для HTTPS в production
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
+)
+
+# Middleware для единой аутентификации
+@app.before_request
+def authenticate_request():
+    """Единая точка аутентификации для всех защищенных endpoints."""
+    if request.path.startswith('/api/'):
+        # Публичные API endpoints, которые не требуют аутентификации
+        public_paths = [
+            '/api/health',
+            '/api/users/by-telegram-id',  # Только для первичной аутентификации
+            '/api/categories',
+            '/api/digests/categories',
+            '/api/digests/styles',
+            '/api/latest',
+            '/api/dashboard/stats',
+            '/api/dashboard/latest_news',
+            '/api/dashboard/news_trend'
+        ]
+        
+        # Проверяем, является ли endpoint публичным
+        is_public = any(request.path.startswith(path) for path in public_paths)
+        
+        if not is_public:
+            # Для защищенных endpoints проверяем аутентификацию
+            bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+            auth_result = verify_telegram_auth(
+                request_headers=dict(request.headers),
+                session_data=session,
+                bot_token=bot_token
+            )
+            
+            if not auth_result['success']:
+                from flask import jsonify
+                logger.warning(f"Authentication failed for {request.path}: {auth_result['message']}")
+                return jsonify({'error': auth_result['message']}), 401
+            
+            # Устанавливаем данные пользователя в g для использования в endpoints
+            g.current_user = auth_result
+            
+            # Устанавливаем session для быстрой повторной аутентификации
+            if auth_result['method'] != 'session':
+                session['user_id'] = auth_result['user_id']
+                session['telegram_id'] = auth_result['telegram_id']
+                session.permanent = True
+
+# Middleware для обработки Telegram WebApp запросов
+@app.before_request
+def process_telegram_request():
+    """Обрабатывает Telegram WebApp запросы и устанавливает флаги."""
+    from utils.auth.telegram_auth import is_telegram_webapp_request
+    g.is_telegram_webapp = is_telegram_webapp_request(dict(request.headers))
+    
+    if g.is_telegram_webapp:
+        logger.debug(f"Telegram WebApp request detected: {request.path}")
+
 # Настройка CORS для Telegram WebApp
 CORS(app, origins=[
-    "https://expressed-nurse-drive-original.trycloudflare.com",
+    "https://vendors-sectors-viewed-inkjet.trycloudflare.com",
     "https://*.trycloudflare.com",
     "https://telegram.org",
     "https://web.telegram.org"
 ])
+
+# Middleware для разрешения встраивания в iframe (Telegram WebApp)
+@app.after_request
+def set_frame_options(response):
+    """Устанавливает заголовки для разрешения встраивания в iframe"""
+    response.headers['X-Frame-Options'] = 'ALLOWALL'
+    # Обновленная CSP политика для Telegram WebApp
+    csp_policy = (
+        "frame-ancestors *; "
+        "connect-src 'self' https://*.trycloudflare.com https://telegram.org https://web.telegram.org wss://*.telegram.org wss://*.web.telegram.org data:; "
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://telegram.org; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        "font-src 'self' data: https://fonts.gstatic.com; "
+        "img-src 'self' data: blob: https:; "
+        "object-src 'none'; "
+        "base-uri 'self'"
+    )
+    response.headers['Content-Security-Policy'] = csp_policy
+    return response
 
 # Middleware для обработки Telegram WebApp заголовков
 @app.before_request

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Brain, Briefcase, Smile, CalendarDays, Filter, Globe2, Coins, TrendingUp, Trophy, Cpu } from 'lucide-react';
+import { X, Sparkles, Brain, Briefcase, Smile, CalendarDays, Filter, Globe2, Coins, TrendingUp, Trophy, Cpu, Newspaper, BookOpen, MessageCircle } from 'lucide-react';
 import { DigestMagicProgress } from './DigestMagicProgress';
 import { cn } from '../../lib/utils';
 import { useDrag } from '@use-gesture/react';
@@ -23,9 +23,10 @@ interface DigestData {
 
 const defaultData: DigestData = {
   styles: {
+    newsroom: "Newsroom",
     analytical: "Аналитический",
-    business: "Бизнес", 
-    meme: "Мемный"
+    magazine: "Magazine",
+    casual: "Простой"
   },
   categories: {
     all: "Все категории",
@@ -443,7 +444,10 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                     const icons = {
                       analytical: <Brain className="w-4 h-4" />,
                       business: <Briefcase className="w-4 h-4" />,
-                      meme: <Smile className="w-4 h-4" />
+                      meme: <Smile className="w-4 h-4" />,
+                      newsroom: <Newspaper className="w-4 h-4" />,
+                      magazine: <BookOpen className="w-4 h-4" />,
+                      casual: <MessageCircle className="w-4 h-4" />
                     };
                     
                     
@@ -457,14 +461,18 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                           selectedStyle === key
                             ? isDark
                               ? `border-2 ${
+                                  key === 'newsroom' ? 'border-red-400/60 bg-red-950/30 text-red-300' :
                                   key === 'analytical' ? 'border-blue-400/60 bg-blue-950/30 text-blue-300' :
-                                  key === 'business' ? 'border-amber-400/60 bg-amber-950/30 text-amber-300' :
-                                  'border-pink-400/60 bg-pink-950/30 text-pink-300'
+                                  key === 'magazine' ? 'border-purple-400/60 bg-purple-950/30 text-purple-300' :
+                                  key === 'casual' ? 'border-green-400/60 bg-green-950/30 text-green-300' :
+                                  'border-gray-400/60 bg-gray-950/30 text-gray-300'
                                 } shadow-[0_0_20px_rgba(59,130,246,0.3)]`
                               : `border-2 ${
+                                  key === 'newsroom' ? 'border-red-400/60 bg-red-50 text-red-600' :
                                   key === 'analytical' ? 'border-blue-400/60 bg-blue-50 text-blue-600' :
-                                  key === 'business' ? 'border-amber-400/60 bg-amber-50 text-amber-600' :
-                                  'border-pink-400/60 bg-pink-50 text-pink-600'
+                                  key === 'magazine' ? 'border-purple-400/60 bg-purple-50 text-purple-600' :
+                                  key === 'casual' ? 'border-green-400/60 bg-green-50 text-green-600' :
+                                  'border-gray-400/60 bg-gray-50 text-gray-600'
                                 } shadow-[0_0_20px_rgba(59,130,246,0.2)]`
                             : isDark
                               ? "border border-gray-700 bg-[#1a1e20]/80 text-gray-300 hover:border-gray-600"
@@ -476,9 +484,10 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         {selectedStyle === key && (
                           <div className={cn(
                             "absolute inset-0 rounded-xl bg-gradient-to-r opacity-20 animate-shimmer",
+                            key === 'newsroom' && "from-red-400 via-orange-400 to-red-300",
                             key === 'analytical' && "from-blue-400 via-cyan-400 to-teal-300",
-                            key === 'business' && "from-amber-400 via-orange-400 to-yellow-400",
-                            key === 'meme' && "from-pink-400 via-fuchsia-400 to-rose-400"
+                            key === 'magazine' && "from-purple-400 via-violet-400 to-purple-300",
+                            key === 'casual' && "from-green-400 via-emerald-400 to-green-300"
                           )} />
                         )}
                         <div className="relative z-10">

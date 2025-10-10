@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Sparkles, Bot, Briefcase, Brain, Laugh } from "lucide-react";
+import { Sparkles, Bot, Briefcase, Brain, Laugh, Newspaper, BookOpen, MessageCircle } from "lucide-react";
 
 const personalities = {
   analytical: {
@@ -32,43 +32,116 @@ const personalities = {
       "AI с чувством юмора на связи 🤖",
       "Собираю весёлую сводку событий!"
     ]
+  },
+  
+  // НОВЫЕ СТИЛИ v2
+  newsroom: {
+    color: "from-slate-400 via-gray-300 to-slate-500",
+    icon: <Newspaper className="w-10 h-10 text-slate-400" />,
+    phrases: [
+      "Собираю факты из проверенных источников...",
+      "Анализирую ключевые события и цифры...",
+      "Проверяю достоверность информации...",
+      "Формирую краткую сводку в стиле Reuters..."
+    ]
+  },
+  
+  magazine: {
+    color: "from-violet-400 via-purple-300 to-indigo-400",
+    icon: <BookOpen className="w-10 h-10 text-violet-400" />,
+    phrases: [
+      "Ищу интересные детали и контекст...",
+      "Превращаю факты в увлекательную историю...",
+      "Добавляю глубину и storytelling...",
+      "Создаю дайджест в стиле The Atlantic..."
+    ]
+  },
+  
+  casual: {
+    color: "from-teal-400 via-cyan-300 to-emerald-400",
+    icon: <MessageCircle className="w-10 h-10 text-teal-400" />,
+    phrases: [
+      "Перевожу новости на простой язык...",
+      "Убираю все сложное и скучное...",
+      "Делаю дайджест для чтения в метро 🚇",
+      "Формирую удобную сводку для Telegram..."
+    ]
   }
 };
 
 interface DigestMagicProgressProps {
-  style?: 'analytical' | 'business' | 'meme';
+  style?: 'analytical' | 'business' | 'meme' | 'newsroom' | 'magazine' | 'casual';
+  tone?: 'neutral' | 'insightful' | 'critical' | 'optimistic';
+  length?: 'short' | 'medium' | 'long';
   onComplete?: () => void;
 }
 
 export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({ 
   style = "analytical", 
+  tone = "neutral",
+  length = "medium",
   onComplete 
 }) => {
   const persona = personalities[style] || personalities.analytical;
-  const [phrase, setPhrase] = useState(persona.phrases[0]);
+  
+  // Адаптация фраз по тону
+  const getPhrases = (style: string, tone?: string) => {
+    const basePersona = personalities[style];
+    
+    if (tone === 'critical') {
+      return [
+        ...basePersona.phrases,
+        "Проверяю противоречия в источниках...",
+        "Анализирую скрытые мотивы..."
+      ];
+    }
+    
+    if (tone === 'optimistic') {
+      return [
+        ...basePersona.phrases,
+        "Ищу позитивные тренды...",
+        "Выделяю успешные решения..."
+      ];
+    }
+    
+    return basePersona.phrases;
+  };
+  
+  const adaptedPhrases = getPhrases(style, tone);
+  const [phrase, setPhrase] = useState(adaptedPhrases[0]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setPhrase(prev => {
-        const currentIndex = persona.phrases.indexOf(prev);
-        const nextIndex = (currentIndex + 1) % persona.phrases.length;
-        return persona.phrases[nextIndex];
+        const currentIndex = adaptedPhrases.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % adaptedPhrases.length;
+        return adaptedPhrases[nextIndex];
       });
     }, 3000);
     
     return () => clearInterval(interval);
-  }, [persona.phrases]);
+  }, [adaptedPhrases]);
+
+  // Динамическое время генерации
+  const getGenerationTime = (length?: string) => {
+    switch (length) {
+      case 'short': return 10000; // 10 секунд
+      case 'medium': return 15000; // 15 секунд
+      case 'long': return 20000; // 20 секунд
+      default: return 15000;
+    }
+  };
 
   // Auto-complete after some time (optional)
   useEffect(() => {
     if (onComplete) {
       const timer = setTimeout(() => {
         onComplete();
-      }, 15000); // 15 seconds max
+      }, getGenerationTime(length));
       
       return () => clearTimeout(timer);
     }
-  }, [onComplete]);
+  }, [onComplete, length]);
 
   return (
     <motion.div 

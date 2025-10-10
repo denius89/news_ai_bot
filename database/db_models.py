@@ -338,6 +338,12 @@ def upsert_user_by_telegram(telegram_id: int, username: str | None = None, local
         return ""
 
     try:
+        # Импортируем нормализацию имён
+        from utils.text.name_normalizer import normalize_user_name
+        
+        # Нормализуем имя пользователя
+        normalized_first_name = normalize_user_name(first_name, username, telegram_id)
+        
         # Сначала пытаемся найти существующего пользователя
         existing_user = supabase.table("users").select("*").eq("telegram_id", telegram_id).execute()
 
@@ -347,8 +353,8 @@ def upsert_user_by_telegram(telegram_id: int, username: str | None = None, local
             
             # Проверяем, нужно ли обновить данные пользователя
             update_data = {}
-            if first_name and not user_data.get("first_name"):
-                update_data["first_name"] = first_name
+            if normalized_first_name and not user_data.get("first_name"):
+                update_data["first_name"] = normalized_first_name
             if username and not user_data.get("username"):
                 update_data["username"] = username
             
@@ -361,12 +367,12 @@ def upsert_user_by_telegram(telegram_id: int, username: str | None = None, local
             logger.debug("Найден существующий пользователь: ID=%s", user_id)
             return user_id
 
-        # Создаем нового пользователя
+        # Создаем нового пользователя с нормализованным именем
         new_user_data = {
             "telegram_id": telegram_id, 
             "username": username, 
             "locale": locale,
-            "first_name": first_name
+            "first_name": normalized_first_name
         }
         
         new_user = (
@@ -1288,7 +1294,7 @@ def get_digest_analytics(user_id: str = None, days: int = 30) -> List[Dict]:
         if user_id:
             query = query.eq("user_id", user_id)
         
-        result = query.order("created_at", desc=True).execute()
+        result = safe_execute(query.order("created_at", desc=True))
         
         return result.data or []
         
@@ -1412,3 +1418,307 @@ def _get_default_smart_filter() -> Dict:
         "categories": None,
         "time_condition": "all"
     }
+
+
+# =========================
+# DIGEST METRICS FUNCTIONS
+# =========================
+
+def save_digest_with_metrics(
+    user_id: str,
+    summary: str,
+    category: str,
+    style: str,
+    confidence: float,
+    generation_time_sec: float,
+    meta: dict,
+    skipped_reason: Optional[str] = None
+) -> str:
+    """
+    Save digest with metrics to database.
+    
+    Args:
+        user_id: User ID
+        summary: Digest content
+        category: News category
+        style: AI style (analytical, business, meme)
+        confidence: AI confidence score (0.0-1.0)
+        generation_time_sec: Time taken to generate digest
+        meta: Additional metadata (style_profile, tone, length, audience)
+        skipped_reason: Reason why digest was skipped (if any)
+    
+    Returns:
+        Digest ID
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return None
+    
+    try:
+        digest_data = {
+            "user_id": user_id,
+            "summary": summary,
+            "category": category,
+            "style": style,
+            "confidence": confidence,
+            "generation_time_sec": generation_time_sec,
+            "meta": meta,
+            "skipped_reason": skipped_reason,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = safe_execute(
+            supabase.table("digests").insert(digest_data).execute()
+        )
+        
+        if result.data:
+            digest_id = result.data[0]["id"]
+            logger.info(f"✅ Digest saved with metrics: {digest_id}")
+            
+            # Update daily analytics
+            update_daily_analytics()
+            
+            return digest_id
+        else:
+            logger.error("❌ Failed to save digest with metrics")
+            return None
+            
+    except Exception as e:
+        logger.error(f"❌ Error saving digest with metrics: {e}")
+        return None
+
+
+def update_digest_feedback(digest_id: str, score: float) -> bool:
+    """
+    Update feedback score for digest.
+    
+    Args:
+        digest_id: Digest ID
+        score: Feedback score (0.0-1.0)
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+    
+    try:
+        # Get current digest data
+        result = safe_execute(
+            supabase.table("digests").select("feedback_score", "feedback_count").eq("id", digest_id)
+        )
+        
+        if not result.data:
+            logger.warning(f"Digest {digest_id} not found")
+            return False
+        
+        current_data = result.data[0]
+        current_score = current_data.get("feedback_score", 0.0) or 0.0
+        current_count = current_data.get("feedback_count", 0) or 0
+        
+        # Calculate new average
+        if current_count == 0:
+            new_score = score
+        else:
+            new_score = (current_score * current_count + score) / (current_count + 1)
+        
+        new_count = current_count + 1
+        
+        # Update digest
+        update_result = safe_execute(
+            supabase.table("digests")
+            .update({
+                "feedback_score": round(new_score, 3),
+                "feedback_count": new_count
+            })
+            .eq("id", digest_id)
+        )
+        
+        if update_result.data:
+            logger.info(f"✅ Feedback updated for digest {digest_id}: {score} (avg: {new_score:.3f})")
+            return True
+        else:
+            logger.error(f"❌ Failed to update feedback for digest {digest_id}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"❌ Error updating digest feedback: {e}")
+        return False
+
+
+def get_digest_analytics(date: Optional[str] = None) -> dict:
+    """
+    Get aggregated analytics for date (default: today).
+    
+    Args:
+        date: Date in YYYY-MM-DD format (default: today)
+    
+    Returns:
+        Dictionary with analytics data
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return {}
+    
+    try:
+        if not date:
+            date = datetime.now().strftime("%Y-%m-%d")
+        
+        # Try to get from digest_analytics table first (filter by date)
+        result = safe_execute(
+            supabase.table("digest_analytics").select("*")
+            .eq("date", date)
+        )
+        
+        if result.data:
+            # Агрегируем данные за день
+            records = result.data
+            total_count = len(records)
+            avg_generation_time = sum(r.get("generation_time_ms", 0) for r in records) / total_count / 1000 if total_count > 0 else 0
+            success_count = sum(1 for r in records if r.get("success", False))
+            
+            logger.debug(f"✅ Retrieved {total_count} analytics records from digest_analytics for {date}")
+            return {
+                "generated_count": total_count,
+                "avg_confidence": 0.0,  # Не хранится в текущей схеме
+                "avg_generation_time_sec": avg_generation_time,
+                "skipped_low_quality": total_count - success_count,
+                "feedback_count": 0,  # Не хранится в текущей схеме
+                "avg_feedback_score": 0.0  # Не хранится в текущей схеме
+            }
+        
+        # Fallback: calculate from digests table
+        logger.debug(f"Calculating analytics from digests table for {date}")
+        
+        # Get digests for the date
+        start_date = f"{date}T00:00:00Z"
+        end_date = f"{date}T23:59:59Z"
+        
+        result = safe_execute(
+            supabase.table("digests")
+            .select("*")
+            .gte("created_at", start_date)
+            .lte("created_at", end_date)
+            .execute()
+        )
+        
+        if not result.data:
+            return {
+                "generated_count": 0,
+                "avg_confidence": 0.0,
+                "avg_generation_time_sec": 0.0,
+                "skipped_low_quality": 0,
+                "feedback_count": 0,
+                "avg_feedback_score": 0.0
+            }
+        
+        digests = result.data
+        
+        # Calculate metrics
+        generated_count = len(digests)
+        skipped_low_quality = len([d for d in digests if d.get("skipped_reason")])
+        
+        # Confidence metrics
+        confidences = [d.get("confidence") for d in digests if d.get("confidence") is not None]
+        avg_confidence = sum(confidences) / len(confidences) if confidences else 0.0
+        
+        # Generation time metrics
+        times = [d.get("generation_time_sec") for d in digests if d.get("generation_time_sec") is not None]
+        avg_generation_time_sec = sum(times) / len(times) if times else 0.0
+        
+        # Feedback metrics
+        feedback_scores = [d.get("feedback_score") for d in digests if d.get("feedback_score") is not None]
+        avg_feedback_score = sum(feedback_scores) / len(feedback_scores) if feedback_scores else 0.0
+        feedback_count = sum(d.get("feedback_count", 0) for d in digests)
+        
+        analytics = {
+            "generated_count": generated_count,
+            "avg_confidence": round(avg_confidence, 3),
+            "avg_generation_time_sec": round(avg_generation_time_sec, 2),
+            "skipped_low_quality": skipped_low_quality,
+            "feedback_count": feedback_count,
+            "avg_feedback_score": round(avg_feedback_score, 3)
+        }
+        
+        logger.debug(f"✅ Calculated analytics for {date}: {analytics}")
+        return analytics
+        
+    except Exception as e:
+        logger.error(f"❌ Error getting digest analytics: {e}")
+        return {}
+
+
+def update_daily_analytics():
+    """
+    Update digest_analytics with today's aggregated data.
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return
+    
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        analytics = get_digest_analytics(today)
+        
+        # Upsert analytics data
+        analytics_data = {
+            "date": today,
+            "generated_count": analytics.get("generated_count", 0),
+            "avg_confidence": analytics.get("avg_confidence", 0.0),
+            "avg_generation_time_sec": analytics.get("avg_generation_time_sec", 0.0),
+            "skipped_low_quality": analytics.get("skipped_low_quality", 0),
+            "feedback_count": analytics.get("feedback_count", 0),
+            "avg_feedback_score": analytics.get("avg_feedback_score", 0.0),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Use upsert to handle duplicates
+        result = safe_execute(
+            supabase.table("digest_analytics")
+            .upsert(analytics_data, on_conflict="date")
+        )
+        
+        if result.data:
+            logger.debug(f"✅ Daily analytics updated for {today}")
+        else:
+            logger.error(f"❌ Failed to update daily analytics for {today}")
+            
+    except Exception as e:
+        logger.error(f"❌ Error updating daily analytics: {e}")
+
+
+def get_digest_analytics_history(days: int = 7) -> List[dict]:
+    """
+    Get digest analytics history for last N days.
+    
+    Args:
+        days: Number of days to retrieve
+    
+    Returns:
+        List of analytics data for each day
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return []
+    
+    try:
+        # Get analytics for last N days
+        result = safe_execute(
+            supabase.table("digest_analytics")
+            .select("*")
+            .order("date", desc=True)
+            .limit(days)
+            .execute()
+        )
+        
+        if result.data:
+            logger.debug(f"✅ Retrieved analytics history for {days} days")
+            return result.data
+        else:
+            logger.debug(f"No analytics history found for {days} days")
+            return []
+            
+    except Exception as e:
+        logger.error(f"❌ Error getting analytics history: {e}")
+        return []

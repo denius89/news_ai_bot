@@ -91,6 +91,74 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 
 ## 🔒 Security
 
+### Telegram WebApp Authentication Flow
+
+PulseAI использует безопасную аутентификацию через Telegram WebApp с HMAC SHA256 проверкой:
+
+```python
+# 1. Получение initData от Telegram WebApp
+init_data = request.headers.get('X-Telegram-Init-Data')
+
+# 2. Проверка подлинности через HMAC SHA256
+verified_data = verify_telegram_webapp_data(init_data, bot_token)
+
+# 3. Извлечение данных пользователя
+if verified_data:
+    user_data = extract_user_from_verified_data(verified_data)
+```
+
+### Name Normalization System
+
+Система нормализации имён защищает от:
+- Emoji-only имён: `🔥🔥🔥` → `User #<user_id>`
+- Невидимых символов: `John\u200bDoe` → `JohnDoe`
+- Стилизованных Unicode: `𝕀𝕧𝕒𝕟` → `Ivan`
+- Испорченной кодировки: `ÐÐ°Ð½` → `Иван`
+
+### Основные принципы безопасности:
+- **HMAC SHA256** - криптографическая проверка данных Telegram
+- **HTTPS everywhere** - все соединения зашифрованы
+- **Session security** - защищённые куки и сессии
+- **CORS настройки** - ограничение доступа по доменам
+- **Environment variables** - секреты не в коде
+- **Database security** - параметризованные запросы
+
+### Настройки безопасности:
+```bash
+# Обязательные переменные окружения
+TELEGRAM_BOT_TOKEN=your_bot_token
+FLASK_SECRET_KEY=your_secret_key_32_chars_min
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+```
+
+### Flask Session Configuration:
+```python
+app.config.update(
+    SECRET_KEY=os.getenv('FLASK_SECRET_KEY'),
+    SESSION_COOKIE_HTTPONLY=True,      # Защита от XSS
+    SESSION_COOKIE_SECURE=True,        # Только HTTPS
+    SESSION_COOKIE_SAMESITE='Lax',     # Защита от CSRF
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
+)
+```
+
+### CORS конфигурация:
+```python
+CORS(app, origins=[
+    "https://*.trycloudflare.com",
+    "https://telegram.org",
+    "https://web.telegram.org",
+    "https://t.me"
+])
+```
+
+### Security Monitoring:
+- Логирование всех попыток аутентификации
+- Мониторинг неудачных попыток входа
+- Алерты при подозрительной активности
+- Регулярная проверка логов безопасности
+
 ### API Keys:
 - Безопасное хранение токенов
 - Ротация ключей
@@ -100,6 +168,8 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 - Контроль доступа к API
 - Аутентификация пользователей
 - Авторизация операций
+
+Подробнее см. [SECURITY.md](../SECURITY.md)
 
 ---
 

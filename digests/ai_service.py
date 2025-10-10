@@ -15,6 +15,11 @@ from models.news import NewsItem
 from utils.text.formatters import format_date
 from utils.ai.ai_client import ask_async
 from digests.prompts import get_prompt_for_category
+try:
+    from digests.prompts_v2 import build_prompt, STYLE_CARDS, CATEGORY_CARDS
+    PROMPTS_V2_AVAILABLE = True
+except ImportError:
+    PROMPTS_V2_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -156,8 +161,30 @@ class DigestAIService:
             ]
         )
 
-        # Используем новую функцию для получения промпта с экспертами
-
+        # Используем новую систему prompts_v2 если доступна и стиль поддерживается
+        if PROMPTS_V2_AVAILABLE and style in STYLE_CARDS and category in CATEGORY_CARDS:
+            logger.info(f"Using prompts_v2 for style: {style}, category: {category}")
+            
+            # Создаем payload для новой системы
+            input_payload = {
+                "category": category,
+                "style_profile": style,
+                "tone": "neutral",  # По умолчанию нейтральный тон
+                "length": "medium",  # По умолчанию средняя длина
+                "audience": "general",  # По умолчанию общая аудитория
+                "news_text": news_text,
+                "min_importance": 0.6,
+                "min_credibility": 0.7
+            }
+            
+            try:
+                system_prompt, user_prompt = build_prompt(input_payload)
+                return f"{system_prompt}\n\n{user_prompt}"
+            except Exception as e:
+                logger.warning(f"Failed to use prompts_v2, falling back to legacy: {e}")
+        
+        # Fallback к старой системе
+        logger.info(f"Using legacy prompts for style: {style}, category: {category}")
         formatted_prompt = get_prompt_for_category(style, category)
 
         # Создаем блок ссылок
