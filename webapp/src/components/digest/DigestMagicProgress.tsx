@@ -86,7 +86,7 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
   
   // Адаптация фраз по тону
   const getPhrases = (style: string, tone?: string) => {
-    const basePersona = personalities[style];
+    const basePersona = personalities[style as keyof typeof personalities];
     
     if (tone === 'critical') {
       return [
@@ -112,7 +112,7 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPhrase(prev => {
+      setPhrase((prev: string) => {
         const currentIndex = adaptedPhrases.indexOf(prev);
         const nextIndex = (currentIndex + 1) % adaptedPhrases.length;
         return adaptedPhrases[nextIndex];

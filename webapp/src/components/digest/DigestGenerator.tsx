@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Sparkles, Brain, Briefcase, Smile, CalendarDays, Filter, Globe2, Coins, TrendingUp, Trophy, Cpu, Newspaper, BookOpen, MessageCircle } from 'lucide-react';
+import { X, Sparkles, Brain, Briefcase, Smile, CalendarDays, Filter, Globe2, Coins, TrendingUp, Trophy, Cpu, Newspaper, BookOpen, MessageCircle, FileText } from 'lucide-react';
 import { DigestMagicProgress } from './DigestMagicProgress';
 import { cn } from '../../lib/utils';
 import { useDrag } from '@use-gesture/react';
@@ -11,7 +11,7 @@ import '../../styles/holographic.css';
 interface DigestGeneratorProps {
   isOpen: boolean;
   onClose: () => void;
-  onGenerate: (category: string, style: string, period: string) => Promise<string>;
+  onGenerate: (category: string, style: string, period: string, length: string) => Promise<string>;
   userId?: string; // Добавляем userId для сохранения предпочтений
 }
 
@@ -19,6 +19,7 @@ interface DigestData {
   styles: Record<string, string>;
   categories: Record<string, string>;
   periods: Record<string, string>;
+  lengths: Record<string, string>;
 }
 
 const defaultData: DigestData = {
@@ -40,6 +41,11 @@ const defaultData: DigestData = {
     today: "Сегодня",
     "7d": "7 дней",
     "30d": "30 дней"
+  },
+  lengths: {
+    short: "Короткий",
+    medium: "Средний",
+    long: "Длинный"
   }
 };
 
@@ -67,6 +73,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
   const [selectedCategory, setSelectedCategory] = useState(preferences.preferred_category);
   const [selectedStyle, setSelectedStyle] = useState(preferences.preferred_style);
   const [selectedPeriod, setSelectedPeriod] = useState(preferences.preferred_period);
+  const [selectedLength, setSelectedLength] = useState('medium');
 
   // Синхронизируем состояния с предпочтениями при их загрузке
   useEffect(() => {
@@ -231,7 +238,12 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
           setData({
             styles: stylesData.data.styles,
             categories: { all: 'Все категории', ...categoriesData.data.categories },
-            periods: categoriesData.data.periods
+            periods: categoriesData.data.periods,
+            lengths: {
+              short: "Короткий",
+              medium: "Средний", 
+              long: "Длинный"
+            }
           });
         }
       } catch (error) {
@@ -250,7 +262,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
     triggerHapticFeedback('heavy'); // Вибрация при запуске генерации
     
     try {
-      const digest = await onGenerate(selectedCategory, selectedStyle, selectedPeriod);
+      const digest = await onGenerate(selectedCategory, selectedStyle, selectedPeriod, selectedLength);
       setGeneratedDigest(digest);
       
       // Сохраняем предпочтения после успешной генерации
@@ -381,7 +393,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
             </div>
           ) : (
             /* Generation Form */
-            <div className="flex-1 overflow-y-auto space-y-5">
+            <div className="flex-1 overflow-y-auto space-y-4">
               {/* Category Selection */}
               <div {...categoryBind()}>
                 <h3 className={cn(
@@ -411,7 +423,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className={cn(
-                          "flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-sm font-medium border transition-all duration-300",
+                          "flex items-center justify-center gap-2 px-3 py-1.5 rounded-xl text-sm font-medium border transition-all duration-300",
                           selectedCategory === key
                             ? isDark
                               ? "border-emerald-400/30 bg-emerald-950/40 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
@@ -457,7 +469,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className={cn(
-                          "flex flex-col items-center gap-1 px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 relative overflow-hidden",
+                          "flex flex-col items-center gap-1 px-2 py-2 rounded-xl text-xs font-medium transition-all duration-300 relative overflow-hidden",
                           selectedStyle === key
                             ? isDark
                               ? `border-2 ${
@@ -525,6 +537,38 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
                       )}
                       onClick={() => handlePeriodSelect(key)}
+                    >
+                      {label}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Length Selection */}
+              <div>
+                <h3 className={cn(
+                  "text-[14px] font-medium flex items-center gap-2 mb-3",
+                  isDark ? "text-gray-300" : "text-gray-700"
+                )}>
+                  <FileText className="w-4 h-4 text-gray-400" /> Длина текста
+                </h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(data.lengths).map(([key, label]) => (
+                    <motion.button
+                      key={key}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className={cn(
+                        "px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 border",
+                        selectedLength === key
+                          ? isDark
+                            ? "bg-emerald-900/40 border border-emerald-400/40 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.2)]"
+                            : "bg-emerald-50 border border-emerald-400/40 text-emerald-700 shadow-[0_0_6px_rgba(16,185,129,0.1)]"
+                          : isDark
+                            ? "bg-[#1a1e20] border border-gray-800 text-gray-400 hover:border-gray-700"
+                            : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
+                      )}
+                      onClick={() => setSelectedLength(key)}
                     >
                       {label}
                     </motion.button>
