@@ -15,7 +15,7 @@ import { TelegramWebApp } from './components/TelegramWebApp';
 
 // Utils
 import { initializeTheme, toggleTheme, getThemePreference, type Theme } from './utils/theme';
-import { useTelegramUser } from './hooks/useTelegramUser';
+import { AuthProvider } from './context/AuthContext';
 
 // Styles
 import './styles/index.css';
@@ -27,8 +27,7 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('light');
   const [unreadNewsCount, setUnreadNewsCount] = useState(0);
   
-  // Получаем данные пользователя Telegram
-  useTelegramUser();
+  // Аутентификация теперь обрабатывается через AuthProvider
 
   useEffect(() => {
     const checkMobile = () => {
@@ -68,7 +67,7 @@ const App: React.FC = () => {
     setTheme(newTheme);
   };
 
-  // Функция для получения количества новых новостей
+  // Функция для получения количества новых новостей (публичный endpoint)
   const fetchUnreadNewsCount = async () => {
     try {
       const response = await fetch('/api/latest');
@@ -196,7 +195,8 @@ const App: React.FC = () => {
 
   return (
     <TelegramWebApp>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AuthProvider>
+        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen bg-bg">
         <AnimatePresence mode="wait">
           <motion.div
@@ -248,7 +248,8 @@ const App: React.FC = () => {
           </nav>
         )}
         </div>
-      </Router>
+        </Router>
+      </AuthProvider>
     </TelegramWebApp>
   );
 };

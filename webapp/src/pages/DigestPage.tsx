@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
-import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, Loader2, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays } from 'lucide-react';
+import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
 interface DigestItem {
@@ -47,14 +47,49 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [archivedDigests, setArchivedDigests] = useState<DigestItem[]>([]);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [selectedDigest, setSelectedDigest] = useState<DigestItem | null>(null);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set());
   
-  // 🚀 Автоматическое получение user_id из Telegram WebApp
-  const { userId, loading: userLoading, error: userError, isAuthenticated } = useTelegramUser();
+  // 🚀 Гибридный подход: useTelegramUser для UI, useAuth для API
+  const { userData } = useTelegramUser();
+  const { authHeaders } = useAuth();
+  const userId = userData?.user_id;
 
   // Функция для показа уведомлений
   const showNotification = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  // Функция для отправки feedback
+  const handleFeedback = async (digestId: string, score: number) => {
+    // Проверяем, не отправлен ли уже отзыв для этого дайджеста
+    if (feedbackSubmitted.has(digestId)) {
+      showNotification('error', 'Отзыв уже отправлен');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          ...authHeaders
+        },
+        body: JSON.stringify({ digest_id: digestId, score })
+      });
+      
+      if (response.ok) {
+        // Добавляем digest ID в множество отправленных отзывов
+        setFeedbackSubmitted(prev => new Set([...prev, digestId]));
+        showNotification('success', 'Спасибо за отзыв!');
+      } else {
+        const errorData = await response.json();
+        showNotification('error', errorData.message || 'Ошибка отправки отзыва');
+      }
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      showNotification('error', 'Ошибка отправки отзыва');
+    }
   };
 
   // Load categories from API
@@ -91,18 +126,24 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         return;
       }
       
-      console.log('🔄 Loading digest history for user:', userId);
+      // Заголовки для аутентификации уже установлены в AuthContext
       
       // Загружаем активные дайджесты (не удаленные и не архивированные)
-      const activeResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=false`);
+      const activeResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=false`, {
+        headers: authHeaders
+      });
       const activeData = await activeResponse.json();
       
       // Загружаем архивированные дайджесты
-      const archivedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=true`);
+      const archivedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=true`, {
+        headers: authHeaders
+      });
       const archivedData = await archivedResponse.json();
       
       // Загружаем удаленные дайджесты
-      const deletedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=true&include_archived=false`);
+      const deletedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=true&include_archived=false`, {
+        headers: authHeaders
+      });
       const deletedData = await deletedResponse.json();
       
       const processDigests = (digestsData: any[]) => digestsData.map((digest: any) => ({
@@ -124,7 +165,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (activeData.status === 'success') {
         const historyDigests = processDigests(activeData.data.digests);
         setDigests(historyDigests); // Используем только реальные данные
-        console.log('✅ Загружено активных дайджестов:', historyDigests.length);
+        // Активные дайджесты загружены
       } else {
         console.warn('⚠️ Не удалось загрузить активные дайджесты:', activeData.message);
         setDigests([]);
@@ -133,7 +174,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (archivedData.status === 'success') {
         const archivedHistoryDigests = processDigests(archivedData.data.digests);
         setArchivedDigests(archivedHistoryDigests);
-        console.log('✅ Загружено архивированных дайджестов:', archivedHistoryDigests.length);
+        // Архивированные дайджесты загружены
       } else {
         console.warn('⚠️ Не удалось загрузить архивированные дайджесты:', archivedData.message);
         setArchivedDigests([]);
@@ -142,7 +183,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       if (deletedData.status === 'success') {
         const deletedHistoryDigests = processDigests(deletedData.data.digests);
         setDeletedDigests(deletedHistoryDigests);
-        console.log('✅ Загружено удаленных дайджестов:', deletedHistoryDigests.length);
+        // Удаленные дайджесты загружены
       } else {
         console.warn('⚠️ Не удалось загрузить удаленные дайджесты:', deletedData.message);
         setDeletedDigests([]);
@@ -160,10 +201,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   // Load digest history on component mount
   // Load digest history when userId is available
   useEffect(() => {
-    if (userId && !userLoading) {
+    if (userId) {
       loadDigestHistory();
     }
-  }, [userId, userLoading]);
+  }, [userId]);
 
 
   // Soft delete digest function
@@ -175,7 +216,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     
     try {
       const response = await fetch(`/api/digests/${digestId}?user_id=${userId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: authHeaders
       });
       
       const data = await response.json();
@@ -205,7 +247,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     
     try {
       const response = await fetch(`/api/digests/${digestId}/restore?user_id=${userId}`, {
-        method: 'POST'
+        method: 'POST',
+        headers: authHeaders
       });
       
       const data = await response.json();
@@ -232,7 +275,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     
     try {
       const response = await fetch(`/api/digests/${digestId}/archive?user_id=${userId}`, {
-        method: 'POST'
+        method: 'POST',
+        headers: authHeaders
       });
       
       const data = await response.json();
@@ -261,7 +305,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     
     try {
       const response = await fetch(`/api/digests/${digestId}/unarchive?user_id=${userId}`, {
-        method: 'POST'
+        method: 'POST',
+        headers: authHeaders
       });
       
       const data = await response.json();
@@ -289,12 +334,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         throw new Error('User ID not available. Please ensure you are logged in.');
       }
       
-      console.log('🔄 Generating digest for user:', userId);
+      // Генерация дайджеста
       
       const response = await fetch('/api/digests/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeaders,
         },
         body: JSON.stringify({
           category,
@@ -340,32 +386,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
 
   // Get current digests based on active tab
   // Show loading state while user is being authenticated
-  if (userLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted">Загрузка пользователя...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state if user authentication failed
-  if (userError && !isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <Bot className="w-12 h-12 mx-auto mb-4 text-muted" />
-          <h2 className="text-xl font-semibold mb-2">Ошибка аутентификации</h2>
-          <p className="text-muted mb-4">{userError}</p>
-          <Button onClick={() => window.location.reload()}>
-            Попробовать снова
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const getCurrentDigests = () => {
     switch (activeTab) {
@@ -600,6 +620,36 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     <div className="mt-4 flex justify-between items-center text-sm">
                       <span className="text-gray-500 dark:text-gray-400">{categories[digest.category] || digest.category}</span>
                       <div className="flex items-center gap-2">
+                        {/* Feedback buttons - only for active tab */}
+                        {activeTab === 'active' && (
+                          <>
+                            <button 
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                feedbackSubmitted.has(digest.id)
+                                  ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                  : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                              }`}
+                              onClick={() => handleFeedback(digest.id, 1.0)}
+                              title={feedbackSubmitted.has(digest.id) ? "Отзыв уже отправлен" : "Понравилось"}
+                              disabled={feedbackSubmitted.has(digest.id)}
+                            >
+                              <ThumbsUp className="w-4 h-4" />
+                            </button>
+                            <button 
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                feedbackSubmitted.has(digest.id)
+                                  ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                  : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                              }`}
+                              onClick={() => handleFeedback(digest.id, 0.0)}
+                              title={feedbackSubmitted.has(digest.id) ? "Отзыв уже отправлен" : "Не понравилось"}
+                              disabled={feedbackSubmitted.has(digest.id)}
+                            >
+                              <ThumbsDown className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                        
                         {activeTab === 'active' && (
                           <>
                             <button 
@@ -719,7 +769,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                   {selectedDigest.metadata?.category_name || selectedDigest.category}
                 </span>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                  <Bot className="w-3 h-3 mr-1" />
+                  {(() => {
+                    const styleIcons = {
+                      analytical: <Bot className="w-3 h-3 mr-1" />,
+                      business: <Bot className="w-3 h-3 mr-1" />,
+                      meme: <Bot className="w-3 h-3 mr-1" />,
+                      newsroom: <Newspaper className="w-3 h-3 mr-1" />,
+                      magazine: <BookOpen className="w-3 h-3 mr-1" />,
+                      casual: <MessageCircle className="w-3 h-3 mr-1" />
+                    };
+                    return styleIcons[selectedDigest.style as keyof typeof styleIcons] || <Bot className="w-3 h-3 mr-1" />;
+                  })()}
                   {selectedDigest.metadata?.style_name || selectedDigest.style}
                 </span>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
@@ -752,7 +812,37 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             </div>
 
             {/* Footer - simplified */}
-            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-end text-xs text-gray-400 dark:text-gray-500">
+            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+              {/* Feedback buttons - only for active tab */}
+              {activeTab === 'active' && (
+                <div className="flex gap-2">
+                  <button 
+                    className={`p-2 rounded-lg transition-colors ${
+                      feedbackSubmitted.has(selectedDigest.id)
+                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                    }`}
+                    onClick={() => handleFeedback(selectedDigest.id, 1.0)}
+                    title={feedbackSubmitted.has(selectedDigest.id) ? "Отзыв уже отправлен" : "Понравилось"}
+                    disabled={feedbackSubmitted.has(selectedDigest.id)}
+                  >
+                    <ThumbsUp className="w-4 h-4" />
+                  </button>
+                  <button 
+                    className={`p-2 rounded-lg transition-colors ${
+                      feedbackSubmitted.has(selectedDigest.id)
+                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                    }`}
+                    onClick={() => handleFeedback(selectedDigest.id, 0.0)}
+                    title={feedbackSubmitted.has(selectedDigest.id) ? "Отзыв уже отправлен" : "Не понравилось"}
+                    disabled={feedbackSubmitted.has(selectedDigest.id)}
+                  >
+                    <ThumbsDown className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+              
               <div className="flex gap-2">
                 {activeTab === 'active' && (
                   <>

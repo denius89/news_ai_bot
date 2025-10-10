@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/ui/Header';
 import { Rocket, Bot, Calendar, Settings, BarChart3, Newspaper, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
 interface HomePageProps {
@@ -34,7 +35,10 @@ interface DashboardStats {
 const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
-  const { telegramUser, userData, loading: userLoading, error } = useTelegramUser();
+  
+  // Гибридный подход: useTelegramUser для UI, useAuth для API
+  const { telegramUser } = useTelegramUser();
+  const { authHeaders } = useAuth();
 
   useEffect(() => {
     fetchDashboardStats();
@@ -47,20 +51,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
 
   // Функция для персонализированного приветствия
   const getPersonalizedGreeting = () => {
-    // Если есть ошибка аутентификации, показываем сообщение об ошибке
-    if (error) {
-      return "Ошибка аутентификации";
-    }
-    
-    // Если пользователь еще загружается
-    if (userLoading) {
-      return "Загрузка...";
-    }
-    
-    // Используем first_name из базы данных, если доступен
-    const firstName = userData?.first_name || telegramUser?.first_name;
-    
-    if (!firstName) {
+    if (!telegramUser?.first_name) {
       return "Добро пожаловать в PulseAI";
     }
     
@@ -75,12 +66,14 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
       greeting = "Добрый вечер";
     }
     
-    return `${greeting}, ${firstName}!`;
+    return `${greeting}, ${telegramUser.first_name}!`;
   };
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch('/api/dashboard/stats');
+      const response = await fetch('/api/dashboard/stats', {
+        headers: authHeaders
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.success) {

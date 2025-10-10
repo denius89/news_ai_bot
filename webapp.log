@@ -1,0 +1,8 @@
+2025-10-10 13:49:03,298 [INFO] news_ai_bot: 🚀 Webapp запущен (хост 0.0.0.0, порт 8001, debug=True)
+2025-10-10 13:49:03,303 [INFO] database: 🔍 Database query attempt 1/5
+2025-10-10 13:49:03,478 [INFO] database: ✅ Database query successful on attempt 1
+2025-10-10 13:49:03,479 [INFO] news_ai_bot: ⚠️ WebSocket отключен, запускаем обычный Flask
+ * Serving Flask app 'webapp'
+ * Debug mode: on
+Address already in use
+Port 8001 is in use by another program. Either identify and stop that program, or start the server with a different port.

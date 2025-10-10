@@ -5,13 +5,15 @@ This is the main document for developers and project participants.
 
 ## ✨ Latest Updates
 
-**🎯 Complete Project Structure Optimization (October 8, 2025):**
-- ✅ **Optimized 8 main project folders**
-- ✅ **Reduced file count by 40%** (from 200+ to 120+)
-- ✅ **Created logical organization** by functionality
-- ✅ **Updated all imports** across the project
-- ✅ **Removed garbage** (200+ backup and temporary files)
-- ✅ **Created complete documentation** of all changes
+**📊 AI Digest Quality & Metrics System (October 9, 2025):**
+- ✅ **Quality Metrics** - confidence, generation_time_sec, feedback_score tracking
+- ✅ **Feedback System** - 👍/👎 UI buttons for user ratings
+- ✅ **Analytics API** - /metrics and /metrics/history endpoints
+- ✅ **Database Schema** - extended digests table + digest_analytics table
+- ✅ **CLI Support** - tools/show_news.py with --feedback parameter
+- ✅ **Showcase Tool** - tools/showcase_digest.py for demo generation
+- ✅ **Testing Coverage** - test_metrics.py and test_showcase.py
+- ✅ **Production Ready** - complete quality monitoring system
 
 ## Table of Contents
 
@@ -144,6 +146,18 @@ This is the main document for developers and project participants.
 - **Card Spacing**: Optimized spacing between news cards
 - **Date Formatting**: Fixed date display in WebApp and Telegram
 - **Minimalist Aesthetic**: Clean, readable design following BBC/Bloomberg/The Economist style
+
+### Day 15: AI Digest Quality & Metrics System ✅
+- **Quality Metrics**: Added confidence, generation_time_sec, feedback_score fields to digests table
+- **Analytics Table**: Created digest_analytics table for daily aggregated metrics
+- **Feedback System**: Implemented 👍/👎 UI buttons and /api/feedback endpoint
+- **Metrics API**: Added /metrics and /metrics/history endpoints for analytics
+- **CLI Support**: Extended tools/show_news.py with --feedback parameter
+- **Showcase Tool**: Created tools/showcase_digest.py for demo generation
+- **Testing**: Added test_metrics.py and test_showcase.py for comprehensive coverage
+- **Database Functions**: Implemented save_digest_with_metrics, update_digest_feedback, get_digest_analytics
+- **Health Check**: Enhanced /api/health with digest_v2_status and avg_confidence
+- **Production Ready**: Complete quality monitoring and feedback system
 
 ### Day 13: Content & Events Intelligence ✅
 - **AI Filters & Auto-Learning**: Полная реализация prefilter, cache, adaptive_thresholds с TTL

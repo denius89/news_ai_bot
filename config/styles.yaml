@@ -1,0 +1,84 @@
+# config/styles.yaml
+# Конфигурация стилей по умолчанию для AI Digest Journalistic System v2
+
+defaults:
+  # Технологии - аналитический стиль с инсайтами
+  tech:
+    style: analytical
+    tone: insightful
+    length: medium
+    audience: general
+  
+  # Криптовалюты - аналитический стиль с критическим анализом
+  crypto:
+    style: analytical
+    tone: critical
+    length: medium
+    audience: pro
+  
+  # Финансовые рынки - newsroom стиль для профессионалов
+  markets:
+    style: newsroom
+    tone: neutral
+    length: short
+    audience: pro
+  
+  # Спорт - newsroom стиль с позитивным тоном
+  sports:
+    style: newsroom
+    tone: optimistic
+    length: short
+    audience: general
+  
+  # Мир - аналитический стиль с нейтральным тоном
+  world:
+    style: analytical
+    tone: neutral
+    length: medium
+    audience: general
+
+# Специальные конфигурации для разных случаев
+special_configs:
+  # Для Telegram бота - простой стиль
+  telegram:
+    style: casual
+    tone: neutral
+    length: short
+    audience: general
+  
+  # Для веб-приложения - magazine стиль
+  webapp:
+    style: magazine
+    tone: insightful
+    length: medium
+    audience: general
+  
+  # Для профессиональных пользователей
+  professional:
+    style: analytical
+    tone: critical
+    length: long
+    audience: pro
+
+# Настройки качества
+quality:
+  min_importance: 0.6
+  min_credibility: 0.7
+  max_tokens: 800
+  temperature:
+    newsroom: 0.5
+    analytical: 0.7
+    magazine: 0.8
+    casual: 0.9
+
+# Лимиты по длине
+length_limits:
+  short:
+    max_words: 100
+    max_paragraphs: 2
+  medium:
+    max_words: 250
+    max_paragraphs: 3
+  long:
+    max_words: 500
+    max_paragraphs: 5

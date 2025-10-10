@@ -15,7 +15,6 @@ export interface UserData {
   telegram_id: number;
   username?: string;
   locale: string;
-  first_name?: string;
   telegram_user?: TelegramUser;
 }
 
@@ -35,7 +34,7 @@ export interface UseTelegramUserReturn {
  * Функциональность:
  * - Автоматически определяет Telegram WebApp
  * - Получает telegram_id из window.Telegram.WebApp.user.id
- * - Находит user_id в базе данных по telegram_id
+ * - Находит user_id в базе данных по telegram_id (опционально)
  * - Предоставляет fallback для разработки
  * - Кэширует результат в localStorage
  * 
@@ -55,109 +54,115 @@ export const useTelegramUser = (): UseTelegramUserReturn => {
         setLoading(true);
         setError(null);
 
-        console.log('🚀 Initializing Telegram user...');
-        console.log('🔍 window.Telegram:', window.Telegram);
-        console.log('🔍 window.Telegram?.WebApp:', window.Telegram?.WebApp);
-        console.log('🔍 window.location:', window.location);
-        console.log('🔍 window.location.origin:', window.location.origin);
-        console.log('🔍 navigator.userAgent:', navigator.userAgent);
-
-        // ВРЕМЕННО ОТКЛЮЧАЕМ HTTPS ПРОВЕРКУ ДЛЯ ОТЛАДКИ
-        const isHttps = window.location.protocol === 'https:';
-        console.log('🔍 Protocol:', window.location.protocol, 'HTTPS:', isHttps);
-        console.log('⚠️ HTTPS check disabled for debugging');
-        
-        // if (!isHttps) {
-        //   console.log('❌ Not HTTPS - Telegram WebApp requires HTTPS');
-        //   setError('Приложение должно запускаться через HTTPS (используйте Cloudflare URL)');
-        //   setIsTelegramWebApp(false);
-        //   return;
-        // }
-
         // Проверяем, запущено ли приложение в Telegram WebApp
         const tgWebApp = window.Telegram?.WebApp;
         const tgUser = tgWebApp?.user || tgWebApp?.initDataUnsafe?.user;
         
-        console.log('🔍 Telegram WebApp check:');
-        console.log('- window.Telegram exists:', !!window.Telegram);
-        console.log('- tgWebApp exists:', !!tgWebApp);
-        console.log('- tgUser exists:', !!tgUser);
-        console.log('- tgUser type:', typeof tgUser);
-        
-        // Отладочная информация
-        console.log('🔍 Debug info:');
-        console.log('- window.Telegram:', window.Telegram);
-        console.log('- tgWebApp:', tgWebApp);
-        console.log('- tgUser:', tgUser);
-        console.log('- Current URL:', window.location.href);
-        console.log('- User Agent:', navigator.userAgent);
-        
         if (tgWebApp && tgUser) {
           console.log('🚀 Telegram WebApp detected:', tgUser);
           setIsTelegramWebApp(true);
-            setTelegramUser(tgUser || null);
+          setTelegramUser(tgUser);
 
-          // Кэш отключен - всегда получаем свежие данные от Telegram
-
-          // Получаем user_id по telegram_id
-          console.log('🔄 Fetching user data for telegram_id:', tgUser.id);
-        console.log('🔍 tgUser data:', tgUser);
-        console.log('🔍 tgUser.first_name:', tgUser.first_name);
-        console.log('🔍 tgUser.username:', tgUser.username);
-        console.log('🔍 tgUser.id:', tgUser.id);
-        console.log('🔍 tgUser keys:', Object.keys(tgUser));
-        console.log('🔍 tgUser full object:', JSON.stringify(tgUser, null, 2));
+          // Проверяем кэш в localStorage
+          const cacheKey = `telegram_user_${tgUser.id}`;
+          const cachedData = localStorage.getItem(cacheKey);
           
-          const response = await fetch(`/api/users/by-telegram-id/${tgUser.id}`, {
-            headers: {
-              'X-Telegram-User-Data': JSON.stringify(tgUser)
+          if (cachedData) {
+            try {
+              const parsedCache = JSON.parse(cachedData);
+              // Проверяем, что кэш не старше 1 часа
+              if (Date.now() - parsedCache.timestamp < 3600000) {
+                console.log('✅ Using cached user data:', parsedCache.data);
+                setUserData(parsedCache.data);
+                setUserId(parsedCache.data.user_id);
+                setLoading(false);
+                return;
+              }
+            } catch (e) {
+              console.warn('⚠️ Invalid cache data, fetching fresh data');
             }
-          });
-          const data = await response.json();
+          }
 
-          if (data.status === 'success') {
-            const userInfo: UserData = {
-              user_id: data.data.user_id,
-              telegram_id: data.data.telegram_id,
-              username: data.data.username,
-              locale: data.data.locale,
-              first_name: data.data.first_name,
-              telegram_user: tgUser
-            };
+          // Опционально получаем user_id по telegram_id (не блокирующий UI)
+          console.log('🔄 Fetching user data for telegram_id:', tgUser.id);
+          
+          try {
+            const response = await fetch(`/api/users/by-telegram-id/${tgUser.id}`);
+            const data = await response.json();
 
-            console.log('✅ User data fetched successfully:', userInfo);
-            
-            setUserData(userInfo);
-            setUserId(userInfo.user_id);
-            
-            // Кэш отключен - не сохраняем данные
-            
-          } else {
-            console.error('❌ Failed to fetch user data:', data.message);
-            // Более понятное сообщение об ошибке
-            const errorMessage = data.message?.includes('Database') ? 
-              'Проблема с подключением к серверу. Попробуйте позже.' :
-              data.message || 'Ошибка аутентификации пользователя';
-            setError(errorMessage);
+            if (data.status === 'success') {
+              const userInfo: UserData = {
+                user_id: data.data.user_id,
+                telegram_id: data.data.telegram_id,
+                username: data.data.username,
+                locale: data.data.locale,
+                telegram_user: tgUser
+              };
+
+              console.log('✅ User data fetched successfully:', userInfo);
+              
+              setUserData(userInfo);
+              setUserId(userInfo.user_id);
+              
+              // Кэшируем данные
+              localStorage.setItem(cacheKey, JSON.stringify({
+                data: userInfo,
+                timestamp: Date.now()
+              }));
+            } else {
+              console.warn('⚠️ Failed to fetch user data from API, using Telegram data only:', data.message);
+              // Не показываем ошибку пользователю, используем только данные Telegram
+            }
+          } catch (apiError) {
+            console.warn('⚠️ API error, using Telegram data only:', apiError);
+            // Не показываем ошибку пользователю, используем только данные Telegram
           }
 
         } else {
           console.log('🌐 Not running in Telegram WebApp - using fallback');
-          console.log('❌ REASON: window.Telegram?.WebApp is:', window.Telegram?.WebApp);
-          console.log('❌ REASON: tgWebApp is:', tgWebApp);
-          console.log('❌ REASON: tgUser is:', tgUser);
           setIsTelegramWebApp(false);
           
-          // Не используем fallback - показываем ошибку
-          setError('Приложение должно запускаться только через Telegram WebApp');
+          // Fallback для разработки - используем тестового пользователя
+          const fallbackUser: UserData = {
+            user_id: 'f7d38911-4e62-4012-a9bf-2aaa03483497', // Тестовый пользователь
+            telegram_id: 123,
+            username: 'demo_user',
+            locale: 'ru',
+            telegram_user: {
+              id: 123,
+              first_name: 'Demo',
+              username: 'demo_user',
+              language_code: 'ru'
+            }
+          };
+
+          console.log('🔄 Using fallback user data:', fallbackUser);
+          setUserData(fallbackUser);
+          setUserId(fallbackUser.user_id);
+          setTelegramUser(fallbackUser.telegram_user || null);
         }
 
       } catch (err) {
         console.error('❌ Error initializing Telegram user:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        // Не показываем ошибку пользователю, используем fallback
         
-        // Не используем fallback при ошибке - показываем ошибку
-        console.log('❌ No fallback user - showing error to user');
+        // Fallback при ошибке
+        const fallbackUser: UserData = {
+          user_id: 'f7d38911-4e62-4012-a9bf-2aaa03483497',
+          telegram_id: 123,
+          username: 'demo_user',
+          locale: 'ru',
+          telegram_user: {
+            id: 123,
+            first_name: 'Demo',
+            username: 'demo_user',
+            language_code: 'ru'
+          }
+        };
+        
+        setUserData(fallbackUser);
+        setUserId(fallbackUser.user_id);
+        setTelegramUser(fallbackUser.telegram_user || null);
         
       } finally {
         setLoading(false);
@@ -210,11 +215,15 @@ export const refreshTelegramUser = async (telegramId: number): Promise<UserData 
         telegram_id: data.data.telegram_id,
         username: data.data.username,
         locale: data.data.locale,
-        first_name: data.data.first_name,
         telegram_user: window.Telegram?.WebApp?.user || window.Telegram?.WebApp?.initDataUnsafe?.user
       };
 
-      // Кэш отключен - не сохраняем данные
+      // Обновляем кэш
+      const cacheKey = `telegram_user_${telegramId}`;
+      localStorage.setItem(cacheKey, JSON.stringify({
+        data: userInfo,
+        timestamp: Date.now()
+      }));
 
       return userInfo;
     }

@@ -51,6 +51,9 @@ help:
 	@echo "  $(YELLOW)make strict-check$(NC)    - Строгая проверка качества кода"
 	@echo "  $(YELLOW)make detailed-fix$(NC)    - Детальная проверка и автоматическое исправление"
 	@echo ""
+	@echo "$(GREEN)Showcase Digest:$(NC)"
+	@echo "  $(YELLOW)make showcase$(NC)         - Генерация дайджеста дня"
+	@echo ""
 	@echo "$(GREEN)Архитектура:$(NC)"
 	@echo "  $(YELLOW)Flask (порт $(FLASK_PORT)):$(NC)   React статика + API"
 	@echo "  $(YELLOW)Telegram Bot:$(NC)                 Управление подписками"
@@ -286,6 +289,17 @@ strict-check:
 detailed-fix:
 	@echo "$(BLUE)🔧 Детальная проверка и автоматическое исправление...$(NC)"
 	@./scripts/detailed_fix.sh
+
+# =============================================================================
+# 🎯 SHOWCASE DIGEST
+# =============================================================================
+
+showcase:
+	@echo "$(BLUE)🎯 Generating showcase digest...$(NC)"
+	@python3 tools/showcase_digest.py
+	@echo "$(GREEN)✅ Showcase digest generated!$(NC)"
+
+.PHONY: showcase
 
 # =============================================================================
 # 🎯 ДЕФОЛТНАЯ КОМАНДА

@@ -37,6 +37,36 @@ Brief explanation of why the task is needed.
 
 ## Completed Days
 
+### Day 15 — AI Digest Quality & Metrics System ✅ (Closed)
+**Priority:** 🟡  
+**Context:**  
+Реализация комплексной системы оценки качества и метрик для AI-дайджестов: отслеживание confidence, времени генерации, пользовательских оценок, аналитики и обратной связи.
+
+**Completed:**
+- ✅ **Quality Metrics Database**: добавлены поля confidence, generation_time_sec, feedback_score в таблицу digests
+- ✅ **Analytics Table**: создана таблица digest_analytics для ежедневной агрегации метрик
+- ✅ **Feedback System**: реализованы кнопки 👍/👎 в UI и API endpoint /api/feedback
+- ✅ **Metrics API**: добавлены endpoints /metrics и /metrics/history для получения аналитики
+- ✅ **Generation Time Tracking**: автоматическое измерение времени генерации в ai_summary.py и generator.py
+- ✅ **CLI Support**: расширен tools/show_news.py с параметром --feedback для тестирования
+- ✅ **Showcase Tool**: создан tools/showcase_digest.py для генерации демонстрационных дайджестов
+- ✅ **Testing Coverage**: добавлены test_metrics.py и test_showcase.py для полного покрытия
+- ✅ **Database Functions**: реализованы save_digest_with_metrics, update_digest_feedback, get_digest_analytics
+- ✅ **Health Check Enhancement**: обновлен /api/health с digest_v2_status и avg_confidence
+- ✅ **Production Ready**: полная система мониторинга качества и обратной связи готова к использованию
+
+**Acceptance Criteria:**
+- ✅ Метрики качества сохраняются при генерации дайджестов
+- ✅ Пользователи могут оценивать дайджесты через UI
+- ✅ API предоставляет аналитику по метрикам
+- ✅ CLI инструменты поддерживают отправку feedback
+- ✅ Все функции покрыты тестами
+- ✅ Система готова к продакшену
+
+**Related Decisions:** Day 15 Quality & Metrics Implementation
+
+---
+
 ### Day 13 — Content & Events Intelligence ✅ (Closed)
 **Priority:** 🟡  
 **Context:**  
