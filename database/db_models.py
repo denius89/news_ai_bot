@@ -1257,13 +1257,18 @@ def log_digest_generation(
             "generation_time_ms": generation_time_ms,
             "success": success,
             "error_message": error_message,
-            "news_count": news_count
+            "news_count": news_count,
+            "created_at": datetime.now(timezone.utc).isoformat()
         }
         
-        result = supabase.table("digest_analytics").insert(analytics_data).execute()
+        result = safe_execute(supabase.table("digest_analytics").insert(analytics_data))
         
-        logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
-        return True
+        if result.data:
+            logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
+            return True
+        else:
+            logger.error(f"Не удалось залогировать аналитику для пользователя {user_id}")
+            return False
         
     except Exception as e:
         logger.error(f"Ошибка при логировании аналитики для пользователя {user_id}: {e}")
@@ -1476,7 +1481,7 @@ def save_digest_with_metrics(
             logger.info(f"✅ Digest saved with metrics: {digest_id}")
             
             # Update daily analytics
-            update_daily_analytics()
+            # update_daily_analytics() - deprecated, using individual event logging
             
             return digest_id
         else:
@@ -1565,10 +1570,14 @@ def get_digest_analytics(date: Optional[str] = None) -> dict:
         if not date:
             date = datetime.now().strftime("%Y-%m-%d")
         
-        # Try to get from digest_analytics table first (filter by date)
+        # Try to get from digest_analytics table first (filter by created_at date)
+        start_date = f"{date}T00:00:00Z"
+        end_date = f"{date}T23:59:59Z"
+        
         result = safe_execute(
             supabase.table("digest_analytics").select("*")
-            .eq("date", date)
+            .gte("created_at", start_date)
+            .lte("created_at", end_date)
         )
         
         if result.data:
@@ -1652,40 +1661,10 @@ def get_digest_analytics(date: Optional[str] = None) -> dict:
 def update_daily_analytics():
     """
     Update digest_analytics with today's aggregated data.
+    Note: This function is deprecated as we now log individual digest generation events.
     """
-    if not supabase:
-        logger.error("Supabase не инициализирован")
-        return
-    
-    try:
-        today = datetime.now().strftime("%Y-%m-%d")
-        analytics = get_digest_analytics(today)
-        
-        # Upsert analytics data
-        analytics_data = {
-            "date": today,
-            "generated_count": analytics.get("generated_count", 0),
-            "avg_confidence": analytics.get("avg_confidence", 0.0),
-            "avg_generation_time_sec": analytics.get("avg_generation_time_sec", 0.0),
-            "skipped_low_quality": analytics.get("skipped_low_quality", 0),
-            "feedback_count": analytics.get("feedback_count", 0),
-            "avg_feedback_score": analytics.get("avg_feedback_score", 0.0),
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
-        
-        # Use upsert to handle duplicates
-        result = safe_execute(
-            supabase.table("digest_analytics")
-            .upsert(analytics_data, on_conflict="date")
-        )
-        
-        if result.data:
-            logger.debug(f"✅ Daily analytics updated for {today}")
-        else:
-            logger.error(f"❌ Failed to update daily analytics for {today}")
-            
-    except Exception as e:
-        logger.error(f"❌ Error updating daily analytics: {e}")
+    logger.warning("update_daily_analytics is deprecated - using individual event logging instead")
+    return
 
 
 def get_digest_analytics_history(days: int = 7) -> List[dict]:
