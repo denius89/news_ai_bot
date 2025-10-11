@@ -148,6 +148,7 @@ class UnifiedDigestService:
         category: Optional[str] = None,  # Backward compatibility
         period: str = "daily",
         style: str = "analytical",
+        length: str = "medium",  # НОВЫЙ ПАРАМЕТР ДЛИНЫ ТЕКСТА
         limit: int = 20,
         min_importance: Optional[float] = None,  # НОВЫЙ ПАРАМЕТР ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
     ) -> str:
@@ -159,6 +160,7 @@ class UnifiedDigestService:
             category: Single category for backward compatibility
             period: Time period for digest
             style: AI generation style
+            length: Text length (short, medium, long)
             limit: Maximum number of news items
             min_importance: Minimum importance threshold for news filtering
 
@@ -210,7 +212,7 @@ class UnifiedDigestService:
                 else:
                     news_objects.append(item)
 
-            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style, category=cat_display)
+            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style, category=cat_display, length=length)
 
             return clean_for_telegram(ai_digest)
 

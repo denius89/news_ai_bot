@@ -128,7 +128,14 @@ def generate_batch_summary(
             temperature=_TEMPS.get(style, 0.7),
         )
         raw_text: Union[str, dict] = response.choices[0].message.content.strip()
-        formatted = format_digest_output(raw_text, style=style)
+        
+        # Check if response is JSON and convert to HTML
+        if isinstance(raw_text, str) and raw_text.strip().startswith('{') and raw_text.strip().endswith('}'):
+            from digests.json_formatter import format_json_digest_to_html
+            logger.info("Converting JSON response to HTML in ai_summary")
+            formatted = format_json_digest_to_html(raw_text)
+        else:
+            formatted = format_digest_output(raw_text, style=style)
 
         if "<b>Почему это важно" not in formatted:
             formatted += "\n\n<b>Почему это важно:</b>\n" "— Событие влияет на рынок\n" "— Важно для инвесторов"

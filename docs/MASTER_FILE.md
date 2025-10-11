@@ -5,6 +5,15 @@ This is the main document for developers and project participants.
 
 ## ✨ Latest Updates
 
+**🎉 STABLE VERSION v2.1 - Production Ready (October 10, 2025):**
+- ✅ **Personalized Greeting** - stable Telegram WebApp API integration
+- ✅ **AI Digests v2** - 4 new styles (newsroom, analytical, magazine, casual)
+- ✅ **Feedback System** - 👍/👎 buttons with duplicate prevention
+- ✅ **Secure Authentication** - HMAC SHA256 + name normalization
+- ✅ **Stable Database** - migrations, indexes, retry logic
+- ✅ **Complete Testing** - 52 tests, all scenarios covered
+- ✅ **Production Ready** - monitoring, logging, documentation
+
 **📊 AI Digest Quality & Metrics System (October 9, 2025):**
 - ✅ **Quality Metrics** - confidence, generation_time_sec, feedback_score tracking
 - ✅ **Feedback System** - 👍/👎 UI buttons for user ratings
