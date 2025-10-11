@@ -370,6 +370,138 @@ def get_events_stats():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+@events_bp.route("/upcoming", methods=["GET"])
+@cross_origin()
+def get_upcoming_events():
+    """
+    Get upcoming events for next 7-10 days.
+    
+    Query parameters:
+    - days: Number of days ahead (default: 7)
+    - category: Filter by category
+    - min_importance: Minimum importance threshold (deprecated, use important flag)
+    - important: Filter only important events (importance_score >= 0.7)
+    """
+    try:
+        days = int(request.args.get("days", 7))
+        category = request.args.get("category")
+        important_only = request.args.get("important", "false").lower() == "true"
+        
+        # Set minimum importance based on important flag
+        if important_only:
+            min_importance = 0.7  # Only highly important events
+        else:
+            min_importance = float(request.args.get("min_importance", 0.6))
+        
+        # Get events service
+        events_service = get_events_service()
+        
+        # Fetch upcoming events
+        events = await events_service.get_upcoming_events(
+            days_ahead=days, 
+            category=category, 
+            min_importance=min_importance
+        )
+        
+        # Format events for response
+        formatted_events = []
+        for event in events:
+            formatted_events.append({
+                "id": event.id,
+                "title": event.title,
+                "category": event.category,
+                "subcategory": event.subcategory,
+                "starts_at": event.starts_at.isoformat(),
+                "ends_at": event.ends_at.isoformat() if event.ends_at else None,
+                "source": event.source,
+                "link": event.link,
+                "importance": event.importance,
+                "description": event.description,
+                "location": event.location,
+                "organizer": event.organizer,
+            })
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "events": formatted_events,
+                "count": len(formatted_events),
+                "days_ahead": days,
+                "category": category,
+                "min_importance": min_importance,
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting upcoming events: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@events_bp.route("/<int:event_id>/result", methods=["GET"])
+@cross_origin()
+def get_event_result(event_id):
+    """Get result data for completed event."""
+    try:
+        from database.db_models import supabase
+        
+        if not supabase:
+            return jsonify({"success": False, "error": "Database not available"}), 500
+        
+        # Get event with result data
+        result = supabase.table("events_new").select("*").eq("id", event_id).execute()
+        
+        if not result.data:
+            return jsonify({"success": False, "error": "Event not found"}), 404
+        
+        event = result.data[0]
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "id": event["id"],
+                "title": event["title"],
+                "status": event["status"],
+                "result_data": event.get("result_data"),
+                "updated_at": event.get("updated_at"),
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting event result: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@events_bp.route("/categories", methods=["GET"])
+@cross_origin()
+def get_event_categories():
+    """Get available event categories with counts."""
+    try:
+        from database.db_models import supabase
+        
+        if not supabase:
+            return jsonify({"success": False, "error": "Database not available"}), 500
+        
+        # Get category counts
+        result = supabase.table("events_new").select("category").execute()
+        
+        category_counts = {}
+        for event in result.data:
+            category = event["category"]
+            category_counts[category] = category_counts.get(category, 0) + 1
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "categories": category_counts,
+                "total_events": sum(category_counts.values()),
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting event categories: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 def register_events_routes(app):
     """Register events routes with Flask app."""
     app.register_blueprint(events_bp)

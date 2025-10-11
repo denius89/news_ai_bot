@@ -31,27 +31,27 @@ logger = logging.getLogger("fetch_and_store_events")
 
 
 async def fetch_and_store_events(
-    days_since: int = 7, days_until: int = 30, providers: List[str] = None, dry_run: bool = False
+    days_ahead: int = 7, categories: List[str] = None, providers: List[str] = None, dry_run: bool = False
 ) -> Dict[str, Any]:
     """
-    Fetch events from providers and store them in the database.
+    Fetch future events from all enabled providers with AI filtering.
 
     Args:
-        days_since: Number of days to look back
-        days_until: Number of days to look ahead
-        providers: List of provider names to use
+        days_ahead: Number of days to look ahead (default: 7)
+        categories: List of categories to fetch (default: all)
+        providers: List of specific providers (default: all enabled)
         dry_run: If True, don't actually store events
 
     Returns:
         Dictionary with fetch results
     """
     try:
-        logger.info(f"Starting event fetch: {days_since} days back, {days_until} days ahead")
+        logger.info(f"Starting event fetch: {days_ahead} days ahead")
 
-        # Calculate date range
+        # Calculate date range (only future events)
         now = datetime.now(timezone.utc)
-        start_date = now - timedelta(days=days_since)
-        end_date = now + timedelta(days=days_until)
+        start_date = now
+        end_date = now + timedelta(days=days_ahead)
 
         logger.info(f"Date range: {start_date.date()} to {end_date.date()}")
 
@@ -61,19 +61,38 @@ async def fetch_and_store_events(
         # Fetch events from providers
         logger.info(f"Fetching events from providers: {providers or 'all'}")
         events = await parser.fetch_events(start_date, end_date, providers)
+        
+        # ML-фильтрация v2: Calculate importance scores
+        from ai_modules.importance_v2 import evaluator_v2
+        
+        for event in events:
+            # Convert event to dict if needed
+            event_dict = event.__dict__ if hasattr(event, '__dict__') else event
+            
+            # Calculate ML importance score
+            importance_score = evaluator_v2.evaluate_importance(event_dict)
+            event.importance_score = importance_score
+            
+            # Store in event dict for database
+            if hasattr(event, '__dict__'):
+                event.__dict__['importance_score'] = importance_score
+        
+        # AI Filtering: Filter by ML importance_score >= 0.6
+        filtered_events = [event for event in events if getattr(event, 'importance_score', 0) >= 0.6]
+        logger.info(f"ML Filtered (v2): {len(events)} -> {len(filtered_events)} events (importance_score >= 0.6)")
 
-        logger.info(f"Fetched {len(events)} events from providers")
+        logger.info(f"Fetched {len(filtered_events)} events after AI filtering")
 
         if dry_run:
             logger.info("DRY RUN: Not storing events to database")
 
             # Log sample events
-            for i, event in enumerate(events[:5]):
+            for i, event in enumerate(filtered_events[:5]):
                 logger.info(f"Sample event {i+1}: {event.title} ({event.category}) - {event.starts_at}")
 
             return {
                 "success": True,
-                "events_fetched": len(events),
+                "events_fetched": len(filtered_events),
                 "events_stored": 0,
                 "dry_run": True,
                 "date_range": {"start": start_date.isoformat(), "end": end_date.isoformat()},
@@ -84,7 +103,7 @@ async def fetch_and_store_events(
 
         # Convert events to dictionary format
         events_data = []
-        for event in events:
+        for event in filtered_events:
             event_data = {
                 "title": event.title,
                 "category": event.category,
@@ -111,7 +130,7 @@ async def fetch_and_store_events(
 
         # Log summary by category
         category_counts = {}
-        for event in events:
+        for event in filtered_events:
             category = event.category
             category_counts[category] = category_counts.get(category, 0) + 1
 
@@ -121,7 +140,7 @@ async def fetch_and_store_events(
 
         return {
             "success": True,
-            "events_fetched": len(events),
+            "events_fetched": len(filtered_events),
             "events_stored": stored_count,
             "dry_run": False,
             "date_range": {"start": start_date.isoformat(), "end": end_date.isoformat()},
@@ -184,15 +203,19 @@ def main():
     """Main function for command-line usage."""
     parser = argparse.ArgumentParser(description="Fetch and store events for PulseAI")
 
-    parser.add_argument("--since", type=int, default=7, help="Number of days to look back (default: 7)")
-
-    parser.add_argument("--until", type=int, default=30, help="Number of days to look ahead (default: 30)")
+    parser.add_argument("--days", type=int, default=7, help="Number of days to look ahead (default: 7)")
 
     parser.add_argument(
         "--providers",
         nargs="+",
-        choices=["coinmarketcal", "investing", "espn"],
-        help="Specific providers to use (default: all)",
+        help="Specific providers to use (default: all enabled)",
+    )
+    
+    parser.add_argument(
+        "--categories",
+        nargs="+",
+        choices=["crypto", "sports", "markets", "tech", "world"],
+        help="Specific categories to fetch (default: all)",
     )
 
     parser.add_argument("--dry-run", action="store_true", help="Fetch events but don't store them")
@@ -214,7 +237,7 @@ def main():
 
         # Fetch and store events
         result = await fetch_and_store_events(
-            days_since=args.since, days_until=args.until, providers=args.providers, dry_run=args.dry_run
+            days_ahead=args.days, categories=args.categories, providers=args.providers, dry_run=args.dry_run
         )
 
         # Print results

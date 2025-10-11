@@ -51,41 +51,53 @@ class EventsService:
 
     async def insert_events(self, events: List[Dict[str, Any]]) -> int:
         """
-        Insert events into the database.
+        Insert events into the database using upsert logic.
 
         Args:
             events: List of event dictionaries
 
         Returns:
-            Number of events inserted
+            Number of events inserted/updated
         """
         try:
             if not events:
                 return 0
 
-            # Prepare insert data
+            from database.db_models import supabase
+
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return 0
+
+            # Prepare insert data with new fields
             insert_data = []
             for event in events:
                 event_data = {
                     "title": event.get("title", ""),
                     "category": event.get("category", "unknown"),
                     "subcategory": event.get("subcategory", "general"),
-                    "starts_at": event.get("starts_at"),
-                    "ends_at": event.get("ends_at"),
+                    "starts_at": event.get("starts_at").isoformat() if event.get("starts_at") else None,
+                    "ends_at": event.get("ends_at").isoformat() if event.get("ends_at") else None,
                     "source": event.get("source", ""),
                     "link": event.get("link", ""),
                     "importance": event.get("importance", 0.5),
                     "description": event.get("description"),
                     "location": event.get("location"),
                     "organizer": event.get("organizer"),
+                    "unique_hash": event.get("unique_hash"),
+                    "metadata": event.get("metadata", {}),
+                    "status": event.get("status", "upcoming"),
                 }
                 insert_data.append(event_data)
 
-            # Insert events (this would need to be implemented in the database service)
-            # For now, we'll simulate the insertion
-            inserted_count = len(insert_data)
+            # Upsert events using unique_hash
+            result = supabase.table("events_new").upsert(
+                insert_data, on_conflict="unique_hash"
+            ).execute()
 
-            logger.info(f"Inserted {inserted_count} events into database")
+            inserted_count = len(result.data) if result.data else 0
+
+            logger.info(f"Upserted {inserted_count} events into database")
             return inserted_count
 
         except Exception as e:
@@ -397,6 +409,157 @@ class EventsService:
             )
 
         return events
+
+    async def update_event_status(
+        self, event_id: int, status: str, result_data: Optional[Dict] = None
+    ) -> bool:
+        """
+        Update event status and results.
+
+        Args:
+            event_id: Event ID
+            status: New status (upcoming, ongoing, completed, cancelled)
+            result_data: Optional result data (for completed events)
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            from database.db_models import supabase
+
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return False
+
+            update_data = {"status": status}
+            if result_data:
+                update_data["result_data"] = result_data
+
+            result = supabase.table("events_new").update(update_data).eq("id", event_id).execute()
+
+            success = len(result.data) > 0 if result.data else False
+            if success:
+                logger.info(f"Updated event {event_id} status to {status}")
+            return success
+
+        except Exception as e:
+            logger.error(f"Error updating event status: {e}")
+            return False
+
+    async def get_completed_events_without_results(self, days_back: int = 3) -> List[Dict]:
+        """
+        Get completed events that need result updates.
+
+        Args:
+            days_back: How many days back to check
+
+        Returns:
+            List of events needing updates
+        """
+        try:
+            from database.db_models import supabase
+
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return []
+
+            # Calculate date range
+            now = datetime.now(timezone.utc)
+            start_date = now - timedelta(days=days_back)
+
+            # Query events that have ended but don't have results
+            result = (
+                supabase.table("events_new")
+                .select("*")
+                .gte("starts_at", start_date.isoformat())
+                .lte("starts_at", now.isoformat())
+                .eq("status", "upcoming")
+                .is_("result_data", "null")
+                .execute()
+            )
+
+            events = result.data or []
+            logger.info(f"Found {len(events)} events needing result updates")
+            return events
+
+        except Exception as e:
+            logger.error(f"Error getting events without results: {e}")
+            return []
+
+    async def get_event_by_hash(self, unique_hash: str) -> Optional[Dict]:
+        """
+        Get event by unique_hash for Smart Sync.
+
+        Args:
+            unique_hash: Unique hash of the event
+
+        Returns:
+            Event dictionary or None if not found
+        """
+        try:
+            from database.db_models import supabase
+
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return None
+
+            result = supabase.table("events_new").select("*").eq("unique_hash", unique_hash).execute()
+
+            if result.data and len(result.data) > 0:
+                return result.data[0]
+            return None
+
+        except Exception as e:
+            logger.error(f"Error getting event by hash: {e}")
+            return None
+
+    async def update_event(self, event_id: int, event_data: Dict) -> bool:
+        """
+        Update existing event with new data.
+
+        Args:
+            event_id: Event ID to update
+            event_data: New event data
+
+        Returns:
+            True if updated successfully
+        """
+        try:
+            from database.db_models import supabase
+
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return False
+
+            # Prepare update data
+            update_data = {
+                "title": event_data.get("title"),
+                "description": event_data.get("description"),
+                "starts_at": event_data.get("starts_at").isoformat() if event_data.get("starts_at") else None,
+                "ends_at": event_data.get("ends_at").isoformat() if event_data.get("ends_at") else None,
+                "importance_score": event_data.get("importance_score"),
+                "credibility_score": event_data.get("credibility_score"),
+                "status": event_data.get("status", "upcoming"),
+                "location": event_data.get("location"),
+                "organizer": event_data.get("organizer"),
+                "metadata": event_data.get("metadata", {}),
+                "sync_status": "updated",
+                "last_synced_at": datetime.now(timezone.utc).isoformat(),
+            }
+
+            # Remove None values
+            update_data = {k: v for k, v in update_data.items() if v is not None}
+
+            result = supabase.table("events_new").update(update_data).eq("id", event_id).execute()
+
+            success = len(result.data) > 0 if result.data else False
+            if success:
+                logger.info(f"Updated event {event_id}")
+            return success
+
+        except Exception as e:
+            logger.error(f"Error updating event: {e}")
+            return False
 
 
 # Global service instance
