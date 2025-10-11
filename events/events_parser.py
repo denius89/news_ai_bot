@@ -52,23 +52,79 @@ class EventsParser:
         logger.info("EventsParser initialized")
 
     def _load_providers(self) -> None:
-        """Load available event providers."""
+        """Load available event providers from configuration."""
         try:
-            from events.providers.coinmarketcal import CoinMarketCalProvider
-            from events.providers.investing import InvestingProvider
-            from events.providers.espn import ESPNProvider
+            import yaml
+            from pathlib import Path
 
-            self.providers = {
-                "coinmarketcal": CoinMarketCalProvider(),
-                "investing": InvestingProvider(),
-                "espn": ESPNProvider(),
-            }
+            # Load configuration
+            config_path = Path(__file__).parent.parent / "config" / "data" / "sources_events.yaml"
+
+            if not config_path.exists():
+                logger.warning(f"Events config not found: {config_path}")
+                return
+
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+
+            # Load providers dynamically
+            for category, providers in config.items():
+                for provider_name, provider_config in providers.items():
+                    if not provider_config.get("enabled", False):
+                        logger.info(f"Skipping disabled provider: {category}/{provider_name}")
+                        continue
+
+                    # Try to import and instantiate provider
+                    provider_instance = self._import_provider(category, provider_name)
+                    if provider_instance:
+                        provider_key = f"{category}_{provider_name}"
+                        self.providers[provider_key] = provider_instance
+                        logger.info(f"Loaded provider: {provider_key}")
 
             logger.info(f"Loaded {len(self.providers)} event providers")
 
-        except ImportError as e:
-            logger.warning(f"Failed to load some providers: {e}")
+        except Exception as e:
+            logger.error(f"Failed to load providers: {e}")
             self.providers = {}
+
+    def _import_provider(self, category: str, provider_name: str):
+        """
+        Dynamically import provider class.
+
+        Args:
+            category: Provider category (crypto, sports, markets, tech, world)
+            provider_name: Provider name (coingecko, football_data, etc.)
+
+        Returns:
+            Provider instance or None
+        """
+        try:
+            # Convert provider_name to class name (e.g., coingecko -> CoinGeckoProvider)
+            class_name = "".join(word.capitalize() for word in provider_name.split("_")) + "Provider"
+
+            # Try to import from category-specific module
+            module_path = f"events.providers.{category}.{provider_name}_provider"
+
+            try:
+                module = __import__(module_path, fromlist=[class_name])
+                provider_class = getattr(module, class_name)
+                return provider_class()
+            except (ImportError, AttributeError) as e:
+                logger.warning(f"Could not import {class_name} from {module_path}: {e}")
+
+                # Fallback: try to import from root providers module (for legacy providers)
+                try:
+                    module_path = f"events.providers.{provider_name}"
+                    module = __import__(module_path, fromlist=[class_name])
+                    provider_class = getattr(module, class_name)
+                    return provider_class()
+                except (ImportError, AttributeError):
+                    logger.error(f"Provider not found: {category}/{provider_name}")
+                    return None
+
+        except Exception as e:
+            logger.error(f"Error importing provider {category}/{provider_name}: {e}")
+            return None
 
     async def fetch_events(
         self, start_date: datetime, end_date: datetime, providers: Optional[List[str]] = None

@@ -42,61 +42,52 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme }) => {
     { id: 'month', label: 'Месяц' },
   ];
 
-  // Mock data
-  const mockEvents: Event[] = [
-    {
-      id: '1',
-      title: 'Заседание ФРС США',
-      description: 'Решение по процентным ставкам и денежно-кредитной политике',
-      category: 'economics',
-      date: '2025-01-06',
-      time: '14:00',
-      importance: 'high',
-      source: 'Federal Reserve',
-      impact: 'Высокий',
-    },
-    {
-      id: '2',
-      title: 'Запуск Ethereum 2.0 обновления',
-      description: 'Крупное обновление сети Ethereum с улучшениями производительности',
-      category: 'crypto',
-      date: '2025-01-07',
-      time: '12:00',
-      importance: 'high',
-      source: 'Ethereum Foundation',
-      impact: 'Высокий',
-    },
-    {
-      id: '3',
-      title: 'Чемпионат мира по футболу - Финал',
-      description: 'Решающий матч чемпионата мира по футболу',
-      category: 'sports',
-      date: '2025-01-08',
-      time: '18:00',
-      importance: 'medium',
-      source: 'FIFA',
-      impact: 'Средний',
-    },
-    {
-      id: '4',
-      title: 'Саммит G7',
-      description: 'Ежегодная встреча лидеров стран G7',
-      category: 'politics',
-      date: '2025-01-10',
-      time: '09:00',
-      importance: 'high',
-      source: 'G7 Secretariat',
-      impact: 'Высокий',
-    },
-  ];
+  // Real API data loading
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setEvents(mockEvents);
+  // Fetch events from API
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/events/upcoming?days=7&min_importance=0.6');
+      const data = await response.json();
+      
+      if (data.success) {
+        // Transform API data to Event format
+        const transformedEvents: Event[] = data.data.events.map((event: any) => ({
+          id: event.id.toString(),
+          title: event.title,
+          description: event.description || '',
+          category: event.category,
+          date: new Date(event.starts_at).toISOString().split('T')[0],
+          time: new Date(event.starts_at).toTimeString().slice(0, 5),
+          importance: event.importance >= 0.8 ? 'high' : event.importance >= 0.6 ? 'medium' : 'low',
+          source: event.source,
+          impact: event.importance >= 0.8 ? 'Высокий' : event.importance >= 0.6 ? 'Средний' : 'Низкий',
+        }));
+        
+        setEvents(transformedEvents);
+      } else {
+        setError(data.error || 'Ошибка загрузки событий');
+      }
+    } catch (err) {
+      setError('Не удалось загрузить события');
+      console.error('Failed to fetch events:', err);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  // Load events on component mount
+  useEffect(() => {
+    fetchEvents();
   }, []);
+
+  // Events are loaded via fetchEvents() useEffect above
 
   const filteredEvents = events.filter(event => {
     const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
@@ -129,6 +120,37 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme }) => {
     
     return matchesCategory && matchesDate;
   });
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Загрузка событий...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Ошибка загрузки</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={fetchEvents}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Попробовать снова
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
