@@ -54,7 +54,7 @@ class DigestAIService:
         except Exception:
             return False
 
-    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "all") -> str:
+    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "all", length: str = "medium") -> str:
         """
         Build AI-powered digest from news items.
 
@@ -62,6 +62,7 @@ class DigestAIService:
             news_items: List of NewsItem objects
             style: Digest style (analytical, business, meme)
             category: News category (crypto, sports, markets, tech, world)
+            length: Text length (short, medium, long)
 
         Returns:
             Formatted digest string
@@ -74,7 +75,7 @@ class DigestAIService:
 
         if self._openai_available:
             try:
-                return await self._llm_summarize(limited_news, style, category)
+                return await self._llm_summarize(limited_news, style, category, length)
             except Exception as e:
                 logger.warning(f"AI summarization failed, using fallback: {e}")
                 return self._build_fallback_digest(limited_news)
@@ -82,7 +83,7 @@ class DigestAIService:
             logger.info("OpenAI API not available, using fallback digest")
             return self._build_fallback_digest(limited_news)
 
-    async def _llm_summarize(self, news_items: List[NewsItem], style: str, category: str = "world") -> str:
+    async def _llm_summarize(self, news_items: List[NewsItem], style: str, category: str = "world", length: str = "medium") -> str:
         """
         Generate AI-powered summary using OpenAI.
 
@@ -90,6 +91,7 @@ class DigestAIService:
             news_items: List of news items to summarize
             style: Summary style
             category: News category for context
+            length: Text length (short, medium, long)
 
         Returns:
             AI-generated digest text
@@ -109,7 +111,7 @@ class DigestAIService:
             )
 
         # Create prompt based on style and category
-        prompt = self._create_prompt(news_data, style, category)
+        prompt = self._create_prompt(news_data, style, category, length)
         logger.info(f"Created prompt length: {len(prompt)}")
         logger.info(f"News data count: {len(news_data)}")
 
@@ -119,8 +121,20 @@ class DigestAIService:
         logger.info(f"AI response length: {len(response) if response else 0}")
         logger.info(f"AI response preview: {response[:200] if response else 'EMPTY'}")
 
-        # Clean HTML containers if AI generated them despite instructions
+        # Process response - check if it's JSON and convert to HTML
         if response:
+            # Import JSON formatter
+            from digests.json_formatter import format_json_digest_to_html, clean_json_from_text
+            
+            # Check if response is JSON
+            if response.strip().startswith('{') and response.strip().endswith('}'):
+                logger.info("Converting JSON response to HTML")
+                response = format_json_digest_to_html(response)
+            else:
+                # Clean any JSON blocks from text
+                response = clean_json_from_text(response)
+
+            # Clean HTML containers if AI generated them despite instructions
             import re
 
             # Remove HTML document structure
@@ -144,7 +158,7 @@ class DigestAIService:
 
         return response
 
-    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str, category: str = "world") -> str:
+    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str, category: str = "world", length: str = "medium") -> str:
         """Create AI prompt based on news data, style and category."""
 
         news_text = "\n\n".join(
@@ -170,7 +184,7 @@ class DigestAIService:
                 "category": category,
                 "style_profile": style,
                 "tone": "neutral",  # По умолчанию нейтральный тон
-                "length": "medium",  # По умолчанию средняя длина
+                "length": length,  # Используем переданный параметр длины
                 "audience": "general",  # По умолчанию общая аудитория
                 "news_text": news_text,
                 "min_importance": 0.6,

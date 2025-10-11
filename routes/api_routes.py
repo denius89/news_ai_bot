@@ -818,6 +818,7 @@ def generate_digest():
     style = data.get("style", "analytical")
     period = data.get("period", "today")
     limit = data.get("limit", 10)
+    length = data.get("length", "medium")  # Новый параметр длины текста
     user_id = data.get("user_id")  # Новый параметр для привязки к пользователю
     save_digest = data.get("save", True)  # По умолчанию сохраняем
     
@@ -827,6 +828,7 @@ def generate_digest():
     logger.info(f"  - style: {style}")
     logger.info(f"  - period: {period}")
     logger.info(f"  - limit: {limit}")
+    logger.info(f"  - length: {length}")
     logger.info(f"  - user_id: {user_id}")
     logger.info(f"  - save_digest: {save_digest}")
     logger.info(f"  - Full data: {data}")
@@ -838,7 +840,7 @@ def generate_digest():
 
     try:
         from services.unified_digest_service import get_async_digest_service
-        from digests.prompts_v2 import STYLE_CARDS
+        from digests.prompts_v2 import STYLE_CARDS, LENGTH_SPECS
         from services.categories import get_categories
         from database.db_models import save_digest as db_save_digest
         
@@ -857,6 +859,9 @@ def generate_digest():
         # Validate parameters
         if style not in STYLE_CARDS:
             return jsonify({"status": "error", "message": f"Invalid style: {style}"}), 400
+
+        if length not in LENGTH_SPECS:
+            return jsonify({"status": "error", "message": f"Invalid length: {length}"}), 400
 
         if category != "all" and category not in real_categories:
             return jsonify({"status": "error", "message": f"Invalid category: {category}"}), 400
@@ -899,6 +904,7 @@ def generate_digest():
                 limit=limit, 
                 categories=categories_list, 
                 style=style,
+                length=length,  # Передаем параметр длины текста
                 min_importance=final_min_importance  # Передаем параметр фильтрации
             )
         )
@@ -1065,6 +1071,8 @@ def get_digest_history():
                 "deleted_at": digest.get("deleted_at"),
                 "archived": digest.get("archived"),
                 "metadata": digest.get("metadata"),
+                "feedback_score": digest.get("feedback_score"),  # Добавляем поле отзыва
+                "feedback_count": digest.get("feedback_count"),  # Опционально для статистики
             }
             formatted_digests.append(formatted_digest)
 
@@ -1697,8 +1705,8 @@ def submit_feedback():
         
         if success:
             # Update daily analytics
-            from database.db_models import update_daily_analytics
-            update_daily_analytics()
+            # from database.db_models import update_daily_analytics
+            # update_daily_analytics() - deprecated, using individual event logging
             
             return jsonify({
                 "status": "success",
@@ -1730,6 +1738,135 @@ def convert_user_id_to_uuid(user_id: str):
     else:
         # user_id is already UUID
         return user_id
+
+
+# ============================================================================
+# Day 17: User Preferences & Notifications API
+# ============================================================================
+
+@api_bp.route("/user/preferences", methods=["GET"])
+def get_user_preferences():
+    """
+    Get user notification preferences.
+    
+    Returns user's notification settings including:
+    - categories: List of interested categories
+    - min_importance: Minimum importance threshold (0.0-1.0)
+    - delivery_method: Notification delivery method (bot/webapp/all)
+    - notification_frequency: Frequency (realtime/hourly/daily/weekly)
+    - max_notifications_per_day: Maximum notifications per day
+    """
+    try:
+        user_id = request.headers.get("X-Telegram-User-Id")
+        
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID required"}), 401
+        
+        from services.notification_service import get_notification_service
+        service = get_notification_service()
+        
+        # Get preferences from database
+        prefs = asyncio.run(service.get_user_preferences(int(user_id)))
+        
+        if not prefs:
+            # Return defaults
+            prefs = {
+                "categories": [],
+                "min_importance": 0.6,
+                "delivery_method": "bot",
+                "notification_frequency": "daily",
+                "max_notifications_per_day": 3
+            }
+        
+        return jsonify({"success": True, "data": prefs})
+    
+    except Exception as e:
+        logger.error(f"Error getting user preferences: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_bp.route("/user/preferences", methods=["POST", "PUT"])
+def update_user_preferences():
+    """
+    Update user notification preferences.
+    
+    Request body:
+    {
+        "categories": ["crypto", "markets"],
+        "min_importance": 0.7,
+        "delivery_method": "bot",
+        "notification_frequency": "daily",
+        "max_notifications_per_day": 3
+    }
+    """
+    try:
+        user_id = request.headers.get("X-Telegram-User-Id")
+        
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID required"}), 401
+        
+        data = request.json
+        
+        if not data:
+            return jsonify({"success": False, "error": "Request body required"}), 400
+        
+        from services.notification_service import get_notification_service
+        service = get_notification_service()
+        
+        # Update preferences
+        success = asyncio.run(service.update_user_preferences(int(user_id), data))
+        
+        if success:
+            # Get updated preferences
+            prefs = asyncio.run(service.get_user_preferences(int(user_id)))
+            return jsonify({"success": True, "data": prefs})
+        else:
+            return jsonify({"success": False, "error": "Failed to update preferences"}), 500
+    
+    except Exception as e:
+        logger.error(f"Error updating user preferences: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_bp.route("/user/notifications/test", methods=["POST"])
+def test_notification():
+    """
+    Test notification delivery for user.
+    
+    Useful for testing notification system without waiting for real events.
+    """
+    try:
+        user_id = request.headers.get("X-Telegram-User-Id")
+        
+        if not user_id:
+            return jsonify({"success": False, "error": "User ID required"}), 401
+        
+        from services.notification_service import get_notification_service
+        service = get_notification_service()
+        
+        # Prepare test digest
+        digest = asyncio.run(service.prepare_daily_digest(int(user_id)))
+        
+        if digest.get('count', 0) > 0:
+            # Send test notification
+            events = digest.get('events', [])
+            success = asyncio.run(service.send_telegram_notification(int(user_id), events))
+            
+            return jsonify({
+                "success": True,
+                "message": "Test notification sent" if success else "Notification rate limit reached",
+                "events_count": len(events)
+            })
+        else:
+            return jsonify({
+                "success": True,
+                "message": "No events matching your preferences",
+                "events_count": 0
+            })
+    
+    except Exception as e:
+        logger.error(f"Error sending test notification: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 __all__ = ["api_bp"]
