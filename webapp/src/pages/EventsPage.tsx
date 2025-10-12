@@ -22,7 +22,9 @@ import {
   MapPin,
   Building,
   ChevronUp,
-  Globe
+  Globe,
+  Search,
+  Star
 } from 'lucide-react';
 
 interface Event {
@@ -30,6 +32,7 @@ interface Event {
   title: string;
   description: string;
   category: string;
+  subcategory?: string;
   date: string;
   time: string;
   importance: number;
@@ -39,6 +42,8 @@ interface Event {
   ends_at?: string;
   location?: string;
   link?: string;
+  group_name?: string;  // Название группы для умной группировки
+  metadata?: Record<string, any>;  // Метаданные события
 }
 
 interface EventsPageProps {
@@ -203,6 +208,19 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showUTC, setShowUTC] = useState(true); // Переключатель UTC/Local времени
+  const [groupingEnabled, setGroupingEnabled] = useState(true); // Переключатель группировки
+  const [searchQuery, setSearchQuery] = useState(''); // Поиск по событиям и группам
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null); // Выбранная группа
+  const [favoriteGroups, setFavoriteGroups] = useState<string[]>([]); // Избранные группы
+
+  // Функции для управления избранными группами
+  const toggleFavoriteGroup = (groupName: string) => {
+    setFavoriteGroups(prev => 
+      prev.includes(groupName) 
+        ? prev.filter(g => g !== groupName)
+        : [...prev, groupName]
+    );
+  };
 
   // Category icons mapping
   const getCategoryIcon = (categoryId: string) => {
@@ -284,6 +302,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
           title: event.title,
           description: event.description || '',
           category: event.category,
+          subcategory: event.subcategory,
           date: new Date(event.starts_at).toISOString().split('T')[0],
           time: new Date(event.starts_at).toTimeString().slice(0, 5),
           importance: event.importance || 0,
@@ -293,6 +312,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
           ends_at: event.ends_at,
           location: event.location,
           link: event.link,
+          group_name: event.group_name,  // Название группы для умной группировки
+          metadata: event.metadata || {},  // Метаданные события
         }));
         
         setEvents(transformedEvents);
@@ -325,7 +346,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
   // Group events by date for timeline
   const eventsByDate = useMemo(() => {
     const groups: { [key: string]: Event[] } = {};
-    events.forEach(event => {
+    filteredEvents.forEach(event => {
       const dateKey = event.date;
       if (!groups[dateKey]) {
         groups[dateKey] = [];
@@ -333,12 +354,65 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
       groups[dateKey].push(event);
     });
     return groups;
-  }, [events]);
+  }, [filteredEvents]);
 
   // Sort dates
   const sortedDates = useMemo(() => {
     return Object.keys(eventsByDate).sort();
   }, [eventsByDate]);
+
+  // Умная группировка: Дата → Категория → Группа → События
+  const groupedEvents = useMemo(() => {
+    if (!groupingEnabled) {
+      return eventsByDate; // Возвращаем простую группировку по датам
+    }
+
+    const result: {
+      [date: string]: {
+        [category: string]: {
+          [groupName: string]: Event[]
+        }
+      }
+    } = {};
+    
+    filteredEvents.forEach(event => {
+      const date = event.date;
+      const category = event.category || 'other';
+      const groupName = event.group_name || event.subcategory || 'Без группы';
+      
+      if (!result[date]) result[date] = {};
+      if (!result[date][category]) result[date][category] = {};
+      if (!result[date][category][groupName]) result[date][category][groupName] = [];
+      
+      result[date][category][groupName].push(event);
+    });
+    
+    return result;
+  }, [filteredEvents, groupingEnabled]);
+
+  // Фильтрация событий по поиску и группе
+  const filteredEvents = useMemo(() => {
+    let filtered = events;
+
+    // Фильтр по поиску
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(event => 
+        event.title.toLowerCase().includes(query) ||
+        event.description.toLowerCase().includes(query) ||
+        event.category.toLowerCase().includes(query) ||
+        (event.group_name && event.group_name.toLowerCase().includes(query)) ||
+        (event.metadata && JSON.stringify(event.metadata).toLowerCase().includes(query))
+      );
+    }
+
+    // Фильтр по выбранной группе
+    if (selectedGroup) {
+      filtered = filtered.filter(event => event.group_name === selectedGroup);
+    }
+
+    return filtered;
+  }, [events, searchQuery, selectedGroup]);
 
   // Format date for display
   const formatDateDisplay = (dateStr: string) => {
@@ -455,7 +529,35 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
       <MobileHeader 
         title="События" 
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Поиск событий..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-4 py-2 text-sm border border-border rounded-lg bg-surface dark:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary w-48"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted hover:text-text"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            
+            <Button 
+              size="sm" 
+              variant={groupingEnabled ? "primary" : "ghost"}
+              onClick={() => setGroupingEnabled(!groupingEnabled)}
+              title={groupingEnabled ? 'Отключить группировку' : 'Включить группировку'}
+            >
+              <Building className="w-4 h-4" />
+            </Button>
             <Button 
               size="sm" 
               variant="ghost"
@@ -518,6 +620,158 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
       </AnimatePresence>
 
       <main className="container-main pb-32">
+        {/* Search Results Info */}
+        {(searchQuery || selectedGroup) && (
+          <motion.section 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-primary" />
+                <span className="text-sm text-muted">
+                  {searchQuery && `Поиск: "${searchQuery}"`}
+                  {searchQuery && selectedGroup && ' • '}
+                  {selectedGroup && `Группа: ${selectedGroup}`}
+                </span>
+              </div>
+              <Button 
+                size="sm" 
+                variant="ghost"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedGroup(null);
+                }}
+              >
+                Очистить
+              </Button>
+            </div>
+          </motion.section>
+        )}
+
+        {/* Group Filters */}
+        {groupingEnabled && (
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Card>
+              <CardContent>
+                <h3 className="text-sm font-medium text-text mb-3">Группы событий</h3>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const groups = [...new Set(events.map(e => e.group_name).filter(Boolean))];
+                    return groups.map(groupName => (
+                      <Button
+                        key={groupName}
+                        variant={selectedGroup === groupName ? 'primary' : 'secondary'}
+                        size="sm"
+                        onClick={() => setSelectedGroup(selectedGroup === groupName ? null : groupName)}
+                        className="relative"
+                      >
+                        <Building className="w-3 h-3 mr-1" />
+                        {groupName}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavoriteGroup(groupName);
+                          }}
+                          className="ml-1 p-0.5 hover:bg-white/20 rounded"
+                        >
+                          <Star 
+                            className={`w-3 h-3 ${
+                              favoriteGroups.includes(groupName) 
+                                ? 'fill-yellow-400 text-yellow-400' 
+                                : 'text-gray-400'
+                            }`} 
+                          />
+                        </button>
+                      </Button>
+                    ));
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.section>
+        )}
+
+        {/* Favorite Groups */}
+        {favoriteGroups.length > 0 && (
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Card>
+              <CardContent>
+                <h3 className="text-sm font-medium text-text mb-3 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                  Избранные группы
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {favoriteGroups.map(groupName => (
+                    <Button
+                      key={groupName}
+                      variant="primary"
+                      size="sm"
+                      onClick={() => setSelectedGroup(groupName)}
+                      className="relative"
+                    >
+                      <Building className="w-3 h-3 mr-1" />
+                      {groupName}
+                      <Star className="w-3 h-3 ml-1 fill-yellow-400 text-yellow-400" />
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.section>
+        )}
+
+        {/* Group Statistics */}
+        {groupingEnabled && (
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <Card>
+              <CardContent>
+                <h3 className="text-sm font-medium text-text mb-3">Статистика групп</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {(() => {
+                    const groupStats = events.reduce((acc, event) => {
+                      const groupName = event.group_name || 'Без группы';
+                      if (!acc[groupName]) {
+                        acc[groupName] = { count: 0, category: event.category };
+                      }
+                      acc[groupName].count++;
+                      return acc;
+                    }, {} as Record<string, { count: number; category: string }>);
+
+                    return Object.entries(groupStats)
+                      .sort(([,a], [,b]) => b.count - a.count)
+                      .slice(0, 3)
+                      .map(([groupName, stats]) => (
+                        <div key={groupName} className="p-3 bg-surface-alt dark:bg-surface rounded-lg">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Building className="w-4 h-4 text-primary" />
+                            <span className="font-medium text-text">{groupName}</span>
+                          </div>
+                          <div className="text-sm text-muted">
+                            {stats.count} событий • {stats.category}
+                          </div>
+                        </div>
+                      ));
+                  })()}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.section>
+        )}
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -601,6 +855,8 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
               ) : (
                 sortedDates.map((dateStr, dateIndex) => {
                   const dayEvents = eventsByDate[dateStr];
+                  const dayGroupedEvents = groupingEnabled ? groupedEvents[dateStr] : null;
+                  
                   return (
                     <motion.div
                       key={dateStr}
