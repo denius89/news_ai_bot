@@ -3,6 +3,9 @@
 Скрипт для загрузки свежих новостей из каждой подкатегории в PulseAI.
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from services.categories import get_categories, get_subcategories
 from database.service import get_async_service
 from parsers.advanced_parser import AdvancedParser

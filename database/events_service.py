@@ -90,9 +90,9 @@ class EventsService:
                 }
                 insert_data.append(event_data)
 
-            # Upsert events using unique_hash
-            result = supabase.table("events_new").upsert(
-                insert_data, on_conflict="unique_hash"
+            # Insert events (without upsert for now)
+            result = supabase.table("events_new").insert(
+                insert_data
             ).execute()
 
             inserted_count = len(result.data) if result.data else 0
@@ -103,6 +103,13 @@ class EventsService:
         except Exception as e:
             logger.error(f"Error inserting events: {e}")
             return 0
+
+    def get_upcoming_events_sync(
+        self, days_ahead: int = 30, category: Optional[str] = None, min_importance: float = 0.0
+    ) -> List[EventRecord]:
+        """Synchronous version of get_upcoming_events for Flask compatibility."""
+        import asyncio
+        return asyncio.run(self.get_upcoming_events(days_ahead, category, min_importance))
 
     async def get_upcoming_events(
         self, days_ahead: int = 30, category: Optional[str] = None, min_importance: float = 0.0
@@ -139,9 +146,52 @@ class EventsService:
 
             query += " ORDER BY starts_at ASC"
 
-            # Execute query (this would need to be implemented in the database service)
-            # For now, we'll return mock data
-            events = await self._get_mock_events(days_ahead, category, min_importance)
+            # Execute query using Supabase
+            from database.db_models import supabase
+            
+            if not supabase:
+                logger.error("Supabase not initialized")
+                return []
+            
+            # Build Supabase query
+            query = supabase.table("events_new").select("*")
+            
+            # Filter by date range
+            query = query.gte("starts_at", now.isoformat())
+            query = query.lte("starts_at", end_date.isoformat())
+            
+            # Filter by importance
+            query = query.gte("importance", min_importance)
+            
+            # Filter by category if specified
+            if category:
+                query = query.eq("category", category)
+            
+            # Order by start time
+            query = query.order("starts_at")
+            
+            # Execute query
+            result = query.execute()
+            
+            # Convert to EventRecord objects
+            events = []
+            for event_data in result.data:
+                event = EventRecord(
+                    id=event_data["id"],
+                    title=event_data["title"],
+                    category=event_data["category"],
+                    subcategory=event_data.get("subcategory", "general"),
+                    starts_at=datetime.fromisoformat(event_data["starts_at"].replace("Z", "+00:00")),
+                    ends_at=datetime.fromisoformat(event_data["ends_at"].replace("Z", "+00:00")) if event_data.get("ends_at") else None,
+                    source=event_data.get("source", "unknown"),
+                    link=event_data.get("link", ""),
+                    importance=event_data.get("importance", 0.0),
+                    description=event_data.get("description", ""),
+                    location=event_data.get("location", ""),
+                    organizer=event_data.get("organizer", ""),
+                    created_at=datetime.fromisoformat(event_data["created_at"].replace("Z", "+00:00")) if event_data.get("created_at") else now
+                )
+                events.append(event)
 
             logger.info(f"Retrieved {len(events)} upcoming events")
             return events

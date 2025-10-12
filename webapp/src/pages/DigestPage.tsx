@@ -608,7 +608,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                       selectedCategory === key
                         ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                        : "bg-white/80 dark:bg-[#161616]/80 text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
+                        : "bg-surface-alt dark:bg-surface-alt text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`}
                   >
                     {getIcon(key)}
@@ -629,7 +629,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                   transition={{ delay: index * 0.1 }}
                 >
                   <motion.div
-                    className="bg-white/80 dark:bg-[#161616]/80 backdrop-blur-md border border-white/10 
+                    className="bg-surface dark:bg-surface backdrop-blur-md border border-border 
                                rounded-3xl p-5 pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.05)] 
                                hover:scale-[1.02] transition-transform duration-300 ease-out mt-4"
                     whileHover={{ scale: 1.02 }}
@@ -765,7 +765,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="flex flex-col items-center justify-center p-8 rounded-3xl bg-white/80 dark:bg-[#161616]/80 mt-6"
+              className="flex flex-col items-center justify-center p-8 rounded-3xl bg-surface dark:bg-surface mt-6"
             >
               <Bot className="w-10 h-10 text-emerald-400 mb-3" />
               <p className="text-gray-600 dark:text-gray-400 text-sm">
@@ -804,7 +804,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="w-full max-w-2xl max-h-[75vh] 
-                       bg-white dark:bg-surface-alt 
+                       bg-surface dark:bg-surface 
                        backdrop-blur-lg rounded-3xl 
                        shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
                        p-6 

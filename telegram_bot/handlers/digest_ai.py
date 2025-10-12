@@ -6,7 +6,7 @@ from services.unified_digest_service import get_async_digest_service
 from telegram_bot.keyboards import back_inline_keyboard
 from services.categories import get_categories
 from services.subscription_service import get_async_subscription_service
-from services.notification_service import get_async_notification_service
+from services.notification_service import get_notification_service
 from digests.configs import PERIODS, STYLES
 from utils.text.clean_text import clean_for_telegram
 from utils.system.progress_animation import (
@@ -233,7 +233,7 @@ async def cb_enable_auto_digest(query: types.CallbackQuery):
     try:
         # Enable auto-digest notifications
         user_id = query.from_user.id
-        notification_service = get_async_notification_service()
+        notification_service = get_notification_service()
         success = await notification_service.enable_auto_digest(user_id, enabled=True)
 
         if success:

@@ -569,10 +569,10 @@ def create_user():
 def health_check():
     """GET /api/health - Health check endpoint with digest v2 status"""
     try:
-        from database.db_models import get_digest_analytics
+        from database.db_models import get_daily_digest_analytics
         
         # Get digest analytics for today
-        analytics = get_digest_analytics()
+        analytics = get_daily_digest_analytics()
         avg_confidence = analytics.get("avg_confidence", 0.0)
         
         # Determine digest v2 status
@@ -670,75 +670,7 @@ def validate_categories_api():
         return jsonify({"status": "error", "message": "Ошибка валидации категорий"}), 500
 
 
-@api_bp.route("/events/upcoming", methods=["GET"])
-def get_upcoming_events():
-    """
-    API endpoint для получения предстоящих событий для календаря.
-
-    Query parameters:
-        - days: количество дней вперед (по умолчанию 7)
-        - category: фильтр по категории (опционально)
-        - min_importance: минимальная важность (по умолчанию 0)
-
-    Returns:
-        JSON с событиями в формате для календаря
-    """
-    try:
-        days = int(request.args.get("days", 7))
-        category = request.args.get("category")
-        min_importance = float(request.args.get("min_importance", 0))
-
-        # Получаем события из базы данных
-        from database.db_models import get_latest_events
-
-        events = get_latest_events(limit=100)
-
-        # Фильтруем по категории если указана
-        if category:
-            events = [e for e in events if e.get("category") == category]
-
-        # Фильтруем по важности
-        events = [e for e in events if (e.get("importance") or 0) >= min_importance]
-
-        # Преобразуем в формат для календаря
-        formatted_events = []
-        for event in events:
-            # Определяем категорию на основе источника или других данных
-            # По умолчанию markets для экономических событий
-            event_category = event.get("category", "markets")
-
-            formatted_event = {
-                "id": event.get("id", f"event_{hash(event.get('title', ''))}"),
-                "title": event.get("title", "Без названия"),
-                "starts_at": event.get("event_time", "2025-10-06T12:00:00Z"),
-                "category": event_category,
-                "importance": float(event.get("importance", 0)) / 3.0,  # Нормализуем 0-3 в 0-1
-                "description": f"Источник: {event.get('source', 'Unknown')}",
-                "country": event.get("country", ""),
-                "currency": event.get("currency", ""),
-                "fact": event.get("fact"),
-                "forecast": event.get("forecast"),
-                "previous": event.get("previous"),
-                "link": None,  # Пока нет ссылок в базе
-            }
-            formatted_events.append(formatted_event)
-
-        return jsonify(
-            {
-                "status": "success",
-                "data": {
-                    "events": formatted_events,
-                    "total_count": len(formatted_events),
-                    "days": days,
-                    "category": category,
-                    "min_importance": min_importance,
-                },
-            }
-        )
-
-    except Exception as e:
-        logger.error(f"Ошибка получения событий: {e}")
-        return jsonify({"status": "error", "message": "Ошибка получения событий"}), 500
+# Events endpoint moved to routes/events_routes.py
 
 
 # --- Digest API Endpoints ---
@@ -1745,7 +1677,7 @@ def convert_user_id_to_uuid(user_id: str):
 # ============================================================================
 
 @api_bp.route("/user/preferences", methods=["GET"])
-def get_user_preferences():
+def get_user_notification_preferences():
     """
     Get user notification preferences.
     

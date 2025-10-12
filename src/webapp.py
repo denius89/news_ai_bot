@@ -12,6 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.core.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACTOR_ENABLED
 from utils.auth.telegram_auth import verify_telegram_auth
 from routes.news_routes import news_bp
+from routes.events_routes import register_events_routes
 
 # webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
@@ -53,7 +54,8 @@ def authenticate_request():
             '/api/latest',
             '/api/dashboard/stats',
             '/api/dashboard/latest_news',
-            '/api/dashboard/news_trend'
+            '/api/dashboard/news_trend',
+            '/api/events'  # Events API - публичный доступ
         ]
         
         # Проверяем, является ли endpoint публичным
@@ -94,7 +96,7 @@ def process_telegram_request():
 
 # Настройка CORS для Telegram WebApp
 CORS(app, origins=[
-    "https://vendors-sectors-viewed-inkjet.trycloudflare.com",
+    "https://design-treasures-titten-formation.trycloudflare.com",
     "https://*.trycloudflare.com",
     "https://telegram.org",
     "https://web.telegram.org"
@@ -230,6 +232,7 @@ def index():
 
 # Регистрируем маршруты
 app.register_blueprint(news_bp)
+register_events_routes(app)  # Register events routes
 # webapp_bp удален - конфликтовал с serve_react()
 app.register_blueprint(api_bp)
 app.register_blueprint(dashboard_api)

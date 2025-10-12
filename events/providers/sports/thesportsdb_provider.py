@@ -125,6 +125,11 @@ class TheSportsDBProvider(BaseEventProvider):
 
             # Combine date and time
             datetime_str = f"{date_str} {time_str}"
+            
+            # Handle timezone info if present
+            if "+" in datetime_str:
+                datetime_str = datetime_str.split("+")[0].strip()
+            
             starts_at = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S").replace(
                 tzinfo=timezone.utc
             )

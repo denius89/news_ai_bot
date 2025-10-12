@@ -23,7 +23,7 @@ export default defineConfig(({ command, mode }) => {
         allowedHosts: [
           'localhost',
           '127.0.0.1',
-          'vendors-sectors-viewed-inkjet.trycloudflare.com',
+          'design-treasures-titten-formation.trycloudflare.com',
           '.trycloudflare.com'
         ],
         headers: {

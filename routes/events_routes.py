@@ -78,7 +78,8 @@ def get_events():
         events_service = get_events_service()
 
         # Fetch events
-        events = await events_service.get_events_by_date_range(from_date, to_date, category)
+        import asyncio
+        events = asyncio.run(events_service.get_events_by_date_range(from_date, to_date, category))
 
         # Filter by subcategory if specified
         if subcategory:
@@ -154,8 +155,8 @@ def get_upcoming_events():
         # Get events service
         events_service = get_events_service()
 
-        # Fetch upcoming events
-        events = await events_service.get_upcoming_events(
+        # Fetch upcoming events (synchronous)
+        events = events_service.get_upcoming_events_sync(
             days_ahead=days, category=category, min_importance=min_importance
         )
 
@@ -213,7 +214,8 @@ def get_today_events():
         events_service = get_events_service()
 
         # Fetch today's events
-        events = await events_service.get_today_events(category=category)
+        import asyncio
+        events = asyncio.run(events_service.get_today_events(category=category))
 
         # Convert to JSON format
         events_data = []
@@ -340,9 +342,10 @@ def get_events_stats():
         events_service = get_events_service()
 
         # Get various event counts
-        today_events = await events_service.get_today_events()
-        upcoming_events = await events_service.get_upcoming_events(days_ahead=7)
-        upcoming_30d = await events_service.get_upcoming_events(days_ahead=30)
+        import asyncio
+        today_events = asyncio.run(events_service.get_today_events())
+        upcoming_events = asyncio.run(events_service.get_upcoming_events(days_ahead=7))
+        upcoming_30d = asyncio.run(events_service.get_upcoming_events(days_ahead=30))
 
         # Calculate statistics
         stats = {
@@ -367,73 +370,6 @@ def get_events_stats():
 
     except Exception as e:
         logger.error(f"Error getting events stats: {e}")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-
-@events_bp.route("/upcoming", methods=["GET"])
-@cross_origin()
-def get_upcoming_events():
-    """
-    Get upcoming events for next 7-10 days.
-    
-    Query parameters:
-    - days: Number of days ahead (default: 7)
-    - category: Filter by category
-    - min_importance: Minimum importance threshold (deprecated, use important flag)
-    - important: Filter only important events (importance_score >= 0.7)
-    """
-    try:
-        days = int(request.args.get("days", 7))
-        category = request.args.get("category")
-        important_only = request.args.get("important", "false").lower() == "true"
-        
-        # Set minimum importance based on important flag
-        if important_only:
-            min_importance = 0.7  # Only highly important events
-        else:
-            min_importance = float(request.args.get("min_importance", 0.6))
-        
-        # Get events service
-        events_service = get_events_service()
-        
-        # Fetch upcoming events
-        events = await events_service.get_upcoming_events(
-            days_ahead=days, 
-            category=category, 
-            min_importance=min_importance
-        )
-        
-        # Format events for response
-        formatted_events = []
-        for event in events:
-            formatted_events.append({
-                "id": event.id,
-                "title": event.title,
-                "category": event.category,
-                "subcategory": event.subcategory,
-                "starts_at": event.starts_at.isoformat(),
-                "ends_at": event.ends_at.isoformat() if event.ends_at else None,
-                "source": event.source,
-                "link": event.link,
-                "importance": event.importance,
-                "description": event.description,
-                "location": event.location,
-                "organizer": event.organizer,
-            })
-        
-        return jsonify({
-            "success": True,
-            "data": {
-                "events": formatted_events,
-                "count": len(formatted_events),
-                "days_ahead": days,
-                "category": category,
-                "min_importance": min_importance,
-            }
-        })
-        
-    except Exception as e:
-        logger.error(f"Error getting upcoming events: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 

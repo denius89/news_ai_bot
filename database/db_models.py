@@ -1473,7 +1473,7 @@ def save_digest_with_metrics(
         }
         
         result = safe_execute(
-            supabase.table("digests").insert(digest_data).execute()
+            supabase.table("digests").insert(digest_data)
         )
         
         if result.data:
@@ -1552,7 +1552,7 @@ def update_digest_feedback(digest_id: str, score: float) -> bool:
         return False
 
 
-def get_digest_analytics(date: Optional[str] = None) -> dict:
+def get_daily_digest_analytics(date: Optional[str] = None) -> dict:
     """
     Get aggregated analytics for date (default: today).
     

@@ -5,6 +5,13 @@ Fetch and Store Events Tool for PulseAI.
 This tool fetches events from various providers and stores them in the database.
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+# Load environment variables
+from dotenv import load_dotenv
+load_dotenv()
 from ai_modules.metrics import get_metrics
 from database.events_service import get_events_service
 from events.events_parser import get_events_parser

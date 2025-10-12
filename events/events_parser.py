@@ -100,7 +100,21 @@ class EventsParser:
         """
         try:
             # Convert provider_name to class name (e.g., coingecko -> CoinGeckoProvider)
-            class_name = "".join(word.capitalize() for word in provider_name.split("_")) + "Provider"
+            # Special cases for camelCase names
+            name_mapping = {
+                "coinmarketcal": "CoinMarketCalProvider",
+                "coingecko": "CoinGeckoProvider", 
+                "defillama": "DeFiLlamaProvider",
+                "tokenunlocks": "TokenUnlocksProvider",
+                "football_data": "FootballDataProvider",
+                "thesportsdb": "TheSportsDBProvider",
+                "github_releases": "GithubReleasesProvider"
+            }
+            
+            if provider_name in name_mapping:
+                class_name = name_mapping[provider_name]
+            else:
+                class_name = "".join(word.capitalize() for word in provider_name.split("_")) + "Provider"
 
             # Try to import from category-specific module
             module_path = f"events.providers.{category}.{provider_name}_provider"

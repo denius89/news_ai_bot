@@ -19,6 +19,9 @@
     python tools/fetch_and_store_news.py --min-importance 0.5 --max-concurrent 5
 """
 
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from parsers.advanced_parser import AdvancedParser
 import asyncio
 import argparse
