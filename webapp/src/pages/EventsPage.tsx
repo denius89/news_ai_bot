@@ -21,7 +21,8 @@ import {
   Clock,
   MapPin,
   Building,
-  ChevronUp
+  ChevronUp,
+  Globe
 } from 'lucide-react';
 
 interface Event {
@@ -50,9 +51,10 @@ interface EventDetailModalProps {
   event: Event | null;
   isOpen: boolean;
   onClose: () => void;
+  showUTC: boolean;
 }
 
-const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, isOpen, onClose }) => {
+const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, isOpen, onClose, showUTC }) => {
   const { exportEvent } = useCalendarExport();
   const { shareEvent } = useShareEvent();
 
@@ -64,6 +66,23 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, isOpen, onCl
 
   const handleShare = async () => {
     await shareEvent(event);
+  };
+
+  // Функция форматирования времени
+  const formatEventTime = (startsAt: string) => {
+    const date = new Date(startsAt);
+    
+    if (showUTC) {
+      const utcTime = date.toISOString().slice(11, 16);
+      return `${utcTime} UTC`;
+    } else {
+      const localTime = date.toLocaleTimeString('ru-RU', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return `${localTime} (${timezone})`;
+    }
   };
 
   return (
@@ -116,7 +135,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, isOpen, onCl
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-muted/10 px-2 py-1 rounded-full">
                     <Clock className="w-3 h-3" />
-                    {event.date} в {event.time}
+                    {event.date} в {formatEventTime(event.starts_at || event.date)}
                   </div>
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">{event.title}</h2>
@@ -183,6 +202,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showUTC, setShowUTC] = useState(true); // Переключатель UTC/Local времени
 
   // Category icons mapping
   const getCategoryIcon = (categoryId: string) => {
@@ -216,6 +236,23 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
   // Hooks for actions
   const { exportEvent } = useCalendarExport();
   const { shareEvent, notification } = useShareEvent();
+
+  // Функция форматирования времени с поддержкой UTC/Local
+  const formatEventTime = (startsAt: string) => {
+    const date = new Date(startsAt);
+    
+    if (showUTC) {
+      const utcTime = date.toISOString().slice(11, 16);
+      return `${utcTime} UTC`;
+    } else {
+      const localTime = date.toLocaleTimeString('ru-RU', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      return `${localTime} (${timezone})`;
+    }
+  };
 
   // Fetch events from API
   const fetchEvents = async () => {
@@ -418,14 +455,24 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
       <MobileHeader 
         title="События" 
         actions={
-          <Button 
-            size="sm" 
-            variant="secondary"
-            onClick={() => setCalendarOpen(true)}
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Календарь
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="ghost"
+              onClick={() => setShowUTC(!showUTC)}
+              title={showUTC ? 'Переключить на локальное время' : 'Переключить на UTC'}
+            >
+              <Globe className="w-4 h-4" />
+            </Button>
+            <Button 
+              size="sm" 
+              variant="secondary"
+              onClick={() => setCalendarOpen(true)}
+            >
+              <Calendar className="w-4 h-4 mr-2" />
+              Календарь
+            </Button>
+          </div>
         }
       />
 
@@ -590,7 +637,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
                                 <div className="flex items-start justify-between mb-2">
                                   <div className="flex items-center gap-2 text-sm font-medium text-text">
                                     <Clock className="w-4 h-4 text-muted" />
-                                    <span>{event.time}</span>
+                                    <span>{formatEventTime(event.starts_at || event.date)}</span>
                                   </div>
                                   <div className="flex gap-1.5">
                                     <div className="flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
@@ -677,6 +724,7 @@ const EventsPage: React.FC<EventsPageProps> = ({ theme: _theme }) => {
       <EventDetailModal 
         event={selectedEvent}
         isOpen={isModalOpen}
+        showUTC={showUTC}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedEvent(null);
