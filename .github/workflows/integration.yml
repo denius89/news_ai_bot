@@ -1,20 +1,31 @@
 name: Integration Tests
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:   # запуск вручную из вкладки Actions
 
 jobs:
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -28,4 +39,15 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
         run: |
-          pytest -m integration -v
+          pytest tests/integration -v --tb=short
+        continue-on-error: false
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-logs
+          path: |
+            logs/*.log
+            *.log
+          retention-days: 7
