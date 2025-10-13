@@ -8,7 +8,7 @@ import hashlib
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 logger = logging.getLogger("base_provider")
 
@@ -133,4 +133,3 @@ class BaseEventProvider(ABC):
             "category": self.category,
             "description": f"{self.name} event provider",
         }
-

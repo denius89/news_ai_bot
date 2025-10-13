@@ -6,7 +6,7 @@ Fetches football matches from Football-Data.org API.
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List
 
 import aiohttp
@@ -33,9 +33,13 @@ class FootballDataProvider(BaseEventProvider):
         self.api_key = os.getenv("FOOTBALL_DATA_TOKEN")
 
         if not self.api_key:
-            logger.warning("FOOTBALL_DATA_TOKEN not set, provider will be disabled")
+            logger.warning(
+                "FOOTBALL_DATA_TOKEN not set, provider will be disabled"
+            )
 
-    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
+    async def fetch_events(
+        self, start_date: datetime, end_date: datetime
+    ) -> List[Dict]:
         """
         Fetch events from Football-Data.org.
 
@@ -110,7 +114,9 @@ class FootballDataProvider(BaseEventProvider):
             if not utc_date_str:
                 return None
 
-            starts_at = datetime.fromisoformat(utc_date_str.replace("Z", "+00:00"))
+            starts_at = datetime.fromisoformat(
+                utc_date_str.replace("Z", "+00:00")
+            )
 
             # Determine importance based on competition
             competition = match.get("competition", {})
@@ -127,11 +133,13 @@ class FootballDataProvider(BaseEventProvider):
                 "title": title,
                 "starts_at": starts_at,
                 "ends_at": None,
+                "category": "sports",  # Категория для группировки
                 "subcategory": subcategory,
                 "importance": importance,
                 "description": f"{competition_name} - {status}",
                 "link": f"https://www.football-data.org/matches/{match.get('id')}",
                 "location": match.get("venue", ""),
+                "group_name": competition_name,  # Название лиги для группировки
                 "metadata": {
                     "match_id": match.get("id"),
                     "competition": competition_name,
@@ -150,7 +158,10 @@ class FootballDataProvider(BaseEventProvider):
         """Calculate importance based on competition."""
         competition_lower = competition_name.lower()
 
-        if any(word in competition_lower for word in ["champions league", "world cup"]):
+        if any(
+            word in competition_lower
+            for word in ["champions league", "world cup"]
+        ):
             return 0.9
         elif any(
             word in competition_lower
@@ -176,4 +187,3 @@ class FootballDataProvider(BaseEventProvider):
             return "europa_league"
         else:
             return "football"
-

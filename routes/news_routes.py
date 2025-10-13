@@ -1,5 +1,51 @@
 """
-Flask-маршруты для отображения новостей и событий.
+Module: routes.news_routes
+Purpose: Flask routes for news and events display
+Location: routes/news_routes.py
+
+Description:
+    Flask Blueprint для отображения новостей и событий в веб-интерфейсе.
+    Обрабатывает запросы к главной странице, новостям и событиям.
+
+Key Endpoints:
+    GET  / - Главная страница с последними новостями
+    GET  /news - Страница новостей с фильтрацией
+    GET  /events - Страница событий
+    GET  /api/news/latest - API для получения последних новостей
+    GET  /api/events/latest - API для получения последних событий
+
+Dependencies:
+    External:
+        - Flask: Web framework
+    Internal:
+        - services.unified_digest_service: Digest generation
+        - services.categories: Category management
+        - database.db_models: Database operations (legacy)
+
+Usage Example:
+    ```python
+    # Главная страница
+    GET /
+    Response: HTML template with latest news
+
+    # API для новостей
+    GET /api/news/latest?limit=10&categories=tech,crypto
+    Response: {"news": [...]}
+    ```
+
+Template Structure:
+    - templates/index.html - Главная страница
+    - templates/news.html - Страница новостей
+    - templates/events.html - Страница событий
+
+Notes:
+    - Использует legacy db_models (нужна миграция на service.py)
+    - Поддерживает фильтрацию по категориям
+    - Интегрирован с unified_digest_service
+    - TODO: Добавить pagination для больших списков
+
+Author: PulseAI Team
+Last Updated: October 2025
 """
 
 import logging
@@ -8,9 +54,7 @@ from flask import Blueprint, render_template, request, jsonify
 
 from services.unified_digest_service import get_sync_digest_service
 from services.categories import get_categories
-from database.db_models import (
-    get_latest_events,
-)  # пока оставим здесь (можно позже вынести в EventsService)
+from database.service import get_sync_service
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +104,8 @@ def digest():
 def events():
     category = request.args.get("category")
 
-    events_list = get_latest_events(limit=50)
+    db_service = get_sync_service()
+    events_list = db_service.get_latest_events(limit=50)
 
     # фильтрация по категории (если у события есть category)
     if category:
@@ -87,14 +132,13 @@ def events():
 def api_latest_news():
     """API endpoint для получения последних новостей."""
     try:
-        from database.db_models import get_latest_news
-
         # Получаем параметры пагинации
         page = int(request.args.get("page", 1))
         limit = int(request.args.get("limit", 20))
 
         # Получаем новости из базы данных
-        all_news = get_latest_news(limit=1000)  # Получаем больше для пагинации
+        db_service = get_sync_service()
+        all_news = db_service.get_latest_news(limit=1000)  # Получаем больше для пагинации
 
         # Сортируем по важности, достоверности и свежести
         import datetime
@@ -169,7 +213,6 @@ def api_latest_news():
 def api_latest_news_weighted():
     """API endpoint для получения новостей с взвешенным распределением по категориям."""
     try:
-        from database.db_models import get_latest_news
         from services.categories import get_categories
         from utils.ai.news_distribution import (
             distribute_news_weighted,
@@ -187,10 +230,11 @@ def api_latest_news_weighted():
         # Получаем новости по категориям
         news_by_category = {}
         all_categories = get_categories()
+        db_service = get_sync_service()
 
         for category in all_categories:
             try:
-                category_news = get_latest_news(categories=[category], limit=100)  # ИСПРАВЛЕНО: передаем список
+                category_news = db_service.get_latest_news(categories=[category], limit=100)  # ИСПРАВЛЕНО: передаем список
                 news_by_category[category] = category_news
                 logger.debug(f"Категория {category}: {len(category_news)} новостей")
             except Exception as e:
@@ -297,17 +341,17 @@ def api_distribution_stats():
     """API endpoint для получения статистики распределения новостей."""
     try:
         from services.categories import get_categories
-        from utils.ai.news_distribution import get_category_weights, get_distribution_statistics
-        from database.db_models import get_latest_news
+        from utils.ai.news_distribution import get_category_weights
 
         # Получаем статистику по категориям
         categories = get_categories()
         category_stats = {}
         total_news = 0
+        db_service = get_sync_service()
 
         for category in categories:
             try:
-                category_news = get_latest_news(categories=[category], limit=1000)
+                category_news = db_service.get_latest_news(categories=[category], limit=1000)
                 category_stats[category] = {
                     "count": len(category_news),
                     "avg_importance": (

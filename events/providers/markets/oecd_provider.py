@@ -5,11 +5,11 @@ Fetches OECD economic events from HTML pages.
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List
 
 import aiohttp
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup  # noqa: F401
 
 from events.providers.base_provider import BaseEventProvider
 
@@ -65,8 +65,8 @@ class OECDProvider(BaseEventProvider):
     def _parse_events(self, html: str, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Parse OECD events from HTML."""
         try:
-            soup = BeautifulSoup(html, "html.parser")
-            events = []
+            # soup = BeautifulSoup(html, "html.parser")
+            # events = []
 
             # This is a simplified placeholder implementation
             # Real implementation would parse actual OECD website structure
@@ -77,4 +77,3 @@ class OECDProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing OECD events: {e}")
             return []
-

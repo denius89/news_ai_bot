@@ -6,7 +6,7 @@ Fetches release events from GitHub API.
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List
 
 import aiohttp
@@ -165,4 +165,3 @@ class GitHubReleasesProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing release: {e}")
             return None
-

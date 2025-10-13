@@ -2,7 +2,7 @@
 """
 Load 100 additional events into the database for comprehensive calendar testing.
 
-This script creates diverse events with more varied dates, subcategories, and 
+This script creates diverse events with more varied dates, subcategories, and
 realistic scenarios for testing the full calendar functionality.
 """
 
@@ -252,36 +252,36 @@ ADDITIONAL_EVENTS = [
     ]
 ]
 
-async def load_additional_events():
+async def load_additional_events():  # noqa: E302
     """Load 100 additional sample events into the database."""
     try:
         print(f"🔄 Loading {len(ADDITIONAL_EVENTS)} additional events into database...")
-        
+
         # Insert events in batches
         batch_size = 50
         total_inserted = 0
-        
+
         for i in range(0, len(ADDITIONAL_EVENTS), batch_size):
             batch = ADDITIONAL_EVENTS[i:i + batch_size]
-            
+
             result = supabase.table("events_new").insert(batch).execute()
-            
+
             if result.data:
                 batch_count = len(result.data)
                 total_inserted += batch_count
                 print(f"✅ Inserted batch {i//batch_size + 1}: {batch_count} events")
             else:
                 print(f"❌ Failed to insert batch {i//batch_size + 1}")
-        
+
         print(f"🎉 Successfully loaded {total_inserted} additional events!")
-        
+
         # Verify total count
         count_result = supabase.table("events_new").select("*", count="exact").execute()
         total_events = count_result.count
         print(f"📊 Total events in database: {total_events}")
-        
+
         return total_inserted
-        
+
     except Exception as e:
         print(f"❌ Error loading additional events: {e}")
         return 0

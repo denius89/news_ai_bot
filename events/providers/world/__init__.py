@@ -3,4 +3,3 @@
 from events.providers.world.un_sc_provider import UNSecurityCouncilProvider
 
 __all__ = ["UNSecurityCouncilProvider"]
-

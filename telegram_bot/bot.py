@@ -1,8 +1,5 @@
 import sys
-import os
-
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
-
+from pathlib import Path
 import asyncio
 import logging
 
@@ -14,6 +11,8 @@ from config.core.settings import TELEGRAM_BOT_TOKEN
 from telegram_bot.handlers import routers
 from utils.logging.logging_setup import setup_logging
 from database.service import get_async_service
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # --- ЛОГИРОВАНИЕ ---
 setup_logging()

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Bell, BellOff, Check, X } from 'lucide-react';
+import { Bell, Check, X } from 'lucide-react';
 
 interface NotificationPreferences {
   categories: string[];

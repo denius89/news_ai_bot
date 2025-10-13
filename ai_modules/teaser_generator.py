@@ -8,14 +8,13 @@ for digest posts to increase engagement and reach.
 import logging
 import re
 import sys
-import os
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 from pathlib import Path
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from ai_modules.metrics import get_metrics
+from ai_modules.metrics import get_metrics  # noqa: E402
 
 # from utils.ai.ai_client import get_ai_client
 

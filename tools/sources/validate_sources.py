@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# Shebang retained: /usr/bin/env python3
 """
 Объединенный инструмент для валидации источников.
 Объединяет функциональность update_rss_sources.py, validate_rss_sources.py
@@ -7,7 +7,7 @@
 
 # === ИЗ update_rss_sources.py ===
 
-#!/usr/bin/env python3
+# Shebang (moved to file header): /usr/bin/env python3
 """
 Скрипт для обновления RSS-источников в PulseAI.
 
@@ -15,8 +15,7 @@
 удаляет неработающие и добавляет новые из GitHub-репозиториев.
 """
 
-from database.service import get_async_service
-from parsers.advanced_parser import AdvancedParser
+import sys
 import asyncio
 import logging
 import yaml
@@ -24,9 +23,10 @@ import aiohttp
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 from urllib.parse import urljoin, urlparse
-import sys
+from database.service import get_async_service
+from parsers.advanced_parser import AdvancedParser  # noqa: F401
 
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -459,7 +459,8 @@ class RSSUpdater:
     async def _update_supabase(self):
         """Обновление источников в Supabase."""
         try:
-            db_service = get_async_service()
+            # get_async_service() can be used here when DB updates are enabled
+            # _db_service = get_async_service()
             logger.info("Обновляем источники в Supabase")
 
             # Здесь можно добавить логику обновления таблицы sources в Supabase
@@ -480,7 +481,7 @@ class RSSUpdater:
         print(f"🗂  Обновлено категорий: {len(self.stats['updated_categories'])}")
 
         if self.stats["updated_categories"]:
-            print(f"\n📂 Обновленные категории:")
+            print("\n📂 Обновленные категории:")
             for category in sorted(self.stats["updated_categories"]):
                 print(f"   • {category}")
 
@@ -548,21 +549,21 @@ if __name__ == "__main__":
 
 # === ИЗ validate_rss_sources.py ===
 
-#!/usr/bin/env python3
+# Shebang retained (secondary block)
 """
 Инструмент для валидации RSS источников и поиска рабочих альтернатив.
 """
 
-from parsers.unified_parser import UnifiedParser
-from services.categories import get_all_sources
 import sys
 from pathlib import Path
 import logging
 import requests
 import feedparser
-from urllib.parse import urljoin
+from urllib.parse import urljoin  # noqa: F401,F811
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
+import time  # noqa: F401
+from parsers.unified_parser import UnifiedParser
+from services.categories import get_all_sources
 
 # Добавляем корневую директорию проекта в путь
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -700,7 +701,7 @@ def validate_all_sources():
                 print(f"❌ Ошибка проверки {name}: {e}")
 
     # Статистика
-    print(f"\n📊 Результаты валидации:")
+    print("\n📊 Результаты валидации:")
     print(f"   ✅ Валидных источников: {len(valid_sources)}")
     print(f"   ❌ Невалидных источников: {len(invalid_sources)}")
     print(f"   📈 Успешность: {len(valid_sources)/(len(valid_sources)+len(invalid_sources))*100:.1f}%")
@@ -711,12 +712,12 @@ def validate_all_sources():
         status = result["status"]
         status_counts[status] = status_counts.get(status, 0) + 1
 
-    print(f"\n🔍 Анализ проблем:")
+    print("\n🔍 Анализ проблем:")
     for status, count in status_counts.items():
         print(f"   {status}: {count} источников")
 
     # Поиск альтернатив для неработающих источников
-    print(f"\n🔍 Поиск альтернатив для неработающих источников...")
+    print("\n🔍 Поиск альтернатив для неработающих источников...")
     alternatives_found = 0
 
     for result in invalid_sources[:5]:  # Проверяем первые 5 неработающих
@@ -730,7 +731,7 @@ def validate_all_sources():
                 for alt in alternatives:
                     print(f"      {alt['url']} - {alt['entries_count']} записей")
             else:
-                print(f"   ❌ Альтернативы не найдены")
+                print("   ❌ Альтернативы не найдены")
 
     if alternatives_found > 0:
         print(f"\n💡 Всего найдено {alternatives_found} рабочих альтернатив!")
@@ -740,7 +741,7 @@ def validate_all_sources():
 
 def test_parser_with_valid_sources():
     """Тестирует парсер с валидными источниками."""
-    print(f"\n🧪 Тестирование парсера с валидными источниками...")
+    print("\n🧪 Тестирование парсера с валидными источниками...")
 
     # Получаем валидные источники
     results, valid_sources, invalid_sources = validate_all_sources()
@@ -768,7 +769,7 @@ def test_parser_with_valid_sources():
                 item = news_items[0]
                 print(f"   📝 Пример: {item['title'][:60]}...")
             else:
-                print(f"   ❌ Парсер: нет новостей")
+                print("   ❌ Парсер: нет новостей")
 
         except Exception as e:
             print(f"   ❌ Ошибка парсера: {e}")

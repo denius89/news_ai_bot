@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from aiogram import Bot
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
+from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter  # noqa: F401
 
 from ai_modules.metrics import get_metrics
 

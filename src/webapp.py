@@ -1,11 +1,10 @@
 import logging
 import os
-from flask import Flask, render_template, send_from_directory, redirect, session, request, g
+from flask import Flask, send_from_directory, redirect, session, request, g
 from flask_cors import CORS
 from datetime import timedelta
 
 import sys
-import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -40,7 +39,7 @@ app.config.update(
 )
 
 # Middleware для единой аутентификации
-@app.before_request
+@app.before_request  # noqa: E302  # noqa: E302
 def authenticate_request():
     """Единая точка аутентификации для всех защищенных endpoints."""
     if request.path.startswith('/api/'):
@@ -57,10 +56,10 @@ def authenticate_request():
             '/api/dashboard/news_trend',
             '/api/events'  # Events API - публичный доступ
         ]
-        
+
         # Проверяем, является ли endpoint публичным
         is_public = any(request.path.startswith(path) for path in public_paths)
-        
+
         if not is_public:
             # Для защищенных endpoints проверяем аутентификацию
             bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -69,15 +68,15 @@ def authenticate_request():
                 session_data=session,
                 bot_token=bot_token
             )
-            
+
             if not auth_result['success']:
                 from flask import jsonify
                 logger.warning(f"Authentication failed for {request.path}: {auth_result['message']}")
                 return jsonify({'error': auth_result['message']}), 401
-            
+
             # Устанавливаем данные пользователя в g для использования в endpoints
             g.current_user = auth_result
-            
+
             # Устанавливаем session для быстрой повторной аутентификации
             if auth_result['method'] != 'session':
                 session['user_id'] = auth_result['user_id']
@@ -85,17 +84,17 @@ def authenticate_request():
                 session.permanent = True
 
 # Middleware для обработки Telegram WebApp запросов
-@app.before_request
+@app.before_request  # noqa: E302  # noqa: E302
 def process_telegram_request():
     """Обрабатывает Telegram WebApp запросы и устанавливает флаги."""
     from utils.auth.telegram_auth import is_telegram_webapp_request
     g.is_telegram_webapp = is_telegram_webapp_request(dict(request.headers))
-    
+
     if g.is_telegram_webapp:
         logger.debug(f"Telegram WebApp request detected: {request.path}")
 
 # Настройка CORS для Telegram WebApp
-CORS(app, origins=[
+CORS(app, origins=[  # noqa: E305
     "https://design-treasures-titten-formation.trycloudflare.com",
     "https://*.trycloudflare.com",
     "https://telegram.org",
@@ -103,7 +102,7 @@ CORS(app, origins=[
 ])
 
 # Middleware для разрешения встраивания в iframe (Telegram WebApp)
-@app.after_request
+@app.after_request  # noqa: E302  # noqa: E302
 def set_frame_options(response):
     """Устанавливает заголовки для разрешения встраивания в iframe"""
     response.headers['X-Frame-Options'] = 'ALLOWALL'
@@ -123,21 +122,21 @@ def set_frame_options(response):
     return response
 
 # Middleware для обработки Telegram WebApp заголовков
-@app.before_request
+@app.before_request  # noqa: E302
 def handle_telegram_headers():
     """Обработка заголовков Telegram WebApp"""
     from flask import request, g
-    
+
     # Логируем заголовки для отладки
     if request.headers.get('X-Telegram-Bot-Api-Secret-Token'):
         logger.info("🔍 Telegram WebApp request detected")
         logger.info(f"Headers: {dict(request.headers)}")
-    
+
     # Устанавливаем флаг для Telegram WebApp
     g.is_telegram_webapp = bool(request.headers.get('X-Telegram-Bot-Api-Secret-Token'))
 
 # Middleware для отключения кэширования API запросов
-@app.after_request
+@app.after_request  # noqa: E302
 def disable_api_caching(response):
     """Отключаем кэширование для всех API запросов"""
     from flask import request

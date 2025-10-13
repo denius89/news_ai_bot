@@ -1,6 +1,7 @@
 import sys
+from pathlib import Path
 
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 # telegram_bot/handlers/__init__.py
 from . import start, digest, digest_ai, events, dashboard, notifications, subscriptions

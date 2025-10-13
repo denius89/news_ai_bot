@@ -9,7 +9,7 @@ from database.service import get_async_service
 from ai_modules.metrics import get_metrics
 import asyncio
 import logging
-import re
+import re  # noqa: F401
 import time
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional, Any
@@ -216,11 +216,11 @@ class TelegramDigestHandler:
             # Build message
             message_parts = [
                 f"{emoji} *{title}*",
-                f"",
+                "",
                 f"🗞️ {summary}",
-                f"",
+                "",
                 f"💡 Почему это важно: {why_important}",
-                f"",
+                "",
                 f"📅 {date_str} | 🔗 {clean_source}",
             ]
 
@@ -237,11 +237,11 @@ class TelegramDigestHandler:
 
                 message_parts = [
                     f"{emoji} *{title}*",
-                    f"",
+                    "",
                     f"🗞️ {summary}",
-                    f"",
+                    "",
                     f"💡 Почему это важно: {why_important}",
-                    f"",
+                    "",
                     f"📅 {date_str} | 🔗 {clean_source}",
                 ]
 

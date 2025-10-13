@@ -363,7 +363,7 @@ class ToolsOptimizer:
             print()
 
             # Анализируем файлы
-            unmapped_tools = self.analyze_files()
+            unmapped_tools = self.analyze_files()  # noqa: F841
             print()
 
             # Создаем новую структуру

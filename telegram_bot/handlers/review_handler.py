@@ -8,16 +8,16 @@ allowing admins to review content before publication.
 import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Any, Callable
+from typing import Dict, Optional, Any, Callable
 from dataclasses import dataclass
 
 import yaml
 from pathlib import Path
 
-from aiogram import Bot, types
-from aiogram.filters import Command
+from aiogram import Bot  # noqa: F401
+from aiogram.filters import Command  # noqa: F401
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter
+from aiogram.exceptions import TelegramBadRequest, TelegramRetryAfter  # noqa: F401
 
 from ai_modules.metrics import get_metrics
 

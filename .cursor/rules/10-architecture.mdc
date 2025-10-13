@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+# Architecture
+- Layers: ai_modules/, digests/, core/, routes/, database/, webapp/, tools/
+- No cross-layer imports; background jobs in tools/
+- Postgres full-text search (no Elastic on MVP)
+- JSON logs with levels & request_id

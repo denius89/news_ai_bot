@@ -1,8 +1,97 @@
 """
-Simplified Unified Database Service for PulseAI.
+Module: database.service
+Purpose: Unified Database Service for PulseAI (Recommended)
+Location: database/service.py
 
-This module provides a clean, simplified interface for both synchronous
-and asynchronous database operations without complex coroutine handling.
+Description:
+    Современный унифицированный сервис для работы с базой данных через Supabase.
+    Поддерживает как синхронные, так и асинхронные операции в едином интерфейсе.
+
+    ✅ РЕКОМЕНДУЕТСЯ: Используйте этот модуль для нового кода вместо db_models
+
+Key Features:
+    - Unified API для sync и async операций
+    - Retry logic с exponential backoff
+    - Proper error handling и logging
+    - Type hints для всех методов
+    - HTTP/2 workaround для Supabase
+    - Factory functions для создания сервисов
+
+Architecture:
+    ```python
+    class DatabaseService:
+        def __init__(self, async_mode: bool = False)
+
+        # Sync methods
+        def get_latest_news()
+        def upsert_news()
+        def get_latest_events()
+        def upsert_event()
+
+        # Async methods
+        async def async_get_latest_news()
+        async def async_upsert_news()
+        async def async_get_latest_events()
+        async def async_upsert_event()
+
+    # Factory functions
+    def get_sync_service() -> DatabaseService
+    def get_async_service() -> DatabaseService
+    ```
+
+Dependencies:
+    External:
+        - supabase-py: Supabase Python client
+        - httpx: HTTP client with HTTP/2 support
+    Internal:
+        - config.core.settings: Configuration (правильный путь!)
+
+Usage Example:
+    ```python
+    from database.service import get_sync_service, get_async_service
+
+    # Sync usage
+    db_service = get_sync_service()
+    news = db_service.get_latest_news(limit=10)
+
+    # Async usage
+    async def fetch_data():
+        db_service = get_async_service()
+        news = await db_service.async_get_latest_news(limit=10)
+        return news
+    ```
+
+Migration from db_models:
+    ```python
+    # Старый способ (db_models):
+    from database.db_models import get_latest_news, upsert_news
+    news = get_latest_news(limit=10)
+    upsert_news(news_items)
+
+    # Новый способ (service):
+    from database.service import get_sync_service
+    db_service = get_sync_service()
+    news = db_service.get_latest_news(limit=10)
+    db_service.upsert_news(news_items)
+    ```
+
+Advantages over db_models:
+    - ✅ Object-oriented design
+    - ✅ Async support без сложностей
+    - ✅ Proper configuration management
+    - ✅ Better error handling
+    - ✅ Retry logic
+    - ✅ Type safety
+    - ✅ Testable (dependency injection ready)
+
+Notes:
+    - Загружает конфигурацию из config.core.settings (правильно!)
+    - HTTP/2 отключен для избежания pseudo-header errors
+    - Использует httpx transport для лучшей производительности
+    - Поддерживает как sync, так и async клиенты
+
+Author: PulseAI Team
+Last Updated: October 2025
 """
 
 import asyncio
@@ -14,11 +103,10 @@ from pathlib import Path
 import sys
 
 import httpx
-from httpx import HTTPTransport, AsyncHTTPTransport
 from supabase import create_client, create_async_client, Client, AsyncClient
 
 # Add project root to path
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ai_modules.credibility import evaluate_credibility  # noqa: E402
 from ai_modules.importance import evaluate_importance  # noqa: E402
@@ -65,7 +153,7 @@ class DatabaseService:
             import os
             os.environ["HTTPX_NO_HTTP2"] = "1"
             os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
-            
+
             self.sync_client = create_client(SUPABASE_URL, SUPABASE_KEY)
             logger.info("✅ Sync Supabase client initialized with HTTP/2 disabled via environment")
         except Exception as e:
@@ -320,8 +408,13 @@ class DatabaseService:
             logger.error("❌ Failed to get async client: %s", e)
             return []
 
-        logger.debug("async_get_latest_news_with_importance: source=%s, categories=%s, limit=%s, min_importance=%s", 
-                    source, categories, limit, min_importance)
+        logger.debug(
+            "async_get_latest_news_with_importance: source=%s, categories=%s, limit=%s, min_importance=%s",
+            source,
+            categories,
+            limit,
+            min_importance,
+        )
 
         query = (
             client.table("news")
@@ -502,6 +595,105 @@ class DatabaseService:
             await self.async_client.aclose()
             self.async_client = None
             logger.info("✅ Async client closed")
+
+    # User Management Methods
+    def get_user_by_telegram(self, telegram_id: int) -> Optional[Dict]:
+        """
+        Get user by Telegram ID.
+
+        Args:
+            telegram_id: Telegram user ID
+
+        Returns:
+            User data dict or None if not found
+        """
+        try:
+            query = self.sync_client.table("users").select("*").eq("telegram_id", telegram_id)
+            result = self.safe_execute(query)
+
+            if result.data and len(result.data) > 0:
+                return result.data[0]
+            return None
+
+        except Exception as e:
+            logger.error("❌ Error getting user by telegram_id %d: %s", telegram_id, e)
+            return None
+
+    def upsert_user_by_telegram(self, telegram_id: int, user_data: Dict) -> Optional[Dict]:
+        """
+        Upsert user by Telegram ID.
+
+        Args:
+            telegram_id: Telegram user ID
+            user_data: User data to upsert
+
+        Returns:
+            Upserted user data or None if failed
+        """
+        try:
+            # Add telegram_id to user_data
+            user_data["telegram_id"] = telegram_id
+
+            query = self.sync_client.table("users").upsert(user_data)
+            result = self.safe_execute(query)
+
+            if result.data and len(result.data) > 0:
+                return result.data[0]
+            return None
+
+        except Exception as e:
+            logger.error("❌ Error upserting user by telegram_id %d: %s", telegram_id, e)
+            return None
+
+    # Digest Management Methods
+    def save_digest(self, digest_data: Dict) -> Optional[str]:
+        """
+        Save digest to database.
+
+        Args:
+            digest_data: Digest data to save
+
+        Returns:
+            Digest ID or None if failed
+        """
+        try:
+            query = self.sync_client.table("digests").insert(digest_data)
+            result = self.safe_execute(query)
+
+            if result.data and len(result.data) > 0:
+                return result.data[0]["id"]
+            return None
+
+        except Exception as e:
+            logger.error("❌ Error saving digest: %s", e)
+            return None
+
+    def get_user_digests(self, user_id: str, limit: int = 10) -> List[Dict]:
+        """
+        Get user digests.
+
+        Args:
+            user_id: User ID
+            limit: Maximum number of digests to return
+
+        Returns:
+            List of digest data
+        """
+        try:
+            query = (
+                self.sync_client.table("digests")
+                .select("*")
+                .eq("user_id", user_id)
+                .order("created_at", desc=True)
+                .limit(limit)
+            )
+
+            result = self.safe_execute(query)
+            return result.data if result.data else []
+
+        except Exception as e:
+            logger.error("❌ Error getting user digests for user %s: %s", user_id, e)
+            return []
 
 
 # Global service instances for backward compatibility

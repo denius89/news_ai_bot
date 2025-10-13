@@ -125,7 +125,7 @@ class DigestAIService:
         if response:
             # Import JSON formatter
             from digests.json_formatter import format_json_digest_to_html, clean_json_from_text
-            
+
             # Check if response is JSON
             if response.strip().startswith('{') and response.strip().endswith('}'):
                 logger.info("Converting JSON response to HTML")
@@ -178,7 +178,7 @@ class DigestAIService:
         # Используем новую систему prompts_v2 если доступна и стиль поддерживается
         if PROMPTS_V2_AVAILABLE and style in STYLE_CARDS and category in CATEGORY_CARDS:
             logger.info(f"Using prompts_v2 for style: {style}, category: {category}")
-            
+
             # Создаем payload для новой системы
             input_payload = {
                 "category": category,
@@ -190,13 +190,13 @@ class DigestAIService:
                 "min_importance": 0.6,
                 "min_credibility": 0.7
             }
-            
+
             try:
                 system_prompt, user_prompt = build_prompt(input_payload)
                 return f"{system_prompt}\n\n{user_prompt}"
             except Exception as e:
                 logger.warning(f"Failed to use prompts_v2, falling back to legacy: {e}")
-        
+
         # Fallback к старой системе
         logger.info(f"Using legacy prompts for style: {style}, category: {category}")
         formatted_prompt = get_prompt_for_category(style, category)

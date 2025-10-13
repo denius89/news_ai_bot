@@ -238,11 +238,11 @@ def test_generate_summary_with_empty_data():
 
 def test_generate_summary_v2_tech_analytical():
     """Test v2 generation for tech/analytical style"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
-    
+
     # Mock news items
     news_items = [
         {
@@ -254,7 +254,7 @@ def test_generate_summary_v2_tech_analytical():
             "published_at": "2024-01-15T10:00:00Z"
         }
     ]
-    
+
     result = generate_summary_journalistic_v2(
         news_items=news_items,
         category="tech",
@@ -263,23 +263,23 @@ def test_generate_summary_v2_tech_analytical():
         length="medium",
         audience="general"
     )
-    
+
     assert isinstance(result, dict)
     assert "title" in result
     assert "summary" in result
     assert "why_important" in result
     assert "meta" in result
-    
+
     print("✅ V2 tech/analytical digest generated:", result["title"])
 
 
 def test_generate_summary_v2_crypto_newsroom():
     """Test v2 generation for crypto/newsroom style"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
-    
+
     news_items = [
         {
             "title": "Bitcoin достиг $50,000",
@@ -290,7 +290,7 @@ def test_generate_summary_v2_crypto_newsroom():
             "published_at": "2024-01-15T12:00:00Z"
         }
     ]
-    
+
     result = generate_summary_journalistic_v2(
         news_items=news_items,
         category="crypto",
@@ -299,18 +299,18 @@ def test_generate_summary_v2_crypto_newsroom():
         length="short",
         audience="pro"
     )
-    
+
     assert isinstance(result, dict)
     assert result["meta"]["style_profile"] == "newsroom"
     assert result["meta"]["tone"] == "neutral"
     assert result["meta"]["length"] == "short"
-    
+
     print("✅ V2 crypto/newsroom digest generated:", result["title"])
 
 
 def test_validate_sources_low_importance():
     """Test that low importance sources are skipped"""
-    
+
     news_items = [
         {
             "title": "Low importance news",
@@ -321,7 +321,7 @@ def test_validate_sources_low_importance():
             "published_at": "2024-01-15T10:00:00Z"
         }
     ]
-    
+
     result = generate_summary_journalistic_v2(
         news_items=news_items,
         category="tech",
@@ -329,20 +329,20 @@ def test_validate_sources_low_importance():
         min_importance=0.6,
         min_credibility=0.7
     )
-    
+
     assert "skipped_reason" in result
     assert "low importance" in result["skipped_reason"]
-    
+
     print("✅ Low importance sources correctly skipped")
 
 
 def test_output_schema_validation():
     """Test that output matches v2 schema"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
-    
+
     news_items = [
         {
             "title": "Test news",
@@ -353,7 +353,7 @@ def test_output_schema_validation():
             "published_at": "2024-01-15T10:00:00Z"
         }
     ]
-    
+
     result = generate_summary_journalistic_v2(
         news_items=news_items,
         category="tech",
@@ -362,27 +362,27 @@ def test_output_schema_validation():
         length="long",
         audience="general"
     )
-    
+
     # Check required fields
     required_fields = ["title", "dek", "summary", "why_important", "meta"]
     for field in required_fields:
         assert field in result, f"Missing required field: {field}"
-    
+
     # Check meta structure
     meta = result["meta"]
     meta_fields = ["style_profile", "tone", "length", "audience", "confidence"]
     for field in meta_fields:
         assert field in meta, f"Missing meta field: {field}"
-    
+
     # Check confidence range
     assert 0.0 <= meta["confidence"] <= 1.0
-    
+
     print("✅ V2 schema validation passed")
 
 
 def test_fallback_to_v1():
     """Test fallback when v2 is not available"""
-    
+
     # Mock the case where v2 prompts are not available
     with pytest.patch("digests.ai_summary.HAS_V2", False):
         news_items = [
@@ -395,27 +395,27 @@ def test_fallback_to_v1():
                 "published_at": "2024-01-15T10:00:00Z"
             }
         ]
-        
+
         result = generate_summary_journalistic_v2(
             news_items=news_items,
             category="tech",
             style_profile="analytical"
         )
-        
+
         assert "fallback" in result
         assert result["fallback"] is True
         assert "legacy_result" in result
-        
+
         print("✅ V2 fallback to v1 working correctly")
 
 
 def test_all_style_profiles():
     """Test all 4 style profiles"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
-    
+
     news_items = [
         {
             "title": "Test news",
@@ -426,9 +426,9 @@ def test_all_style_profiles():
             "published_at": "2024-01-15T10:00:00Z"
         }
     ]
-    
+
     styles = ["newsroom", "analytical", "magazine", "casual"]
-    
+
     for style in styles:
         result = generate_summary_journalistic_v2(
             news_items=news_items,
@@ -437,21 +437,21 @@ def test_all_style_profiles():
             tone="neutral",
             length="medium"
         )
-        
+
         assert isinstance(result, dict)
         if "meta" in result:
             assert result["meta"]["style_profile"] == style
-        
+
         print(f"✅ Style {style} working correctly")
 
 
 def test_all_tones():
     """Test all tone options"""
-    
+
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         pytest.skip("❌ Нет OPENAI_API_KEY в .env")
-    
+
     news_items = [
         {
             "title": "Test news",
@@ -462,9 +462,9 @@ def test_all_tones():
             "published_at": "2024-01-15T10:00:00Z"
         }
     ]
-    
+
     tones = ["neutral", "insightful", "critical", "optimistic"]
-    
+
     for tone in tones:
         result = generate_summary_journalistic_v2(
             news_items=news_items,
@@ -473,9 +473,9 @@ def test_all_tones():
             tone=tone,
             length="medium"
         )
-        
+
         assert isinstance(result, dict)
         if "meta" in result:
             assert result["meta"]["tone"] == tone
-        
+
         print(f"✅ Tone {tone} working correctly")

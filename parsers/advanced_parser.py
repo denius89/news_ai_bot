@@ -1,18 +1,87 @@
 """
-Advanced News Parser for PulseAI
+Module: parsers.advanced_parser
+Purpose: Advanced News Parser with AI-powered content extraction
+Location: parsers/advanced_parser.py
 
-Умный универсальный парсер новостей, который объединяет лучшие решения для извлечения контента.
-Автоматически определяет тип источника (RSS/HTML/API) и применяет каскадную стратегию извлечения:
-1. news-please (приоритет 1)
-2. Fundus (приоритет 2)
-3. trafilatura (fallback)
-4. AutoScraper (последний шанс)
+Description:
+    Умный универсальный парсер новостей, который объединяет лучшие решения для извлечения контента.
+    Автоматически определяет тип источника (RSS/HTML/API) и применяет каскадную стратегию извлечения.
 
-Применяет AI-фильтры для оценки важности и достоверности, сохраняет только релевантные новости.
+    ✅ РЕКОМЕНДУЕТСЯ: Основной парсер для production использования
 
-Пример использования:
+Key Features:
+    - Каскадная стратегия извлечения контента (4 уровня fallback)
+    - AI-powered фильтрация важности и достоверности
+    - Поддержка множественных источников (RSS, HTML, API)
+    - Async/await архитектура для высокой производительности
+    - Автоматическое определение типа источника
+    - Retry logic с exponential backoff
+
+Extraction Strategy (Priority Order):
+    1. news-please (приоритет 1) - лучший для большинства сайтов
+    2. Fundus (приоритет 2) - специализированный для новостей
+    3. trafilatura (fallback) - универсальный extractor
+    4. AutoScraper (последний шанс) - когда все остальное не работает
+
+AI Processing:
+    - evaluate_importance(): Оценка важности новости (0.1-1.0)
+    - evaluate_credibility(): Оценка достоверности источника
+    - Фильтрация: сохраняет только релевантные новости
+
+Dependencies:
+    External:
+        - news-please: News content extraction
+        - fundus: News-specific extraction
+        - trafilatura: Universal content extraction
+        - autoscraper: Fallback extraction
+        - httpx: Async HTTP client
+    Internal:
+        - database.service: Database operations (modern approach)
+        - ai_modules.importance: Importance scoring
+        - ai_modules.credibility: Credibility scoring
+        - config.data.sources: Source configuration
+
+Usage Example:
+    ```python
     from parsers.advanced_parser import AdvancedParser
-    asyncio.run(AdvancedParser().run())
+
+    # Async context manager (recommended)
+    async with AdvancedParser() as parser:
+        await parser.run()
+
+    # Manual usage
+    parser = AdvancedParser()
+    await parser._init_session()
+    await parser._load_sources_config()
+    await parser.run()
+    ```
+
+Configuration:
+    Sources configuration in `config/data/sources.yaml`:
+    ```yaml
+    sources:
+      - name: "TechCrunch"
+        url: "https://techcrunch.com/feed/"
+        type: "rss"
+        category: "tech"
+        enabled: true
+    ```
+
+Performance:
+    - Async processing для высокой производительности
+    - Batch processing источников
+    - Connection pooling через httpx
+    - Retry logic для надежности
+
+Notes:
+    - Использует современный database.service (не legacy db_models)
+    - Поддерживает async context manager
+    - Автоматически загружает конфигурацию источников
+    - Логирует детальную информацию о процессе
+    - TODO: Добавить metrics и monitoring
+
+Author: PulseAI Team
+Last Updated: October 2025
 """
 
 import asyncio

@@ -175,8 +175,8 @@ class UnifiedDigestService:
             # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ С ФИЛЬТРАЦИЕЙ ПО ВАЖНОСТИ
             if min_importance is not None:
                 news_items = await self.db_service.async_get_latest_news_with_importance(
-                    categories=categories, 
-                    limit=limit, 
+                    categories=categories,
+                    limit=limit,
                     min_importance=min_importance
                 )
             else:

@@ -8,7 +8,7 @@ to the new DigestAIService for digest generation.
 import argparse
 import logging
 import asyncio
-import time
+import time  # noqa: F401
 from typing import Optional, List
 
 from database.db_models import supabase
@@ -22,16 +22,16 @@ logger = logging.getLogger("generator")
 def _convert_v2_to_text(v2_result: dict) -> str:
     """
     Convert v2 digest result to text format for backward compatibility.
-    
+
     Args:
         v2_result: Dictionary with v2 digest structure
-    
+
     Returns:
         Formatted text string
     """
     if not v2_result:
         return "Ошибка конвертации v2 результата"
-    
+
     # Extract main content
     title = v2_result.get("title", "Дайджест новостей")
     dek = v2_result.get("dek", "")
@@ -40,30 +40,30 @@ def _convert_v2_to_text(v2_result: dict) -> str:
     context = v2_result.get("context", "")
     what_next = v2_result.get("what_next", "")
     sources_cited = v2_result.get("sources_cited", [])
-    
+
     # Build text
     text_parts = [f"<b>{title}</b>"]
-    
+
     if dek:
         text_parts.append(f"<i>{dek}</i>")
-    
+
     if summary:
         text_parts.append(f"\n{summary}")
-    
+
     if why_important:
         text_parts.append("\n<b>Почему это важно:</b>")
         for item in why_important:
             text_parts.append(f"— {item}")
-    
+
     if context:
         text_parts.append(f"\n<b>Контекст:</b> {context}")
-    
+
     if what_next:
         text_parts.append(f"\n<b>Что дальше:</b> {what_next}")
-    
+
     if sources_cited:
         text_parts.append(f"\n<b>Источники:</b> {', '.join(sources_cited)}")
-    
+
     return "\n".join(text_parts)
 
 
@@ -132,9 +132,9 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[N
 
 
 async def generate_digest(
-    limit: int = 10, 
-    category: Optional[str] = None, 
-    ai: bool = False, 
+    limit: int = 10,
+    category: Optional[str] = None,
+    ai: bool = False,
     style: str = "analytical",
     # NEW PARAMETERS
     tone: str = "neutral",
@@ -169,12 +169,12 @@ async def generate_digest(
         if ai:
             # Определяем категорию для контекста промта
             digest_category = category or "world"
-            
+
             # Try v2 generation if enabled
             if use_v2:
                 try:
                     from digests.ai_summary import generate_summary_journalistic_v2
-                    
+
                     # Generate v2 digest
                     v2_result = generate_summary_journalistic_v2(
                         news_items=news_items,
@@ -185,22 +185,22 @@ async def generate_digest(
                         audience=audience,
                         max_tokens=800
                     )
-                    
+
                     # Check if v2 generation was successful
                     if "error" not in v2_result and "skipped_reason" not in v2_result:
                         # Convert v2 result to text format
                         digest_text = _convert_v2_to_text(v2_result)
                         logger.info(f"Successfully generated v2 digest with style: {style}, tone: {tone}")
-                        
+
                         # Save metrics to database if user_id provided
                         if user_id and "meta" in v2_result:
                             try:
                                 from database.db_models import save_digest_with_metrics
-                                
+
                                 meta = v2_result["meta"]
                                 confidence = meta.get("confidence", 0.0)
                                 generation_time_sec = meta.get("generation_time_sec", 0.0)
-                                
+
                                 digest_id = save_digest_with_metrics(
                                     user_id=user_id,
                                     summary=digest_text,
@@ -210,10 +210,10 @@ async def generate_digest(
                                     generation_time_sec=generation_time_sec,
                                     meta=meta
                                 )
-                                
+
                                 if digest_id:
                                     logger.info(f"✅ Digest metrics saved: {digest_id}")
-                                
+
                             except Exception as e:
                                 logger.warning(f"Failed to save digest metrics: {e}")
                     else:
@@ -275,9 +275,9 @@ def main():
 
     # Generate digest
     digest = asyncio.run(generate_digest(
-        limit=args.limit, 
-        category=args.category, 
-        ai=args.ai, 
+        limit=args.limit,
+        category=args.category,
+        ai=args.ai,
         style=args.style,
         tone=args.tone,
         length=args.length,

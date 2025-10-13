@@ -1,8 +1,123 @@
 """
-Events Parser for PulseAI.
+Module: events.events_parser
+Purpose: Unified event parsing and normalization system
+Location: events/events_parser.py
 
-This module provides unified event parsing and normalization
-across different event providers and sources.
+Description:
+    Унифицированная система парсинга и нормализации событий из различных провайдеров.
+    Обрабатывает события из спорта, криптовалют, технологий и других источников.
+
+Key Features:
+    - Unified API для всех event providers
+    - Автоматическая нормализация данных
+    - Поддержка множественных форматов времени
+    - Группировка событий по категориям
+    - Async processing для высокой производительности
+    - Retry logic и error handling
+
+Supported Providers:
+    Sports:
+        - Football-Data.org: Футбольные матчи и результаты
+        - TheSportsDB: Спортивные события и статистика
+        - PandaScore: Esports и традиционные виды спорта
+
+    Crypto:
+        - CoinMarketCal: Криптовалютные события и релизы
+        - CoinGecko: Market events и announcements
+        - GitHub Releases: Технические релизы
+
+    Tech:
+        - GitHub Releases: Software releases
+        - Finnhub: Financial events
+        - Custom sources: Конференции, вебинары
+
+Event Normalization:
+    Все события приводятся к единому формату:
+    ```python
+    {
+        "title": str,
+        "category": str,           # sports, crypto, tech, etc.
+        "subcategory": str,        # football, bitcoin, conference, etc.
+        "starts_at": datetime,     # UTC time
+        "ends_at": datetime,       # UTC time (optional)
+        "source": str,            # provider name
+        "link": str,              # event URL
+        "importance": float,       # 0.1-1.0
+        "description": str,       # event description
+        "location": str,          # physical location
+        "organizer": str,         # event organizer
+        "group_name": str,        # для умной группировки
+        "metadata": dict          # provider-specific data
+    }
+    ```
+
+Dependencies:
+    External:
+        - httpx: Async HTTP client
+        - python-dateutil: Date parsing
+    Internal:
+        - events.providers.*: Provider implementations
+        - database.events_service: Event storage
+        - utils.system.dates: Date utilities
+
+Usage Example:
+    ```python
+    from events.events_parser import EventsParser
+
+    # Async context manager
+    async with EventsParser() as parser:
+        await parser.run()
+
+    # Manual usage
+    parser = EventsParser()
+    await parser.parse_all_providers()
+    ```
+
+Provider Architecture:
+    ```
+    EventsParser
+    ├── Sports Providers
+    │   ├── FootballDataProvider
+    │   ├── TheSportsDBProvider
+    │   └── PandaScoreProvider
+    ├── Crypto Providers
+    │   ├── CoinMarketCalProvider
+    │   └── CoinGeckoProvider
+    └── Tech Providers
+        ├── GitHubReleasesProvider
+        └── FinnhubProvider
+    ```
+
+Configuration:
+    Provider configuration in `config/data/providers.yaml`:
+    ```yaml
+    providers:
+      football_data:
+        enabled: true
+        api_key: "${FOOTBALL_DATA_API_KEY}"
+        leagues: ["premier-league", "champions-league"]
+
+      coinmarketcal:
+        enabled: true
+        api_key: "${COINMARKETCAL_API_KEY}"
+        coins: ["bitcoin", "ethereum"]
+    ```
+
+Performance:
+    - Async processing всех провайдеров
+    - Batch operations для database
+    - Connection pooling
+    - Rate limiting для API providers
+
+Notes:
+    - Использует events_service для database операций
+    - Поддерживает умную группировку событий
+    - Автоматически обрабатывает timezone conversion
+    - Логирует детальную информацию о процессе
+    - TODO: Добавить metrics и monitoring
+
+Author: PulseAI Team
+Last Updated: October 2025
 """
 
 import asyncio
@@ -103,14 +218,14 @@ class EventsParser:
             # Special cases for camelCase names
             name_mapping = {
                 "coinmarketcal": "CoinMarketCalProvider",
-                "coingecko": "CoinGeckoProvider", 
+                "coingecko": "CoinGeckoProvider",
                 "defillama": "DeFiLlamaProvider",
                 "tokenunlocks": "TokenUnlocksProvider",
                 "football_data": "FootballDataProvider",
                 "thesportsdb": "TheSportsDBProvider",
                 "github_releases": "GithubReleasesProvider"
             }
-            
+
             if provider_name in name_mapping:
                 class_name = name_mapping[provider_name]
             else:

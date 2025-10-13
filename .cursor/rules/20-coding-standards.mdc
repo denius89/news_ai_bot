@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+# Python & Flask
+- PEP8, typing, Google docstrings; imports stdlib→3rd→local
+- Blueprints; thin routes; JSON-only API
+
+# React / WebApp
+- Function components + hooks; Tailwind, shadcn/ui, Framer Motion
+- Mobile-first; verify dark mode; minimal UI

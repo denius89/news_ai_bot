@@ -68,22 +68,22 @@ async def fetch_and_store_events(
         # Fetch events from providers
         logger.info(f"Fetching events from providers: {providers or 'all'}")
         events = await parser.fetch_events(start_date, end_date, providers)
-        
+
         # ML-фильтрация v2: Calculate importance scores
         from ai_modules.importance_v2 import evaluator_v2
-        
+
         for event in events:
             # Convert event to dict if needed
             event_dict = event.__dict__ if hasattr(event, '__dict__') else event
-            
+
             # Calculate ML importance score
             importance_score = evaluator_v2.evaluate_importance(event_dict)
             event.importance_score = importance_score
-            
+
             # Store in event dict for database
             if hasattr(event, '__dict__'):
                 event.__dict__['importance_score'] = importance_score
-        
+
         # AI Filtering: Filter by ML importance_score >= 0.6
         filtered_events = [event for event in events if getattr(event, 'importance_score', 0) >= 0.6]
         logger.info(f"ML Filtered (v2): {len(events)} -> {len(filtered_events)} events (importance_score >= 0.6)")
@@ -217,7 +217,7 @@ def main():
         nargs="+",
         help="Specific providers to use (default: all enabled)",
     )
-    
+
     parser.add_argument(
         "--categories",
         nargs="+",

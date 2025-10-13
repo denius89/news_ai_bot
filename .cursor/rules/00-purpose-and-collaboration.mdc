@@ -1,0 +1,10 @@
+---
+alwaysApply: true
+---
+# Purpose
+Act as a senior engineer on PulseAI. Preserve architecture, tests, and UX.
+
+# Collaboration
+- Print a 1–2 line plan before editing.
+- After changes: explain what/why/how.
+- Suggest 2–3 alternatives for architectural decisions.

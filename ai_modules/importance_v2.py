@@ -7,7 +7,6 @@ instead of relying solely on AI prompts.
 
 import logging
 from typing import Dict
-import re
 
 logger = logging.getLogger("importance_v2")
 
@@ -54,10 +53,10 @@ class ImportanceEvaluatorV2:
     def evaluate_importance(self, event: Dict) -> float:
         """
         Evaluate event importance using ML features.
-        
+
         Args:
             event: Event dictionary with title, description, category, etc.
-        
+
         Returns:
             float: Importance score [0.0, 1.0]
         """
@@ -76,10 +75,10 @@ class ImportanceEvaluatorV2:
         category = event.get('category', '').lower()
         subcategory = event.get('subcategory', '').lower()
         metadata = event.get('metadata', {})
-        
+
         # Combine text for keyword analysis
         full_text = f"{title} {description}"
-        
+
         return {
             'title_length': len(title),
             'description_length': len(description),
@@ -101,54 +100,54 @@ class ImportanceEvaluatorV2:
             keywords = self.HIGH_IMPORTANCE_KEYWORDS.get(category, [])
         else:
             keywords = self.MEDIUM_IMPORTANCE_KEYWORDS.get(category, [])
-        
+
         count = sum(1 for keyword in keywords if keyword in text)
         return count
 
     def _calculate_score(self, features: Dict) -> float:
         """
         Calculate importance score from features.
-        
+
         Uses weighted combination of multiple signals.
         """
         # Start with provider's base importance
         score = features['source_importance']
-        
+
         # High importance keywords (strong signal)
         if features['high_keyword_count'] > 0:
             score += 0.15 * min(features['high_keyword_count'], 3)
-        
+
         # Medium importance keywords (moderate signal)
         if features['medium_keyword_count'] > 0:
             score += 0.05 * min(features['medium_keyword_count'], 2)
-        
+
         # Description quality bonus
         if features['has_description']:
             if features['description_length'] > 200:
                 score += 0.1
             elif features['description_length'] > 100:
                 score += 0.05
-        
+
         # Metadata richness (indicates well-structured event)
         if features['metadata_richness'] >= 5:
             score += 0.08
         elif features['metadata_richness'] >= 3:
             score += 0.04
-        
+
         # Location and organizer (indicates official event)
         if features['has_location'] and features['has_organizer']:
             score += 0.05
-        
+
         # Category-specific adjustments
         if features['category'] in ['markets', 'world']:
             score += 0.05  # Financial and geopolitical events tend to be important
         elif features['category'] == 'crypto' and 'defi' in features['subcategory']:
             score += 0.03  # DeFi events are often significant
-        
+
         # Title length penalty (very short titles might be incomplete)
         if features['title_length'] < 20:
             score -= 0.05
-        
+
         return score
 
 
@@ -159,10 +158,10 @@ evaluator_v2 = ImportanceEvaluatorV2()
 def evaluate_event_importance(event: Dict) -> float:
     """
     Convenience function to evaluate event importance.
-    
+
     Args:
         event: Event dictionary
-    
+
     Returns:
         float: Importance score [0.0, 1.0]
     """
@@ -170,4 +169,3 @@ def evaluate_event_importance(event: Dict) -> float:
 
 
 __all__ = ['ImportanceEvaluatorV2', 'evaluator_v2', 'evaluate_event_importance']
-

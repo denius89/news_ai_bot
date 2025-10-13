@@ -1,12 +1,90 @@
 """
-Events API Routes for PulseAI.
+Module: routes.events_routes
+Purpose: Events API endpoints and calendar functionality
+Location: routes/events_routes.py
 
-This module provides API endpoints for events and calendar functionality.
+Description:
+    Flask Blueprint для API endpoints событий и календарной функциональности.
+    Предоставляет REST API для получения событий, фильтрации и группировки.
+
+Key Endpoints:
+    GET  /api/events - Получить события с фильтрацией
+    GET  /api/events/upcoming - Получить предстоящие события
+    GET  /api/events/by-date - События по дате
+    GET  /api/events/categories - Список категорий событий
+    GET  /api/events/groups - Группы событий для умной группировки
+
+Query Parameters:
+    - limit: Количество событий (default: 50)
+    - category: Фильтр по категории
+    - group_name: Фильтр по группе
+    - start_date: Начальная дата (ISO format)
+    - end_date: Конечная дата (ISO format)
+    - importance_min: Минимальная важность (0.1-1.0)
+
+Dependencies:
+    External:
+        - Flask: Web framework
+    Internal:
+        - database.events_service: Events database operations
+        - database.db_models: Legacy database operations
+
+Usage Example:
+    ```python
+    # Получить события
+    GET /api/events?limit=20&category=sports&group_name=premier-league
+    Response: {
+        "events": [...],
+        "total": 150,
+        "groups": [...]
+    }
+
+    # События по дате
+    GET /api/events/by-date?date=2025-10-15
+    Response: {"events": [...]}
+    ```
+
+Response Format:
+    ```json
+    {
+        "events": [
+            {
+                "id": 123,
+                "title": "Event Title",
+                "category": "sports",
+                "subcategory": "football",
+                "starts_at": "2025-10-15T15:00:00Z",
+                "ends_at": "2025-10-15T17:00:00Z",
+                "source": "provider",
+                "link": "https://...",
+                "importance": 0.8,
+                "description": "Event description",
+                "location": "Location",
+                "organizer": "Organizer",
+                "group_name": "premier-league",
+                "metadata": {...},
+                "created_at": "2025-10-13T10:00:00Z"
+            }
+        ],
+        "total": 150,
+        "groups": ["premier-league", "champions-league"],
+        "categories": ["sports", "tech", "crypto"]
+    }
+    ```
+
+Notes:
+    - Использует events_service для новых операций
+    - Поддерживает умную группировку по group_name
+    - Возвращает время в UTC ISO format
+    - Поддерживает фильтрацию по metadata
+    - TODO: Добавить caching для часто запрашиваемых данных
+
+Author: PulseAI Team
+Last Updated: October 2025
 """
 
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Any
 
 from flask import Blueprint, jsonify, request
 from flask_cors import cross_origin
@@ -45,41 +123,94 @@ def get_events():
         # Parse dates
         if from_date_str:
             try:
-                from_date = datetime.strptime(from_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                from_date = datetime.strptime(
+                    from_date_str, "%Y-%m-%d"
+                ).replace(tzinfo=timezone.utc)
             except ValueError:
-                return jsonify({"success": False, "error": "Invalid from date format. Use YYYY-MM-DD"}), 400
+                return (
+                    jsonify(
+                        {
+                            "success": False,
+                            "error": "Invalid from date format. Use YYYY-MM-DD",
+                        }
+                    ),
+                    400,
+                )
         else:
             # Default to today
-            from_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            from_date = datetime.now(timezone.utc).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
 
         if to_date_str:
             try:
                 to_date = datetime.strptime(to_date_str, "%Y-%m-%d").replace(
-                    hour=23, minute=59, second=59, microsecond=999999, tzinfo=timezone.utc
+                    hour=23,
+                    minute=59,
+                    second=59,
+                    microsecond=999999,
+                    tzinfo=timezone.utc,
                 )
             except ValueError:
-                return jsonify({"success": False, "error": "Invalid to date format. Use YYYY-MM-DD"}), 400
+                return (
+                    jsonify(
+                        {
+                            "success": False,
+                            "error": "Invalid to date format. Use YYYY-MM-DD",
+                        }
+                    ),
+                    400,
+                )
         else:
             # Default to 30 days from start date
             to_date = from_date + timedelta(days=30)
 
         # Validate date range
         if from_date > to_date:
-            return jsonify({"success": False, "error": "From date must be before or equal to to date"}), 400
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "From date must be before or equal to to date",
+                    }
+                ),
+                400,
+            )
 
         # Validate parameters
         if min_importance < 0 or min_importance > 1:
-            return jsonify({"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "min_importance must be between 0.0 and 1.0",
+                    }
+                ),
+                400,
+            )
 
         if limit <= 0 or limit > 1000:
-            return jsonify({"success": False, "error": "limit must be between 1 and 1000"}), 400
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "limit must be between 1 and 1000",
+                    }
+                ),
+                400,
+            )
 
         # Get events service
         events_service = get_events_service()
 
         # Fetch events
         import asyncio
-        events = asyncio.run(events_service.get_events_by_date_range(from_date, to_date, category))
+
+        events = asyncio.run(
+            events_service.get_events_by_date_range(
+                from_date, to_date, category
+            )
+        )
 
         # Filter by subcategory if specified
         if subcategory:
@@ -100,7 +231,9 @@ def get_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": event.ends_at.isoformat() if event.ends_at else None,
+                "ends_at": (
+                    event.ends_at.isoformat() if event.ends_at else None
+                ),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -117,8 +250,15 @@ def get_events():
                 "data": {
                     "events": events_data,
                     "count": len(events_data),
-                    "date_range": {"from": from_date.isoformat(), "to": to_date.isoformat()},
-                    "filters": {"category": category, "subcategory": subcategory, "min_importance": min_importance},
+                    "date_range": {
+                        "from": from_date.isoformat(),
+                        "to": to_date.isoformat(),
+                    },
+                    "filters": {
+                        "category": category,
+                        "subcategory": subcategory,
+                        "min_importance": min_importance,
+                    },
                 },
             }
         )
@@ -147,10 +287,26 @@ def get_upcoming_events():
 
         # Validate parameters
         if days <= 0 or days > 365:
-            return jsonify({"success": False, "error": "days must be between 1 and 365"}), 400
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "days must be between 1 and 365",
+                    }
+                ),
+                400,
+            )
 
         if min_importance < 0 or min_importance > 1:
-            return jsonify({"success": False, "error": "min_importance must be between 0.0 and 1.0"}), 400
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "min_importance must be between 0.0 and 1.0",
+                    }
+                ),
+                400,
+            )
 
         # Get events service
         events_service = get_events_service()
@@ -169,7 +325,9 @@ def get_upcoming_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": event.ends_at.isoformat() if event.ends_at else None,
+                "ends_at": (
+                    event.ends_at.isoformat() if event.ends_at else None
+                ),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -187,7 +345,10 @@ def get_upcoming_events():
                     "events": events_data,
                     "count": len(events_data),
                     "days_ahead": days,
-                    "filters": {"category": category, "min_importance": min_importance},
+                    "filters": {
+                        "category": category,
+                        "min_importance": min_importance,
+                    },
                 },
             }
         )
@@ -215,7 +376,10 @@ def get_today_events():
 
         # Fetch today's events
         import asyncio
-        events = asyncio.run(events_service.get_today_events(category=category))
+
+        events = asyncio.run(
+            events_service.get_today_events(category=category)
+        )
 
         # Convert to JSON format
         events_data = []
@@ -226,7 +390,9 @@ def get_today_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": event.ends_at.isoformat() if event.ends_at else None,
+                "ends_at": (
+                    event.ends_at.isoformat() if event.ends_at else None
+                ),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -343,9 +509,14 @@ def get_events_stats():
 
         # Get various event counts
         import asyncio
+
         today_events = asyncio.run(events_service.get_today_events())
-        upcoming_events = asyncio.run(events_service.get_upcoming_events(days_ahead=7))
-        upcoming_30d = asyncio.run(events_service.get_upcoming_events(days_ahead=30))
+        upcoming_events = asyncio.run(
+            events_service.get_upcoming_events(days_ahead=7)
+        )
+        upcoming_30d = asyncio.run(
+            events_service.get_upcoming_events(days_ahead=30)
+        )
 
         # Calculate statistics
         stats = {
@@ -363,7 +534,9 @@ def get_events_stats():
             category_counts = {}
             for event in event_list:
                 category = event.category
-                category_counts[category] = category_counts.get(category, 0) + 1
+                category_counts[category] = (
+                    category_counts.get(category, 0) + 1
+                )
             stats[key]["by_category"] = category_counts
 
         return jsonify({"success": True, "data": stats})
@@ -379,29 +552,39 @@ def get_event_result(event_id):
     """Get result data for completed event."""
     try:
         from database.db_models import supabase
-        
+
         if not supabase:
-            return jsonify({"success": False, "error": "Database not available"}), 500
-        
+            return (
+                jsonify({"success": False, "error": "Database not available"}),
+                500,
+            )
+
         # Get event with result data
-        result = supabase.table("events_new").select("*").eq("id", event_id).execute()
-        
+        result = (
+            supabase.table("events_new")
+            .select("*")
+            .eq("id", event_id)
+            .execute()
+        )
+
         if not result.data:
             return jsonify({"success": False, "error": "Event not found"}), 404
-        
+
         event = result.data[0]
-        
-        return jsonify({
-            "success": True,
-            "data": {
-                "id": event["id"],
-                "title": event["title"],
-                "status": event["status"],
-                "result_data": event.get("result_data"),
-                "updated_at": event.get("updated_at"),
+
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "id": event["id"],
+                    "title": event["title"],
+                    "status": event["status"],
+                    "result_data": event.get("result_data"),
+                    "updated_at": event.get("updated_at"),
+                },
             }
-        })
-        
+        )
+
     except Exception as e:
         logger.error(f"Error getting event result: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
@@ -413,26 +596,31 @@ def get_event_categories():
     """Get available event categories with counts."""
     try:
         from database.db_models import supabase
-        
+
         if not supabase:
-            return jsonify({"success": False, "error": "Database not available"}), 500
-        
+            return (
+                jsonify({"success": False, "error": "Database not available"}),
+                500,
+            )
+
         # Get category counts
         result = supabase.table("events_new").select("category").execute()
-        
+
         category_counts = {}
         for event in result.data:
             category = event["category"]
             category_counts[category] = category_counts.get(category, 0) + 1
-        
-        return jsonify({
-            "success": True,
-            "data": {
-                "categories": category_counts,
-                "total_events": sum(category_counts.values()),
+
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "categories": category_counts,
+                    "total_events": sum(category_counts.values()),
+                },
             }
-        })
-        
+        )
+
     except Exception as e:
         logger.error(f"Error getting event categories: {e}")
         return jsonify({"success": False, "error": str(e)}), 500

@@ -111,4 +111,3 @@ class DefiLlamaProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error checking protocol for events: {e}")
             return None
-

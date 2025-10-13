@@ -4,8 +4,7 @@
 """
 
 import logging
-import random
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
@@ -163,7 +162,7 @@ def distribute_news_weighted(
         news_by_category[category].sort(key=calculate_news_score, reverse=True)
 
     # Рассчитываем количество новостей для каждой категории
-    category_limits = {}
+    category_limits = {}  # noqa: F841
     available_categories = list(news_by_category.keys())
 
     # Нормализуем веса для доступных категорий
@@ -172,7 +171,7 @@ def distribute_news_weighted(
 
     # Распределяем новости
     distributed_news = []
-    remaining_limit = total_limit
+    remaining_limit = total_limit  # noqa: F841
 
     for category in available_categories:
         weight = normalized_weights[category]

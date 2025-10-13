@@ -6,13 +6,11 @@ import logging
 from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.types import (
-    ReplyKeyboardMarkup,
-    KeyboardButton,
     WebAppInfo,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
-from telegram_bot.keyboards import back_inline_keyboard
+from telegram_bot.keyboards import back_inline_keyboard  # noqa: F401
 from config.core.settings import WEBAPP_URL
 
 logger = logging.getLogger(__name__)

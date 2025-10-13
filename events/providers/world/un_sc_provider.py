@@ -117,4 +117,3 @@ class UNSecurityCouncilProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing meeting element: {e}")
             return None
-

@@ -20,6 +20,9 @@ from utils.text.formatters import format_digest_output
 from models.news import NewsItem
 from utils.text.clean_text import clean_for_telegram
 
+# Setup logger
+logger = logging.getLogger(__name__)
+
 # Try to import v2 prompts for backward compatibility
 try:
     from digests.prompts_v2 import build_prompt, validate_sources, validate_output_schema, calculate_confidence_score
@@ -29,7 +32,7 @@ except ImportError:
     logger.warning("prompts_v2 not found, using legacy prompts")
 
 # Загружаем переменные окружения из .env файла
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / "environment" / ".env")
 
@@ -128,7 +131,7 @@ def generate_batch_summary(
             temperature=_TEMPS.get(style, 0.7),
         )
         raw_text: Union[str, dict] = response.choices[0].message.content.strip()
-        
+
         # Check if response is JSON and convert to HTML
         if isinstance(raw_text, str) and raw_text.strip().startswith('{') and raw_text.strip().endswith('}'):
             from digests.json_formatter import format_json_digest_to_html
@@ -160,7 +163,7 @@ def generate_summary_journalistic_v2(
 ) -> dict:
     """
     Generate journalistic-style digest with v2 prompts.
-    
+
     Args:
         news_items: List of NewsItem objects
         lang: Language (default: "ru")
@@ -172,7 +175,7 @@ def generate_summary_journalistic_v2(
         max_tokens: Maximum tokens for generation
         min_importance: Minimum importance threshold
         min_credibility: Minimum credibility threshold
-    
+
     Returns:
         Dictionary with structured digest or error information
     """
@@ -183,16 +186,16 @@ def generate_summary_journalistic_v2(
             "fallback": True,
             "legacy_result": generate_batch_summary(news_items, max_tokens, style_profile)
         }
-    
+
     if not news_items:
         return {
             "error": "No news items provided",
             "skipped_reason": "empty input"
         }
-    
+
     # Start timer for generation time tracking
     start_time = time.time()
-    
+
     # Prepare sources for validation
     sources = []
     for item in news_items:
@@ -204,10 +207,10 @@ def generate_summary_journalistic_v2(
             "source": item.source or "Unknown",
             "published_at": item.published_at_fmt if item.published_at else "Unknown"
         })
-    
+
     # Validate sources
     validation_result = validate_sources(sources, min_importance, min_credibility)
-    
+
     if not validation_result["valid"]:
         logger.warning(f"Skipping generation due to: {validation_result['reason']}")
         return {
@@ -215,7 +218,7 @@ def generate_summary_journalistic_v2(
             "skipped_count": validation_result["skipped_count"],
             "valid_sources_count": len(validation_result["valid_sources"])
         }
-    
+
     # Prepare news text for AI
     news_text = "\n\n".join([
         f"ЗАГОЛОВОК: {source['title']}\n"
@@ -224,7 +227,7 @@ def generate_summary_journalistic_v2(
         f"СОДЕРЖАНИЕ: {source['content'][:300]}..."
         for source in validation_result["valid_sources"]
     ])
-    
+
     # Build prompts
     try:
         input_payload = {
@@ -237,15 +240,15 @@ def generate_summary_journalistic_v2(
             "min_importance": min_importance,
             "min_credibility": min_credibility
         }
-        
+
         system_prompt, user_prompt = build_prompt(input_payload)
-        
+
     except Exception as e:
         logger.error(f"Error building prompts: {e}")
         return {
             "error": f"Prompt building failed: {str(e)}"
         }
-    
+
     # Call OpenAI
     client = get_client()
     try:
@@ -258,9 +261,9 @@ def generate_summary_journalistic_v2(
             max_tokens=max_tokens,
             temperature=_TEMPS.get(style_profile, 0.7),
         )
-        
+
         raw_response = response.choices[0].message.content.strip()
-        
+
         # Parse JSON response
         try:
             parsed_output = json.loads(raw_response)
@@ -271,7 +274,7 @@ def generate_summary_journalistic_v2(
                 "error": f"JSON parsing failed: {str(e)}",
                 "raw_response": raw_response
             }
-        
+
         # Validate output schema
         schema_validation = validate_output_schema(parsed_output)
         if not schema_validation["valid"]:
@@ -280,13 +283,13 @@ def generate_summary_journalistic_v2(
                 "error": f"Schema validation failed: {schema_validation['errors']}",
                 "parsed_output": parsed_output
             }
-        
+
         # Calculate confidence score
         confidence = calculate_confidence_score(parsed_output, len(validation_result["valid_sources"]))
-        
+
         # Calculate generation time
         generation_time = time.time() - start_time
-        
+
         # Update meta with confidence and generation time
         if "meta" in parsed_output:
             parsed_output["meta"]["confidence"] = confidence
@@ -296,10 +299,10 @@ def generate_summary_journalistic_v2(
                 "confidence": confidence,
                 "generation_time_sec": round(generation_time, 2)
             }
-        
+
         logger.info(f"Successfully generated v2 digest with confidence: {confidence}, time: {generation_time:.2f}s")
         return parsed_output
-        
+
     except Exception as e:
         logger.error(f"OpenAI API error: {e}")
         return {

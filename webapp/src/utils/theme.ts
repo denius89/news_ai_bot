@@ -94,16 +94,9 @@ export const initializeTheme = (): Theme => {
     };
     
     mediaQuery.addEventListener('change', handleSystemThemeChange);
-    
-    // Cleanup function
-    return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange);
-    };
   }
   
-  return () => {
-    mediaQuery.removeEventListener('change', handleSystemThemeChange);
-  };
+  return theme;
 };
 
 /**

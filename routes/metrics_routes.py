@@ -22,7 +22,7 @@ metrics_bp = Blueprint('metrics', __name__)
 def get_metrics():
     """
     Get current digest metrics for today.
-    
+
     Returns:
         JSON with metrics data:
         {
@@ -39,7 +39,7 @@ def get_metrics():
     """
     try:
         analytics = get_digest_analytics()
-        
+
         return jsonify({
             "status": "success",
             "data": {
@@ -51,7 +51,7 @@ def get_metrics():
                 "avg_feedback_score": round(analytics.get("avg_feedback_score", 0.0), 2)
             }
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Error getting metrics: {e}")
         return jsonify({
@@ -64,28 +64,28 @@ def get_metrics():
 def get_metrics_history():
     """
     Get metrics history for last N days.
-    
+
     Query params:
         days: Number of days to retrieve (default: 7)
-    
+
     Returns:
         JSON with historical metrics data
     """
     try:
         days = request.args.get('days', 7, type=int)
-        
+
         # Limit to reasonable range
         if days < 1 or days > 30:
             days = 7
-        
+
         history = get_digest_analytics_history(days)
-        
+
         return jsonify({
             "status": "success",
             "data": history,
             "days_requested": days
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Error getting metrics history: {e}")
         return jsonify({
@@ -98,18 +98,18 @@ def get_metrics_history():
 def get_metrics_health():
     """
     Get health status based on metrics.
-    
+
     Returns:
         JSON with health status and recommendations
     """
     try:
         analytics = get_digest_analytics()
-        
+
         # Calculate health indicators
         avg_confidence = analytics.get("avg_confidence", 0.0)
         generated_count = analytics.get("generated_count", 0)
         avg_generation_time = analytics.get("avg_generation_time_sec", 0.0)
-        
+
         # Determine health status
         if avg_confidence >= 0.8 and generated_count > 0:
             health_status = "excellent"
@@ -119,7 +119,7 @@ def get_metrics_health():
             health_status = "fair"
         else:
             health_status = "poor"
-        
+
         # Generate recommendations
         recommendations = []
         if avg_confidence < 0.7:
@@ -128,7 +128,7 @@ def get_metrics_health():
             recommendations.append("Generation time is high, check AI performance")
         if generated_count == 0:
             recommendations.append("No digests generated today")
-        
+
         return jsonify({
             "status": "success",
             "data": {
@@ -139,7 +139,7 @@ def get_metrics_health():
                 "recommendations": recommendations
             }
         }), 200
-        
+
     except Exception as e:
         logger.error(f"Error getting metrics health: {e}")
         return jsonify({

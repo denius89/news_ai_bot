@@ -5,7 +5,7 @@ Fetches token unlock events from TokenUnlocks.app.
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, List
 
 import aiohttp
@@ -142,4 +142,3 @@ class TokenUnlocksProvider(BaseEventProvider):
             return 0.6
         else:
             return 0.5
-

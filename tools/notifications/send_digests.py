@@ -22,7 +22,7 @@ from typing import Dict, List
 from dotenv import load_dotenv
 
 from config.core.constants import CATEGORIES
-from database.db_models import get_latest_news
+from database.service import get_sync_service
 from digests.ai_service import DigestAIService, DigestConfig
 from models.news import NewsItem
 from services.notification_service import NotificationService
@@ -131,7 +131,8 @@ async def fetch_news_by_categories(categories: List[str], limit: int = 10) -> Li
         logger.info(f"📰 Получение новостей по категориям: {categories}")
 
         # Получаем все последние новости
-        news_data = get_latest_news(limit=limit * 2)  # Берем больше, чтобы отфильтровать
+        db_service = get_sync_service()
+        news_data = db_service.get_latest_news(limit=limit * 2)  # Берем больше, чтобы отфильтровать
 
         if not news_data:
             logger.info("ℹ️ Новостей в базе данных нет")

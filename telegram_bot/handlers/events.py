@@ -1,7 +1,7 @@
 from aiogram import types, Router, F
 from aiogram.filters import Command
 
-from database.db_models import get_latest_events
+from database.service import get_sync_service
 from telegram_bot.utils.formatters import format_events
 from telegram_bot.keyboards import back_inline_keyboard
 
@@ -14,7 +14,8 @@ async def send_events(
     min_importance: int = 1,
 ):
     """Отправка ближайших событий из базы."""
-    events = get_latest_events(limit=limit)
+    db_service = get_sync_service()
+    events = db_service.get_latest_events(limit=limit)
     if not events:
         text = "⚠️ Нет свежих событий"
     else:

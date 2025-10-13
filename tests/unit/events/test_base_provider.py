@@ -13,7 +13,7 @@ from events.providers.base_provider import BaseEventProvider
 
 class TestProvider(BaseEventProvider):
     """Test implementation of BaseEventProvider."""
-    
+
     async def fetch_events(self, start_date: datetime, end_date: datetime):
         """Mock implementation."""
         return [
@@ -47,11 +47,11 @@ class TestBaseEventProvider:
         title = "Test Event"
         starts_at = datetime(2025, 1, 15, 12, 0, tzinfo=timezone.utc)
         source = "test_source"
-        
+
         hash1 = provider.create_unique_hash(title, starts_at, source)
         hash2 = provider.create_unique_hash(title, starts_at, source)
         hash3 = provider.create_unique_hash("Different Event", starts_at, source)
-        
+
         # Same inputs should produce same hash
         assert hash1 == hash2
         # Different inputs should produce different hash
@@ -62,7 +62,7 @@ class TestBaseEventProvider:
     def test_normalize_event(self):
         """Test event normalization."""
         provider = TestProvider()
-        
+
         event_data = {
             "title": "  Test Event  ",
             "subcategory": "crypto",
@@ -75,9 +75,9 @@ class TestBaseEventProvider:
             "organizer": "Test Organizer",
             "metadata": {"test": True},
         }
-        
+
         normalized = provider.normalize_event(event_data)
-        
+
         assert normalized["title"] == "Test Event"  # Trimmed
         assert normalized["category"] == "test"  # From provider
         assert normalized["subcategory"] == "crypto"
@@ -95,14 +95,14 @@ class TestBaseEventProvider:
     def test_normalize_event_missing_fields(self):
         """Test event normalization with missing fields."""
         provider = TestProvider()
-        
+
         event_data = {
             "title": "Test Event",
             "starts_at": datetime(2025, 1, 15, 12, 0, tzinfo=timezone.utc),
         }
-        
+
         normalized = provider.normalize_event(event_data)
-        
+
         assert normalized["title"] == "Test Event"
         assert normalized["category"] == "test"
         assert normalized["subcategory"] == "general"  # Default
@@ -117,21 +117,21 @@ class TestBaseEventProvider:
     def test_normalize_event_invalid(self):
         """Test event normalization with invalid data."""
         provider = TestProvider()
-        
+
         # Missing title
         event_data = {
             "starts_at": datetime(2025, 1, 15, 12, 0, tzinfo=timezone.utc),
         }
-        
+
         normalized = provider.normalize_event(event_data)
         assert normalized is None
 
     def test_get_info(self):
         """Test provider info."""
         provider = TestProvider()
-        
+
         info = provider.get_info()
-        
+
         assert info["name"] == "test"
         assert info["category"] == "test"
         assert "description" in info
@@ -141,17 +141,17 @@ class TestBaseEventProvider:
         """Test provider close."""
         provider = TestProvider()
         provider.session = Mock()
-        
+
         await provider.close()
-        
+
         assert provider.session is None
 
     @pytest.mark.asyncio
     async def test_close_no_session(self):
         """Test provider close without session."""
         provider = TestProvider()
-        
+
         # Should not raise exception
         await provider.close()
-        
+
         assert provider.session is None

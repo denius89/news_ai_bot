@@ -8,7 +8,7 @@ PULSEAI — SUPER PROMPT: РЕАЛИСТИЧНЫЕ ИНТЕЛЛЕКТУАЛЬН�
 
 import json
 import logging
-from typing import Dict, List, Tuple, Any, Optional
+from typing import Dict, List, Tuple, Any, Optional  # noqa: F401
 
 logger = logging.getLogger("prompts_v2")
 
@@ -30,7 +30,7 @@ STYLE_CARDS = {
         "expert_persona": "Опытный журналист Reuters с 15-летним стажем",
         "writing_style": "пишет как для профессионального издания, использует точные формулировки"
     },
-    
+
     "analytical": {
         "name": "Аналитический",
         "description": "Глубокий анализ с причинно-следственными связями",
@@ -44,7 +44,7 @@ STYLE_CARDS = {
         "expert_persona": "Ведущий аналитик The Economist",
         "writing_style": "анализирует события как эксперт, выявляет скрытые связи и тренды"
     },
-    
+
     "magazine": {
         "name": "Magazine",
         "description": "Storytelling стиль — engaging, метафоры, читабельность",
@@ -58,7 +58,7 @@ STYLE_CARDS = {
         "expert_persona": "Талантливый автор The Atlantic",
         "writing_style": "превращает факты в увлекательную историю, использует метафоры и аналогии"
     },
-    
+
     "casual": {
         "name": "Простой",
         "description": "Разговорный стиль для Telegram — просто, понятно, дружелюбно",
@@ -86,7 +86,7 @@ CATEGORY_CARDS = {
         "impact": "влияние на крипторынок, инвесторов, регуляторную среду",
         "keywords": ["блокчейн", "DeFi", "NFT", "майнинг", "регуляция", "токены", "смарт-контракты"]
     },
-    
+
     "markets": {
         "name": "Финансовые рынки",
         "expert": "Уоррен Баффет, легендарный инвестор",
@@ -94,7 +94,7 @@ CATEGORY_CARDS = {
         "impact": "влияние на инвесторов, экономику, корпорации и глобальные рынки",
         "keywords": ["акции", "облигации", "валюта", "нефть", "золото", "инфляция", "процентные ставки"]
     },
-    
+
     "tech": {
         "name": "Технологии",
         "expert": "Илон Маск, основатель SpaceX и Tesla",
@@ -102,7 +102,7 @@ CATEGORY_CARDS = {
         "impact": "влияние на технологии, пользователей, бизнес и общество",
         "keywords": ["ИИ", "стартапы", "гаджеты", "инновации", "кибербезопасность", "автономные системы"]
     },
-    
+
     "sports": {
         "name": "Спорт",
         "expert": "Василий Уткин, известный спортивный комментатор",
@@ -110,7 +110,7 @@ CATEGORY_CARDS = {
         "impact": "влияние на команды, лиги, спортсменов и фанатов",
         "keywords": ["матчи", "трансферы", "достижения", "турниры", "команды", "спортсмены"]
     },
-    
+
     "world": {
         "name": "Мир",
         "expert": "Дмитрий Киселев, директор МИА 'Россия сегодня'",
@@ -130,19 +130,19 @@ TONE_CARDS = {
         "description": "Сбалансированная подача фактов без эмоций",
         "characteristics": ["Объективность", "Факты", "Сбалансированность", "Профессионализм"]
     },
-    
+
     "insightful": {
         "name": "Инсайты",
         "description": "Акцент на инсайты, контекст и глубокое понимание",
         "characteristics": ["Анализ", "Контекст", "Инсайты", "Предвидение"]
     },
-    
+
     "critical": {
         "name": "Критический",
         "description": "Критический анализ с выявлением проблем",
         "characteristics": ["Скептицизм", "Анализ рисков", "Выявление проблем", "Критическое мышление"]
     },
-    
+
     "optimistic": {
         "name": "Позитивный",
         "description": "Позитивный фокус на возможностях и решениях",
@@ -161,14 +161,14 @@ LENGTH_SPECS = {
         "paragraphs": "1-2",
         "description": "Краткая сводка для быстрого чтения"
     },
-    
+
     "medium": {
         "name": "Средний",
         "max_words": 250,
         "paragraphs": "2-3",
         "description": "Сбалансированный дайджест с контекстом"
     },
-    
+
     "long": {
         "name": "Длинный",
         "max_words": 500,
@@ -187,7 +187,7 @@ AUDIENCE_SPECS = {
         "description": "Широкая аудитория без специальных знаний",
         "characteristics": ["Простые объяснения", "Минимум терминов", "Общие понятия", "Доступность"]
     },
-    
+
     "pro": {
         "name": "Профессионалы",
         "description": "Аудитория с профессиональными знаниями в области",
@@ -227,7 +227,7 @@ FEW_SHOT_EXAMPLES = [
             }
         }
     },
-    
+
     {
         "category": "tech",
         "style": "analytical",
@@ -328,10 +328,11 @@ OUTPUT_SCHEMA = {
 # MAIN FUNCTIONS
 # ============================================================================
 
+
 def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
     """
     Build system and user prompts from input payload.
-    
+
     Args:
         input_payload: Dictionary with keys:
             - category: str (crypto, markets, tech, sports, world)
@@ -342,7 +343,7 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
             - news_text: str (formatted news data)
             - min_importance: float (default 0.6)
             - min_credibility: float (default 0.7)
-    
+
     Returns:
         Tuple of (system_prompt, user_prompt)
     """
@@ -351,14 +352,14 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
     for key in required_keys:
         if key not in input_payload:
             raise ValueError(f"Missing required key: {key}")
-    
+
     # Get configurations
     category = input_payload["category"]
     style_profile = input_payload["style_profile"]
     tone = input_payload["tone"]
     length = input_payload["length"]
     audience = input_payload["audience"]
-    
+
     # Validate values
     if style_profile not in STYLE_CARDS:
         raise ValueError(f"Invalid style_profile: {style_profile}")
@@ -370,14 +371,14 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         raise ValueError(f"Invalid audience: {audience}")
     if category not in CATEGORY_CARDS:
         raise ValueError(f"Invalid category: {category}")
-    
+
     # Get style configuration
     style_config = STYLE_CARDS[style_profile]
     tone_config = TONE_CARDS[tone]
     length_config = LENGTH_SPECS[length]
     audience_config = AUDIENCE_SPECS[audience]
     category_config = CATEGORY_CARDS[category]
-    
+
     # Build system prompt
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         expert_persona=style_config["expert_persona"],
@@ -391,7 +392,7 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         audience_description=audience_config["description"],
         tone_name=tone_config["name"]
     )
-    
+
     # Build user prompt
     user_prompt = USER_PROMPT_TEMPLATE.format(
         category_name=category_config["name"],
@@ -405,19 +406,19 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         style_name=style_config["name"],
         output_schema=json.dumps(OUTPUT_SCHEMA, indent=2, ensure_ascii=False)
     )
-    
+
     return system_prompt, user_prompt
 
 
 def validate_sources(sources: List[Dict[str, Any]], min_importance: float = 0.6, min_credibility: float = 0.7) -> Dict[str, Any]:
     """
     Validate sources meet quality threshold.
-    
+
     Args:
         sources: List of source dictionaries with 'importance' and 'credibility' keys
         min_importance: Minimum importance threshold
         min_credibility: Minimum credibility threshold
-    
+
     Returns:
         Dictionary with validation results:
         {
@@ -429,16 +430,16 @@ def validate_sources(sources: List[Dict[str, Any]], min_importance: float = 0.6,
     """
     valid_sources = []
     skipped_count = 0
-    
+
     for source in sources:
         importance = source.get("importance", 0.0)
         credibility = source.get("credibility", 0.0)
-        
+
         if importance >= min_importance and credibility >= min_credibility:
             valid_sources.append(source)
         else:
             skipped_count += 1
-    
+
     if not valid_sources:
         return {
             "valid": False,
@@ -446,7 +447,7 @@ def validate_sources(sources: List[Dict[str, Any]], min_importance: float = 0.6,
             "skipped_count": skipped_count,
             "reason": f"low importance/credibility (min: {min_importance}/{min_credibility})"
         }
-    
+
     return {
         "valid": True,
         "valid_sources": valid_sources,
@@ -497,21 +498,21 @@ def get_audience_config(audience: str) -> Dict[str, Any]:
 def validate_output_schema(output: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate output matches expected schema.
-    
+
     Args:
         output: Generated digest output
-    
+
     Returns:
         Validation result with errors if any
     """
     errors = []
-    
+
     # Required fields
     required_fields = ["title", "dek", "summary", "why_important", "meta"]
     for field in required_fields:
         if field not in output:
             errors.append(f"Missing required field: {field}")
-    
+
     # Validate meta structure
     if "meta" in output:
         meta = output["meta"]
@@ -519,13 +520,13 @@ def validate_output_schema(output: Dict[str, Any]) -> Dict[str, Any]:
         for field in meta_required:
             if field not in meta:
                 errors.append(f"Missing meta field: {field}")
-    
+
     # Validate confidence range
     if "meta" in output and "confidence" in output["meta"]:
         confidence = output["meta"]["confidence"]
         if not isinstance(confidence, (int, float)) or not 0.0 <= confidence <= 1.0:
             errors.append("Confidence must be a number between 0.0 and 1.0")
-    
+
     return {
         "valid": len(errors) == 0,
         "errors": errors
@@ -535,22 +536,22 @@ def validate_output_schema(output: Dict[str, Any]) -> Dict[str, Any]:
 def calculate_confidence_score(output: Dict[str, Any], sources_count: int) -> float:
     """
     Calculate confidence score based on output quality and source count.
-    
+
     Args:
         output: Generated digest output
         sources_count: Number of sources used
-    
+
     Returns:
         Confidence score between 0.0 and 1.0
     """
     score = 0.0
-    
+
     # Base score for required fields
     required_fields = ["title", "dek", "summary", "why_important"]
     for field in required_fields:
         if field in output and output[field]:
             score += 0.15
-    
+
     # Meta fields
     if "meta" in output:
         meta = output["meta"]
@@ -558,18 +559,18 @@ def calculate_confidence_score(output: Dict[str, Any], sources_count: int) -> fl
         for field in meta_fields:
             if field in meta and meta[field]:
                 score += 0.05
-    
+
     # Source count bonus
     if sources_count >= 3:
         score += 0.1
     elif sources_count >= 2:
         score += 0.05
-    
+
     # Content quality indicators
     if "summary" in output and len(output["summary"]) > 100:
         score += 0.05
-    
+
     if "why_important" in output and len(output["why_important"]) >= 2:
         score += 0.05
-    
+
     return min(score, 1.0)

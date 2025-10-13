@@ -30,7 +30,7 @@ interface SettingsPageProps {
   onThemeToggle: () => void;
 }
 
-const SettingsPage: React.FC<SettingsPageProps> = ({ theme }) => {
+const SettingsPage: React.FC<SettingsPageProps> = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [notifications, setNotifications] = useState<NotificationSettings>({
     push: true,
@@ -135,7 +135,6 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ theme }) => {
       y: 0,
       transition: {
         duration: 0.5,
-        ease: 'easeOut',
       },
     },
   };

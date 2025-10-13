@@ -14,7 +14,6 @@ from services.notification_service import NotificationService
 from services.categories import get_categories
 from telegram_bot.keyboards import (
     subscriptions_inline_keyboard,
-    notifications_inline_keyboard,
     categories_inline_keyboard,
     back_inline_keyboard,
 )

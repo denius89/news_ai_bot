@@ -6,7 +6,7 @@ digests/configs.py
 # Категории новостей
 CATEGORIES = {
     "crypto": "Crypto",
-    "economy": "Economy", 
+    "economy": "Economy",
     "world": "World",
     "technology": "Technology",
     "politics": "Politics",

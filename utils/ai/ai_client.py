@@ -4,10 +4,9 @@ import asyncio
 import sys
 import os
 from openai import OpenAI
+from config.core.settings import OPENAI_API_KEY, AI_MODEL_SUMMARY, AI_MAX_TOKENS
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
-from config.core.settings import OPENAI_API_KEY, AI_MODEL_SUMMARY, AI_MAX_TOKENS
 
 logger = logging.getLogger("ai_client")
 

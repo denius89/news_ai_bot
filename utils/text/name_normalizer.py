@@ -66,19 +66,19 @@ CORRUPTION_MAP = {
 def normalize_user_name(raw_name: Optional[str], username: Optional[str], user_id: int) -> str:
     """
     Возвращает безопасное, читаемое имя для UI и логов.
-    
+
     Алгоритм нормализации:
     1. Если raw_name отсутствует → использовать @username или User #<user_id>
     2. Удалить невидимые Unicode символы и управляющие символы
     3. Проверить, состоит ли строка только из эмодзи/символов — если да → fallback
     4. Обрезать до 64 символов с сохранением целостности слов
     5. Вернуть безопасное имя (display_name)
-    
+
     Args:
         raw_name: Оригинальное имя пользователя (может быть None)
         username: Telegram username (может быть None)
         user_id: Telegram user ID для fallback
-        
+
     Returns:
         Безопасное имя для отображения
     """
@@ -86,31 +86,31 @@ def normalize_user_name(raw_name: Optional[str], username: Optional[str], user_i
         # Шаг 1: Проверяем наличие raw_name
         if not raw_name or not raw_name.strip():
             return _get_fallback_name(username, user_id)
-        
+
         # Шаг 2: Обрабатываем испорченную кодировку
         processed_name = _fix_corrupted_encoding(raw_name)
-        
+
         # Шаг 3: Удаляем невидимые и управляющие символы
         cleaned_name = _remove_invisible_chars(processed_name)
-        
+
         # Шаг 4: Конвертируем стилизованные Unicode символы
         normalized_name = _convert_styled_unicode(cleaned_name)
-        
+
         # Шаг 5: Проверяем на emoji-only
         if _is_emoji_only(normalized_name):
             logger.debug(f"Emoji-only name detected: '{normalized_name}', using fallback")
             return _get_fallback_name(username, user_id)
-        
+
         # Шаг 6: Обрезаем до 64 символов с сохранением слов
         final_name = _truncate_preserving_words(normalized_name, 64)
-        
+
         # Шаг 7: Финальная проверка на пустоту
         if not final_name.strip():
             return _get_fallback_name(username, user_id)
-        
+
         logger.debug(f"Normalized name: '{raw_name}' -> '{final_name}'")
         return final_name.strip()
-        
+
     except Exception as e:
         logger.error(f"Error normalizing name '{raw_name}': {e}")
         return _get_fallback_name(username, user_id)
@@ -128,7 +128,7 @@ def _fix_corrupted_encoding(name: str) -> str:
     # Проверяем известные испорченные имена
     if name in CORRUPTION_MAP:
         return CORRUPTION_MAP[name]
-    
+
     # Проверяем на двойную кодировку UTF-8
     try:
         if 'Ð' in name and len(name) > 0:
@@ -139,36 +139,36 @@ def _fix_corrupted_encoding(name: str) -> str:
                 return fixed
     except (UnicodeDecodeError, UnicodeEncodeError):
         pass
-    
+
     return name
 
 
 def _remove_invisible_chars(name: str) -> str:
     """Удаляет невидимые и управляющие Unicode символы."""
     result = []
-    
+
     for char in name:
         # Удаляем известные невидимые символы
         if char in INVISIBLE_CHARS:
             continue
-            
+
         # Удаляем управляющие символы (категория C)
         if unicodedata.category(char).startswith('C'):
             continue
-            
+
         # Удаляем лишние пробелы
         if char.isspace() and len(result) > 0 and result[-1].isspace():
             continue
-            
+
         result.append(char)
-    
+
     return ''.join(result)
 
 
 def _convert_styled_unicode(name: str) -> str:
     """Конвертирует стилизованные Unicode символы в обычные ASCII."""
     result = []
-    
+
     for char in name:
         if char in UNICODE_STYLE_MAP:
             result.append(UNICODE_STYLE_MAP[char])
@@ -181,7 +181,7 @@ def _convert_styled_unicode(name: str) -> str:
             else:
                 # Оставляем как есть, если не можем конвертировать
                 result.append(char)
-    
+
     return ''.join(result)
 
 
@@ -189,7 +189,7 @@ def _is_emoji_only(name: str) -> bool:
     """Проверяет, состоит ли имя только из эмодзи и пробелов."""
     if not name.strip():
         return True
-    
+
     return bool(EMOJI_ONLY_PATTERN.match(name.strip()))
 
 
@@ -197,14 +197,14 @@ def _truncate_preserving_words(text: str, max_length: int) -> str:
     """Обрезает текст до max_length символов, сохраняя целостность слов."""
     if len(text) <= max_length:
         return text
-    
+
     # Ищем последний пробел перед max_length
     truncated = text[:max_length]
     last_space = truncated.rfind(' ')
-    
+
     if last_space > max_length * 0.7:  # Если пробел не слишком далеко от конца
         return truncated[:last_space]
-    
+
     return truncated
 
 
@@ -213,7 +213,7 @@ def is_safe_name(name: str) -> bool:
     """Проверяет, является ли имя безопасным для отображения."""
     try:
         normalized = normalize_user_name(name, None, 0)
-        return normalized != f"User #0"  # Если не пришлось использовать fallback
+        return normalized != "User #0"  # Если не пришлось использовать fallback
     except Exception:
         return False
 

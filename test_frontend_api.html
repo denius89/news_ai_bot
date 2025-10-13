@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Events API</title>
+</head>
+<body>
+    <h1>Events API Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:8001/api/events/upcoming?min_importance=0.0&days=30');
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                const resultsDiv = document.getElementById('results');
+                
+                if (data.success && data.data.events.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <h2>✅ API работает! Загружено ${data.data.events.length} событий</h2>
+                        <h3>Примеры событий:</h3>
+                        ${data.data.events.slice(0, 3).map(event => `
+                            <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+                                <h4>${event.title}</h4>
+                                <p><strong>Категория:</strong> ${event.category}</p>
+                                <p><strong>Группа:</strong> ${event.group_name || 'Нет группы'}</p>
+                                <p><strong>Важность:</strong> ${event.importance}</p>
+                                <p><strong>Время:</strong> ${event.starts_at}</p>
+                                <p><strong>Метаданные:</strong> ${JSON.stringify(event.metadata, null, 2)}</p>
+                            </div>
+                        `).join('')}
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `<h2>❌ Ошибка: ${data.error || 'Нет событий'}</h2>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('results').innerHTML = `<h2>❌ Ошибка загрузки: ${error.message}</h2>`;
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>

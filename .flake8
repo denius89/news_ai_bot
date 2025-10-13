@@ -1,0 +1,15 @@
+[flake8]
+max-line-length = 100
+extend-exclude = venv,__pycache__,.git,webapp,*/migrations/*,.venv,build,dist
+ignore = E501,W503,E203
+per-file-ignores =
+    __init__.py:F401,E402
+    test_*.py:F401,E128,E712,F841,E402,F541
+    tests/*.py:F401,E128,E712,F841,E402,F541
+    tools/**/*.py:E402,F401,F541,E265,F811,E226,E128
+    scripts/*.py:E402,F401,F541
+    routes/dashboard_api.py:E402,F401
+    routes/metrics_routes.py:F401
+    routes/subscriptions.py:E402
+    src/webapp.py:E402
+

@@ -19,12 +19,12 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-async def load_sample_events():
+async def load_sample_events():  # noqa: E302
     """Загрузить примеры событий в базу данных."""
-    
+
     # Получить сервис событий
     events_service = get_events_service()
-    
+
     # 25 разнообразных событий
     sample_events = [
         # Crypto Events
@@ -45,7 +45,7 @@ async def load_sample_events():
         {
             "title": "Ethereum 2.0 Upgrade",
             "description": "Major Ethereum network upgrade with new features",
-            "category": "crypto", 
+            "category": "crypto",
             "subcategory": "ethereum",
             "starts_at": datetime.now() + timedelta(days=45),
             "ends_at": datetime.now() + timedelta(days=45, hours=2),
@@ -98,7 +98,7 @@ async def load_sample_events():
             "unique_hash": "cardano-hardfork-2025",
             "metadata": {"type": "hardfork", "coin": "cardano"}
         },
-        
+
         # Sports Events
         {
             "title": "FIFA World Cup 2026",
@@ -170,7 +170,7 @@ async def load_sample_events():
             "unique_hash": "f1-monaco-2025",
             "metadata": {"type": "race", "sport": "f1"}
         },
-        
+
         # Tech Events
         {
             "title": "Apple WWDC 2025",
@@ -242,7 +242,7 @@ async def load_sample_events():
             "unique_hash": "aws-reinvent-2025",
             "metadata": {"type": "conference", "company": "aws"}
         },
-        
+
         # World/Politics Events
         {
             "title": "G7 Summit 2025",
@@ -314,7 +314,7 @@ async def load_sample_events():
             "unique_hash": "imf-annual-2025",
             "metadata": {"type": "meeting", "organization": "imf"}
         },
-        
+
         # Markets/Finance Events
         {
             "title": "Federal Reserve Meeting",
@@ -387,9 +387,9 @@ async def load_sample_events():
             "metadata": {"type": "meeting", "organization": "g20"}
         }
     ]
-    
+
     logger.info(f"Загружаем {len(sample_events)} событий...")
-    
+
     stored_count = 0
     for event_data in sample_events:
         try:
@@ -402,10 +402,10 @@ async def load_sample_events():
                 logger.error(f"❌ Ошибка сохранения: {event_data['title']}")
         except Exception as e:
             logger.error(f"❌ Ошибка при сохранении события {event_data['title']}: {e}")
-    
+
     logger.info(f"📊 Всего сохранено: {stored_count} из {len(sample_events)} событий")
 
-async def main():
+async def main():  # noqa: E302
     """Основная функция."""
     try:
         await load_sample_events()

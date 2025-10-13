@@ -278,4 +278,3 @@ class FinnhubProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing economic event: {e}")
             return None
-

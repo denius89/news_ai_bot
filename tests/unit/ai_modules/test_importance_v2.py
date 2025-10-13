@@ -238,4 +238,3 @@ class TestImportanceEvaluatorV2:
 
         # Should be high due to "wwdc" and "keynote" keywords
         assert score >= 0.75
-
