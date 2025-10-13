@@ -8,6 +8,7 @@ realistic scenarios for testing the full calendar functionality.
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import asyncio
@@ -31,8 +32,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.4, 0.8), 2),
             "unique_hash": f"defi-launch-{random.randint(10000, 99999)}",
-            "metadata": {"type": "protocol_launch", "category": "defi"}
-        } for _ in range(10)
+            "metadata": {"type": "protocol_launch", "category": "defi"},
+        }
+        for _ in range(10)
     ],
     *[
         {
@@ -47,8 +49,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.5, 0.85), 2),
             "unique_hash": f"infra-upgrade-{random.randint(10000, 99999)}",
-            "metadata": {"type": "infrastructure_upgrade", "layer": "l2"}
-        } for _ in range(8)
+            "metadata": {"type": "infrastructure_upgrade", "layer": "l2"},
+        }
+        for _ in range(8)
     ],
     *[
         {
@@ -63,8 +66,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.7, 0.95), 2),
             "unique_hash": f"cbdc-{random.randint(1000, 9999)}",
-            "metadata": {"type": "cbdc", "country": "china"}
-        } for _ in range(6)
+            "metadata": {"type": "cbdc", "country": "china"},
+        }
+        for _ in range(6)
     ],
     *[
         {
@@ -79,10 +83,10 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.6, 0.9), 2),
             "unique_hash": f"crypto-reg-{random.randint(1000, 9999)}",
-            "metadata": {"type": "regulation", "jurisdiction": "us"}
-        } for _ in range(6)
+            "metadata": {"type": "regulation", "jurisdiction": "us"},
+        }
+        for _ in range(6)
     ],
-
     # More Sports Events (25 events)
     *[
         {
@@ -97,8 +101,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.6, 0.9), 2),
             "unique_hash": f"uefa-{random.randint(10000, 99999)}",
-            "metadata": {"type": "football_tournament", "competition": "uefa"}
-        } for _ in range(10)
+            "metadata": {"type": "football_tournament", "competition": "uefa"},
+        }
+        for _ in range(10)
     ],
     *[
         {
@@ -113,8 +118,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.8, 0.95), 2),
             "unique_hash": f"olympics-{random.randint(1000, 9999)}",
-            "metadata": {"type": "olympic_games", "year": "2026"}
-        } for _ in range(8)
+            "metadata": {"type": "olympic_games", "year": "2026"},
+        }
+        for _ in range(8)
     ],
     *[
         {
@@ -129,10 +135,10 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.5, 0.8), 2),
             "unique_hash": f"f1-{random.randint(10000, 99999)}",
-            "metadata": {"type": "f1_race", "circuit": "monaco"}
-        } for _ in range(7)
+            "metadata": {"type": "f1_race", "circuit": "monaco"},
+        }
+        for _ in range(7)
     ],
-
     # More Tech Events (20 events)
     *[
         {
@@ -147,8 +153,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.6, 0.85), 2),
             "unique_hash": f"ai-conf-{random.randint(1000, 9999)}",
-            "metadata": {"type": "tech_conference", "focus": "ai"}
-        } for _ in range(8)
+            "metadata": {"type": "tech_conference", "focus": "ai"},
+        }
+        for _ in range(8)
     ],
     *[
         {
@@ -163,8 +170,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.5, 0.8), 2),
             "unique_hash": f"tech-summit-{random.randint(1000, 9999)}",
-            "metadata": {"type": "tech_summit", "domain": "security"}
-        } for _ in range(6)
+            "metadata": {"type": "tech_summit", "domain": "security"},
+        }
+        for _ in range(6)
     ],
     *[
         {
@@ -179,10 +187,10 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.6, 0.9), 2),
             "unique_hash": f"space-{random.randint(1000, 9999)}",
-            "metadata": {"type": "space_mission", "company": "spacex"}
-        } for _ in range(6)
+            "metadata": {"type": "space_mission", "company": "spacex"},
+        }
+        for _ in range(6)
     ],
-
     # More Markets Events (15 events)
     *[
         {
@@ -197,8 +205,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.4, 0.7), 2),
             "unique_hash": f"commodity-{random.randint(1000, 9999)}",
-            "metadata": {"type": "commodity_analysis", "asset": "gold"}
-        } for _ in range(8)
+            "metadata": {"type": "commodity_analysis", "asset": "gold"},
+        }
+        for _ in range(8)
     ],
     *[
         {
@@ -213,10 +222,10 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.5, 0.8), 2),
             "unique_hash": f"bond-{random.randint(1000, 9999)}",
-            "metadata": {"type": "bond_event", "category": "treasury"}
-        } for _ in range(7)
+            "metadata": {"type": "bond_event", "category": "treasury"},
+        }
+        for _ in range(7)
     ],
-
     # More World Events (10 events)
     *[
         {
@@ -231,8 +240,9 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.6, 0.85), 2),
             "unique_hash": f"climate-init-{random.randint(1000, 9999)}",
-            "metadata": {"type": "climate_initiative", "focus": "sustainability"}
-        } for _ in range(5)
+            "metadata": {"type": "climate_initiative", "focus": "sustainability"},
+        }
+        for _ in range(5)
     ],
     *[
         {
@@ -247,10 +257,12 @@ ADDITIONAL_EVENTS = [
             "link": "",
             "importance": round(random.uniform(0.5, 0.8), 2),
             "unique_hash": f"global-summit-{random.randint(1000, 9999)}",
-            "metadata": {"type": "international_summit", "topic": "trade"}
-        } for _ in range(5)
-    ]
+            "metadata": {"type": "international_summit", "topic": "trade"},
+        }
+        for _ in range(5)
+    ],
 ]
+
 
 async def load_additional_events():  # noqa: E302
     """Load 100 additional sample events into the database."""
@@ -262,7 +274,7 @@ async def load_additional_events():  # noqa: E302
         total_inserted = 0
 
         for i in range(0, len(ADDITIONAL_EVENTS), batch_size):
-            batch = ADDITIONAL_EVENTS[i:i + batch_size]
+            batch = ADDITIONAL_EVENTS[i : i + batch_size]
 
             result = supabase.table("events_new").insert(batch).execute()
 
@@ -285,6 +297,7 @@ async def load_additional_events():  # noqa: E302
     except Exception as e:
         print(f"❌ Error loading additional events: {e}")
         return 0
+
 
 if __name__ == "__main__":
     asyncio.run(load_additional_events())

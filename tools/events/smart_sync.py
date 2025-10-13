@@ -50,22 +50,16 @@ class SmartSync:
         Returns:
             Dictionary with sync statistics
         """
-        stats = {
-            'added': 0,
-            'updated': 0,
-            'skipped': 0,
-            'errors': 0,
-            'total': len(new_events)
-        }
+        stats = {"added": 0, "updated": 0, "skipped": 0, "errors": 0, "total": len(new_events)}
 
         logger.info(f"Starting Smart Sync for {stats['total']} events")
 
         for event in new_events:
             try:
-                unique_hash = event.get('unique_hash')
+                unique_hash = event.get("unique_hash")
                 if not unique_hash:
                     logger.warning(f"Event missing unique_hash: {event.get('title')}")
-                    stats['errors'] += 1
+                    stats["errors"] += 1
                     continue
 
                 # Check if event exists
@@ -74,21 +68,21 @@ class SmartSync:
                 if not existing:
                     # New event - add it
                     await self.events_service.insert_events([event])
-                    stats['added'] += 1
+                    stats["added"] += 1
                     logger.debug(f"Added new event: {event.get('title')}")
                 else:
                     # Check if update needed
                     if self._needs_update(existing, event):
-                        await self.events_service.update_event(existing['id'], event)
-                        stats['updated'] += 1
+                        await self.events_service.update_event(existing["id"], event)
+                        stats["updated"] += 1
                         logger.debug(f"Updated event: {event.get('title')}")
                     else:
-                        stats['skipped'] += 1
+                        stats["skipped"] += 1
                         logger.debug(f"Skipped unchanged event: {event.get('title')}")
 
             except Exception as e:
                 logger.error(f"Error syncing event {event.get('title')}: {e}")
-                stats['errors'] += 1
+                stats["errors"] += 1
 
         logger.info(
             f"Smart Sync complete: {stats['added']} added, "
@@ -111,15 +105,15 @@ class SmartSync:
         """
         # Fields to compare for changes
         fields_to_compare = [
-            'title',
-            'description',
-            'starts_at',
-            'ends_at',
-            'importance_score',
-            'credibility_score',
-            'status',
-            'location',
-            'organizer',
+            "title",
+            "description",
+            "starts_at",
+            "ends_at",
+            "importance_score",
+            "credibility_score",
+            "status",
+            "location",
+            "organizer",
         ]
 
         for field in fields_to_compare:
@@ -127,7 +121,7 @@ class SmartSync:
             new_value = new.get(field)
 
             # Handle datetime comparison
-            if field in ['starts_at', 'ends_at']:
+            if field in ["starts_at", "ends_at"]:
                 if existing_value and new_value:
                     # Convert to strings for comparison if they're datetime objects
                     if isinstance(existing_value, datetime):
@@ -137,18 +131,13 @@ class SmartSync:
 
             # Compare values
             if existing_value != new_value:
-                logger.debug(
-                    f"Field '{field}' changed: '{existing_value}' -> '{new_value}'"
-                )
+                logger.debug(f"Field '{field}' changed: '{existing_value}' -> '{new_value}'")
                 return True
 
         return False
 
     async def sync_from_providers(
-        self,
-        days_ahead: int = 7,
-        categories: Optional[List[str]] = None,
-        providers: Optional[List[str]] = None
+        self, days_ahead: int = 7, categories: Optional[List[str]] = None, providers: Optional[List[str]] = None
     ) -> Dict:
         """
         Fetch events from providers and sync them.
@@ -182,20 +171,18 @@ class SmartSync:
 
             # Calculate ML importance scores
             for event in events:
-                event_dict = event.__dict__ if hasattr(event, '__dict__') else event
+                event_dict = event.__dict__ if hasattr(event, "__dict__") else event
                 importance_score = evaluator_v2.evaluate_importance(event_dict)
-                event_dict['importance_score'] = importance_score
+                event_dict["importance_score"] = importance_score
 
             # Filter by importance >= 0.6
             filtered_events = [
-                e.__dict__ if hasattr(e, '__dict__') else e
+                e.__dict__ if hasattr(e, "__dict__") else e
                 for e in events
-                if (e.__dict__ if hasattr(e, '__dict__') else e).get('importance_score', 0) >= 0.6
+                if (e.__dict__ if hasattr(e, "__dict__") else e).get("importance_score", 0) >= 0.6
             ]
 
-            logger.info(
-                f"Filtered to {len(filtered_events)} events (importance >= 0.6)"
-            )
+            logger.info(f"Filtered to {len(filtered_events)} events (importance >= 0.6)")
 
             # Sync filtered events
             stats = await self.sync_events(filtered_events)
@@ -204,41 +191,23 @@ class SmartSync:
 
         except Exception as e:
             logger.error(f"Error in sync_from_providers: {e}")
-            return {
-                'added': 0,
-                'updated': 0,
-                'skipped': 0,
-                'errors': 1,
-                'total': 0,
-                'error': str(e)
-            }
+            return {"added": 0, "updated": 0, "skipped": 0, "errors": 1, "total": 0, "error": str(e)}
 
 
 async def main():
     """Main function for command-line usage."""
-    parser = argparse.ArgumentParser(
-        description="Smart Sync events for PulseAI"
-    )
+    parser = argparse.ArgumentParser(description="Smart Sync events for PulseAI")
 
-    parser.add_argument(
-        "--days",
-        type=int,
-        default=7,
-        help="Number of days to look ahead (default: 7)"
-    )
+    parser.add_argument("--days", type=int, default=7, help="Number of days to look ahead (default: 7)")
 
     parser.add_argument(
         "--categories",
         nargs="+",
         choices=["crypto", "sports", "markets", "tech", "world"],
-        help="Specific categories to sync (default: all)"
+        help="Specific categories to sync (default: all)",
     )
 
-    parser.add_argument(
-        "--providers",
-        nargs="+",
-        help="Specific providers to use (default: all enabled)"
-    )
+    parser.add_argument("--providers", nargs="+", help="Specific providers to use (default: all enabled)")
 
     args = parser.parse_args()
 
@@ -247,13 +216,11 @@ async def main():
 
     # Sync events from providers
     stats = await smart_sync.sync_from_providers(
-        days_ahead=args.days,
-        categories=args.categories,
-        providers=args.providers
+        days_ahead=args.days, categories=args.categories, providers=args.providers
     )
 
     # Print results
-    if stats.get('error'):
+    if stats.get("error"):
         print(f"❌ Error: {stats['error']}")
         sys.exit(1)
     else:
@@ -261,7 +228,7 @@ async def main():
         print(f"📊 Added: {stats['added']}")
         print(f"🔄 Updated: {stats['updated']}")
         print(f"⏭️  Skipped: {stats['skipped']}")
-        if stats['errors'] > 0:
+        if stats["errors"] > 0:
             print(f"⚠️  Errors: {stats['errors']}")
 
 

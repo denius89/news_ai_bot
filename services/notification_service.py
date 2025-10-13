@@ -50,8 +50,8 @@ class NotificationService:
             events = await self._get_matching_events(user_id, prefs)
 
             # Group by importance
-            high_importance = [e for e in events if e.get('importance_score', 0) >= 0.8]
-            medium_importance = [e for e in events if 0.6 <= e.get('importance_score', 0) < 0.8]
+            high_importance = [e for e in events if e.get("importance_score", 0) >= 0.8]
+            medium_importance = [e for e in events if 0.6 <= e.get("importance_score", 0) < 0.8]
 
             logger.info(
                 f"Prepared digest for user {user_id}: "
@@ -202,9 +202,7 @@ class NotificationService:
             }
 
             # Upsert preferences
-            result = supabase.table("user_preferences").upsert(
-                prefs_data, on_conflict="user_id"
-            ).execute()
+            result = supabase.table("user_preferences").upsert(prefs_data, on_conflict="user_id").execute()
 
             success = len(result.data) > 0 if result.data else False
             if success:
@@ -237,12 +235,12 @@ class NotificationService:
             query = supabase.table("events_new").select("*")
 
             # Filter by categories
-            categories = prefs.get('categories', [])
+            categories = prefs.get("categories", [])
             if categories and len(categories) > 0:
                 query = query.in_("category", categories)
 
             # Filter by importance
-            min_importance = prefs.get('min_importance', 0.6)
+            min_importance = prefs.get("min_importance", 0.6)
             query = query.gte("importance_score", min_importance)
 
             # Only upcoming events
@@ -284,7 +282,7 @@ class NotificationService:
 
             # Get user preferences for max notifications
             prefs = await self.get_user_preferences(user_id)
-            max_per_day = prefs.get('max_notifications_per_day', 3) if prefs else 3
+            max_per_day = prefs.get("max_notifications_per_day", 3) if prefs else 3
 
             # Count notifications sent today
             today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -298,7 +296,7 @@ class NotificationService:
                 .execute()
             )
 
-            count = result.count if hasattr(result, 'count') else 0
+            count = result.count if hasattr(result, "count") else 0
 
             can_send = count < max_per_day
             logger.debug(f"User {user_id} notifications today: {count}/{max_per_day}, can_send: {can_send}")
@@ -325,9 +323,9 @@ class NotificationService:
                 return
 
             # Update last_notified_at in user_preferences
-            await supabase.table("user_preferences").update({
-                "last_notified_at": datetime.now(timezone.utc).isoformat()
-            }).eq("user_id", user_id).execute()
+            await supabase.table("user_preferences").update(
+                {"last_notified_at": datetime.now(timezone.utc).isoformat()}
+            ).eq("user_id", user_id).execute()
 
             logger.debug(f"Recorded notification for user {user_id} via {method}: {events_count} events")
 
@@ -350,15 +348,15 @@ class NotificationService:
         lines = ["📅 *Важные события:*\n"]
 
         for event in events[:5]:  # Limit to 5 events
-            category_emoji = self._get_category_emoji(event.get('category', 'unknown'))
-            title = event.get('title', 'Без названия')
-            importance = event.get('importance_score', 0)
-            starts_at = event.get('starts_at', '')
+            category_emoji = self._get_category_emoji(event.get("category", "unknown"))
+            title = event.get("title", "Без названия")
+            importance = event.get("importance_score", 0)
+            starts_at = event.get("starts_at", "")
 
             # Format date
             try:
-                date_obj = datetime.fromisoformat(starts_at.replace('Z', '+00:00'))
-                date_str = date_obj.strftime('%d.%m %H:%M')
+                date_obj = datetime.fromisoformat(starts_at.replace("Z", "+00:00"))
+                date_str = date_obj.strftime("%d.%m %H:%M")
             except Exception:
                 date_str = starts_at
 

@@ -62,9 +62,7 @@ class UNSecurityCouncilProvider(BaseEventProvider):
             logger.error(f"Error fetching UN SC events: {e}")
             return []
 
-    def _parse_schedule(
-        self, html: str, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    def _parse_schedule(self, html: str, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Parse UN SC schedule from HTML."""
         try:
             soup = BeautifulSoup(html, "html.parser")
@@ -87,9 +85,7 @@ class UNSecurityCouncilProvider(BaseEventProvider):
             logger.error(f"Error parsing UN SC schedule: {e}")
             return []
 
-    def _parse_meeting_element(
-        self, element, start_date: datetime, end_date: datetime
-    ) -> Dict:
+    def _parse_meeting_element(self, element, start_date: datetime, end_date: datetime) -> Dict:
         """Parse individual meeting element."""
         try:
             # This is a placeholder implementation

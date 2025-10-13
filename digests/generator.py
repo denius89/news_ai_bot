@@ -183,7 +183,7 @@ async def generate_digest(
                         tone=tone,
                         length=length,
                         audience=audience,
-                        max_tokens=800
+                        max_tokens=800,
                     )
 
                     # Check if v2 generation was successful
@@ -208,7 +208,7 @@ async def generate_digest(
                                     style=style,
                                     confidence=confidence,
                                     generation_time_sec=generation_time_sec,
-                                    meta=meta
+                                    meta=meta,
                                 )
 
                                 if digest_id:
@@ -217,7 +217,9 @@ async def generate_digest(
                             except Exception as e:
                                 logger.warning(f"Failed to save digest metrics: {e}")
                     else:
-                        logger.warning(f"V2 generation failed: {v2_result.get('error', v2_result.get('skipped_reason'))}")
+                        logger.warning(
+                            f"V2 generation failed: {v2_result.get('error', v2_result.get('skipped_reason'))}"
+                        )
                         # Fallback to legacy generation
                         digest_text = await service.build_digest(news_items, style, digest_category)
                 except Exception as e:
@@ -266,24 +268,34 @@ def main():
         choices=["analytical", "business", "meme", "newsroom", "magazine", "casual"],
         help="Digest style",
     )
-    parser.add_argument("--tone", type=str, default="neutral", choices=["neutral", "insightful", "critical", "optimistic"], help="Digest tone")
-    parser.add_argument("--length", type=str, default="medium", choices=["short", "medium", "long"], help="Digest length")
+    parser.add_argument(
+        "--tone",
+        type=str,
+        default="neutral",
+        choices=["neutral", "insightful", "critical", "optimistic"],
+        help="Digest tone",
+    )
+    parser.add_argument(
+        "--length", type=str, default="medium", choices=["short", "medium", "long"], help="Digest length"
+    )
     parser.add_argument("--audience", type=str, default="general", choices=["general", "pro"], help="Target audience")
     parser.add_argument("--use-v2", action="store_true", help="Use v2 prompts")
 
     args = parser.parse_args()
 
     # Generate digest
-    digest = asyncio.run(generate_digest(
-        limit=args.limit,
-        category=args.category,
-        ai=args.ai,
-        style=args.style,
-        tone=args.tone,
-        length=args.length,
-        audience=args.audience,
-        use_v2=args.use_v2
-    ))
+    digest = asyncio.run(
+        generate_digest(
+            limit=args.limit,
+            category=args.category,
+            ai=args.ai,
+            style=args.style,
+            tone=args.tone,
+            length=args.length,
+            audience=args.audience,
+            use_v2=args.use_v2,
+        )
+    )
 
     print(digest)
 

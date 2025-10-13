@@ -26,35 +26,36 @@ from utils.logging.logging_setup import setup_logging
 setup_logging()
 logger = logging.getLogger("news_ai_bot")
 
-app = Flask(__name__, static_folder='dist')
+app = Flask(__name__, static_folder="dist")
 app.config["VERSION"] = VERSION
 
 # Flask session configuration для безопасности
 app.config.update(
-    SECRET_KEY=os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production'),
+    SECRET_KEY=os.getenv("FLASK_SECRET_KEY", "dev-secret-key-change-in-production"),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=not DEBUG,  # Только для HTTPS в production
-    SESSION_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=24)
+    SESSION_COOKIE_SAMESITE="Lax",
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
 )
+
 
 # Middleware для единой аутентификации
 @app.before_request  # noqa: E302  # noqa: E302
 def authenticate_request():
     """Единая точка аутентификации для всех защищенных endpoints."""
-    if request.path.startswith('/api/'):
+    if request.path.startswith("/api/"):
         # Публичные API endpoints, которые не требуют аутентификации
         public_paths = [
-            '/api/health',
-            '/api/users/by-telegram-id',  # Только для первичной аутентификации
-            '/api/categories',
-            '/api/digests/categories',
-            '/api/digests/styles',
-            '/api/latest',
-            '/api/dashboard/stats',
-            '/api/dashboard/latest_news',
-            '/api/dashboard/news_trend',
-            '/api/events'  # Events API - публичный доступ
+            "/api/health",
+            "/api/users/by-telegram-id",  # Только для первичной аутентификации
+            "/api/categories",
+            "/api/digests/categories",
+            "/api/digests/styles",
+            "/api/latest",
+            "/api/dashboard/stats",
+            "/api/dashboard/latest_news",
+            "/api/dashboard/news_trend",
+            "/api/events",  # Events API - публичный доступ
         ]
 
         # Проверяем, является ли endpoint публичным
@@ -62,50 +63,56 @@ def authenticate_request():
 
         if not is_public:
             # Для защищенных endpoints проверяем аутентификацию
-            bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
             auth_result = verify_telegram_auth(
-                request_headers=dict(request.headers),
-                session_data=session,
-                bot_token=bot_token
+                request_headers=dict(request.headers), session_data=session, bot_token=bot_token
             )
 
-            if not auth_result['success']:
+            if not auth_result["success"]:
                 from flask import jsonify
+
                 logger.warning(f"Authentication failed for {request.path}: {auth_result['message']}")
-                return jsonify({'error': auth_result['message']}), 401
+                return jsonify({"error": auth_result["message"]}), 401
 
             # Устанавливаем данные пользователя в g для использования в endpoints
             g.current_user = auth_result
 
             # Устанавливаем session для быстрой повторной аутентификации
-            if auth_result['method'] != 'session':
-                session['user_id'] = auth_result['user_id']
-                session['telegram_id'] = auth_result['telegram_id']
+            if auth_result["method"] != "session":
+                session["user_id"] = auth_result["user_id"]
+                session["telegram_id"] = auth_result["telegram_id"]
                 session.permanent = True
+
 
 # Middleware для обработки Telegram WebApp запросов
 @app.before_request  # noqa: E302  # noqa: E302
 def process_telegram_request():
     """Обрабатывает Telegram WebApp запросы и устанавливает флаги."""
     from utils.auth.telegram_auth import is_telegram_webapp_request
+
     g.is_telegram_webapp = is_telegram_webapp_request(dict(request.headers))
 
     if g.is_telegram_webapp:
         logger.debug(f"Telegram WebApp request detected: {request.path}")
 
+
 # Настройка CORS для Telegram WebApp
-CORS(app, origins=[  # noqa: E305
-    "https://design-treasures-titten-formation.trycloudflare.com",
-    "https://*.trycloudflare.com",
-    "https://telegram.org",
-    "https://web.telegram.org"
-])
+CORS(
+    app,
+    origins=[  # noqa: E305
+        "https://design-treasures-titten-formation.trycloudflare.com",
+        "https://*.trycloudflare.com",
+        "https://telegram.org",
+        "https://web.telegram.org",
+    ],
+)
+
 
 # Middleware для разрешения встраивания в iframe (Telegram WebApp)
 @app.after_request  # noqa: E302  # noqa: E302
 def set_frame_options(response):
     """Устанавливает заголовки для разрешения встраивания в iframe"""
-    response.headers['X-Frame-Options'] = 'ALLOWALL'
+    response.headers["X-Frame-Options"] = "ALLOWALL"
     # Обновленная CSP политика для Telegram WebApp
     csp_policy = (
         "frame-ancestors *; "
@@ -118,8 +125,9 @@ def set_frame_options(response):
         "object-src 'none'; "
         "base-uri 'self'"
     )
-    response.headers['Content-Security-Policy'] = csp_policy
+    response.headers["Content-Security-Policy"] = csp_policy
     return response
+
 
 # Middleware для обработки Telegram WebApp заголовков
 @app.before_request  # noqa: E302
@@ -128,22 +136,24 @@ def handle_telegram_headers():
     from flask import request, g
 
     # Логируем заголовки для отладки
-    if request.headers.get('X-Telegram-Bot-Api-Secret-Token'):
+    if request.headers.get("X-Telegram-Bot-Api-Secret-Token"):
         logger.info("🔍 Telegram WebApp request detected")
         logger.info(f"Headers: {dict(request.headers)}")
 
     # Устанавливаем флаг для Telegram WebApp
-    g.is_telegram_webapp = bool(request.headers.get('X-Telegram-Bot-Api-Secret-Token'))
+    g.is_telegram_webapp = bool(request.headers.get("X-Telegram-Bot-Api-Secret-Token"))
+
 
 # Middleware для отключения кэширования API запросов
 @app.after_request  # noqa: E302
 def disable_api_caching(response):
     """Отключаем кэширование для всех API запросов"""
     from flask import request
-    if request.path.startswith('/api/'):
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
+
+    if request.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
     return response
 
 

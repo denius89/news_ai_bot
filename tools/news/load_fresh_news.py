@@ -41,10 +41,7 @@ async def load_fresh_news():
             subcategories = get_subcategories(category)
             total_subcategories += len(subcategories)
 
-        logger.info(
-            f"Найдено {len(categories)} категорий и "
-            f"{total_subcategories} подкатегорий"
-        )
+        logger.info(f"Найдено {len(categories)} категорий и " f"{total_subcategories} подкатегорий")
 
         # Запускаем парсинг
         logger.info("🚀 Запускаем AdvancedParser для загрузки новостей")
@@ -68,9 +65,7 @@ async def load_fresh_news():
         category_stats = {}
         for category in categories:
             result = await db_service.async_safe_execute(
-                client.table("news")
-                .select("id", count="exact")
-                .eq("category", category)
+                client.table("news").select("id", count="exact").eq("category", category)
             )
 
             if result and hasattr(result, "data"):
@@ -78,16 +73,10 @@ async def load_fresh_news():
                 category_stats[category] = count
 
         # Общая статистика
-        total_result = await db_service.async_safe_execute(
-            client.table("news").select("id", count="exact")
-        )
+        total_result = await db_service.async_safe_execute(client.table("news").select("id", count="exact"))
 
         total_count = (
-            len(total_result.data)
-            if total_result
-            and hasattr(total_result, "data")
-            and total_result.data
-            else 0
+            len(total_result.data) if total_result and hasattr(total_result, "data") and total_result.data else 0
         )
 
         logger.info("📊 Статистика загруженных новостей:")
@@ -99,15 +88,9 @@ async def load_fresh_news():
         # Проверяем корректность заполнения полей
         logger.info("🔍 Проверяем корректность заполнения полей")
 
-        sample_result = await db_service.async_safe_execute(
-            client.table("news").select("*").limit(5)
-        )
+        sample_result = await db_service.async_safe_execute(client.table("news").select("*").limit(5))
 
-        if (
-            sample_result
-            and hasattr(sample_result, "data")
-            and sample_result.data
-        ):
+        if sample_result and hasattr(sample_result, "data") and sample_result.data:
             sample_news = sample_result.data[0]
             required_fields = [
                 "id",
@@ -129,25 +112,17 @@ async def load_fresh_news():
                     missing_fields.append(field)
 
             if missing_fields:
-                logger.warning(
-                    f"⚠️ Пропущенные поля в новостях: {missing_fields}"
-                )
+                logger.warning(f"⚠️ Пропущенные поля в новостях: {missing_fields}")
             else:
                 logger.info("✅ Все обязательные поля заполнены корректно")
 
             # Проверяем типы данных
-            if isinstance(
-                sample_news.get("credibility"), (int, float)
-            ) and isinstance(sample_news.get("importance"), (int, float)):
-                logger.info(
-                    "✅ Поля credibility и importance имеют "
-                    "корректные числовые значения"
-                )
+            if isinstance(sample_news.get("credibility"), (int, float)) and isinstance(
+                sample_news.get("importance"), (int, float)
+            ):
+                logger.info("✅ Поля credibility и importance имеют " "корректные числовые значения")
             else:
-                logger.warning(
-                    "⚠️ Поля credibility или importance имеют "
-                    "некорректные значения"
-                )
+                logger.warning("⚠️ Поля credibility или importance имеют " "некорректные значения")
 
         logger.info("✅ Загрузка свежих новостей завершена успешно")
 

@@ -5,9 +5,11 @@
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from database.db_models import supabase, safe_execute  # noqa: E402
+
 
 def apply_migration():  # noqa: E302
     """Применить миграцию для digest_analytics."""
@@ -55,7 +57,7 @@ def apply_migration():  # noqa: E302
 
     try:
         # Выполняем миграцию
-        result = safe_execute(supabase.rpc('exec_sql', {'sql': migration_sql}))
+        result = safe_execute(supabase.rpc("exec_sql", {"sql": migration_sql}))
 
         if result:
             print("✅ Миграция применена успешно")
@@ -87,7 +89,7 @@ def apply_migration():  # noqa: E302
             );
             """
 
-            result = safe_execute(supabase.rpc('exec_sql', {'sql': create_table_sql}))
+            result = safe_execute(supabase.rpc("exec_sql", {"sql": create_table_sql}))
 
             if result:
                 print("✅ Таблица digest_analytics создана")
@@ -98,7 +100,7 @@ def apply_migration():  # noqa: E302
                 CREATE INDEX IF NOT EXISTS idx_digest_analytics_created_at ON digest_analytics(created_at DESC);
                 """
 
-                safe_execute(supabase.rpc('exec_sql', {'sql': index_sql}))
+                safe_execute(supabase.rpc("exec_sql", {"sql": index_sql}))
                 print("✅ Индексы созданы")
 
                 return True
@@ -110,27 +112,20 @@ def apply_migration():  # noqa: E302
             print(f"❌ Альтернативный способ тоже не сработал: {e2}")
             return False
 
+
 def verify_migration():  # noqa: E302
     """Проверить, что миграция применена."""
     print("\n🔍 Проверка миграции...")
 
     try:
         # Проверяем существование таблицы digest_analytics
-        result = safe_execute(
-            supabase.table("digest_analytics")
-            .select("id")
-            .limit(1)
-        )
+        result = safe_execute(supabase.table("digest_analytics").select("id").limit(1))
 
         if result:
             print("✅ Таблица digest_analytics существует")
 
             # Проверяем структуру таблицы
-            result = safe_execute(
-                supabase.table("digest_analytics")
-                .select("*")
-                .limit(1)
-            )
+            result = safe_execute(supabase.table("digest_analytics").select("*").limit(1))
 
             if result and result.data:
                 print("✅ Таблица digest_analytics доступна для чтения")
@@ -146,6 +141,7 @@ def verify_migration():  # noqa: E302
     except Exception as e:
         print(f"❌ Ошибка при проверке: {e}")
         return False
+
 
 if __name__ == "__main__":  # noqa: E305
     print("🚀 Применение миграции digest_analytics...")

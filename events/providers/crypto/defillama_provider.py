@@ -70,9 +70,7 @@ class DefiLlamaProvider(BaseEventProvider):
             logger.error(f"Error fetching DeFi Llama events: {e}")
             return []
 
-    def _check_protocol_for_events(
-        self, protocol: Dict, start_date: datetime, end_date: datetime
-    ) -> Dict:
+    def _check_protocol_for_events(self, protocol: Dict, start_date: datetime, end_date: datetime) -> Dict:
         """
         Check if protocol has events in date range.
 

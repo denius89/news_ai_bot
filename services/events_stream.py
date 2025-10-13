@@ -70,19 +70,13 @@ class EventsStream:
 
         if now - last < self.update_interval:
             logger.debug(
-                f"Rate limit for user {user_id}: "
-                f"last update {now - last:.1f}s ago, need {self.update_interval}s"
+                f"Rate limit for user {user_id}: " f"last update {now - last:.1f}s ago, need {self.update_interval}s"
             )
             return False
 
         return True
 
-    async def broadcast_event(
-        self,
-        event_type: str,
-        event_data: Dict,
-        user_ids: Optional[list] = None
-    ):
+    async def broadcast_event(self, event_type: str, event_data: Dict, user_ids: Optional[list] = None):
         """
         Broadcast event to connected clients.
 
@@ -136,12 +130,7 @@ class EventsStream:
         except Exception as e:
             logger.error(f"Error broadcasting event: {e}")
 
-    async def send_to_user(
-        self,
-        user_id: int,
-        event_type: str,
-        event_data: Dict
-    ) -> bool:
+    async def send_to_user(self, user_id: int, event_type: str, event_data: Dict) -> bool:
         """
         Send event to specific user.
 

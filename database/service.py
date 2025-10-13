@@ -151,6 +151,7 @@ class DatabaseService:
         try:
             # Принудительно отключаем HTTP/2 для решения pseudo-header ошибки
             import os
+
             os.environ["HTTPX_NO_HTTP2"] = "1"
             os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
 
@@ -442,6 +443,7 @@ class DatabaseService:
             for item in news_items:
                 if item.get("published_at"):
                     from utils.system.dates import format_datetime
+
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
             # Sort by importance if not filtered by min_importance

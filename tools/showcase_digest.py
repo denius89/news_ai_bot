@@ -15,7 +15,7 @@ from datetime import datetime
 from digests.generator import generate_digest
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -38,7 +38,7 @@ async def generate_showcase():
                 tone="neutral",
                 length="short",
                 audience="general",
-                use_v2=True
+                use_v2=True,
             )
 
             showcase[category] = digest
@@ -57,21 +57,21 @@ async def generate_showcase():
         "generated_at": datetime.now().isoformat(),
         "categories": showcase,
         "total_categories": len(categories),
-        "successful_generations": len([d for d in showcase.values() if not d.startswith("Ошибка")])
+        "successful_generations": len([d for d in showcase.values() if not d.startswith("Ошибка")]),
     }
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(showcase_data, f, ensure_ascii=False, indent=2)
 
     logger.info(f"✅ Showcase saved to {output_path}")
 
     # Print markdown summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📰 DIGEST OF THE DAY")
-    print("="*60)
+    print("=" * 60)
     print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Categories: {showcase_data['successful_generations']}/{showcase_data['total_categories']}")
-    print("="*60)
+    print("=" * 60)
 
     for category, digest in showcase.items():
         print(f"\n**{category.upper()}**")
@@ -83,9 +83,9 @@ async def generate_showcase():
             display_text = digest[:300] + "..." if len(digest) > 300 else digest
             print(display_text)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✅ Showcase generation completed!")
-    print("="*60)
+    print("=" * 60)
 
     return showcase_data
 
@@ -96,8 +96,8 @@ async def main():
         showcase_data = await generate_showcase()
 
         # Return success status
-        successful = showcase_data['successful_generations']
-        total = showcase_data['total_categories']
+        successful = showcase_data["successful_generations"]
+        total = showcase_data["total_categories"]
 
         if successful == total:
             logger.info("🎉 All categories generated successfully!")

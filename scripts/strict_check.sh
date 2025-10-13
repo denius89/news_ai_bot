@@ -56,10 +56,10 @@ strict_code_check() {
     
     # 2. Строгая Flake8 проверка стиля
     echo -e "${YELLOW}🔍 Строгая проверка Flake8...${NC}"
-    if ! python3 -m flake8 --max-line-length=100 --ignore=E203,W503 .; then
+    if ! python3 -m flake8 --config=.flake8 .; then
         echo -e "${RED}❌ Flake8 нашел критические проблемы в коде${NC}"
         echo -e "${YELLOW}💡 Исправьте ошибки перед коммитом:${NC}"
-        python3 -m flake8 --max-line-length=100 --ignore=E203,W503 .
+        python3 -m flake8 --config=.flake8 .
         exit 1
     fi
     echo -e "${GREEN}✅ Flake8 строгая проверка пройдена${NC}"

@@ -13,11 +13,7 @@ import random
 import time
 from datetime import datetime, timedelta
 
-sys.path.append(
-    os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    )
-)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from database.db_models import supabase
 
@@ -33,9 +29,7 @@ def generate_sample_events():
                 "title": f"Bitcoin Mining Difficulty Adjustment #{random.randint(820000, 830000)}",
                 "category": "crypto",
                 "subcategory": "bitcoin",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(1, 90))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(1, 90))).isoformat(),
                 "country": "Global",
                 "source": "coingecko",
                 "event_id": f"btc-diff-{random.randint(820000, 830000)}-{int(time.time() * 1000000)}",
@@ -54,9 +48,7 @@ def generate_sample_events():
                 "title": f"Ethereum Network Upgrade - {upgrade} v2.{random.randint(1, 5)}",
                 "category": "crypto",
                 "subcategory": "ethereum",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(5, 120))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(5, 120))).isoformat(),
                 "source": "defillama",
                 "event_id": f"eth-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -65,17 +57,13 @@ def generate_sample_events():
         )
 
     for _ in range(12):
-        coin = random.choice(
-            ["Solana", "Cardano", "Polkadot", "Avalanche", "Polygon"]
-        )
+        coin = random.choice(["Solana", "Cardano", "Polkadot", "Avalanche", "Polygon"])
         events.append(
             {
                 "title": f"{coin} Token Unlock Event",
                 "category": "crypto",
                 "subcategory": "altcoins",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(1, 180))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(1, 180))).isoformat(),
                 "source": "tokenunlocks",
                 "event_id": f"unlock-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -93,9 +81,7 @@ def generate_sample_events():
                 "title": f"{exchange} Quarterly Earnings Report",
                 "category": "crypto",
                 "subcategory": "exchanges",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(10, 120))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(10, 120))).isoformat(),
                 "source": "fmp",
                 "event_id": f"earn-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -108,17 +94,13 @@ def generate_sample_events():
 
     # Sports Events (35 events)
     for _ in range(15):
-        league = random.choice(
-            ["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"]
-        )
+        league = random.choice(["Premier League", "La Liga", "Bundesliga", "Serie A", "Ligue 1"])
         events.append(
             {
                 "title": f"{league} Matchday {random.randint(1, 38)}",
                 "category": "sports",
                 "subcategory": "football",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(1, 200))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(1, 200))).isoformat(),
                 "source": "football_data",
                 "event_id": f"football-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -136,9 +118,7 @@ def generate_sample_events():
                 "title": f"NBA {game_type} Game",
                 "category": "sports",
                 "subcategory": "basketball",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(1, 180))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(1, 180))).isoformat(),
                 "source": "thesportsdb",
                 "event_id": f"nba-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -147,17 +127,13 @@ def generate_sample_events():
         )
 
     for _ in range(10):
-        tournament = random.choice(
-            ["Australian Open", "French Open", "Wimbledon", "US Open"]
-        )
+        tournament = random.choice(["Australian Open", "French Open", "Wimbledon", "US Open"])
         events.append(
             {
                 "title": f"{tournament} Tennis Championship",
                 "category": "sports",
                 "subcategory": "tennis",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(10, 300))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(10, 300))).isoformat(),
                 "source": "thesportsdb",
                 "event_id": f"tennis-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -167,17 +143,13 @@ def generate_sample_events():
 
     # Tech Events (30 events)
     for _ in range(10):
-        company = random.choice(
-            ["Apple", "Google", "Microsoft", "Amazon", "Meta"]
-        )
+        company = random.choice(["Apple", "Google", "Microsoft", "Amazon", "Meta"])
         events.append(
             {
                 "title": f"{company} Product Launch Event",
                 "category": "tech",
                 "subcategory": "product_launches",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(5, 180))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(5, 180))).isoformat(),
                 "source": "github",
                 "event_id": f"launch-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -189,17 +161,13 @@ def generate_sample_events():
         )
 
     for _ in range(10):
-        conf = random.choice(
-            ["WWDC", "Google I/O", "Microsoft Build", "AWS re:Invent"]
-        )
+        conf = random.choice(["WWDC", "Google I/O", "Microsoft Build", "AWS re:Invent"])
         events.append(
             {
                 "title": f"{conf} Developer Conference",
                 "category": "tech",
                 "subcategory": "conferences",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(30, 300))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(30, 300))).isoformat(),
                 "source": "github",
                 "event_id": f"conf-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -217,9 +185,7 @@ def generate_sample_events():
                 "title": f"{tech} Technology Summit",
                 "category": "tech",
                 "subcategory": "summits",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(20, 250))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(20, 250))).isoformat(),
                 "source": "github",
                 "event_id": f"summit-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -229,17 +195,13 @@ def generate_sample_events():
 
     # Market Events (95 events)
     for _ in range(30):
-        company = random.choice(
-            ["Apple", "Tesla", "Amazon", "Microsoft", "Google"]
-        )
+        company = random.choice(["Apple", "Tesla", "Amazon", "Microsoft", "Google"])
         events.append(
             {
                 "title": f"{company} Quarterly Earnings Report",
                 "category": "markets",
                 "subcategory": "earnings",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(5, 120))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(5, 120))).isoformat(),
                 "source": "finnhub",
                 "event_id": f"earn-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -251,17 +213,13 @@ def generate_sample_events():
         )
 
     for _ in range(25):
-        bank = random.choice(
-            ["Federal Reserve", "ECB", "Bank of England", "Bank of Japan"]
-        )
+        bank = random.choice(["Federal Reserve", "ECB", "Bank of England", "Bank of Japan"])
         events.append(
             {
                 "title": f"{bank} Interest Rate Decision",
                 "category": "markets",
                 "subcategory": "interest_rates",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(10, 180))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(10, 180))).isoformat(),
                 "source": "finnhub",
                 "event_id": f"rate-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -270,17 +228,13 @@ def generate_sample_events():
         )
 
     for _ in range(20):
-        indicator = random.choice(
-            ["GDP", "CPI", "Unemployment", "Retail Sales"]
-        )
+        indicator = random.choice(["GDP", "CPI", "Unemployment", "Retail Sales"])
         events.append(
             {
                 "title": f"US {indicator} Data Release",
                 "category": "markets",
                 "subcategory": "economic_indicators",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(3, 90))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(3, 90))).isoformat(),
                 "source": "finnhub",
                 "event_id": f"data-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,
@@ -298,9 +252,7 @@ def generate_sample_events():
                 "title": f"{company} Investor Day Presentation",
                 "category": "markets",
                 "subcategory": "investor_relations",
-                "event_time": (
-                    datetime.now() + timedelta(days=random.randint(15, 200))
-                ).isoformat(),
+                "event_time": (datetime.now() + timedelta(days=random.randint(15, 200))).isoformat(),
                 "source": "finnhub",
                 "event_id": f"inv-{random.randint(100000, 999999)}-{int(time.time() * 1000000)}",
                 "importance": 1,

@@ -33,18 +33,14 @@ class TelegramSender:
         try:
             # Try to import existing bot instance
             from telegram_bot.bot import get_bot_instance
+
             self.bot = get_bot_instance()
             logger.info("Connected to existing Telegram bot instance")
         except Exception as e:
             logger.warning(f"Could not connect to Telegram bot: {e}")
             self.bot = None
 
-    async def send_notification(
-        self,
-        user_id: int,
-        message: str,
-        parse_mode: str = "Markdown"
-    ) -> bool:
+    async def send_notification(self, user_id: int, message: str, parse_mode: str = "Markdown") -> bool:
         """
         Send notification message to user via Telegram.
 
@@ -62,11 +58,7 @@ class TelegramSender:
                 return False
 
             # Send message via bot
-            await self.bot.send_message(
-                chat_id=user_id,
-                text=message,
-                parse_mode=parse_mode
-            )
+            await self.bot.send_message(chat_id=user_id, text=message, parse_mode=parse_mode)
 
             logger.info(f"Sent Telegram notification to user {user_id}")
             return True
@@ -75,11 +67,7 @@ class TelegramSender:
             logger.error(f"Error sending Telegram notification to user {user_id}: {e}")
             return False
 
-    async def send_event_notification(
-        self,
-        user_id: int,
-        events: List[Dict]
-    ) -> bool:
+    async def send_event_notification(self, user_id: int, events: List[Dict]) -> bool:
         """
         Send formatted event notification to user.
 
@@ -105,11 +93,7 @@ class TelegramSender:
             logger.error(f"Error sending event notification to user {user_id}: {e}")
             return False
 
-    async def send_daily_digest(
-        self,
-        user_id: int,
-        digest_data: Dict
-    ) -> bool:
+    async def send_daily_digest(self, user_id: int, digest_data: Dict) -> bool:
         """
         Send daily digest to user.
 
@@ -121,8 +105,8 @@ class TelegramSender:
             True if sent successfully
         """
         try:
-            events = digest_data.get('events', [])
-            high_importance = digest_data.get('high_importance', [])
+            events = digest_data.get("events", [])
+            high_importance = digest_data.get("high_importance", [])
 
             if not events:
                 logger.debug(f"No events in digest for user {user_id}")
@@ -154,16 +138,17 @@ class TelegramSender:
         lines = ["🔔 *Важные события:*\n"]
 
         for event in events[:5]:  # Limit to 5 events
-            category_emoji = self._get_category_emoji(event.get('category', 'unknown'))
-            title = event.get('title', 'Без названия')
-            importance = event.get('importance_score', 0)
-            starts_at = event.get('starts_at', '')
+            category_emoji = self._get_category_emoji(event.get("category", "unknown"))
+            title = event.get("title", "Без названия")
+            importance = event.get("importance_score", 0)
+            starts_at = event.get("starts_at", "")
 
             # Format date
             try:
                 from datetime import datetime
-                date_obj = datetime.fromisoformat(starts_at.replace('Z', '+00:00'))
-                date_str = date_obj.strftime('%d.%m %H:%M')
+
+                date_obj = datetime.fromisoformat(starts_at.replace("Z", "+00:00"))
+                date_str = date_obj.strftime("%d.%m %H:%M")
             except Exception:
                 date_str = starts_at
 
@@ -171,7 +156,7 @@ class TelegramSender:
             lines.append(f"   📊 Важность: {int(importance * 100)}% | 📅 {date_str}")
 
             # Add link if available
-            link = event.get('link')
+            link = event.get("link")
             if link:
                 lines.append(f"   🔗 [Подробнее]({link})")
 
@@ -182,11 +167,7 @@ class TelegramSender:
 
         return "\n".join(lines)
 
-    def _format_digest_message(
-        self,
-        events: List[Dict],
-        high_importance: List[Dict]
-    ) -> str:
+    def _format_digest_message(self, events: List[Dict], high_importance: List[Dict]) -> str:
         """
         Format daily digest message.
 
@@ -202,8 +183,8 @@ class TelegramSender:
         if high_importance:
             lines.append("🔥 *Особо важные события:*\n")
             for event in high_importance[:3]:
-                category_emoji = self._get_category_emoji(event.get('category', 'unknown'))
-                title = event.get('title', 'Без названия')
+                category_emoji = self._get_category_emoji(event.get("category", "unknown"))
+                title = event.get("title", "Без названия")
                 lines.append(f"{category_emoji} {title}")
             lines.append("")
 

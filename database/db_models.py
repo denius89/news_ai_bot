@@ -92,15 +92,11 @@ if SUPABASE_URL and SUPABASE_KEY:
 
         # Стандартная инициализация с отключенным HTTP/2
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-        logger.info(
-            "✅ Supabase client initialized with HTTP/2 disabled via environment"
-        )
+        logger.info("✅ Supabase client initialized with HTTP/2 disabled via environment")
     except Exception as e:
         logger.error("❌ Ошибка инициализации Supabase: %s", e)
 else:
-    logger.warning(
-        "⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД."
-    )
+    logger.warning("⚠️ Supabase не инициализирован (нет ключей). Unit-тесты будут выполняться без БД.")
 
 
 # --- SAFE EXECUTE (ретраи) ---
@@ -117,17 +113,10 @@ def safe_execute(query, retries: int = 5, delay: float = 1.0):
             return result
         except Exception as e:
             error_str = str(e)
-            if (
-                "ConnectionTerminated" in error_str
-                or "error_code:9" in error_str
-            ):
-                logger.warning(
-                    f"⚠️ HTTP/2 connection error attempt {attempt}/{retries}: {e}"
-                )
+            if "ConnectionTerminated" in error_str or "error_code:9" in error_str:
+                logger.warning(f"⚠️ HTTP/2 connection error attempt {attempt}/{retries}: {e}")
             else:
-                logger.warning(
-                    f"⚠️ Database error attempt {attempt}/{retries}: {e}"
-                )
+                logger.warning(f"⚠️ Database error attempt {attempt}/{retries}: {e}")
 
             if attempt < retries:
                 # Экспоненциальная задержка: 1s, 2s, 4s, 8s
@@ -193,9 +182,7 @@ def enrich_news_with_ai(news_item: Dict) -> Dict:
     """Обновляет credibility и importance для новости через AI-модули."""
     # Проверяем, что news_item - это словарь
     if not isinstance(news_item, dict):
-        logger.error(
-            f"enrich_news_with_ai получил не словарь: {type(news_item)} = {news_item}"
-        )
+        logger.error(f"enrich_news_with_ai получил не словарь: {type(news_item)} = {news_item}")
         # Возвращаем пустой словарь или исходный объект как словарь
         if isinstance(news_item, str):
             return {
@@ -232,23 +219,13 @@ def upsert_news(items: List[Dict]):
         try:
             # Проверяем, что item - это словарь
             if not isinstance(item, dict):
-                logger.error(
-                    f"upsert_news получил не словарь: {type(item)} = {item}"
-                )
+                logger.error(f"upsert_news получил не словарь: {type(item)} = {item}")
                 continue
 
             enriched = enrich_news_with_ai(item)
 
-            title = (
-                (enriched.get("title") or "").strip()
-                or enriched.get("source")
-                or "Без названия"
-            )
-            content = (
-                (enriched.get("content") or "").strip()
-                or (enriched.get("summary") or "").strip()
-                or title
-            )
+            title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
+            content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
             uid = make_uid(enriched.get("url", ""), title)
 
             row = {
@@ -256,8 +233,7 @@ def upsert_news(items: List[Dict]):
                 "title": title[:512],
                 "content": content,
                 "link": enriched.get("url"),
-                "published_at": ensure_utc_iso(enriched.get("published_at"))
-                or datetime.now(timezone.utc).isoformat(),
+                "published_at": ensure_utc_iso(enriched.get("published_at")) or datetime.now(timezone.utc).isoformat(),
                 "source": enriched.get("source"),
                 "category": (enriched.get("category") or "").lower() or None,
                 "credibility": enriched.get("credibility"),
@@ -273,9 +249,7 @@ def upsert_news(items: List[Dict]):
         return
 
     try:
-        res = safe_execute(
-            supabase.table("news").upsert(rows, on_conflict="uid")
-        )
+        res = safe_execute(supabase.table("news").upsert(rows, on_conflict="uid"))
         inserted = len(res.data or [])
         logger.info(
             "✅ Upsert news: %s prepared, %s inserted/updated",
@@ -305,9 +279,7 @@ def upsert_event(items: List[Dict]):
 
             country_raw = (item.get("country") or "").lower()
             country_code = COUNTRY_MAP.get(country_raw)
-            event_id = make_event_id(
-                item.get("title", ""), item.get("country", ""), event_time
-            )
+            event_id = make_event_id(item.get("title", ""), item.get("country", ""), event_time)
 
             row = {
                 "event_id": event_id,
@@ -334,9 +306,7 @@ def upsert_event(items: List[Dict]):
         return
 
     try:
-        res = safe_execute(
-            supabase.table("events").upsert(rows, on_conflict="event_id")
-        )
+        res = safe_execute(supabase.table("events").upsert(rows, on_conflict="event_id"))
         inserted = len(res.data or [])
         logger.info(
             "✅ Upsert events: %s prepared, %s inserted/updated",
@@ -355,16 +325,12 @@ upsert_events = upsert_event
 # --- Получение событий ---
 def get_latest_events(limit: int = 10) -> List[Dict]:
     if not supabase:
-        logger.warning(
-            "⚠️ Supabase не подключён, get_latest_events не работает."
-        )
+        logger.warning("⚠️ Supabase не подключён, get_latest_events не работает.")
         return []
 
     query = (
         supabase.table("events")
-        .select(
-            "event_time, country, country_code, currency, title, importance, fact, forecast, previous, source"
-        )
+        .select("event_time, country, country_code, currency, title, importance, fact, forecast, previous, source")
         .order("event_time", desc=False)
         .limit(limit)
     )
@@ -403,9 +369,7 @@ def get_latest_news(
 
     query = (
         supabase.table("news")
-        .select(
-            "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
-        )
+        .select("id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance")
         .order("published_at", desc=True)
         .limit(limit)
     )
@@ -421,9 +385,7 @@ def get_latest_news(
         logger.debug("get_latest_news: fetched %d rows", len(data))
         for row in data:
             # Парсим published_at в datetime объект
-            row["published_at"] = parse_datetime_from_row(
-                row.get("published_at")
-            )
+            row["published_at"] = parse_datetime_from_row(row.get("published_at"))
             # Добавляем форматированную строку для обратной совместимости
             row["published_at_fmt"] = format_datetime(row.get("published_at"))
         return data
@@ -462,17 +424,10 @@ def upsert_user_by_telegram(
         from utils.text.name_normalizer import normalize_user_name
 
         # Нормализуем имя пользователя
-        normalized_first_name = normalize_user_name(
-            first_name, username, telegram_id
-        )
+        normalized_first_name = normalize_user_name(first_name, username, telegram_id)
 
         # Сначала пытаемся найти существующего пользователя
-        existing_user = (
-            supabase.table("users")
-            .select("*")
-            .eq("telegram_id", telegram_id)
-            .execute()
-        )
+        existing_user = supabase.table("users").select("*").eq("telegram_id", telegram_id).execute()
 
         if existing_user.data:
             user_data = existing_user.data[0]
@@ -488,9 +443,7 @@ def upsert_user_by_telegram(
             # Обновляем пользователя, если есть новые данные
             if update_data:
                 update_data["updated_at"] = "now()"
-                supabase.table("users").update(update_data).eq(
-                    "id", user_id
-                ).execute()
+                supabase.table("users").update(update_data).eq("id", user_id).execute()
                 logger.info(
                     "Обновлены данные пользователя: ID=%s, данные=%s",
                     user_id,
@@ -543,12 +496,7 @@ def get_user_by_telegram(telegram_id: int) -> dict | None:
         return None
 
     try:
-        result = (
-            supabase.table("users")
-            .select("*")
-            .eq("telegram_id", telegram_id)
-            .execute()
-        )
+        result = supabase.table("users").select("*").eq("telegram_id", telegram_id).execute()
 
         if result.data:
             return result.data[0]
@@ -575,11 +523,7 @@ def add_subscription(user_id: str, category: str) -> bool:
         return False
 
     try:
-        result = (
-            supabase.table("subscriptions")
-            .insert({"user_id": user_id, "category": category})
-            .execute()
-        )
+        result = supabase.table("subscriptions").insert({"user_id": user_id, "category": category}).execute()
 
         if result.data:
             logger.info(
@@ -617,19 +561,11 @@ def remove_subscription(user_id: str, category: str) -> int:
         return 0
 
     try:
-        result = (
-            supabase.table("subscriptions")
-            .delete()
-            .eq("user_id", user_id)
-            .eq("category", category)
-            .execute()
-        )
+        result = supabase.table("subscriptions").delete().eq("user_id", user_id).eq("category", category).execute()
 
         deleted_count = len(result.data) if result.data else 0
         if deleted_count > 0:
-            logger.info(
-                "Удалена подписка: user_id=%d, category=%s", user_id, category
-            )
+            logger.info("Удалена подписка: user_id=%d, category=%s", user_id, category)
 
         return deleted_count
 
@@ -653,12 +589,7 @@ def list_subscriptions(user_id: str) -> list[dict]:
         return []
 
     try:
-        result = (
-            supabase.table("subscriptions")
-            .select("*")
-            .eq("user_id", user_id)
-            .execute()
-        )
+        result = supabase.table("subscriptions").select("*").eq("user_id", user_id).execute()
 
         return result.data or []
 
@@ -732,12 +663,7 @@ def list_notifications(user_id: str) -> list[dict]:
         return []
 
     try:
-        result = (
-            supabase.table("notifications")
-            .select("*")
-            .eq("user_id", user_id)
-            .execute()
-        )
+        result = supabase.table("notifications").select("*").eq("user_id", user_id).execute()
 
         return result.data or []
 
@@ -749,9 +675,7 @@ def list_notifications(user_id: str) -> list[dict]:
 # --- USER NOTIFICATIONS FUNCTIONS ---
 
 
-def get_user_notifications(
-    user_id: Union[int, str], limit: int = 50, offset: int = 0
-) -> List[Dict]:
+def get_user_notifications(user_id: Union[int, str], limit: int = 50, offset: int = 0) -> List[Dict]:
     """
     Получает уведомления пользователя.
 
@@ -888,22 +812,14 @@ def create_user_notification(
             "via_webapp": via_webapp,
         }
 
-        result = (
-            supabase.table("user_notifications")
-            .insert(notification_data)
-            .execute()
-        )
+        result = supabase.table("user_notifications").insert(notification_data).execute()
 
         if result.data and len(result.data) > 0:
             notification_id = result.data[0].get("id")
-            logger.info(
-                f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}"
-            )
+            logger.info(f"✅ Создано уведомление: user_id={user_id}, notification_id={notification_id}")
             return str(notification_id)
         else:
-            logger.error(
-                f"❌ Не удалось создать уведомление для user_id={user_id}"
-            )
+            logger.error(f"❌ Не удалось создать уведомление для user_id={user_id}")
             return None
 
     except Exception as e:
@@ -911,9 +827,7 @@ def create_user_notification(
         return None
 
 
-def mark_notification_read(
-    user_id: Union[int, str], notification_id: Union[int, str]
-) -> bool:
+def mark_notification_read(user_id: Union[int, str], notification_id: Union[int, str]) -> bool:
     """
     Отмечает уведомление как прочитанное.
 
@@ -1074,11 +988,7 @@ def get_user_digests(
             query = query.is_("deleted_at", "null")
             query = query.or_("archived.is.null,archived.eq.false")
 
-        result = (
-            query.order("created_at", desc=True)
-            .range(offset, offset + limit - 1)
-            .execute()
-        )
+        result = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
 
         return result.data or []
 
@@ -1149,9 +1059,7 @@ def soft_delete_digest(digest_id: str, user_id: str) -> bool:
         )
 
         if result.data:
-            logger.info(
-                "Дайджест мягко удален: ID=%s, user_id=%s", digest_id, user_id
-            )
+            logger.info("Дайджест мягко удален: ID=%s, user_id=%s", digest_id, user_id)
             return True
         else:
             logger.warning(
@@ -1192,16 +1100,12 @@ def restore_digest(digest_id: str, user_id: str) -> bool:
             )
             .eq("id", digest_id)
             .eq("user_id", user_id)
-            .not_.is_(
-                "deleted_at", "null"
-            )  # Только если удален (deleted_at IS NOT NULL)
+            .not_.is_("deleted_at", "null")  # Только если удален (deleted_at IS NOT NULL)
             .execute()
         )
 
         if result.data:
-            logger.info(
-                "Дайджест восстановлен: ID=%s, user_id=%s", digest_id, user_id
-            )
+            logger.info("Дайджест восстановлен: ID=%s, user_id=%s", digest_id, user_id)
             return True
         else:
             logger.warning(
@@ -1243,9 +1147,7 @@ def archive_digest(digest_id: str, user_id: str) -> bool:
         )
 
         if result.data:
-            logger.info(
-                "Дайджест архивирован: ID=%s, user_id=%s", digest_id, user_id
-            )
+            logger.info("Дайджест архивирован: ID=%s, user_id=%s", digest_id, user_id)
             return True
         else:
             logger.warning(
@@ -1326,13 +1228,7 @@ def permanent_delete_digest(digest_id: str, user_id: str) -> bool:
         return False
 
     try:
-        result = (
-            supabase.table("digests")
-            .delete()
-            .eq("id", digest_id)
-            .eq("user_id", user_id)
-            .execute()
-        )
+        result = supabase.table("digests").delete().eq("id", digest_id).eq("user_id", user_id).execute()
 
         if result.data:
             logger.info(
@@ -1397,17 +1293,13 @@ def save_user_preferences(
         }
 
         # Используем upsert для обновления существующих предпочтений
-        supabase.table("user_preferences").upsert(
-            preferences_data, on_conflict="user_id"
-        ).execute()
+        supabase.table("user_preferences").upsert(preferences_data, on_conflict="user_id").execute()
 
         logger.info(f"Предпочтения пользователя {user_id} сохранены")
         return True
 
     except Exception as e:
-        logger.error(
-            f"Ошибка при сохранении предпочтений пользователя {user_id}: {e}"
-        )
+        logger.error(f"Ошибка при сохранении предпочтений пользователя {user_id}: {e}")
         return False
 
 
@@ -1426,27 +1318,18 @@ def get_user_preferences(user_id: str) -> Dict:
         return _get_default_preferences()
 
     try:
-        result = (
-            supabase.table("user_preferences")
-            .select("*")
-            .eq("user_id", user_id)
-            .execute()
-        )
+        result = supabase.table("user_preferences").select("*").eq("user_id", user_id).execute()
 
         if result.data:
             preferences = result.data[0]
             logger.debug(f"Найдены предпочтения для пользователя {user_id}")
             return preferences
         else:
-            logger.debug(
-                f"Предпочтения для пользователя {user_id} не найдены, возвращаем по умолчанию"
-            )
+            logger.debug(f"Предпочтения для пользователя {user_id} не найдены, возвращаем по умолчанию")
             return _get_default_preferences()
 
     except Exception as e:
-        logger.error(
-            f"Ошибка при получении предпочтений пользователя {user_id}: {e}"
-        )
+        logger.error(f"Ошибка при получении предпочтений пользователя {user_id}: {e}")
         return _get_default_preferences()
 
 
@@ -1512,25 +1395,17 @@ def log_digest_generation(
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
-        result = safe_execute(
-            supabase.table("digest_analytics").insert(analytics_data)
-        )
+        result = safe_execute(supabase.table("digest_analytics").insert(analytics_data))
 
         if result.data:
-            logger.debug(
-                f"Аналитика генерации дайджеста залогирована для пользователя {user_id}"
-            )
+            logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
             return True
         else:
-            logger.error(
-                f"Не удалось залогировать аналитику для пользователя {user_id}"
-            )
+            logger.error(f"Не удалось залогировать аналитику для пользователя {user_id}")
             return False
 
     except Exception as e:
-        logger.error(
-            f"Ошибка при логировании аналитики для пользователя {user_id}: {e}"
-        )
+        logger.error(f"Ошибка при логировании аналитики для пользователя {user_id}: {e}")
         return False
 
 
@@ -1553,11 +1428,7 @@ def get_digest_analytics(user_id: str = None, days: int = 30) -> List[Dict]:
         # Вычисляем дату начала периода
         start_date = datetime.now(timezone.utc) - timedelta(days=days)
 
-        query = (
-            supabase.table("digest_analytics")
-            .select("*")
-            .gte("created_at", start_date.isoformat())
-        )
+        query = supabase.table("digest_analytics").select("*").gte("created_at", start_date.isoformat())
 
         if user_id:
             query = query.eq("user_id", user_id)
@@ -1623,19 +1494,13 @@ def get_latest_news_with_importance(
 
         # Сортируем по важности (если не указана min_importance)
         if min_importance is None:
-            data = sorted(
-                data, key=lambda x: x.get("importance", 0), reverse=True
-            )
+            data = sorted(data, key=lambda x: x.get("importance", 0), reverse=True)
 
-        logger.debug(
-            f"Получено {len(data)} новостей с фильтрацией по важности"
-        )
+        logger.debug(f"Получено {len(data)} новостей с фильтрацией по важности")
 
         for row in data:
             # Парсим published_at в datetime объект
-            row["published_at"] = parse_datetime_from_row(
-                row.get("published_at")
-            )
+            row["published_at"] = parse_datetime_from_row(row.get("published_at"))
             # Добавляем форматированную строку для обратной совместимости
             row["published_at_fmt"] = format_datetime(row.get("published_at"))
 
@@ -1682,14 +1547,10 @@ def get_smart_filter_for_time() -> Dict:
 
         if result.data:
             filter_data = result.data[0]
-            logger.debug(
-                f"Применен умный фильтр для времени: {time_condition}"
-            )
+            logger.debug(f"Применен умный фильтр для времени: {time_condition}")
             return filter_data
         else:
-            logger.debug(
-                f"Умный фильтр для времени {time_condition} не найден, используем по умолчанию"
-            )
+            logger.debug(f"Умный фильтр для времени {time_condition} не найден, используем по умолчанию")
             return _get_default_smart_filter()
 
     except Exception as e:
@@ -1791,11 +1652,7 @@ def update_digest_feedback(digest_id: str, score: float) -> bool:
 
     try:
         # Get current digest data
-        result = safe_execute(
-            supabase.table("digests")
-            .select("feedback_score", "feedback_count")
-            .eq("id", digest_id)
-        )
+        result = safe_execute(supabase.table("digests").select("feedback_score", "feedback_count").eq("id", digest_id))
 
         if not result.data:
             logger.warning(f"Digest {digest_id} not found")
@@ -1809,9 +1666,7 @@ def update_digest_feedback(digest_id: str, score: float) -> bool:
         if current_count == 0:
             new_score = score
         else:
-            new_score = (current_score * current_count + score) / (
-                current_count + 1
-            )
+            new_score = (current_score * current_count + score) / (current_count + 1)
 
         new_count = current_count + 1
 
@@ -1828,14 +1683,10 @@ def update_digest_feedback(digest_id: str, score: float) -> bool:
         )
 
         if update_result.data:
-            logger.info(
-                f"✅ Feedback updated for digest {digest_id}: {score} (avg: {new_score:.3f})"
-            )
+            logger.info(f"✅ Feedback updated for digest {digest_id}: {score} (avg: {new_score:.3f})")
             return True
         else:
-            logger.error(
-                f"❌ Failed to update feedback for digest {digest_id}"
-            )
+            logger.error(f"❌ Failed to update feedback for digest {digest_id}")
             return False
 
     except Exception as e:
@@ -1866,10 +1717,7 @@ def get_daily_digest_analytics(date: Optional[str] = None) -> dict:
         end_date = f"{date}T23:59:59Z"
 
         result = safe_execute(
-            supabase.table("digest_analytics")
-            .select("*")
-            .gte("created_at", start_date)
-            .lte("created_at", end_date)
+            supabase.table("digest_analytics").select("*").gte("created_at", start_date).lte("created_at", end_date)
         )
 
         if result.data:
@@ -1877,17 +1725,11 @@ def get_daily_digest_analytics(date: Optional[str] = None) -> dict:
             records = result.data
             total_count = len(records)
             avg_generation_time = (
-                sum(r.get("generation_time_ms", 0) for r in records)
-                / total_count
-                / 1000
-                if total_count > 0
-                else 0
+                sum(r.get("generation_time_ms", 0) for r in records) / total_count / 1000 if total_count > 0 else 0
             )
             success_count = sum(1 for r in records if r.get("success", False))
 
-            logger.debug(
-                f"✅ Retrieved {total_count} analytics records from digest_analytics for {date}"
-            )
+            logger.debug(f"✅ Retrieved {total_count} analytics records from digest_analytics for {date}")
             return {
                 "generated_count": total_count,
                 "avg_confidence": 0.0,  # Не хранится в текущей схеме
@@ -1905,11 +1747,7 @@ def get_daily_digest_analytics(date: Optional[str] = None) -> dict:
         end_date = f"{date}T23:59:59Z"
 
         result = safe_execute(
-            supabase.table("digests")
-            .select("*")
-            .gte("created_at", start_date)
-            .lte("created_at", end_date)
-            .execute()
+            supabase.table("digests").select("*").gte("created_at", start_date).lte("created_at", end_date).execute()
         )
 
         if not result.data:
@@ -1926,39 +1764,19 @@ def get_daily_digest_analytics(date: Optional[str] = None) -> dict:
 
         # Calculate metrics
         generated_count = len(digests)
-        skipped_low_quality = len(
-            [d for d in digests if d.get("skipped_reason")]
-        )
+        skipped_low_quality = len([d for d in digests if d.get("skipped_reason")])
 
         # Confidence metrics
-        confidences = [
-            d.get("confidence")
-            for d in digests
-            if d.get("confidence") is not None
-        ]
-        avg_confidence = (
-            sum(confidences) / len(confidences) if confidences else 0.0
-        )
+        confidences = [d.get("confidence") for d in digests if d.get("confidence") is not None]
+        avg_confidence = sum(confidences) / len(confidences) if confidences else 0.0
 
         # Generation time metrics
-        times = [
-            d.get("generation_time_sec")
-            for d in digests
-            if d.get("generation_time_sec") is not None
-        ]
+        times = [d.get("generation_time_sec") for d in digests if d.get("generation_time_sec") is not None]
         avg_generation_time_sec = sum(times) / len(times) if times else 0.0
 
         # Feedback metrics
-        feedback_scores = [
-            d.get("feedback_score")
-            for d in digests
-            if d.get("feedback_score") is not None
-        ]
-        avg_feedback_score = (
-            sum(feedback_scores) / len(feedback_scores)
-            if feedback_scores
-            else 0.0
-        )
+        feedback_scores = [d.get("feedback_score") for d in digests if d.get("feedback_score") is not None]
+        avg_feedback_score = sum(feedback_scores) / len(feedback_scores) if feedback_scores else 0.0
         feedback_count = sum(d.get("feedback_count", 0) for d in digests)
 
         analytics = {
@@ -1983,9 +1801,7 @@ def update_daily_analytics():
     Update digest_analytics with today's aggregated data.
     Note: This function is deprecated as we now log individual digest generation events.
     """
-    logger.warning(
-        "update_daily_analytics is deprecated - using individual event logging instead"
-    )
+    logger.warning("update_daily_analytics is deprecated - using individual event logging instead")
     return
 
 
@@ -2006,11 +1822,7 @@ def get_digest_analytics_history(days: int = 7) -> List[dict]:
     try:
         # Get analytics for last N days
         result = safe_execute(
-            supabase.table("digest_analytics")
-            .select("*")
-            .order("date", desc=True)
-            .limit(days)
-            .execute()
+            supabase.table("digest_analytics").select("*").order("date", desc=True).limit(days).execute()
         )
 
         if result.data:

@@ -175,9 +175,7 @@ class UnifiedDigestService:
             # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ С ФИЛЬТРАЦИЕЙ ПО ВАЖНОСТИ
             if min_importance is not None:
                 news_items = await self.db_service.async_get_latest_news_with_importance(
-                    categories=categories,
-                    limit=limit,
-                    min_importance=min_importance
+                    categories=categories, limit=limit, min_importance=min_importance
                 )
             else:
                 # Fallback на старую функцию
@@ -212,7 +210,9 @@ class UnifiedDigestService:
                 else:
                     news_objects.append(item)
 
-            ai_digest = await ai_service.build_digest(news_items=news_objects, style=style, category=cat_display, length=length)
+            ai_digest = await ai_service.build_digest(
+                news_items=news_objects, style=style, category=cat_display, length=length
+            )
 
             return clean_for_telegram(ai_digest)
 

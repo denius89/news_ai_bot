@@ -236,6 +236,7 @@ def test_generate_summary_with_empty_data():
 # V2 JOURNALISTIC SYSTEM TESTS
 # ============================================================================
 
+
 def test_generate_summary_v2_tech_analytical():
     """Test v2 generation for tech/analytical style"""
 
@@ -251,7 +252,7 @@ def test_generate_summary_v2_tech_analytical():
             "importance": 0.8,
             "credibility": 0.9,
             "source": "TechCrunch",
-            "published_at": "2024-01-15T10:00:00Z"
+            "published_at": "2024-01-15T10:00:00Z",
         }
     ]
 
@@ -261,7 +262,7 @@ def test_generate_summary_v2_tech_analytical():
         style_profile="analytical",
         tone="insightful",
         length="medium",
-        audience="general"
+        audience="general",
     )
 
     assert isinstance(result, dict)
@@ -287,7 +288,7 @@ def test_generate_summary_v2_crypto_newsroom():
             "importance": 0.9,
             "credibility": 0.8,
             "source": "CoinDesk",
-            "published_at": "2024-01-15T12:00:00Z"
+            "published_at": "2024-01-15T12:00:00Z",
         }
     ]
 
@@ -297,7 +298,7 @@ def test_generate_summary_v2_crypto_newsroom():
         style_profile="newsroom",
         tone="neutral",
         length="short",
-        audience="pro"
+        audience="pro",
     )
 
     assert isinstance(result, dict)
@@ -318,16 +319,12 @@ def test_validate_sources_low_importance():
             "importance": 0.3,  # Below threshold
             "credibility": 0.9,
             "source": "Test",
-            "published_at": "2024-01-15T10:00:00Z"
+            "published_at": "2024-01-15T10:00:00Z",
         }
     ]
 
     result = generate_summary_journalistic_v2(
-        news_items=news_items,
-        category="tech",
-        style_profile="analytical",
-        min_importance=0.6,
-        min_credibility=0.7
+        news_items=news_items, category="tech", style_profile="analytical", min_importance=0.6, min_credibility=0.7
     )
 
     assert "skipped_reason" in result
@@ -350,7 +347,7 @@ def test_output_schema_validation():
             "importance": 0.8,
             "credibility": 0.9,
             "source": "Test",
-            "published_at": "2024-01-15T10:00:00Z"
+            "published_at": "2024-01-15T10:00:00Z",
         }
     ]
 
@@ -360,7 +357,7 @@ def test_output_schema_validation():
         style_profile="magazine",
         tone="optimistic",
         length="long",
-        audience="general"
+        audience="general",
     )
 
     # Check required fields
@@ -392,15 +389,11 @@ def test_fallback_to_v1():
                 "importance": 0.8,
                 "credibility": 0.9,
                 "source": "Test",
-                "published_at": "2024-01-15T10:00:00Z"
+                "published_at": "2024-01-15T10:00:00Z",
             }
         ]
 
-        result = generate_summary_journalistic_v2(
-            news_items=news_items,
-            category="tech",
-            style_profile="analytical"
-        )
+        result = generate_summary_journalistic_v2(news_items=news_items, category="tech", style_profile="analytical")
 
         assert "fallback" in result
         assert result["fallback"] is True
@@ -423,7 +416,7 @@ def test_all_style_profiles():
             "importance": 0.8,
             "credibility": 0.9,
             "source": "Test",
-            "published_at": "2024-01-15T10:00:00Z"
+            "published_at": "2024-01-15T10:00:00Z",
         }
     ]
 
@@ -431,11 +424,7 @@ def test_all_style_profiles():
 
     for style in styles:
         result = generate_summary_journalistic_v2(
-            news_items=news_items,
-            category="tech",
-            style_profile=style,
-            tone="neutral",
-            length="medium"
+            news_items=news_items, category="tech", style_profile=style, tone="neutral", length="medium"
         )
 
         assert isinstance(result, dict)
@@ -459,7 +448,7 @@ def test_all_tones():
             "importance": 0.8,
             "credibility": 0.9,
             "source": "Test",
-            "published_at": "2024-01-15T10:00:00Z"
+            "published_at": "2024-01-15T10:00:00Z",
         }
     ]
 
@@ -467,11 +456,7 @@ def test_all_tones():
 
     for tone in tones:
         result = generate_summary_journalistic_v2(
-            news_items=news_items,
-            category="tech",
-            style_profile="analytical",
-            tone=tone,
-            length="medium"
+            news_items=news_items, category="tech", style_profile="analytical", tone=tone, length="medium"
         )
 
         assert isinstance(result, dict)

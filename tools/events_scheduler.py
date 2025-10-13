@@ -18,35 +18,17 @@ sys.path.insert(0, str(project_root))
 
 from services.rate_limit_manager import get_rate_limit_manager, RATE_LIMITS  # noqa: E402
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("events_scheduler")
 
 
 # Fetch schedule configuration
 FETCH_SCHEDULE = {
-    'crypto': {
-        'interval': 14400,  # 4 hours
-        'providers': ['coinmarketcal', 'coingecko', 'defillama', 'tokenunlocks']
-    },
-    'markets': {
-        'interval': 21600,  # 6 hours
-        'providers': ['finnhub', 'fmp', 'eodhd']
-    },
-    'sports': {
-        'interval': 7200,  # 2 hours
-        'providers': ['football_data', 'thesportsdb', 'pandascore']
-    },
-    'tech': {
-        'interval': 43200,  # 12 hours
-        'providers': ['github_releases']
-    },
-    'world': {
-        'interval': 21600,  # 6 hours
-        'providers': ['oecd']
-    },
+    "crypto": {"interval": 14400, "providers": ["coinmarketcal", "coingecko", "defillama", "tokenunlocks"]},  # 4 hours
+    "markets": {"interval": 21600, "providers": ["finnhub", "fmp", "eodhd"]},  # 6 hours
+    "sports": {"interval": 7200, "providers": ["football_data", "thesportsdb", "pandascore"]},  # 2 hours
+    "tech": {"interval": 43200, "providers": ["github_releases"]},  # 12 hours
+    "world": {"interval": 21600, "providers": ["oecd"]},  # 6 hours
 }
 
 
@@ -75,8 +57,8 @@ async def schedule_fetches(category: str = None, force: bool = False):
 
         for cat in categories:
             schedule = FETCH_SCHEDULE[cat]
-            providers = schedule['providers']
-            interval = schedule['interval']
+            providers = schedule["providers"]
+            interval = schedule["interval"]
 
             logger.info(f"\n{'='*60}")
             logger.info(f"Category: {cat.upper()}")
@@ -109,8 +91,7 @@ async def schedule_fetches(category: str = None, force: bool = False):
                     rate_limiter.record_request(provider)
                 else:
                     logger.warning(
-                        f"✗ {provider}: Rate limit reached, "
-                        f"wait {wait_time:.0f}s ({wait_time/60:.1f}min)"
+                        f"✗ {provider}: Rate limit reached, " f"wait {wait_time:.0f}s ({wait_time/60:.1f}min)"
                     )
 
             logger.info("")
@@ -122,8 +103,8 @@ async def schedule_fetches(category: str = None, force: bool = False):
 
         stats = rate_limiter.get_stats()
 
-        for provider, provider_stats in stats['providers'].items():
-            status = "✓ OK" if provider_stats['can_request'] else "✗ LIMIT"
+        for provider, provider_stats in stats["providers"].items():
+            status = "✓ OK" if provider_stats["can_request"] else "✗ LIMIT"
             logger.info(
                 f"{status} {provider}: "
                 f"{provider_stats['current_requests']}/{provider_stats['max_requests']} requests, "
@@ -144,8 +125,8 @@ async def show_schedule():
     logger.info("=" * 60)
 
     for category, schedule in FETCH_SCHEDULE.items():
-        interval = schedule['interval']
-        providers = schedule['providers']
+        interval = schedule["interval"]
+        providers = schedule["providers"]
 
         logger.info(f"\n{category.upper()}:")
         logger.info(f"  Interval: {interval}s ({interval/3600:.1f}h)")
@@ -195,29 +176,15 @@ def main():
     )
 
     parser.add_argument(
-        "--category",
-        choices=['crypto', 'markets', 'sports', 'tech', 'world'],
-        help="Category to fetch (default: all)"
+        "--category", choices=["crypto", "markets", "sports", "tech", "world"], help="Category to fetch (default: all)"
     )
 
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Force fetch even if rate limit reached"
-    )
+    parser.add_argument("--force", action="store_true", help="Force fetch even if rate limit reached")
+
+    parser.add_argument("--show-schedule", action="store_true", help="Show fetch schedule and exit")
 
     parser.add_argument(
-        "--show-schedule",
-        action="store_true",
-        help="Show fetch schedule and exit"
-    )
-
-    parser.add_argument(
-        "--clear-cache",
-        nargs="?",
-        const="all",
-        metavar="PROVIDER",
-        help="Clear cache for provider (or all)"
+        "--clear-cache", nargs="?", const="all", metavar="PROVIDER", help="Clear cache for provider (or all)"
     )
 
     args = parser.parse_args()

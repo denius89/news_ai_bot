@@ -7,10 +7,12 @@ This tool fetches events from various providers and stores them in the database.
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 # Load environment variables
 from dotenv import load_dotenv
+
 load_dotenv()
 from ai_modules.metrics import get_metrics
 from database.events_service import get_events_service
@@ -74,18 +76,18 @@ async def fetch_and_store_events(
 
         for event in events:
             # Convert event to dict if needed
-            event_dict = event.__dict__ if hasattr(event, '__dict__') else event
+            event_dict = event.__dict__ if hasattr(event, "__dict__") else event
 
             # Calculate ML importance score
             importance_score = evaluator_v2.evaluate_importance(event_dict)
             event.importance_score = importance_score
 
             # Store in event dict for database
-            if hasattr(event, '__dict__'):
-                event.__dict__['importance_score'] = importance_score
+            if hasattr(event, "__dict__"):
+                event.__dict__["importance_score"] = importance_score
 
         # AI Filtering: Filter by ML importance_score >= 0.6
-        filtered_events = [event for event in events if getattr(event, 'importance_score', 0) >= 0.6]
+        filtered_events = [event for event in events if getattr(event, "importance_score", 0) >= 0.6]
         logger.info(f"ML Filtered (v2): {len(events)} -> {len(filtered_events)} events (importance_score >= 0.6)")
 
         logger.info(f"Fetched {len(filtered_events)} events after AI filtering")

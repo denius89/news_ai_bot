@@ -123,9 +123,7 @@ def get_events():
         # Parse dates
         if from_date_str:
             try:
-                from_date = datetime.strptime(
-                    from_date_str, "%Y-%m-%d"
-                ).replace(tzinfo=timezone.utc)
+                from_date = datetime.strptime(from_date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
             except ValueError:
                 return (
                     jsonify(
@@ -138,9 +136,7 @@ def get_events():
                 )
         else:
             # Default to today
-            from_date = datetime.now(timezone.utc).replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
+            from_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
 
         if to_date_str:
             try:
@@ -206,11 +202,7 @@ def get_events():
         # Fetch events
         import asyncio
 
-        events = asyncio.run(
-            events_service.get_events_by_date_range(
-                from_date, to_date, category
-            )
-        )
+        events = asyncio.run(events_service.get_events_by_date_range(from_date, to_date, category))
 
         # Filter by subcategory if specified
         if subcategory:
@@ -231,9 +223,7 @@ def get_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": (
-                    event.ends_at.isoformat() if event.ends_at else None
-                ),
+                "ends_at": (event.ends_at.isoformat() if event.ends_at else None),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -325,9 +315,7 @@ def get_upcoming_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": (
-                    event.ends_at.isoformat() if event.ends_at else None
-                ),
+                "ends_at": (event.ends_at.isoformat() if event.ends_at else None),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -377,9 +365,7 @@ def get_today_events():
         # Fetch today's events
         import asyncio
 
-        events = asyncio.run(
-            events_service.get_today_events(category=category)
-        )
+        events = asyncio.run(events_service.get_today_events(category=category))
 
         # Convert to JSON format
         events_data = []
@@ -390,9 +376,7 @@ def get_today_events():
                 "category": event.category,
                 "subcategory": event.subcategory,
                 "starts_at": event.starts_at.isoformat(),
-                "ends_at": (
-                    event.ends_at.isoformat() if event.ends_at else None
-                ),
+                "ends_at": (event.ends_at.isoformat() if event.ends_at else None),
                 "source": event.source,
                 "link": event.link,
                 "importance": event.importance,
@@ -511,12 +495,8 @@ def get_events_stats():
         import asyncio
 
         today_events = asyncio.run(events_service.get_today_events())
-        upcoming_events = asyncio.run(
-            events_service.get_upcoming_events(days_ahead=7)
-        )
-        upcoming_30d = asyncio.run(
-            events_service.get_upcoming_events(days_ahead=30)
-        )
+        upcoming_events = asyncio.run(events_service.get_upcoming_events(days_ahead=7))
+        upcoming_30d = asyncio.run(events_service.get_upcoming_events(days_ahead=30))
 
         # Calculate statistics
         stats = {
@@ -534,9 +514,7 @@ def get_events_stats():
             category_counts = {}
             for event in event_list:
                 category = event.category
-                category_counts[category] = (
-                    category_counts.get(category, 0) + 1
-                )
+                category_counts[category] = category_counts.get(category, 0) + 1
             stats[key]["by_category"] = category_counts
 
         return jsonify({"success": True, "data": stats})
@@ -560,12 +538,7 @@ def get_event_result(event_id):
             )
 
         # Get event with result data
-        result = (
-            supabase.table("events_new")
-            .select("*")
-            .eq("id", event_id)
-            .execute()
-        )
+        result = supabase.table("events_new").select("*").eq("id", event_id).execute()
 
         if not result.data:
             return jsonify({"success": False, "error": "Event not found"}), 404

@@ -76,9 +76,7 @@ class FinnhubProvider(BaseEventProvider):
             logger.error(f"Error fetching Finnhub events: {e}")
             return []
 
-    async def _fetch_earnings_calendar(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def _fetch_earnings_calendar(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Fetch earnings calendar."""
         try:
             url = f"{self.base_url}/calendar/earnings"
@@ -109,9 +107,7 @@ class FinnhubProvider(BaseEventProvider):
             logger.error(f"Error fetching earnings calendar: {e}")
             return []
 
-    async def _fetch_ipo_calendar(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def _fetch_ipo_calendar(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Fetch IPO calendar."""
         try:
             url = f"{self.base_url}/calendar/ipo"
@@ -142,9 +138,7 @@ class FinnhubProvider(BaseEventProvider):
             logger.error(f"Error fetching IPO calendar: {e}")
             return []
 
-    async def _fetch_economic_calendar(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def _fetch_economic_calendar(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Fetch economic calendar."""
         try:
             url = f"{self.base_url}/calendar/economic"

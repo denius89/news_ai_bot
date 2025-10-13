@@ -81,12 +81,12 @@ def convert_unicode_name(name):
 
     # Специальные случаи испорченных имен
     corruption_map = {
-        'ÐÐ°Ð½': 'Иван',
-        'ÐÐ°ÑÐ°': 'Маша',
-        'ÐÐ»ÐµÐºÑÐµÐ¹': 'Алексей',
+        "ÐÐ°Ð½": "Иван",
+        "ÐÐ°ÑÐ°": "Маша",
+        "ÐÐ»ÐµÐºÑÐµÐ¹": "Алексей",
         # Дважды испорченные имена
-        'Ã\x90Ã\x90Â°Ã\x90Â½': 'Иван',
-        'ÃÐÃÐÂ°ÃÐÂ½': 'Иван',
+        "Ã\x90Ã\x90Â°Ã\x90Â½": "Иван",
+        "ÃÐÃÐÂ°ÃÐÂ½": "Иван",
     }
 
     if name in corruption_map:
@@ -94,12 +94,12 @@ def convert_unicode_name(name):
 
     # Проверяем на двойную кодировку UTF-8
     try:
-        if 'Ð' in name and len(name) > 0:
+        if "Ð" in name and len(name) > 0:
             try:
                 # Кодируем в latin-1, затем декодируем как UTF-8
-                fixed = name.encode('latin-1').decode('utf-8')
+                fixed = name.encode("latin-1").decode("utf-8")
                 # Проверяем, что получили кириллицу
-                if any('\u0400' <= c <= '\u04FF' for c in fixed):
+                if any("\u0400" <= c <= "\u04ff" for c in fixed):
                     return fixed
             except (UnicodeDecodeError, UnicodeEncodeError):
                 pass
@@ -109,24 +109,112 @@ def convert_unicode_name(name):
     # Маппинг Unicode стилизованных символов на обычные
     unicode_map = {
         # Mathematical Bold (𝔸-𝔾)
-        '\U0001D400': 'A', '\U0001D401': 'B', '\U0001D402': 'C', '\U0001D403': 'D', '\U0001D404': 'E', '\U0001D405': 'F', '\U0001D406': 'G',
-        '\U0001D407': 'H', '\U0001D408': 'I', '\U0001D409': 'J', '\U0001D40A': 'K', '\U0001D40B': 'L', '\U0001D40C': 'M', '\U0001D40D': 'N',
-        '\U0001D40E': 'O', '\U0001D40F': 'P', '\U0001D410': 'Q', '\U0001D411': 'R', '\U0001D412': 'S', '\U0001D413': 'T', '\U0001D414': 'U',
-        '\U0001D415': 'V', '\U0001D416': 'W', '\U0001D417': 'X', '\U0001D418': 'Y', '\U0001D419': 'Z',
+        "\U0001d400": "A",
+        "\U0001d401": "B",
+        "\U0001d402": "C",
+        "\U0001d403": "D",
+        "\U0001d404": "E",
+        "\U0001d405": "F",
+        "\U0001d406": "G",
+        "\U0001d407": "H",
+        "\U0001d408": "I",
+        "\U0001d409": "J",
+        "\U0001d40a": "K",
+        "\U0001d40b": "L",
+        "\U0001d40c": "M",
+        "\U0001d40d": "N",
+        "\U0001d40e": "O",
+        "\U0001d40f": "P",
+        "\U0001d410": "Q",
+        "\U0001d411": "R",
+        "\U0001d412": "S",
+        "\U0001d413": "T",
+        "\U0001d414": "U",
+        "\U0001d415": "V",
+        "\U0001d416": "W",
+        "\U0001d417": "X",
+        "\U0001d418": "Y",
+        "\U0001d419": "Z",
         # Mathematical Bold lowercase (𝕒-𝕫)
-        '\U0001D41A': 'a', '\U0001D41B': 'b', '\U0001D41C': 'c', '\U0001D41D': 'd', '\U0001D41E': 'e', '\U0001D41F': 'f', '\U0001D420': 'g',
-        '\U0001D421': 'h', '\U0001D422': 'i', '\U0001D423': 'j', '\U0001D424': 'k', '\U0001D425': 'l', '\U0001D426': 'm', '\U0001D427': 'n',
-        '\U0001D428': 'o', '\U0001D429': 'p', '\U0001D42A': 'q', '\U0001D42B': 'r', '\U0001D42C': 's', '\U0001D42D': 't', '\U0001D42E': 'u',
-        '\U0001D42F': 'v', '\U0001D430': 'w', '\U0001D431': 'x', '\U0001D432': 'y', '\U0001D433': 'z',
+        "\U0001d41a": "a",
+        "\U0001d41b": "b",
+        "\U0001d41c": "c",
+        "\U0001d41d": "d",
+        "\U0001d41e": "e",
+        "\U0001d41f": "f",
+        "\U0001d420": "g",
+        "\U0001d421": "h",
+        "\U0001d422": "i",
+        "\U0001d423": "j",
+        "\U0001d424": "k",
+        "\U0001d425": "l",
+        "\U0001d426": "m",
+        "\U0001d427": "n",
+        "\U0001d428": "o",
+        "\U0001d429": "p",
+        "\U0001d42a": "q",
+        "\U0001d42b": "r",
+        "\U0001d42c": "s",
+        "\U0001d42d": "t",
+        "\U0001d42e": "u",
+        "\U0001d42f": "v",
+        "\U0001d430": "w",
+        "\U0001d431": "x",
+        "\U0001d432": "y",
+        "\U0001d433": "z",
         # Mathematical Double-Struck (𝔸-𝔾)
-        '\U0001D538': 'A', '\U0001D539': 'B', '\U0001D53A': 'C', '\U0001D53B': 'D', '\U0001D53C': 'E', '\U0001D53D': 'F', '\U0001D53E': 'G',
-        '\U0001D53F': 'H', '\U0001D540': 'I', '\U0001D541': 'J', '\U0001D542': 'K', '\U0001D543': 'L', '\U0001D544': 'M', '\U0001D545': 'N',
-        '\U0001D546': 'O', '\U0001D547': 'P', '\U0001D548': 'Q', '\U0001D549': 'R', '\U0001D54A': 'S', '\U0001D54B': 'T', '\U0001D54C': 'U',
-        '\U0001D54D': 'V', '\U0001D54E': 'W', '\U0001D54F': 'X', '\U0001D550': 'Y', '\U0001D551': 'Z',
-        '\U0001D552': 'a', '\U0001D553': 'b', '\U0001D554': 'c', '\U0001D555': 'd', '\U0001D556': 'e', '\U0001D557': 'f', '\U0001D558': 'g',
-        '\U0001D559': 'h', '\U0001D55A': 'i', '\U0001D55B': 'j', '\U0001D55C': 'k', '\U0001D55D': 'l', '\U0001D55E': 'm', '\U0001D55F': 'n',
-        '\U0001D560': 'o', '\U0001D561': 'p', '\U0001D562': 'q', '\U0001D563': 'r', '\U0001D564': 's', '\U0001D565': 't', '\U0001D566': 'u',
-        '\U0001D567': 'v', '\U0001D568': 'w', '\U0001D569': 'x', '\U0001D56A': 'y', '\U0001D56B': 'z',
+        "\U0001d538": "A",
+        "\U0001d539": "B",
+        "\U0001d53a": "C",
+        "\U0001d53b": "D",
+        "\U0001d53c": "E",
+        "\U0001d53d": "F",
+        "\U0001d53e": "G",
+        "\U0001d53f": "H",
+        "\U0001d540": "I",
+        "\U0001d541": "J",
+        "\U0001d542": "K",
+        "\U0001d543": "L",
+        "\U0001d544": "M",
+        "\U0001d545": "N",
+        "\U0001d546": "O",
+        "\U0001d547": "P",
+        "\U0001d548": "Q",
+        "\U0001d549": "R",
+        "\U0001d54a": "S",
+        "\U0001d54b": "T",
+        "\U0001d54c": "U",
+        "\U0001d54d": "V",
+        "\U0001d54e": "W",
+        "\U0001d54f": "X",
+        "\U0001d550": "Y",
+        "\U0001d551": "Z",
+        "\U0001d552": "a",
+        "\U0001d553": "b",
+        "\U0001d554": "c",
+        "\U0001d555": "d",
+        "\U0001d556": "e",
+        "\U0001d557": "f",
+        "\U0001d558": "g",
+        "\U0001d559": "h",
+        "\U0001d55a": "i",
+        "\U0001d55b": "j",
+        "\U0001d55c": "k",
+        "\U0001d55d": "l",
+        "\U0001d55e": "m",
+        "\U0001d55f": "n",
+        "\U0001d560": "o",
+        "\U0001d561": "p",
+        "\U0001d562": "q",
+        "\U0001d563": "r",
+        "\U0001d564": "s",
+        "\U0001d565": "t",
+        "\U0001d566": "u",
+        "\U0001d567": "v",
+        "\U0001d568": "w",
+        "\U0001d569": "x",
+        "\U0001d56a": "y",
+        "\U0001d56b": "z",
     }
 
     # Конвертируем символы
@@ -136,7 +224,7 @@ def convert_unicode_name(name):
             result += unicode_map[char]
         else:
             # Пытаемся нормализовать символ
-            normalized = unicodedata.normalize('NFKD', char)
+            normalized = unicodedata.normalize("NFKD", char)
             # Если после нормализации получили ASCII символ
             if len(normalized) == 1 and ord(normalized) < 128:
                 result += normalized
@@ -638,23 +726,25 @@ def health_check():
         else:
             digest_v2_status = "error"
 
-        return jsonify({
-            "status": "success",
-            "message": "PulseAI API is healthy",
-            "version": "1.0.0",
-            "digest_v2_status": digest_v2_status,
-            "avg_confidence": round(avg_confidence, 3),
-            "generated_today": analytics.get("generated_count", 0)
-        })
+        return jsonify(
+            {
+                "status": "success",
+                "message": "PulseAI API is healthy",
+                "version": "1.0.0",
+                "digest_v2_status": digest_v2_status,
+                "avg_confidence": round(avg_confidence, 3),
+                "generated_today": analytics.get("generated_count", 0),
+            }
+        )
 
     except Exception as e:
         logger.error(f"Health check error: {e}")
-        return jsonify({
-            "status": "error",
-            "message": "Health check failed",
-            "digest_v2_status": "error",
-            "error": str(e)
-        }), 500
+        return (
+            jsonify(
+                {"status": "error", "message": "Health check failed", "digest_v2_status": "error", "error": str(e)}
+            ),
+            500,
+        )
 
 
 @api_bp.route("/categories", methods=["GET"])
@@ -835,7 +925,7 @@ def generate_digest():
             get_user_preferences,
             save_user_preferences,
             log_digest_generation,
-            get_smart_filter_for_time
+            get_smart_filter_for_time,
         )
         import time
 
@@ -891,7 +981,7 @@ def generate_digest():
                 categories=categories_list,
                 style=style,
                 length=length,  # Передаем параметр длины текста
-                min_importance=final_min_importance  # Передаем параметр фильтрации
+                min_importance=final_min_importance,  # Передаем параметр фильтрации
             )
         )
 
@@ -913,21 +1003,23 @@ def generate_digest():
             try:
                 # user_id уже является UUID строкой, не нужно искать пользователя
                 db_service = get_sync_service()
-                digest_id = db_service.save_digest({
-                    "user_id": str(user_id),
-                    "summary": digest_text,
-                    "category": category,
-                    "style": style,
-                    "period": period,
-                    "limit_count": limit,
-                    "metadata": {
-                        "generation_time_ms": generation_time_ms,
-                        "news_count": digest_text.count('\n') if digest_text else 0,
-                        "min_importance": final_min_importance,
-                        "smart_filtering": enable_smart_filtering,
-                        "user_preferences_used": use_user_preferences
+                digest_id = db_service.save_digest(
+                    {
+                        "user_id": str(user_id),
+                        "summary": digest_text,
+                        "category": category,
+                        "style": style,
+                        "period": period,
+                        "limit_count": limit,
+                        "metadata": {
+                            "generation_time_ms": generation_time_ms,
+                            "news_count": digest_text.count("\n") if digest_text else 0,
+                            "min_importance": final_min_importance,
+                            "smart_filtering": enable_smart_filtering,
+                            "user_preferences_used": use_user_preferences,
+                        },
                     }
-                })
+                )
                 logger.info(f"Дайджест сохранен для пользователя {user_id}: {digest_id}")
             except Exception as save_error:
                 logger.warning(f"Не удалось сохранить дайджест: {save_error}")
@@ -942,7 +1034,7 @@ def generate_digest():
                     preferred_style=style,
                     preferred_period=period,
                     min_importance=final_min_importance or 0.3,
-                    enable_smart_filtering=enable_smart_filtering
+                    enable_smart_filtering=enable_smart_filtering,
                 )
                 logger.debug(f"Предпочтения пользователя {user_id} обновлены")
             except Exception as pref_error:
@@ -952,7 +1044,7 @@ def generate_digest():
         if user_id:
             try:
                 # Подсчитываем количество новостей в дайджесте (примерно)
-                news_count = digest_text.count('\n') if digest_text else 0
+                news_count = digest_text.count("\n") if digest_text else 0
 
                 log_digest_generation(
                     user_id=str(user_id),
@@ -962,7 +1054,7 @@ def generate_digest():
                     min_importance=final_min_importance,
                     generation_time_ms=generation_time_ms,
                     success=True,
-                    news_count=news_count
+                    news_count=news_count,
                 )
                 logger.debug(f"Аналитика генерации дайджеста залогирована для пользователя {user_id}")
             except Exception as analytics_error:
@@ -1004,10 +1096,10 @@ def get_digest_history():
     from flask import g
 
     # Получаем данные пользователя из middleware аутентификации
-    if not hasattr(g, 'current_user') or not g.current_user:
+    if not hasattr(g, "current_user") or not g.current_user:
         return jsonify({"status": "error", "message": "Authentication required"}), 401
 
-    user_id = g.current_user['user_id']
+    user_id = g.current_user["user_id"]
     limit = int(request.args.get("limit", 20))
     offset = int(request.args.get("offset", 0))
     # Параметры пока не используются; зарезервированы для будущих фильтров
@@ -1024,7 +1116,7 @@ def get_digest_history():
             user_data = db_service.get_user_by_telegram(int(user_id))
             if not user_data:
                 return jsonify({"status": "error", "message": "User not found"}), 404
-            user_uuid = user_data['id']
+            user_uuid = user_data["id"]
         else:
             # user_id is already UUID
             user_uuid = user_id
@@ -1092,7 +1184,7 @@ def get_digest_by_id(digest_id):
             user_data = get_user_by_telegram(int(user_id))
             if not user_data:
                 return jsonify({"status": "error", "message": "User not found"}), 404
-            user_uuid = user_data['id']
+            user_uuid = user_data["id"]
         else:
             # user_id is already UUID
             user_uuid = user_id
@@ -1279,10 +1371,11 @@ def get_user_by_telegram_id(telegram_id):
             return jsonify({"status": "error", "message": "Database not initialized"}), 500
 
         # Получаем данные пользователя из заголовков (опционально)
-        tg_user_data = request.headers.get('X-Telegram-User-Data')
+        tg_user_data = request.headers.get("X-Telegram-User-Data")
         tg_user = None
         if tg_user_data:
             import json
+
             try:
                 tg_user = json.loads(tg_user_data)
                 logger.info(f"⚠️ Using userData for user {telegram_id}")
@@ -1294,7 +1387,12 @@ def get_user_by_telegram_id(telegram_id):
         for attempt in range(max_retries):
             try:
                 logger.info(f"🔍 Database query attempt {attempt + 1} for telegram_id: {telegram_id}")
-                result = supabase.table("users").select("id, username, locale, first_name").eq("telegram_id", telegram_id).execute()
+                result = (
+                    supabase.table("users")
+                    .select("id, username, locale, first_name")
+                    .eq("telegram_id", telegram_id)
+                    .execute()
+                )
                 logger.info(f"✅ Database query successful on attempt {attempt + 1}")
                 break
             except Exception as db_error:
@@ -1304,49 +1402,55 @@ def get_user_by_telegram_id(telegram_id):
                     return jsonify({"status": "error", "message": f"Database connection error: {str(db_error)}"}), 500
                 else:
                     import time
+
                     time.sleep(0.5)  # Небольшая пауза перед retry
 
         if result.data:
             user_data = result.data[0]
             logger.info(f"User found by telegram_id {telegram_id}: {user_data['id']}")
-            logger.info(f"🔍 User data: first_name='{user_data.get('first_name')}', username='{user_data.get('username')}'")
+            logger.info(
+                f"🔍 User data: first_name='{user_data.get('first_name')}', username='{user_data.get('username')}'"
+            )
 
             # Обновляем данные пользователя с нормализацией имён
             needs_update = False
-            new_first_name = user_data.get('first_name')
-            new_username = user_data.get('username')
+            new_first_name = user_data.get("first_name")
+            new_username = user_data.get("username")
 
-            if tg_user and tg_user.get('first_name'):
-                if not user_data.get('first_name'):
+            if tg_user and tg_user.get("first_name"):
+                if not user_data.get("first_name"):
                     # Нормализуем имя пользователя
-                    raw_first_name = tg_user.get('first_name')
+                    raw_first_name = tg_user.get("first_name")
                     new_first_name = normalize_user_name(
-                        raw_name=raw_first_name,
-                        username=tg_user.get('username'),
-                        user_id=telegram_id
+                        raw_name=raw_first_name, username=tg_user.get("username"), user_id=telegram_id
                     )
                     needs_update = True
-                    logger.info(f"Will update first_name for user {user_data['id']}: {raw_first_name} -> {new_first_name}")
+                    logger.info(
+                        f"Will update first_name for user {user_data['id']}: {raw_first_name} -> {new_first_name}"
+                    )
 
-            if tg_user and tg_user.get('username'):
-                if not user_data.get('username'):
-                    new_username = tg_user.get('username')
+            if tg_user and tg_user.get("username"):
+                if not user_data.get("username"):
+                    new_username = tg_user.get("username")
                     needs_update = True
                     logger.info(f"Will update username for user {user_data['id']}: {tg_user.get('username')}")
 
             if needs_update:
                 try:
                     from database.db_models import upsert_user_by_telegram
+
                     upsert_user_by_telegram(
                         telegram_id=telegram_id,
                         username=new_username,
-                        locale=user_data.get('locale', 'ru'),
-                        first_name=new_first_name
+                        locale=user_data.get("locale", "ru"),
+                        first_name=new_first_name,
                     )
                     # Обновляем данные в ответе
-                    user_data['first_name'] = new_first_name
-                    user_data['username'] = new_username
-                    logger.info(f"Updated user data for {user_data['id']}: first_name={new_first_name}, username={new_username}")
+                    user_data["first_name"] = new_first_name
+                    user_data["username"] = new_username
+                    logger.info(
+                        f"Updated user data for {user_data['id']}: first_name={new_first_name}, username={new_username}"
+                    )
                 except Exception as update_error:
                     logger.error(f"Failed to update user data for {user_data['id']}: {update_error}")
 
@@ -1368,6 +1472,7 @@ def get_user_by_telegram_id(telegram_id):
             # Проверяем JSON сериализацию
             try:
                 import json
+
                 json_str = json.dumps(response_data, ensure_ascii=False)
                 logger.info(f"✅ JSON serialization successful, length: {len(json_str)}")
             except Exception as e:
@@ -1376,9 +1481,9 @@ def get_user_by_telegram_id(telegram_id):
 
             response = jsonify(response_data)
             # Отключаем кэширование для API пользователя
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
             return response
         else:
             logger.info(f"User not found by telegram_id: {telegram_id}, creating new user")
@@ -1394,27 +1499,24 @@ def get_user_by_telegram_id(telegram_id):
                     # Создаем пользователя с минимальными данными
                     normalized_name = normalize_user_name(None, None, telegram_id)
                     new_user_id = create_user(
-                        telegram_id=telegram_id,
-                        username=None,
-                        locale='ru',
-                        first_name=normalized_name
+                        telegram_id=telegram_id, username=None, locale="ru", first_name=normalized_name
                     )
                 else:
                     # Нормализуем имя пользователя
-                    raw_first_name = tg_user.get('first_name')
+                    raw_first_name = tg_user.get("first_name")
                     normalized_name = normalize_user_name(
-                        raw_name=raw_first_name,
-                        username=tg_user.get('username'),
-                        user_id=telegram_id
+                        raw_name=raw_first_name, username=tg_user.get("username"), user_id=telegram_id
                     )
 
-                    logger.info(f"🔧 Creating user with normalized name: {repr(raw_first_name)} -> {repr(normalized_name)}")
+                    logger.info(
+                        f"🔧 Creating user with normalized name: {repr(raw_first_name)} -> {repr(normalized_name)}"
+                    )
 
                     new_user_id = create_user(
                         telegram_id=telegram_id,
-                        username=tg_user.get('username'),
-                        locale=tg_user.get('language_code', 'ru'),
-                        first_name=normalized_name
+                        username=tg_user.get("username"),
+                        locale=tg_user.get("language_code", "ru"),
+                        first_name=normalized_name,
                     )
 
                 if new_user_id:
@@ -1426,8 +1528,8 @@ def get_user_by_telegram_id(telegram_id):
                             "data": {
                                 "user_id": new_user_id,
                                 "telegram_id": telegram_id,
-                                "username": tg_user.get('username') if tg_user else None,
-                                "locale": tg_user.get('language_code', 'ru') if tg_user else 'ru',
+                                "username": tg_user.get("username") if tg_user else None,
+                                "locale": tg_user.get("language_code", "ru") if tg_user else "ru",
                                 "first_name": normalized_name,
                             },
                         }
@@ -1514,6 +1616,7 @@ def telegram_auth():
 # USER PREFERENCES API ENDPOINTS
 # =============================================================================
 
+
 @api_bp.route("/users/preferences", methods=["GET"])
 def get_user_preferences():
     """Get user preferences."""
@@ -1527,10 +1630,7 @@ def get_user_preferences():
 
         preferences = get_user_preferences(user_id)
 
-        return jsonify({
-            "status": "success",
-            "data": preferences
-        })
+        return jsonify({"status": "success", "data": preferences})
 
     except Exception as e:
         logger.error(f"Error getting user preferences: {e}")
@@ -1558,14 +1658,11 @@ def save_user_preferences():
             preferred_style=data.get("preferred_style", "analytical"),
             preferred_period=data.get("preferred_period", "today"),
             min_importance=data.get("min_importance", 0.3),
-            enable_smart_filtering=data.get("enable_smart_filtering", True)
+            enable_smart_filtering=data.get("enable_smart_filtering", True),
         )
 
         if success:
-            return jsonify({
-                "status": "success",
-                "message": "Preferences saved successfully"
-            })
+            return jsonify({"status": "success", "message": "Preferences saved successfully"})
         else:
             return jsonify({"status": "error", "message": "Failed to save preferences"}), 500
 
@@ -1577,6 +1674,7 @@ def save_user_preferences():
 # =============================================================================
 # ANALYTICS API ENDPOINTS
 # =============================================================================
+
 
 @api_bp.route("/analytics/digest-stats", methods=["GET"])
 def get_digest_analytics():
@@ -1592,7 +1690,11 @@ def get_digest_analytics():
         # Подсчитываем статистику
         total_generations = len(analytics_data)
         successful_generations = len([a for a in analytics_data if a.get("success", True)])
-        avg_generation_time = sum([a.get("generation_time_ms", 0) for a in analytics_data]) / total_generations if total_generations > 0 else 0
+        avg_generation_time = (
+            sum([a.get("generation_time_ms", 0) for a in analytics_data]) / total_generations
+            if total_generations > 0
+            else 0
+        )
 
         # Популярные комбинации
         category_stats = {}
@@ -1605,19 +1707,21 @@ def get_digest_analytics():
             category_stats[category] = category_stats.get(category, 0) + 1
             style_stats[style] = style_stats.get(style, 0) + 1
 
-        return jsonify({
-            "status": "success",
-            "data": {
-                "total_generations": total_generations,
-                "successful_generations": successful_generations,
-                "success_rate": successful_generations / total_generations if total_generations > 0 else 0,
-                "avg_generation_time_ms": avg_generation_time,
-                "category_stats": category_stats,
-                "style_stats": style_stats,
-                "period_days": days,
-                "user_id": user_id
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "total_generations": total_generations,
+                    "successful_generations": successful_generations,
+                    "success_rate": successful_generations / total_generations if total_generations > 0 else 0,
+                    "avg_generation_time_ms": avg_generation_time,
+                    "category_stats": category_stats,
+                    "style_stats": style_stats,
+                    "period_days": days,
+                    "user_id": user_id,
+                },
             }
-        })
+        )
 
     except Exception as e:
         logger.error(f"Error getting digest analytics: {e}")
@@ -1628,6 +1732,7 @@ def get_digest_analytics():
 # SMART FILTERING API ENDPOINTS
 # =============================================================================
 
+
 @api_bp.route("/smart-filters/current", methods=["GET"])
 def get_current_smart_filter():
     """Get current smart filter based on time."""
@@ -1636,10 +1741,7 @@ def get_current_smart_filter():
 
         smart_filter = get_smart_filter_for_time()
 
-        return jsonify({
-            "status": "success",
-            "data": smart_filter
-        })
+        return jsonify({"status": "success", "data": smart_filter})
 
     except Exception as e:
         logger.error(f"Error getting smart filter: {e}")
@@ -1650,7 +1752,8 @@ def get_current_smart_filter():
 # FEEDBACK API ENDPOINTS
 # =============================================================================
 
-@api_bp.route('/feedback', methods=['POST'])
+
+@api_bp.route("/feedback", methods=["POST"])
 def submit_feedback():
     """
     Submit feedback for digest.
@@ -1666,23 +1769,18 @@ def submit_feedback():
     """
     try:
         data = request.get_json()
-        digest_id = data.get('digest_id')
-        score = data.get('score')  # 0.0 - 1.0
+        digest_id = data.get("digest_id")
+        score = data.get("score")  # 0.0 - 1.0
 
         if not digest_id or score is None:
-            return jsonify({
-                "status": "error",
-                "message": "digest_id and score are required"
-            }), 400
+            return jsonify({"status": "error", "message": "digest_id and score are required"}), 400
 
         if not 0.0 <= score <= 1.0:
-            return jsonify({
-                "status": "error",
-                "message": "score must be between 0.0 and 1.0"
-            }), 400
+            return jsonify({"status": "error", "message": "score must be between 0.0 and 1.0"}), 400
 
         # Update feedback
         from database.db_models import update_digest_feedback
+
         success = update_digest_feedback(digest_id, score)
 
         if success:
@@ -1690,22 +1788,13 @@ def submit_feedback():
             # from database.db_models import update_daily_analytics
             # update_daily_analytics() - deprecated, using individual event logging
 
-            return jsonify({
-                "status": "success",
-                "message": "Feedback saved"
-            }), 200
+            return jsonify({"status": "success", "message": "Feedback saved"}), 200
         else:
-            return jsonify({
-                "status": "error",
-                "message": "Digest not found"
-            }), 404
+            return jsonify({"status": "error", "message": "Digest not found"}), 404
 
     except Exception as e:
         logger.error(f"Error submitting feedback: {e}")
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 def convert_user_id_to_uuid(user_id: str):
@@ -1713,10 +1802,11 @@ def convert_user_id_to_uuid(user_id: str):
     if user_id.isdigit() and len(user_id) < 10:
         # user_id is telegram_id, convert to UUID
         from database.db_models import get_user_by_telegram
+
         user_data = get_user_by_telegram(int(user_id))
         if not user_data:
             return None
-        return user_data['id']
+        return user_data["id"]
     else:
         # user_id is already UUID
         return user_id
@@ -1725,6 +1815,7 @@ def convert_user_id_to_uuid(user_id: str):
 # ============================================================================
 # Day 17: User Preferences & Notifications API
 # ============================================================================
+
 
 @api_bp.route("/user/preferences", methods=["GET"])
 def get_user_notification_preferences():
@@ -1745,6 +1836,7 @@ def get_user_notification_preferences():
             return jsonify({"success": False, "error": "User ID required"}), 401
 
         from services.notification_service import get_notification_service
+
         service = get_notification_service()
 
         # Get preferences from database
@@ -1757,7 +1849,7 @@ def get_user_notification_preferences():
                 "min_importance": 0.6,
                 "delivery_method": "bot",
                 "notification_frequency": "daily",
-                "max_notifications_per_day": 3
+                "max_notifications_per_day": 3,
             }
 
         return jsonify({"success": True, "data": prefs})
@@ -1793,6 +1885,7 @@ def update_user_preferences():
             return jsonify({"success": False, "error": "Request body required"}), 400
 
         from services.notification_service import get_notification_service
+
         service = get_notification_service()
 
         # Update preferences
@@ -1824,27 +1917,26 @@ def test_notification():
             return jsonify({"success": False, "error": "User ID required"}), 401
 
         from services.notification_service import get_notification_service
+
         service = get_notification_service()
 
         # Prepare test digest
         digest = asyncio.run(service.prepare_daily_digest(int(user_id)))
 
-        if digest.get('count', 0) > 0:
+        if digest.get("count", 0) > 0:
             # Send test notification
-            events = digest.get('events', [])
+            events = digest.get("events", [])
             success = asyncio.run(service.send_telegram_notification(int(user_id), events))
 
-            return jsonify({
-                "success": True,
-                "message": "Test notification sent" if success else "Notification rate limit reached",
-                "events_count": len(events)
-            })
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "Test notification sent" if success else "Notification rate limit reached",
+                    "events_count": len(events),
+                }
+            )
         else:
-            return jsonify({
-                "success": True,
-                "message": "No events matching your preferences",
-                "events_count": 0
-            })
+            return jsonify({"success": True, "message": "No events matching your preferences", "events_count": 0})
 
     except Exception as e:
         logger.error(f"Error sending test notification: {e}")

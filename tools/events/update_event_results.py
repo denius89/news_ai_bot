@@ -28,9 +28,7 @@ logging.basicConfig(
 logger = logging.getLogger("update_event_results")
 
 
-async def update_event_results(
-    days_back: int = 3, categories: list = None, dry_run: bool = False
-) -> Dict[str, Any]:
+async def update_event_results(days_back: int = 3, categories: list = None, dry_run: bool = False) -> Dict[str, Any]:
     """
     Update results for completed events.
 
@@ -67,9 +65,7 @@ async def update_event_results(
         for event in events:
             # For now, just mark as completed
             # In production, this would fetch actual results from providers
-            success = await events_service.update_event_status(
-                event["id"], "completed", {"note": "Auto-completed"}
-            )
+            success = await events_service.update_event_status(event["id"], "completed", {"note": "Auto-completed"})
             if success:
                 updated_count += 1
 
@@ -91,12 +87,13 @@ def main():
     """Main function for command-line usage."""
     parser = argparse.ArgumentParser(description="Update event results for PulseAI")
 
-    parser.add_argument(
-        "--days", type=int, default=3, help="Number of days to look back (default: 3)"
-    )
+    parser.add_argument("--days", type=int, default=3, help="Number of days to look back (default: 3)")
 
     parser.add_argument(
-        "--categories", nargs="+", choices=["crypto", "sports", "markets", "tech", "world"], help="Specific categories to update (default: all)"
+        "--categories",
+        nargs="+",
+        choices=["crypto", "sports", "markets", "tech", "world"],
+        help="Specific categories to update (default: all)",
     )
 
     parser.add_argument("--dry-run", action="store_true", help="Check events but don't update them")
@@ -104,9 +101,7 @@ def main():
     args = parser.parse_args()
 
     async def run():
-        result = await update_event_results(
-            days_back=args.days, categories=args.categories, dry_run=args.dry_run
-        )
+        result = await update_event_results(days_back=args.days, categories=args.categories, dry_run=args.dry_run)
 
         # Print results
         if result["success"]:

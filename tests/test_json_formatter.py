@@ -20,11 +20,11 @@ class TestJSONFormatter(unittest.TestCase):
             "why_important": [
                 "Рост институционального спроса",
                 "Регуляторная ясность улучшается",
-                "Технологические инновации ускоряются"
+                "Технологические инновации ускоряются",
             ],
             "context": "Рынок показывает признаки зрелости",
             "what_next": "Ожидается продолжение роста",
-            "sources_cited": ["CoinDesk", "Bloomberg"]
+            "sources_cited": ["CoinDesk", "Bloomberg"],
         }
 
         result = format_json_digest_to_html(json_data)
@@ -104,10 +104,7 @@ class TestJSONFormatter(unittest.TestCase):
 
     def test_minimal_data(self):
         """Тест обработки минимальных данных."""
-        minimal_data = {
-            "title": "Заголовок",
-            "summary": "Текст"
-        }
+        minimal_data = {"title": "Заголовок", "summary": "Текст"}
 
         result = format_json_digest_to_html(minimal_data)
 

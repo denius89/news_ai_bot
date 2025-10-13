@@ -87,9 +87,7 @@ class GitHubReleasesProvider(BaseEventProvider):
             logger.error(f"Error fetching GitHub Releases events: {e}")
             return []
 
-    async def _fetch_repo_releases(
-        self, repo: str, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def _fetch_repo_releases(self, repo: str, start_date: datetime, end_date: datetime) -> List[Dict]:
         """Fetch releases for a specific repository."""
         try:
             url = f"{self.base_url}/repos/{repo}/releases"
@@ -116,9 +114,7 @@ class GitHubReleasesProvider(BaseEventProvider):
             logger.error(f"Error fetching releases for {repo}: {e}")
             return []
 
-    def _parse_release(
-        self, release: Dict, repo: str, start_date: datetime, end_date: datetime
-    ) -> Dict:
+    def _parse_release(self, release: Dict, repo: str, start_date: datetime, end_date: datetime) -> Dict:
         """Parse release to standard format."""
         try:
             tag_name = release.get("tag_name", "")

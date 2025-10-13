@@ -10,7 +10,6 @@ CLI утилита для тестирования AI Digest Journalistic System
 import asyncio
 import argparse
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
@@ -38,49 +37,50 @@ Examples:
 
   # Submit feedback for a digest
   python tools/show_news.py --feedback 0.9 --digest-id "uuid-here"
-        """
+        """,
     )
 
     # Basic arguments
-    parser.add_argument("--category", default="tech",
-                       choices=["crypto", "markets", "tech", "sports", "world"],
-                       help="News category (default: tech)")
-    parser.add_argument("--ai", action="store_true",
-                       help="Use AI summarization")
-    parser.add_argument("--limit", type=int, default=10,
-                       help="Number of news items (default: 10)")
+    parser.add_argument(
+        "--category",
+        default="tech",
+        choices=["crypto", "markets", "tech", "sports", "world"],
+        help="News category (default: tech)",
+    )
+    parser.add_argument("--ai", action="store_true", help="Use AI summarization")
+    parser.add_argument("--limit", type=int, default=10, help="Number of news items (default: 10)")
 
     # Style arguments
-    parser.add_argument("--style", default="analytical",
-                       choices=["analytical", "business", "meme", "newsroom", "magazine", "casual"],
-                       help="Digest style (default: analytical)")
-    parser.add_argument("--tone", default="neutral",
-                       choices=["neutral", "insightful", "critical", "optimistic"],
-                       help="Digest tone (default: neutral)")
-    parser.add_argument("--length", default="medium",
-                       choices=["short", "medium", "long"],
-                       help="Digest length (default: medium)")
-    parser.add_argument("--audience", default="general",
-                       choices=["general", "pro"],
-                       help="Target audience (default: general)")
+    parser.add_argument(
+        "--style",
+        default="analytical",
+        choices=["analytical", "business", "meme", "newsroom", "magazine", "casual"],
+        help="Digest style (default: analytical)",
+    )
+    parser.add_argument(
+        "--tone",
+        default="neutral",
+        choices=["neutral", "insightful", "critical", "optimistic"],
+        help="Digest tone (default: neutral)",
+    )
+    parser.add_argument(
+        "--length", default="medium", choices=["short", "medium", "long"], help="Digest length (default: medium)"
+    )
+    parser.add_argument(
+        "--audience", default="general", choices=["general", "pro"], help="Target audience (default: general)"
+    )
 
     # Version control
-    parser.add_argument("--use-v2", action="store_true",
-                       help="Use v2 journalistic prompts")
-    parser.add_argument("--legacy", action="store_true",
-                       help="Force legacy generation (disable v2)")
+    parser.add_argument("--use-v2", action="store_true", help="Use v2 journalistic prompts")
+    parser.add_argument("--legacy", action="store_true", help="Force legacy generation (disable v2)")
 
     # Output options
-    parser.add_argument("--verbose", "-v", action="store_true",
-                       help="Verbose output")
-    parser.add_argument("--json", action="store_true",
-                       help="Output raw JSON (v2 only)")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    parser.add_argument("--json", action="store_true", help="Output raw JSON (v2 only)")
 
     # Feedback options
-    parser.add_argument("--feedback", type=float, metavar="SCORE",
-                       help="Submit feedback score (0.0-1.0)")
-    parser.add_argument("--digest-id", type=str,
-                       help="Digest ID for feedback submission")
+    parser.add_argument("--feedback", type=float, metavar="SCORE", help="Submit feedback score (0.0-1.0)")
+    parser.add_argument("--digest-id", type=str, help="Digest ID for feedback submission")
 
     args = parser.parse_args()
 
@@ -109,7 +109,7 @@ Examples:
             tone=args.tone,
             length=args.length,
             audience=args.audience,
-            use_v2=use_v2
+            use_v2=use_v2,
         )
 
         if args.json and use_v2:
@@ -124,7 +124,7 @@ Examples:
             print("=" * 50)
 
             if args.verbose:
-                print(f"\n✅ Digest generated successfully")
+                print("\n✅ Digest generated successfully")
                 print(f"📊 Length: {len(digest)} characters")
 
         # Handle feedback submission
@@ -139,7 +139,7 @@ Examples:
                 response = requests.post(
                     "http://localhost:8001/api/feedback",
                     json={"digest_id": args.digest_id, "score": args.feedback},
-                    timeout=10
+                    timeout=10,
                 )
 
                 if response.ok:
@@ -156,6 +156,7 @@ Examples:
         print(f"❌ Error generating digest: {e}")
         if args.verbose:
             import traceback
+
             traceback.print_exc()
         sys.exit(1)
 

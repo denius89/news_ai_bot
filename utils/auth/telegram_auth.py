@@ -42,13 +42,13 @@ def verify_telegram_webapp_data(init_data: str, bot_token: str) -> Optional[Dict
         parsed_data = dict(parse_qsl(init_data))
 
         # Извлекаем hash для проверки
-        hash_value = parsed_data.pop('hash', None)
+        hash_value = parsed_data.pop("hash", None)
         if not hash_value:
             logger.error("Missing hash in init_data")
             return None
 
         # Проверяем auth_date (не старше 24 часов)
-        auth_date_str = parsed_data.get('auth_date', '0')
+        auth_date_str = parsed_data.get("auth_date", "0")
         try:
             auth_date = int(auth_date_str)
         except ValueError:
@@ -62,15 +62,11 @@ def verify_telegram_webapp_data(init_data: str, bot_token: str) -> Optional[Dict
 
         # Создаем data_check_string для проверки подписи
         data_check_arr = [f"{k}={v}" for k, v in sorted(parsed_data.items())]
-        data_check_string = '\n'.join(data_check_arr)
+        data_check_string = "\n".join(data_check_arr)
 
         # Вычисляем secret_key и hash
         secret_key = hashlib.sha256(bot_token.encode()).digest()
-        calculated_hash = hmac.new(
-            secret_key,
-            data_check_string.encode(),
-            hashlib.sha256
-        ).hexdigest()
+        calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
 
         # Сравниваем вычисленный hash с полученным
         if not hmac.compare_digest(calculated_hash, hash_value):
@@ -81,19 +77,19 @@ def verify_telegram_webapp_data(init_data: str, bot_token: str) -> Optional[Dict
             return None
 
         # Проверяем наличие обязательных полей
-        if 'user' not in parsed_data:
+        if "user" not in parsed_data:
             logger.error("Missing 'user' field in init_data")
             return None
 
         # Парсим данные пользователя
         try:
-            user_data = json.loads(parsed_data['user'])
+            user_data = json.loads(parsed_data["user"])
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse user data: {e}")
             return None
 
         # Проверяем обязательные поля пользователя
-        if not user_data.get('id'):
+        if not user_data.get("id"):
             logger.error("Missing user ID in user data")
             return None
 
@@ -101,7 +97,7 @@ def verify_telegram_webapp_data(init_data: str, bot_token: str) -> Optional[Dict
 
         # Возвращаем все данные включая пользователя
         result = parsed_data.copy()
-        result['user'] = user_data
+        result["user"] = user_data
 
         return result
 
@@ -120,21 +116,21 @@ def extract_user_from_verified_data(verified_data: Dict[str, Any]) -> Optional[D
     Returns:
         Dict с данными пользователя или None
     """
-    if not verified_data or 'user' not in verified_data:
+    if not verified_data or "user" not in verified_data:
         return None
 
-    user_data = verified_data['user']
+    user_data = verified_data["user"]
 
     # Извлекаем основные поля пользователя
     return {
-        'id': user_data.get('id'),
-        'first_name': user_data.get('first_name'),
-        'last_name': user_data.get('last_name'),
-        'username': user_data.get('username'),
-        'language_code': user_data.get('language_code'),
-        'is_premium': user_data.get('is_premium', False),
-        'photo_url': user_data.get('photo_url'),
-        'allows_write_to_pm': user_data.get('allows_write_to_pm', False),
+        "id": user_data.get("id"),
+        "first_name": user_data.get("first_name"),
+        "last_name": user_data.get("last_name"),
+        "username": user_data.get("username"),
+        "language_code": user_data.get("language_code"),
+        "is_premium": user_data.get("is_premium", False),
+        "photo_url": user_data.get("photo_url"),
+        "allows_write_to_pm": user_data.get("allows_write_to_pm", False),
     }
 
 
@@ -149,18 +145,18 @@ def is_telegram_webapp_request(request_headers: Dict[str, str]) -> bool:
         True если запрос от Telegram WebApp
     """
     # Проверяем наличие initData в заголовках
-    init_data = request_headers.get('X-Telegram-Init-Data')
+    init_data = request_headers.get("X-Telegram-Init-Data")
     if init_data:
         return True
 
     # Проверяем User-Agent на наличие Telegram
-    user_agent = request_headers.get('User-Agent', '').lower()
-    if 'telegram' in user_agent:
+    user_agent = request_headers.get("User-Agent", "").lower()
+    if "telegram" in user_agent:
         return True
 
     # Проверяем Referer на Telegram домены
-    referer = request_headers.get('Referer', '').lower()
-    telegram_domains = ['telegram.org', 'web.telegram.org', 't.me']
+    referer = request_headers.get("Referer", "").lower()
+    telegram_domains = ["telegram.org", "web.telegram.org", "t.me"]
     if any(domain in referer for domain in telegram_domains):
         return True
 
@@ -178,8 +174,8 @@ def validate_telegram_auth_headers(request_headers: Dict[str, str]) -> bool:
         True если заголовки корректны
     """
     # Проверяем наличие хотя бы одного из методов аутентификации
-    init_data = request_headers.get('X-Telegram-Init-Data')
-    user_data = request_headers.get('X-Telegram-User-Data')
+    init_data = request_headers.get("X-Telegram-Init-Data")
+    user_data = request_headers.get("X-Telegram-User-Data")
 
     if not init_data and not user_data:
         logger.warning("No Telegram authentication headers found")
@@ -189,7 +185,7 @@ def validate_telegram_auth_headers(request_headers: Dict[str, str]) -> bool:
     if init_data:
         try:
             parsed = dict(parse_qsl(init_data))
-            if 'hash' not in parsed or 'user' not in parsed:
+            if "hash" not in parsed or "user" not in parsed:
                 logger.warning("Invalid initData format")
                 return False
         except Exception as e:
@@ -218,23 +214,23 @@ def get_telegram_user_id_from_headers(request_headers: Dict[str, str]) -> Option
         Telegram user ID или None
     """
     # Сначала пробуем извлечь из initData
-    init_data = request_headers.get('X-Telegram-Init-Data')
+    init_data = request_headers.get("X-Telegram-Init-Data")
     if init_data:
         try:
             parsed = dict(parse_qsl(init_data))
-            user_data = json.loads(parsed.get('user', '{}'))
-            user_id = user_data.get('id')
+            user_data = json.loads(parsed.get("user", "{}"))
+            user_id = user_data.get("id")
             if user_id:
                 return int(user_id)
         except (ValueError, json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Failed to extract user ID from initData: {e}")
 
     # Затем пробуем извлечь из user data
-    user_data = request_headers.get('X-Telegram-User-Data')
+    user_data = request_headers.get("X-Telegram-User-Data")
     if user_data:
         try:
             user_info = json.loads(user_data)
-            user_id = user_info.get('id')
+            user_id = user_info.get("id")
             if user_id:
                 return int(user_id)
         except (ValueError, json.JSONDecodeError, KeyError) as e:
@@ -255,14 +251,14 @@ def create_fallback_user_data(telegram_id: int) -> Dict[str, Any]:
         Dict с базовыми данными пользователя
     """
     return {
-        'id': telegram_id,
-        'first_name': None,
-        'last_name': None,
-        'username': None,
-        'language_code': 'ru',
-        'is_premium': False,
-        'photo_url': None,
-        'allows_write_to_pm': False,
+        "id": telegram_id,
+        "first_name": None,
+        "last_name": None,
+        "username": None,
+        "language_code": "ru",
+        "is_premium": False,
+        "photo_url": None,
+        "allows_write_to_pm": False,
     }
 
 
@@ -282,7 +278,9 @@ def log_auth_attempt(telegram_id: int, success: bool, method: str, error: Option
         logger.warning(f"Telegram auth failed: user_id={telegram_id}, method={method}, error={error}")
 
 
-def verify_telegram_auth(request_headers: Dict[str, str], session_data: Optional[Dict[str, Any]] = None, bot_token: Optional[str] = None) -> Dict[str, Any]:
+def verify_telegram_auth(
+    request_headers: Dict[str, str], session_data: Optional[Dict[str, Any]] = None, bot_token: Optional[str] = None
+) -> Dict[str, Any]:
     """
     Унифицированная функция аутентификации с приоритизацией методов.
 
@@ -307,61 +305,61 @@ def verify_telegram_auth(request_headers: Dict[str, str], session_data: Optional
         }
     """
     # 1. ПРИОРИТЕТ 1: HMAC SHA256 аутентификация
-    init_data = request_headers.get('X-Telegram-Init-Data')
+    init_data = request_headers.get("X-Telegram-Init-Data")
     if init_data and bot_token:
         try:
             verified_data = verify_telegram_webapp_data(init_data, bot_token)
             if verified_data:
                 user_data = extract_user_from_verified_data(verified_data)
                 if user_data:
-                    telegram_id = user_data['id']
-                    log_auth_attempt(telegram_id, True, 'initData_HMAC')
+                    telegram_id = user_data["id"]
+                    log_auth_attempt(telegram_id, True, "initData_HMAC")
                     return {
-                        'success': True,
-                        'user_id': str(telegram_id),  # Временно используем telegram_id как user_id
-                        'telegram_id': telegram_id,
-                        'method': 'initData_HMAC',
-                        'message': 'HMAC SHA256 authentication successful'
+                        "success": True,
+                        "user_id": str(telegram_id),  # Временно используем telegram_id как user_id
+                        "telegram_id": telegram_id,
+                        "method": "initData_HMAC",
+                        "message": "HMAC SHA256 authentication successful",
                     }
         except Exception as e:
             logger.debug(f"HMAC authentication failed (will try fallback): {e}")
 
     # 2. ПРИОРИТЕТ 2: Session аутентификация
-    if session_data and session_data.get('user_id') and session_data.get('telegram_id'):
-        telegram_id = session_data['telegram_id']
-        log_auth_attempt(telegram_id, True, 'session')
+    if session_data and session_data.get("user_id") and session_data.get("telegram_id"):
+        telegram_id = session_data["telegram_id"]
+        log_auth_attempt(telegram_id, True, "session")
         return {
-            'success': True,
-            'user_id': session_data['user_id'],
-            'telegram_id': telegram_id,
-            'method': 'session',
-            'message': 'Session authentication successful'
+            "success": True,
+            "user_id": session_data["user_id"],
+            "telegram_id": telegram_id,
+            "method": "session",
+            "message": "Session authentication successful",
         }
 
     # 3. ПРИОРИТЕТ 3: Fallback JSON аутентификация
-    user_data_header = request_headers.get('X-Telegram-User-Data')
+    user_data_header = request_headers.get("X-Telegram-User-Data")
     if user_data_header:
         try:
             user_info = json.loads(user_data_header)
-            telegram_id = user_info.get('id')
+            telegram_id = user_info.get("id")
             if telegram_id:
-                log_auth_attempt(telegram_id, True, 'userData_fallback')
+                log_auth_attempt(telegram_id, True, "userData_fallback")
                 return {
-                    'success': True,
-                    'user_id': str(telegram_id),  # Временно используем telegram_id как user_id
-                    'telegram_id': telegram_id,
-                    'method': 'userData_fallback',
-                    'message': 'Fallback JSON authentication successful'
+                    "success": True,
+                    "user_id": str(telegram_id),  # Временно используем telegram_id как user_id
+                    "telegram_id": telegram_id,
+                    "method": "userData_fallback",
+                    "message": "Fallback JSON authentication successful",
                 }
         except (json.JSONDecodeError, KeyError) as e:
             logger.warning(f"Fallback authentication failed: {e}")
 
     # Все методы аутентификации провалились
-    log_auth_attempt(0, False, 'none', 'No valid authentication method found')
+    log_auth_attempt(0, False, "none", "No valid authentication method found")
     return {
-        'success': False,
-        'user_id': None,
-        'telegram_id': None,
-        'method': 'none',
-        'message': 'Authentication failed: no valid method found'
+        "success": False,
+        "user_id": None,
+        "telegram_id": None,
+        "method": "none",
+        "message": "Authentication failed: no valid method found",
     }

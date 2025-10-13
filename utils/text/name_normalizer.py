@@ -13,53 +13,143 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 # Регулярное выражение для определения emoji-only имён
-EMOJI_ONLY_PATTERN = re.compile(r'^[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF\U00002600-\U000026FF\U00002700-\U000027BF\s]+$')
+EMOJI_ONLY_PATTERN = re.compile(
+    r"^[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF\U00002600-\U000026FF\U00002700-\U000027BF\s]+$"
+)
 
 # Невидимые и управляющие Unicode символы для удаления
 INVISIBLE_CHARS = {
-    '\u200b',  # Zero Width Space
-    '\u200c',  # Zero Width Non-Joiner
-    '\u200d',  # Zero Width Joiner
-    '\u202a',  # Left-to-Right Embedding
-    '\u202b',  # Right-to-Left Embedding
-    '\u202c',  # Pop Directional Formatting
-    '\u202d',  # Left-to-Right Override
-    '\u202e',  # Right-to-Left Override
-    '\u2060',  # Word Joiner
-    '\ufeff',  # Zero Width No-Break Space
+    "\u200b",  # Zero Width Space
+    "\u200c",  # Zero Width Non-Joiner
+    "\u200d",  # Zero Width Joiner
+    "\u202a",  # Left-to-Right Embedding
+    "\u202b",  # Right-to-Left Embedding
+    "\u202c",  # Pop Directional Formatting
+    "\u202d",  # Left-to-Right Override
+    "\u202e",  # Right-to-Left Override
+    "\u2060",  # Word Joiner
+    "\ufeff",  # Zero Width No-Break Space
 }
 
 # Маппинг стилизованных Unicode символов на обычные ASCII
 UNICODE_STYLE_MAP = {
     # Mathematical Bold (𝔸-𝔾)
-    '\U0001D400': 'A', '\U0001D401': 'B', '\U0001D402': 'C', '\U0001D403': 'D', '\U0001D404': 'E', '\U0001D405': 'F', '\U0001D406': 'G',
-    '\U0001D407': 'H', '\U0001D408': 'I', '\U0001D409': 'J', '\U0001D40A': 'K', '\U0001D40B': 'L', '\U0001D40C': 'M', '\U0001D40D': 'N',
-    '\U0001D40E': 'O', '\U0001D40F': 'P', '\U0001D410': 'Q', '\U0001D411': 'R', '\U0001D412': 'S', '\U0001D413': 'T', '\U0001D414': 'U',
-    '\U0001D415': 'V', '\U0001D416': 'W', '\U0001D417': 'X', '\U0001D418': 'Y', '\U0001D419': 'Z',
+    "\U0001d400": "A",
+    "\U0001d401": "B",
+    "\U0001d402": "C",
+    "\U0001d403": "D",
+    "\U0001d404": "E",
+    "\U0001d405": "F",
+    "\U0001d406": "G",
+    "\U0001d407": "H",
+    "\U0001d408": "I",
+    "\U0001d409": "J",
+    "\U0001d40a": "K",
+    "\U0001d40b": "L",
+    "\U0001d40c": "M",
+    "\U0001d40d": "N",
+    "\U0001d40e": "O",
+    "\U0001d40f": "P",
+    "\U0001d410": "Q",
+    "\U0001d411": "R",
+    "\U0001d412": "S",
+    "\U0001d413": "T",
+    "\U0001d414": "U",
+    "\U0001d415": "V",
+    "\U0001d416": "W",
+    "\U0001d417": "X",
+    "\U0001d418": "Y",
+    "\U0001d419": "Z",
     # Mathematical Bold lowercase (𝕒-𝕫)
-    '\U0001D41A': 'a', '\U0001D41B': 'b', '\U0001D41C': 'c', '\U0001D41D': 'd', '\U0001D41E': 'e', '\U0001D41F': 'f', '\U0001D420': 'g',
-    '\U0001D421': 'h', '\U0001D422': 'i', '\U0001D423': 'j', '\U0001D424': 'k', '\U0001D425': 'l', '\U0001D426': 'm', '\U0001D427': 'n',
-    '\U0001D428': 'o', '\U0001D429': 'p', '\U0001D42A': 'q', '\U0001D42B': 'r', '\U0001D42C': 's', '\U0001D42D': 't', '\U0001D42E': 'u',
-    '\U0001D42F': 'v', '\U0001D430': 'w', '\U0001D431': 'x', '\U0001D432': 'y', '\U0001D433': 'z',
+    "\U0001d41a": "a",
+    "\U0001d41b": "b",
+    "\U0001d41c": "c",
+    "\U0001d41d": "d",
+    "\U0001d41e": "e",
+    "\U0001d41f": "f",
+    "\U0001d420": "g",
+    "\U0001d421": "h",
+    "\U0001d422": "i",
+    "\U0001d423": "j",
+    "\U0001d424": "k",
+    "\U0001d425": "l",
+    "\U0001d426": "m",
+    "\U0001d427": "n",
+    "\U0001d428": "o",
+    "\U0001d429": "p",
+    "\U0001d42a": "q",
+    "\U0001d42b": "r",
+    "\U0001d42c": "s",
+    "\U0001d42d": "t",
+    "\U0001d42e": "u",
+    "\U0001d42f": "v",
+    "\U0001d430": "w",
+    "\U0001d431": "x",
+    "\U0001d432": "y",
+    "\U0001d433": "z",
     # Mathematical Double-Struck (𝔸-𝔾)
-    '\U0001D538': 'A', '\U0001D539': 'B', '\U0001D53A': 'C', '\U0001D53B': 'D', '\U0001D53C': 'E', '\U0001D53D': 'F', '\U0001D53E': 'G',
-    '\U0001D53F': 'H', '\U0001D540': 'I', '\U0001D541': 'J', '\U0001D542': 'K', '\U0001D543': 'L', '\U0001D544': 'M', '\U0001D545': 'N',
-    '\U0001D546': 'O', '\U0001D547': 'P', '\U0001D548': 'Q', '\U0001D549': 'R', '\U0001D54A': 'S', '\U0001D54B': 'T', '\U0001D54C': 'U',
-    '\U0001D54D': 'V', '\U0001D54E': 'W', '\U0001D54F': 'X', '\U0001D550': 'Y', '\U0001D551': 'Z',
-    '\U0001D552': 'a', '\U0001D553': 'b', '\U0001D554': 'c', '\U0001D555': 'd', '\U0001D556': 'e', '\U0001D557': 'f', '\U0001D558': 'g',
-    '\U0001D559': 'h', '\U0001D55A': 'i', '\U0001D55B': 'j', '\U0001D55C': 'k', '\U0001D55D': 'l', '\U0001D55E': 'm', '\U0001D55F': 'n',
-    '\U0001D560': 'o', '\U0001D561': 'p', '\U0001D562': 'q', '\U0001D563': 'r', '\U0001D564': 's', '\U0001D565': 't', '\U0001D566': 'u',
-    '\U0001D567': 'v', '\U0001D568': 'w', '\U0001D569': 'x', '\U0001D56A': 'y', '\U0001D56B': 'z',
+    "\U0001d538": "A",
+    "\U0001d539": "B",
+    "\U0001d53a": "C",
+    "\U0001d53b": "D",
+    "\U0001d53c": "E",
+    "\U0001d53d": "F",
+    "\U0001d53e": "G",
+    "\U0001d53f": "H",
+    "\U0001d540": "I",
+    "\U0001d541": "J",
+    "\U0001d542": "K",
+    "\U0001d543": "L",
+    "\U0001d544": "M",
+    "\U0001d545": "N",
+    "\U0001d546": "O",
+    "\U0001d547": "P",
+    "\U0001d548": "Q",
+    "\U0001d549": "R",
+    "\U0001d54a": "S",
+    "\U0001d54b": "T",
+    "\U0001d54c": "U",
+    "\U0001d54d": "V",
+    "\U0001d54e": "W",
+    "\U0001d54f": "X",
+    "\U0001d550": "Y",
+    "\U0001d551": "Z",
+    "\U0001d552": "a",
+    "\U0001d553": "b",
+    "\U0001d554": "c",
+    "\U0001d555": "d",
+    "\U0001d556": "e",
+    "\U0001d557": "f",
+    "\U0001d558": "g",
+    "\U0001d559": "h",
+    "\U0001d55a": "i",
+    "\U0001d55b": "j",
+    "\U0001d55c": "k",
+    "\U0001d55d": "l",
+    "\U0001d55e": "m",
+    "\U0001d55f": "n",
+    "\U0001d560": "o",
+    "\U0001d561": "p",
+    "\U0001d562": "q",
+    "\U0001d563": "r",
+    "\U0001d564": "s",
+    "\U0001d565": "t",
+    "\U0001d566": "u",
+    "\U0001d567": "v",
+    "\U0001d568": "w",
+    "\U0001d569": "x",
+    "\U0001d56a": "y",
+    "\U0001d56b": "z",
 }
 
 # Маппинг испорченных имён (двойная кодировка UTF-8)
 CORRUPTION_MAP = {
-    'ÐÐ°Ð½': 'Иван',
-    'ÐÐ°ÑÐ°': 'Маша',
-    'ÐÐ»ÐµÐºÑÐµÐ¹': 'Алексей',
+    "ÐÐ°Ð½": "Иван",
+    "ÐÐ°ÑÐ°": "Маша",
+    "ÐÐ»ÐµÐºÑÐµÐ¹": "Алексей",
     # Дважды испорченные имена
-    'Ã\x90Ã\x90Â°Ã\x90Â½': 'Иван',
-    'ÃÐÃÐÂ°ÃÐÂ½': 'Иван',
+    "Ã\x90Ã\x90Â°Ã\x90Â½": "Иван",
+    "ÃÐÃÐÂ°ÃÐÂ½": "Иван",
 }
 
 
@@ -131,11 +221,11 @@ def _fix_corrupted_encoding(name: str) -> str:
 
     # Проверяем на двойную кодировку UTF-8
     try:
-        if 'Ð' in name and len(name) > 0:
+        if "Ð" in name and len(name) > 0:
             # Кодируем в latin-1, затем декодируем как UTF-8
-            fixed = name.encode('latin-1').decode('utf-8')
+            fixed = name.encode("latin-1").decode("utf-8")
             # Проверяем, что получили кириллицу
-            if any('\u0400' <= c <= '\u04FF' for c in fixed):
+            if any("\u0400" <= c <= "\u04ff" for c in fixed):
                 return fixed
     except (UnicodeDecodeError, UnicodeEncodeError):
         pass
@@ -153,7 +243,7 @@ def _remove_invisible_chars(name: str) -> str:
             continue
 
         # Удаляем управляющие символы (категория C)
-        if unicodedata.category(char).startswith('C'):
+        if unicodedata.category(char).startswith("C"):
             continue
 
         # Удаляем лишние пробелы
@@ -162,7 +252,7 @@ def _remove_invisible_chars(name: str) -> str:
 
         result.append(char)
 
-    return ''.join(result)
+    return "".join(result)
 
 
 def _convert_styled_unicode(name: str) -> str:
@@ -174,7 +264,7 @@ def _convert_styled_unicode(name: str) -> str:
             result.append(UNICODE_STYLE_MAP[char])
         else:
             # Пытаемся нормализовать символ
-            normalized = unicodedata.normalize('NFKD', char)
+            normalized = unicodedata.normalize("NFKD", char)
             # Если после нормализации получили ASCII символ
             if len(normalized) == 1 and ord(normalized) < 128:
                 result.append(normalized)
@@ -182,7 +272,7 @@ def _convert_styled_unicode(name: str) -> str:
                 # Оставляем как есть, если не можем конвертировать
                 result.append(char)
 
-    return ''.join(result)
+    return "".join(result)
 
 
 def _is_emoji_only(name: str) -> bool:
@@ -200,7 +290,7 @@ def _truncate_preserving_words(text: str, max_length: int) -> str:
 
     # Ищем последний пробел перед max_length
     truncated = text[:max_length]
-    last_space = truncated.rfind(' ')
+    last_space = truncated.rfind(" ")
 
     if last_space > max_length * 0.7:  # Если пробел не слишком далеко от конца
         return truncated[:last_space]

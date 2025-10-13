@@ -30,9 +30,7 @@ class TheSportsDBProvider(BaseEventProvider):
         super().__init__("thesportsdb", "sports")
         self.base_url = "https://www.thesportsdb.com/api/v1/json/3"
 
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
         Fetch events from TheSportsDB.
 
@@ -132,9 +130,7 @@ class TheSportsDBProvider(BaseEventProvider):
             if "+" in datetime_str:
                 datetime_str = datetime_str.split("+")[0].strip()
 
-            starts_at = datetime.strptime(
-                datetime_str, "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc)
+            starts_at = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
             # Get sport and league
             sport = event.get("strSport", "Soccer")
@@ -156,8 +152,7 @@ class TheSportsDBProvider(BaseEventProvider):
                 "description": f"{league} - {sport}",
                 "link": f"https://www.thesportsdb.com/event/{event.get('idEvent')}",
                 "location": event.get("strVenue", ""),
-                "group_name": league
-                or sport,  # Лига или спорт для группировки
+                "group_name": league or sport,  # Лига или спорт для группировки
                 "metadata": {
                     "event_id": event.get("idEvent"),
                     "sport": sport,
@@ -176,15 +171,9 @@ class TheSportsDBProvider(BaseEventProvider):
         """Calculate importance based on league."""
         league_lower = league.lower()
 
-        if any(
-            word in league_lower
-            for word in ["champions league", "world cup", "premier league"]
-        ):
+        if any(word in league_lower for word in ["champions league", "world cup", "premier league"]):
             return 0.8
-        elif any(
-            word in league_lower
-            for word in ["la liga", "bundesliga", "serie a"]
-        ):
+        elif any(word in league_lower for word in ["la liga", "bundesliga", "serie a"]):
             return 0.75
         elif "europa" in league_lower:
             return 0.7

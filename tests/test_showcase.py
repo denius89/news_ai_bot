@@ -17,6 +17,7 @@ from datetime import datetime
 
 # Import showcase tool
 import sys
+
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -27,7 +28,7 @@ class TestShowcaseGeneration:
     """Test showcase digest generation."""
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_digest')
+    @patch("tools.showcase_digest.generate_digest")
     async def test_showcase_generation_success(self, mock_generate_digest):
         """Test successful showcase generation."""
         # Mock digest generation for each category
@@ -36,18 +37,18 @@ class TestShowcaseGeneration:
             "sports": "Championship finals set for next weekend...",
             "markets": "Stock markets show mixed signals amid economic uncertainty...",
             "tech": "New AI breakthrough promises faster processing...",
-            "world": "International summit addresses climate change..."
+            "world": "International summit addresses climate change...",
         }
 
         def mock_generate_side_effect(*args, **kwargs):
-            category = kwargs.get('category', 'tech')
+            category = kwargs.get("category", "tech")
             return mock_digests.get(category, "Default digest")
 
         mock_generate_digest.side_effect = mock_generate_side_effect
 
         # Mock file operations
-        with patch('builtins.open', MagicMock()) as mock_open:
-            with patch('pathlib.Path.mkdir', MagicMock()):
+        with patch("builtins.open", MagicMock()) as mock_open:
+            with patch("pathlib.Path.mkdir", MagicMock()):
                 showcase_data = await generate_showcase()
 
         # Verify structure
@@ -72,12 +73,13 @@ class TestShowcaseGeneration:
         assert categories["sports"] == mock_digests["sports"]
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_digest')
+    @patch("tools.showcase_digest.generate_digest")
     async def test_showcase_generation_partial_failure(self, mock_generate_digest):
         """Test showcase generation with some failures."""
+
         # Mock some successful, some failed generations
         def mock_generate_side_effect(*args, **kwargs):
-            category = kwargs.get('category', 'tech')
+            category = kwargs.get("category", "tech")
             if category in ["crypto", "sports"]:
                 return f"Success digest for {category}"
             else:
@@ -85,8 +87,8 @@ class TestShowcaseGeneration:
 
         mock_generate_digest.side_effect = mock_generate_side_effect
 
-        with patch('builtins.open', MagicMock()) as mock_open:
-            with patch('pathlib.Path.mkdir', MagicMock()):
+        with patch("builtins.open", MagicMock()) as mock_open:
+            with patch("pathlib.Path.mkdir", MagicMock()):
                 showcase_data = await generate_showcase()
 
         # Verify partial success
@@ -101,13 +103,13 @@ class TestShowcaseGeneration:
         assert "Ошибка генерации" in categories["world"]
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_digest')
+    @patch("tools.showcase_digest.generate_digest")
     async def test_showcase_generation_complete_failure(self, mock_generate_digest):
         """Test showcase generation with complete failure."""
         mock_generate_digest.side_effect = Exception("All generations failed")
 
-        with patch('builtins.open', MagicMock()) as mock_open:
-            with patch('pathlib.Path.mkdir', MagicMock()):
+        with patch("builtins.open", MagicMock()) as mock_open:
+            with patch("pathlib.Path.mkdir", MagicMock()):
                 showcase_data = await generate_showcase()
 
         # Verify complete failure
@@ -119,7 +121,7 @@ class TestShowcaseGeneration:
             assert "Ошибка генерации" in categories[category]
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_digest')
+    @patch("tools.showcase_digest.generate_digest")
     async def test_showcase_file_creation(self, mock_generate_digest):
         """Test that showcase file is created correctly."""
         mock_generate_digest.return_value = "Test digest content"
@@ -128,14 +130,14 @@ class TestShowcaseGeneration:
         mock_file_content = []
 
         def mock_open_side_effect(path, mode, **kwargs):
-            if 'w' in mode:
+            if "w" in mode:
                 mock_file = MagicMock()
                 mock_file.write = lambda content: mock_file_content.append(content)
                 return mock_file
             return MagicMock()
 
-        with patch('builtins.open', side_effect=mock_open_side_effect):
-            with patch('pathlib.Path.mkdir', MagicMock()):
+        with patch("builtins.open", side_effect=mock_open_side_effect):
+            with patch("pathlib.Path.mkdir", MagicMock()):
                 await generate_showcase()
 
         # Verify file was written
@@ -153,54 +155,49 @@ class TestShowcaseMain:
     """Test main function and exit codes."""
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_showcase')
+    @patch("tools.showcase_digest.generate_showcase")
     async def test_main_success(self, mock_generate_showcase):
         """Test main function with successful generation."""
-        mock_generate_showcase.return_value = {
-            "successful_generations": 5,
-            "total_categories": 5
-        }
+        mock_generate_showcase.return_value = {"successful_generations": 5, "total_categories": 5}
 
         from tools.showcase_digest import main
+
         exit_code = await main()
 
         assert exit_code == 0
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_showcase')
+    @patch("tools.showcase_digest.generate_showcase")
     async def test_main_partial_success(self, mock_generate_showcase):
         """Test main function with partial success."""
-        mock_generate_showcase.return_value = {
-            "successful_generations": 3,
-            "total_categories": 5
-        }
+        mock_generate_showcase.return_value = {"successful_generations": 3, "total_categories": 5}
 
         from tools.showcase_digest import main
+
         exit_code = await main()
 
         assert exit_code == 1
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_showcase')
+    @patch("tools.showcase_digest.generate_showcase")
     async def test_main_complete_failure(self, mock_generate_showcase):
         """Test main function with complete failure."""
-        mock_generate_showcase.return_value = {
-            "successful_generations": 0,
-            "total_categories": 5
-        }
+        mock_generate_showcase.return_value = {"successful_generations": 0, "total_categories": 5}
 
         from tools.showcase_digest import main
+
         exit_code = await main()
 
         assert exit_code == 2
 
     @pytest.mark.asyncio
-    @patch('tools.showcase_digest.generate_showcase')
+    @patch("tools.showcase_digest.generate_showcase")
     async def test_main_exception(self, mock_generate_showcase):
         """Test main function with exception."""
         mock_generate_showcase.side_effect = Exception("Unexpected error")
 
         from tools.showcase_digest import main
+
         exit_code = await main()
 
         assert exit_code == 3
@@ -219,10 +216,10 @@ class TestShowcaseIntegration:
                 "sports": "Sports news...",
                 "markets": "Market update...",
                 "tech": "Tech breakthrough...",
-                "world": "World news..."
+                "world": "World news...",
             },
             "total_categories": 5,
-            "successful_generations": 5
+            "successful_generations": 5,
         }
 
         # Convert to JSON and back

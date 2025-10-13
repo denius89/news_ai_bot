@@ -15,8 +15,10 @@ from models.news import NewsItem
 from utils.text.formatters import format_date
 from utils.ai.ai_client import ask_async
 from digests.prompts import get_prompt_for_category
+
 try:
     from digests.prompts_v2 import build_prompt, STYLE_CARDS, CATEGORY_CARDS
+
     PROMPTS_V2_AVAILABLE = True
 except ImportError:
     PROMPTS_V2_AVAILABLE = False
@@ -54,7 +56,9 @@ class DigestAIService:
         except Exception:
             return False
 
-    async def build_digest(self, news_items: List[NewsItem], style: str = "analytical", category: str = "all", length: str = "medium") -> str:
+    async def build_digest(
+        self, news_items: List[NewsItem], style: str = "analytical", category: str = "all", length: str = "medium"
+    ) -> str:
         """
         Build AI-powered digest from news items.
 
@@ -83,7 +87,9 @@ class DigestAIService:
             logger.info("OpenAI API not available, using fallback digest")
             return self._build_fallback_digest(limited_news)
 
-    async def _llm_summarize(self, news_items: List[NewsItem], style: str, category: str = "world", length: str = "medium") -> str:
+    async def _llm_summarize(
+        self, news_items: List[NewsItem], style: str, category: str = "world", length: str = "medium"
+    ) -> str:
         """
         Generate AI-powered summary using OpenAI.
 
@@ -127,7 +133,7 @@ class DigestAIService:
             from digests.json_formatter import format_json_digest_to_html, clean_json_from_text
 
             # Check if response is JSON
-            if response.strip().startswith('{') and response.strip().endswith('}'):
+            if response.strip().startswith("{") and response.strip().endswith("}"):
                 logger.info("Converting JSON response to HTML")
                 response = format_json_digest_to_html(response)
             else:
@@ -158,7 +164,9 @@ class DigestAIService:
 
         return response
 
-    def _create_prompt(self, news_data: List[Dict[str, Any]], style: str, category: str = "world", length: str = "medium") -> str:
+    def _create_prompt(
+        self, news_data: List[Dict[str, Any]], style: str, category: str = "world", length: str = "medium"
+    ) -> str:
         """Create AI prompt based on news data, style and category."""
 
         news_text = "\n\n".join(
@@ -188,7 +196,7 @@ class DigestAIService:
                 "audience": "general",  # По умолчанию общая аудитория
                 "news_text": news_text,
                 "min_importance": 0.6,
-                "min_credibility": 0.7
+                "min_credibility": 0.7,
             }
 
             try:

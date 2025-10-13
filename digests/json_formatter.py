@@ -98,17 +98,17 @@ def clean_json_from_text(text: str) -> str:
     """
     try:
         # Пытаемся найти JSON в тексте
-        if text.strip().startswith('{') and text.strip().endswith('}'):
+        if text.strip().startswith("{") and text.strip().endswith("}"):
             # Весь текст - это JSON
             return format_json_digest_to_html(text)
 
         # Ищем JSON блоки в тексте
-        lines = text.split('\n')
+        lines = text.split("\n")
         cleaned_lines = []
 
         for line in lines:
             stripped = line.strip()
-            if stripped.startswith('{') and stripped.endswith('}'):
+            if stripped.startswith("{") and stripped.endswith("}"):
                 # Строка содержит JSON
                 try:
                     json_obj = json.loads(stripped)
@@ -116,16 +116,16 @@ def clean_json_from_text(text: str) -> str:
                     cleaned_lines.append(html_content)
                 except json.JSONDecodeError:
                     cleaned_lines.append(line)
-            elif stripped.startswith('```json'):
+            elif stripped.startswith("```json"):
                 # Блок JSON с маркерами
                 continue
-            elif stripped.startswith('```') and not stripped.startswith('```json'):
+            elif stripped.startswith("```") and not stripped.startswith("```json"):
                 # Конец блока
                 continue
             else:
                 cleaned_lines.append(line)
 
-        return '\n'.join(cleaned_lines)
+        return "\n".join(cleaned_lines)
 
     except Exception as e:
         logger.error(f"Error cleaning JSON from text: {e}")

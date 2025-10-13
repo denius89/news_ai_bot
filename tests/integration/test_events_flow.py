@@ -20,64 +20,70 @@ class TestEventsFlow:
         """Test complete flow: fetch events -> AI filter -> store."""
         # Mock providers
         mock_provider = Mock()
-        mock_provider.fetch_events = Mock(return_value=[
-            {
-                "title": "High Importance Event",
-                "starts_at": datetime.now(timezone.utc) + timedelta(days=1),
-                "subcategory": "crypto",
-                "importance": 0.8,
-                "description": "Important crypto event",
-                "source": "test_provider",
-            },
-            {
-                "title": "Low Importance Event",
-                "starts_at": datetime.now(timezone.utc) + timedelta(days=1),
-                "subcategory": "general",
-                "importance": 0.4,
-                "description": "Less important event",
-                "source": "test_provider",
+        mock_provider.fetch_events = Mock(
+            return_value=[
+                {
+                    "title": "High Importance Event",
+                    "starts_at": datetime.now(timezone.utc) + timedelta(days=1),
+                    "subcategory": "crypto",
+                    "importance": 0.8,
+                    "description": "Important crypto event",
+                    "source": "test_provider",
+                },
+                {
+                    "title": "Low Importance Event",
+                    "starts_at": datetime.now(timezone.utc) + timedelta(days=1),
+                    "subcategory": "general",
+                    "importance": 0.4,
+                    "description": "Less important event",
+                    "source": "test_provider",
+                },
+            ]
+        )
+        mock_provider.normalize_event = Mock(
+            side_effect=lambda x: {
+                "title": x["title"],
+                "category": "crypto",
+                "subcategory": x["subcategory"],
+                "starts_at": x["starts_at"],
+                "importance": x["importance"],
+                "description": x["description"],
+                "source": x["source"],
+                "unique_hash": "test_hash",
+                "status": "upcoming",
             }
-        ])
-        mock_provider.normalize_event = Mock(side_effect=lambda x: {
-            "title": x["title"],
-            "category": "crypto",
-            "subcategory": x["subcategory"],
-            "starts_at": x["starts_at"],
-            "importance": x["importance"],
-            "description": x["description"],
-            "source": x["source"],
-            "unique_hash": "test_hash",
-            "status": "upcoming",
-        })
+        )
 
         # Mock events parser
-        with patch('events.events_parser.EventsParser') as mock_parser_class:
+        with patch("events.events_parser.EventsParser") as mock_parser_class:
             mock_parser = Mock()
             mock_parser.providers = {"test_provider": mock_provider}
-            mock_parser.fetch_events = Mock(return_value=[
-                Mock(
-                    title="High Importance Event",
-                    category="crypto",
-                    subcategory="crypto",
-                    starts_at=datetime.now(timezone.utc) + timedelta(days=1),
-                    importance=0.8,
-                    description="Important crypto event",
-                    source="test_provider",
-                ),
-                Mock(
-                    title="Low Importance Event",
-                    category="crypto",
-                    subcategory="general",
-                    starts_at=datetime.now(timezone.utc) + timedelta(days=1),
-                    importance=0.4,
-                    description="Less important event",
-                    source="test_provider",
-                )
-            ])
+            mock_parser.fetch_events = Mock(
+                return_value=[
+                    Mock(
+                        title="High Importance Event",
+                        category="crypto",
+                        subcategory="crypto",
+                        starts_at=datetime.now(timezone.utc) + timedelta(days=1),
+                        importance=0.8,
+                        description="Important crypto event",
+                        source="test_provider",
+                    ),
+                    Mock(
+                        title="Low Importance Event",
+                        category="crypto",
+                        subcategory="general",
+                        starts_at=datetime.now(timezone.utc) + timedelta(days=1),
+                        importance=0.4,
+                        description="Less important event",
+                        source="test_provider",
+                    ),
+                ]
+            )
             mock_parser_class.return_value = mock_parser
 
             # Mock events service
-            with patch('database.events_service.EventsService') as mock_service_class:
+            with patch("database.events_service.EventsService") as mock_service_class:
                 mock_service = Mock()
                 mock_service.insert_events = Mock(return_value=1)  # Only high importance event stored
                 mock_service_class.return_value = mock_service
@@ -85,11 +91,7 @@ class TestEventsFlow:
                 # Import and test the function
                 from tools.events.fetch_events import fetch_and_store_events
 
-                result = await fetch_and_store_events(
-                    days_ahead=7,
-                    categories=["crypto"],
-                    dry_run=False
-                )
+                result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=False)
 
                 # Verify results
                 assert result["success"] is True
@@ -112,7 +114,7 @@ class TestEventsFlow:
         mock_provider.normalize_event = Mock(return_value={})
 
         # Mock events parser
-        with patch('events.events_parser.EventsParser') as mock_parser_class:
+        with patch("events.events_parser.EventsParser") as mock_parser_class:
             mock_parser = Mock()
             mock_parser.providers = {"test_provider": mock_provider}
             mock_parser.fetch_events = Mock(return_value=[])
@@ -121,11 +123,7 @@ class TestEventsFlow:
             # Import and test the function
             from tools.events.fetch_events import fetch_and_store_events
 
-            result = await fetch_and_store_events(
-                days_ahead=7,
-                categories=["crypto"],
-                dry_run=True
-            )
+            result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=True)
 
             # Verify results
             assert result["success"] is True
@@ -137,23 +135,21 @@ class TestEventsFlow:
     async def test_update_event_results_flow(self):
         """Test updating event results."""
         # Mock events service
-        with patch('database.events_service.EventsService') as mock_service_class:
+        with patch("database.events_service.EventsService") as mock_service_class:
             mock_service = Mock()
-            mock_service.get_completed_events_without_results = Mock(return_value=[
-                {"id": 1, "title": "Completed Event", "status": "upcoming"},
-                {"id": 2, "title": "Another Event", "status": "upcoming"},
-            ])
+            mock_service.get_completed_events_without_results = Mock(
+                return_value=[
+                    {"id": 1, "title": "Completed Event", "status": "upcoming"},
+                    {"id": 2, "title": "Another Event", "status": "upcoming"},
+                ]
+            )
             mock_service.update_event_status = Mock(return_value=True)
             mock_service_class.return_value = mock_service
 
             # Import and test the function
             from tools.events.update_event_results import update_event_results
 
-            result = await update_event_results(
-                days_back=3,
-                categories=["crypto"],
-                dry_run=False
-            )
+            result = await update_event_results(days_back=3, categories=["crypto"], dry_run=False)
 
             # Verify results
             assert result["success"] is True
@@ -176,13 +172,13 @@ class TestEventsFlow:
             },
             "sports": {
                 "football_data": {"enabled": True},
-            }
+            },
         }
 
-        with patch('yaml.safe_load', return_value=mock_config):
-            with patch('builtins.open', Mock()):
+        with patch("yaml.safe_load", return_value=mock_config):
+            with patch("builtins.open", Mock()):
                 # Mock successful imports
-                with patch('events.events_parser.__import__') as mock_import:
+                with patch("events.events_parser.__import__") as mock_import:
                     # Mock provider classes
                     mock_provider_class = Mock()
                     mock_provider_instance = Mock()
@@ -200,7 +196,7 @@ class TestEventsFlow:
     async def test_error_handling(self):
         """Test error handling in events flow."""
         # Mock parser that raises exception
-        with patch('events.events_parser.EventsParser') as mock_parser_class:
+        with patch("events.events_parser.EventsParser") as mock_parser_class:
             mock_parser = Mock()
             mock_parser.fetch_events = Mock(side_effect=Exception("Network error"))
             mock_parser_class.return_value = mock_parser
@@ -208,10 +204,7 @@ class TestEventsFlow:
             # Import and test the function
             from tools.events.fetch_events import fetch_and_store_events
 
-            result = await fetch_and_store_events(
-                days_ahead=7,
-                dry_run=True
-            )
+            result = await fetch_and_store_events(days_ahead=7, dry_run=True)
 
             # Verify error handling
             assert result["success"] is False

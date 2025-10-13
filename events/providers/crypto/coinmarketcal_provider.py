@@ -33,13 +33,9 @@ class CoinMarketCalProvider(BaseEventProvider):
         self.base_url = "https://developers.coinmarketcal.com/v1"
 
         if not self.api_key:
-            logger.warning(
-                "COINMARKETCAL_TOKEN not set, provider will be disabled"
-            )
+            logger.warning("COINMARKETCAL_TOKEN not set, provider will be disabled")
 
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
         Fetch events from CoinMarketCal.
 
@@ -56,9 +52,7 @@ class CoinMarketCalProvider(BaseEventProvider):
 
         try:
             if not self.session:
-                self.session = aiohttp.ClientSession(
-                    headers={"x-api-key": self.api_key}
-                )
+                self.session = aiohttp.ClientSession(headers={"x-api-key": self.api_key})
 
             # CoinMarketCal events endpoint
             url = f"{self.base_url}/events"
@@ -84,10 +78,7 @@ class CoinMarketCalProvider(BaseEventProvider):
                         if normalized_event:
                             normalized_events.append(normalized_event)
 
-                logger.info(
-                    f"Fetched {len(normalized_events)} events from "
-                    "CoinMarketCal"
-                )
+                logger.info(f"Fetched {len(normalized_events)} events from " "CoinMarketCal")
                 return [e for e in normalized_events if e is not None]
 
         except Exception as e:
@@ -114,15 +105,11 @@ class CoinMarketCalProvider(BaseEventProvider):
             if not date_event:
                 return None
 
-            starts_at = datetime.strptime(
-                date_event, "%d/%m/%Y %H:%M:%S"
-            ).replace(tzinfo=timezone.utc)
+            starts_at = datetime.strptime(date_event, "%d/%m/%Y %H:%M:%S").replace(tzinfo=timezone.utc)
 
             # Get coins
             coins = event.get("coins", [])
-            coin_names = [
-                coin.get("name", "") for coin in coins if coin.get("name")
-            ]
+            coin_names = [coin.get("name", "") for coin in coins if coin.get("name")]
 
             # Determine importance based on vote count and categories
             vote_count = event.get("vote_count", 0)
@@ -135,19 +122,11 @@ class CoinMarketCalProvider(BaseEventProvider):
             # Build description
             description = event.get("description", {}).get("en", "")
             if coin_names:
-                description = (
-                    f"Coins: {', '.join(coin_names[:3])}. {description}"
-                )
+                description = f"Coins: {', '.join(coin_names[:3])}. {description}"
 
             # Определяем группу (первая монета или категория)
             group_name = (
-                coin_names[0]
-                if coin_names
-                else (
-                    categories[0].get("name", "Crypto")
-                    if categories
-                    else "Crypto"
-                )
+                coin_names[0] if coin_names else (categories[0].get("name", "Crypto") if categories else "Crypto")
             )
 
             return {
@@ -172,9 +151,7 @@ class CoinMarketCalProvider(BaseEventProvider):
             logger.error(f"Error parsing CoinMarketCal event: {e}")
             return None
 
-    def _calculate_importance(
-        self, vote_count: int, categories: List[Dict]
-    ) -> float:
+    def _calculate_importance(self, vote_count: int, categories: List[Dict]) -> float:
         """Calculate importance score based on votes and categories."""
         # Base importance from votes
         if vote_count >= 1000:
@@ -209,21 +186,13 @@ class CoinMarketCalProvider(BaseEventProvider):
         """Determine subcategory based on categories."""
         category_names = [cat.get("name", "").lower() for cat in categories]
 
-        if any(
-            "mainnet" in name or "launch" in name for name in category_names
-        ):
+        if any("mainnet" in name or "launch" in name for name in category_names):
             return "protocol"
-        elif any(
-            "airdrop" in name or "token" in name for name in category_names
-        ):
+        elif any("airdrop" in name or "token" in name for name in category_names):
             return "token"
-        elif any(
-            "listing" in name or "exchange" in name for name in category_names
-        ):
+        elif any("listing" in name or "exchange" in name for name in category_names):
             return "exchange"
-        elif any(
-            "conference" in name or "meetup" in name for name in category_names
-        ):
+        elif any("conference" in name or "meetup" in name for name in category_names):
             return "conference"
         elif any("partnership" in name for name in category_names):
             return "partnership"

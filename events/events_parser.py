@@ -223,7 +223,7 @@ class EventsParser:
                 "tokenunlocks": "TokenUnlocksProvider",
                 "football_data": "FootballDataProvider",
                 "thesportsdb": "TheSportsDBProvider",
-                "github_releases": "GithubReleasesProvider"
+                "github_releases": "GithubReleasesProvider",
             }
 
             if provider_name in name_mapping:

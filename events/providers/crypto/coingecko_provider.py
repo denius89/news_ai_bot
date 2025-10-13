@@ -30,9 +30,7 @@ class CoinGeckoProvider(BaseEventProvider):
         super().__init__("coingecko", "crypto")
         self.base_url = "https://api.coingecko.com/api/v3"
 
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
         Fetch events from CoinGecko.
 
@@ -66,13 +64,9 @@ class CoinGeckoProvider(BaseEventProvider):
                 for event in events:
                     normalized = self._parse_event(event)
                     if normalized:
-                        normalized_events.append(
-                            self.normalize_event(normalized)
-                        )
+                        normalized_events.append(self.normalize_event(normalized))
 
-                logger.info(
-                    f"Fetched {len(normalized_events)} events from CoinGecko"
-                )
+                logger.info(f"Fetched {len(normalized_events)} events from CoinGecko")
                 return [e for e in normalized_events if e is not None]
 
         except Exception as e:
@@ -99,17 +93,13 @@ class CoinGeckoProvider(BaseEventProvider):
             if not start_date_str:
                 return None
 
-            starts_at = datetime.fromisoformat(
-                start_date_str.replace("Z", "+00:00")
-            )
+            starts_at = datetime.fromisoformat(start_date_str.replace("Z", "+00:00"))
 
             # Parse end date if available
             end_date_str = event.get("end_date")
             ends_at = None
             if end_date_str:
-                ends_at = datetime.fromisoformat(
-                    end_date_str.replace("Z", "+00:00")
-                )
+                ends_at = datetime.fromisoformat(end_date_str.replace("Z", "+00:00"))
 
             # Determine importance based on event type
             event_type = event.get("type", "").lower()
@@ -166,22 +156,15 @@ class CoinGeckoProvider(BaseEventProvider):
 
     def _determine_subcategory(self, event_type: str) -> str:
         """Determine subcategory based on event type."""
-        if any(
-            word in event_type
-            for word in ["mainnet", "launch", "upgrade", "fork"]
-        ):
+        if any(word in event_type for word in ["mainnet", "launch", "upgrade", "fork"]):
             return "protocol"
         elif any(word in event_type for word in ["airdrop", "token"]):
             return "token"
         elif any(word in event_type for word in ["listing", "exchange"]):
             return "exchange"
-        elif any(
-            word in event_type for word in ["conference", "meetup", "summit"]
-        ):
+        elif any(word in event_type for word in ["conference", "meetup", "summit"]):
             return "conference"
-        elif any(
-            word in event_type for word in ["partnership", "collaboration"]
-        ):
+        elif any(word in event_type for word in ["partnership", "collaboration"]):
             return "partnership"
         else:
             return "general"

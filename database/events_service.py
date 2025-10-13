@@ -68,9 +68,7 @@ class EventsService:
             List of EventRecord objects
         """
         if not supabase:
-            logger.warning(
-                "⚠️ Supabase не подключён, get_events_by_date_range не работает."
-            )
+            logger.warning("⚠️ Supabase не подключён, get_events_by_date_range не работает.")
             return []
 
         try:
@@ -103,30 +101,22 @@ class EventsService:
                     # Parse event_time to datetime
                     event_time_str = event_data.get("event_time")
                     if isinstance(event_time_str, str):
-                        starts_at = datetime.fromisoformat(
-                            event_time_str.replace("Z", "+00:00")
-                        )
+                        starts_at = datetime.fromisoformat(event_time_str.replace("Z", "+00:00"))
                     else:
                         starts_at = event_time_str
 
                     event = EventRecord(
                         id=event_data.get("id", 0),
                         title=event_data.get("title", ""),
-                        category=event_data.get("category")
-                        or "general",  # Default to "general" if null
+                        category=event_data.get("category") or "general",  # Default to "general" if null
                         subcategory=event_data.get("subcategory", ""),
                         starts_at=starts_at,
                         ends_at=None,  # Events don't have end_time in current schema
                         source=event_data.get("source", ""),
                         link="",  # No link field in current schema
-                        importance=float(event_data.get("importance", 1))
-                        / 10.0,  # Convert 1-10 to 0.1-1.0
-                        description=event_data.get(
-                            "fact", ""
-                        ),  # Use fact as description
-                        location=event_data.get(
-                            "country", ""
-                        ),  # Use country as location
+                        importance=float(event_data.get("importance", 1)) / 10.0,  # Convert 1-10 to 0.1-1.0
+                        description=event_data.get("fact", ""),  # Use fact as description
+                        location=event_data.get("country", ""),  # Use country as location
                         organizer=None,
                         group_name=event_data.get("group_name"),
                         metadata=event_data.get("metadata", {}),
@@ -170,9 +160,7 @@ class EventsService:
         from_date = datetime.now(timezone.utc)
         to_date = from_date + timedelta(days=days)
 
-        events = await self.get_events_by_date_range(
-            from_date, to_date, category
-        )
+        events = await self.get_events_by_date_range(from_date, to_date, category)
 
         # Filter by importance
         if min_importance > 0:
@@ -203,9 +191,7 @@ class EventsService:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-        return loop.run_until_complete(
-            self.get_upcoming_events(days_ahead, category, min_importance)
-        )
+        return loop.run_until_complete(self.get_upcoming_events(days_ahead, category, min_importance))
 
 
 # Global instance

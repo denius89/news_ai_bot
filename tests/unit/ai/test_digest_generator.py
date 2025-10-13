@@ -32,9 +32,9 @@ async def test_generate_digest_with_v2_params():
     ]
 
     # Mock fetch_recent_news
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         # Mock v2 generation
-        with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
+        with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
             mock_v2.return_value = {
                 "title": "Test Digest",
                 "dek": "Test dek",
@@ -45,8 +45,8 @@ async def test_generate_digest_with_v2_params():
                     "tone": "insightful",
                     "length": "medium",
                     "audience": "general",
-                    "confidence": 0.9
-                }
+                    "confidence": 0.9,
+                },
             }
 
             result = await generate_digest(
@@ -57,7 +57,7 @@ async def test_generate_digest_with_v2_params():
                 tone="insightful",
                 length="medium",
                 audience="general",
-                use_v2=True
+                use_v2=True,
             )
 
             assert isinstance(result, str)
@@ -94,26 +94,18 @@ async def test_generate_digest_v2_fallback_to_legacy():
         )
     ]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         # Mock v2 failure
-        with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
-            mock_v2.return_value = {
-                "error": "V2 generation failed"
-            }
+        with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
+            mock_v2.return_value = {"error": "V2 generation failed"}
 
             # Mock legacy service
-            with patch('digests.generator.DigestAIService') as mock_service:
+            with patch("digests.generator.DigestAIService") as mock_service:
                 mock_instance = MagicMock()
                 mock_instance.build_digest.return_value = "Legacy digest result"
                 mock_service.return_value = mock_instance
 
-                result = await generate_digest(
-                    limit=10,
-                    category="tech",
-                    ai=True,
-                    style="analytical",
-                    use_v2=True
-                )
+                result = await generate_digest(limit=10, category="tech", ai=True, style="analytical", use_v2=True)
 
                 assert isinstance(result, str)
                 assert "Legacy digest result" in result
@@ -141,20 +133,14 @@ async def test_generate_digest_legacy_mode():
         )
     ]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         # Mock legacy service
-        with patch('digests.generator.DigestAIService') as mock_service:
+        with patch("digests.generator.DigestAIService") as mock_service:
             mock_instance = MagicMock()
             mock_instance.build_digest.return_value = "Legacy digest result"
             mock_service.return_value = mock_instance
 
-            result = await generate_digest(
-                limit=10,
-                category="tech",
-                ai=True,
-                style="analytical",
-                use_v2=False
-            )
+            result = await generate_digest(limit=10, category="tech", ai=True, style="analytical", use_v2=False)
 
             assert isinstance(result, str)
             assert "Legacy digest result" in result
@@ -174,7 +160,7 @@ def test_convert_v2_to_text():
         "why_important": ["Important point 1", "Important point 2"],
         "context": "Test context",
         "what_next": "Test what next",
-        "sources_cited": ["Source 1", "Source 2"]
+        "sources_cited": ["Source 1", "Source 2"],
     }
 
     result = _convert_v2_to_text(v2_result)
@@ -195,10 +181,7 @@ def test_convert_v2_to_text():
 def test_convert_v2_to_text_minimal():
     """Test conversion with minimal v2 result"""
 
-    v2_result = {
-        "title": "Minimal Digest",
-        "summary": "Minimal summary"
-    }
+    v2_result = {"title": "Minimal Digest", "summary": "Minimal summary"}
 
     result = _convert_v2_to_text(v2_result)
 
@@ -248,23 +231,17 @@ async def test_all_style_profiles():
 
     styles = ["analytical", "business", "meme", "newsroom", "magazine", "casual"]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         for style in styles:
-            with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
+            with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
                 mock_v2.return_value = {
                     "title": f"Test {style} Digest",
                     "summary": f"Test {style} summary",
                     "why_important": ["Important point"],
-                    "meta": {"style_profile": style}
+                    "meta": {"style_profile": style},
                 }
 
-                result = await generate_digest(
-                    limit=10,
-                    category="tech",
-                    ai=True,
-                    style=style,
-                    use_v2=True
-                )
+                result = await generate_digest(limit=10, category="tech", ai=True, style=style, use_v2=True)
 
                 assert isinstance(result, str)
                 assert f"Test {style} Digest" in result
@@ -295,23 +272,18 @@ async def test_all_tones():
 
     tones = ["neutral", "insightful", "critical", "optimistic"]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         for tone in tones:
-            with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
+            with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
                 mock_v2.return_value = {
                     "title": f"Test {tone} Digest",
                     "summary": f"Test {tone} summary",
                     "why_important": ["Important point"],
-                    "meta": {"tone": tone}
+                    "meta": {"tone": tone},
                 }
 
                 result = await generate_digest(
-                    limit=10,
-                    category="tech",
-                    ai=True,
-                    style="analytical",
-                    tone=tone,
-                    use_v2=True
+                    limit=10, category="tech", ai=True, style="analytical", tone=tone, use_v2=True
                 )
 
                 assert isinstance(result, str)
@@ -343,23 +315,18 @@ async def test_all_lengths():
 
     lengths = ["short", "medium", "long"]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         for length in lengths:
-            with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
+            with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
                 mock_v2.return_value = {
                     "title": f"Test {length} Digest",
                     "summary": f"Test {length} summary",
                     "why_important": ["Important point"],
-                    "meta": {"length": length}
+                    "meta": {"length": length},
                 }
 
                 result = await generate_digest(
-                    limit=10,
-                    category="tech",
-                    ai=True,
-                    style="analytical",
-                    length=length,
-                    use_v2=True
+                    limit=10, category="tech", ai=True, style="analytical", length=length, use_v2=True
                 )
 
                 assert isinstance(result, str)
@@ -391,23 +358,18 @@ async def test_all_audiences():
 
     audiences = ["general", "pro"]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         for audience in audiences:
-            with patch('digests.generator.generate_summary_journalistic_v2') as mock_v2:
+            with patch("digests.generator.generate_summary_journalistic_v2") as mock_v2:
                 mock_v2.return_value = {
                     "title": f"Test {audience} Digest",
                     "summary": f"Test {audience} summary",
                     "why_important": ["Important point"],
-                    "meta": {"audience": audience}
+                    "meta": {"audience": audience},
                 }
 
                 result = await generate_digest(
-                    limit=10,
-                    category="tech",
-                    ai=True,
-                    style="analytical",
-                    audience=audience,
-                    use_v2=True
+                    limit=10, category="tech", ai=True, style="analytical", audience=audience, use_v2=True
                 )
 
                 assert isinstance(result, str)
@@ -437,19 +399,14 @@ async def test_no_ai_mode():
         )
     ]
 
-    with patch('digests.generator.fetch_recent_news', return_value=news_items):
+    with patch("digests.generator.fetch_recent_news", return_value=news_items):
         # Mock DigestAIService
-        with patch('digests.generator.DigestAIService') as mock_service:
+        with patch("digests.generator.DigestAIService") as mock_service:
             mock_instance = MagicMock()
             mock_instance._build_fallback_digest.return_value = "Fallback digest result"
             mock_service.return_value = mock_instance
 
-            result = await generate_digest(
-                limit=10,
-                category="tech",
-                ai=False,  # No AI
-                style="analytical"
-            )
+            result = await generate_digest(limit=10, category="tech", ai=False, style="analytical")  # No AI
 
             assert isinstance(result, str)
             assert "Fallback digest result" in result
@@ -463,13 +420,8 @@ async def test_no_ai_mode():
 async def test_empty_news_list():
     """Test handling of empty news list"""
 
-    with patch('digests.generator.fetch_recent_news', return_value=[]):
-        result = await generate_digest(
-            limit=10,
-            category="tech",
-            ai=True,
-            style="analytical"
-        )
+    with patch("digests.generator.fetch_recent_news", return_value=[]):
+        result = await generate_digest(limit=10, category="tech", ai=True, style="analytical")
 
         assert isinstance(result, str)
         assert "новостей нет" in result

@@ -234,7 +234,9 @@ def api_latest_news_weighted():
 
         for category in all_categories:
             try:
-                category_news = db_service.get_latest_news(categories=[category], limit=100)  # ИСПРАВЛЕНО: передаем список
+                category_news = db_service.get_latest_news(
+                    categories=[category], limit=100
+                )  # ИСПРАВЛЕНО: передаем список
                 news_by_category[category] = category_news
                 logger.debug(f"Категория {category}: {len(category_news)} новостей")
             except Exception as e:

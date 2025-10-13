@@ -33,13 +33,9 @@ class FootballDataProvider(BaseEventProvider):
         self.api_key = os.getenv("FOOTBALL_DATA_TOKEN")
 
         if not self.api_key:
-            logger.warning(
-                "FOOTBALL_DATA_TOKEN not set, provider will be disabled"
-            )
+            logger.warning("FOOTBALL_DATA_TOKEN not set, provider will be disabled")
 
-    async def fetch_events(
-        self, start_date: datetime, end_date: datetime
-    ) -> List[Dict]:
+    async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
         Fetch events from Football-Data.org.
 
@@ -56,9 +52,7 @@ class FootballDataProvider(BaseEventProvider):
 
         try:
             if not self.session:
-                self.session = aiohttp.ClientSession(
-                    headers={"X-Auth-Token": self.api_key}
-                )
+                self.session = aiohttp.ClientSession(headers={"X-Auth-Token": self.api_key})
 
             # Fetch matches
             url = f"{self.base_url}/matches"
@@ -114,9 +108,7 @@ class FootballDataProvider(BaseEventProvider):
             if not utc_date_str:
                 return None
 
-            starts_at = datetime.fromisoformat(
-                utc_date_str.replace("Z", "+00:00")
-            )
+            starts_at = datetime.fromisoformat(utc_date_str.replace("Z", "+00:00"))
 
             # Determine importance based on competition
             competition = match.get("competition", {})
@@ -158,15 +150,9 @@ class FootballDataProvider(BaseEventProvider):
         """Calculate importance based on competition."""
         competition_lower = competition_name.lower()
 
-        if any(
-            word in competition_lower
-            for word in ["champions league", "world cup"]
-        ):
+        if any(word in competition_lower for word in ["champions league", "world cup"]):
             return 0.9
-        elif any(
-            word in competition_lower
-            for word in ["premier league", "la liga", "bundesliga", "serie a"]
-        ):
+        elif any(word in competition_lower for word in ["premier league", "la liga", "bundesliga", "serie a"]):
             return 0.8
         elif "europa" in competition_lower:
             return 0.7

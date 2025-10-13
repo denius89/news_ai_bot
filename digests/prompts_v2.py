@@ -25,12 +25,11 @@ STYLE_CARDS = {
             "Факты без интерпретации",
             "Цифры и статистика в приоритете",
             "1-2 абзаца максимум",
-            "Нейтральный тон без эмоций"
+            "Нейтральный тон без эмоций",
         ],
         "expert_persona": "Опытный журналист Reuters с 15-летним стажем",
-        "writing_style": "пишет как для профессионального издания, использует точные формулировки"
+        "writing_style": "пишет как для профессионального издания, использует точные формулировки",
     },
-
     "analytical": {
         "name": "Аналитический",
         "description": "Глубокий анализ с причинно-следственными связями",
@@ -39,12 +38,11 @@ STYLE_CARDS = {
             "Причинно-следственные связи",
             "Контекст и предыстория",
             "2-3 абзаца с развитием мысли",
-            "Интеллектуальный тон"
+            "Интеллектуальный тон",
         ],
         "expert_persona": "Ведущий аналитик The Economist",
-        "writing_style": "анализирует события как эксперт, выявляет скрытые связи и тренды"
+        "writing_style": "анализирует события как эксперт, выявляет скрытые связи и тренды",
     },
-
     "magazine": {
         "name": "Magazine",
         "description": "Storytelling стиль — engaging, метафоры, читабельность",
@@ -53,12 +51,11 @@ STYLE_CARDS = {
             "Эмоциональная окраска",
             "Читабельный стиль",
             "2-4 абзаца с развитием",
-            "Engaging тон"
+            "Engaging тон",
         ],
         "expert_persona": "Талантливый автор The Atlantic",
-        "writing_style": "превращает факты в увлекательную историю, использует метафоры и аналогии"
+        "writing_style": "превращает факты в увлекательную историю, использует метафоры и аналогии",
     },
-
     "casual": {
         "name": "Простой",
         "description": "Разговорный стиль для Telegram — просто, понятно, дружелюбно",
@@ -67,11 +64,11 @@ STYLE_CARDS = {
             "Разговорные обороты",
             "Дружелюбный тон",
             "1-2 абзаца",
-            "Понятно для всех"
+            "Понятно для всех",
         ],
         "expert_persona": "Опытный блогер с миллионной аудиторией",
-        "writing_style": "объясняет сложное простыми словами, как другу за чашкой кофе"
-    }
+        "writing_style": "объясняет сложное простыми словами, как другу за чашкой кофе",
+    },
 }
 
 # ============================================================================
@@ -84,40 +81,36 @@ CATEGORY_CARDS = {
         "expert": "Виталик Бутерин, сооснователь Ethereum",
         "focus": "блокчейн, DeFi, NFT, регуляция, майнинг, технологические инновации",
         "impact": "влияние на крипторынок, инвесторов, регуляторную среду",
-        "keywords": ["блокчейн", "DeFi", "NFT", "майнинг", "регуляция", "токены", "смарт-контракты"]
+        "keywords": ["блокчейн", "DeFi", "NFT", "майнинг", "регуляция", "токены", "смарт-контракты"],
     },
-
     "markets": {
         "name": "Финансовые рынки",
         "expert": "Уоррен Баффет, легендарный инвестор",
         "focus": "фондовые рынки, валюты, сырьевые товары, экономические индикаторы",
         "impact": "влияние на инвесторов, экономику, корпорации и глобальные рынки",
-        "keywords": ["акции", "облигации", "валюта", "нефть", "золото", "инфляция", "процентные ставки"]
+        "keywords": ["акции", "облигации", "валюта", "нефть", "золото", "инфляция", "процентные ставки"],
     },
-
     "tech": {
         "name": "Технологии",
         "expert": "Илон Маск, основатель SpaceX и Tesla",
         "focus": "искусственный интеллект, стартапы, гаджеты, инновации, кибербезопасность",
         "impact": "влияние на технологии, пользователей, бизнес и общество",
-        "keywords": ["ИИ", "стартапы", "гаджеты", "инновации", "кибербезопасность", "автономные системы"]
+        "keywords": ["ИИ", "стартапы", "гаджеты", "инновации", "кибербезопасность", "автономные системы"],
     },
-
     "sports": {
         "name": "Спорт",
         "expert": "Василий Уткин, известный спортивный комментатор",
         "focus": "результаты матчей, трансферы, достижения спортсменов, турнирная ситуация",
         "impact": "влияние на команды, лиги, спортсменов и фанатов",
-        "keywords": ["матчи", "трансферы", "достижения", "турниры", "команды", "спортсмены"]
+        "keywords": ["матчи", "трансферы", "достижения", "турниры", "команды", "спортсмены"],
     },
-
     "world": {
         "name": "Мир",
         "expert": "Дмитрий Киселев, директор МИА 'Россия сегодня'",
         "focus": "геополитика, международные отношения, конфликты, дипломатия",
         "impact": "влияние на глобальную стабильность, экономику и международные отношения",
-        "keywords": ["геополитика", "дипломатия", "конфликты", "санкции", "международные отношения"]
-    }
+        "keywords": ["геополитика", "дипломатия", "конфликты", "санкции", "международные отношения"],
+    },
 }
 
 # ============================================================================
@@ -128,26 +121,23 @@ TONE_CARDS = {
     "neutral": {
         "name": "Нейтральный",
         "description": "Сбалансированная подача фактов без эмоций",
-        "characteristics": ["Объективность", "Факты", "Сбалансированность", "Профессионализм"]
+        "characteristics": ["Объективность", "Факты", "Сбалансированность", "Профессионализм"],
     },
-
     "insightful": {
         "name": "Инсайты",
         "description": "Акцент на инсайты, контекст и глубокое понимание",
-        "characteristics": ["Анализ", "Контекст", "Инсайты", "Предвидение"]
+        "characteristics": ["Анализ", "Контекст", "Инсайты", "Предвидение"],
     },
-
     "critical": {
         "name": "Критический",
         "description": "Критический анализ с выявлением проблем",
-        "characteristics": ["Скептицизм", "Анализ рисков", "Выявление проблем", "Критическое мышление"]
+        "characteristics": ["Скептицизм", "Анализ рисков", "Выявление проблем", "Критическое мышление"],
     },
-
     "optimistic": {
         "name": "Позитивный",
         "description": "Позитивный фокус на возможностях и решениях",
-        "characteristics": ["Позитивность", "Возможности", "Решения", "Прогресс"]
-    }
+        "characteristics": ["Позитивность", "Возможности", "Решения", "Прогресс"],
+    },
 }
 
 # ============================================================================
@@ -159,22 +149,20 @@ LENGTH_SPECS = {
         "name": "Короткий",
         "max_words": 100,
         "paragraphs": "1-2",
-        "description": "Краткая сводка для быстрого чтения"
+        "description": "Краткая сводка для быстрого чтения",
     },
-
     "medium": {
         "name": "Средний",
         "max_words": 250,
         "paragraphs": "2-3",
-        "description": "Сбалансированный дайджест с контекстом"
+        "description": "Сбалансированный дайджест с контекстом",
     },
-
     "long": {
         "name": "Длинный",
         "max_words": 500,
         "paragraphs": "3-5",
-        "description": "Подробный анализ с глубоким контекстом"
-    }
+        "description": "Подробный анализ с глубоким контекстом",
+    },
 }
 
 # ============================================================================
@@ -185,14 +173,13 @@ AUDIENCE_SPECS = {
     "general": {
         "name": "Общая аудитория",
         "description": "Широкая аудитория без специальных знаний",
-        "characteristics": ["Простые объяснения", "Минимум терминов", "Общие понятия", "Доступность"]
+        "characteristics": ["Простые объяснения", "Минимум терминов", "Общие понятия", "Доступность"],
     },
-
     "pro": {
         "name": "Профессионалы",
         "description": "Аудитория с профессиональными знаниями в области",
-        "characteristics": ["Специализированные термины", "Технические детали", "Экспертный уровень", "Глубина"]
-    }
+        "characteristics": ["Специализированные термины", "Технические детали", "Экспертный уровень", "Глубина"],
+    },
 }
 
 # ============================================================================
@@ -213,7 +200,7 @@ FEW_SHOT_EXAMPLES = [
             "why_important": [
                 "Психологический барьер $50,000 для Bitcoin может привлечь новых инвесторов",
                 "Рост Ethereum подтверждает активность в DeFi и NFT секторах",
-                "Институциональный интерес к криптовалютам продолжает расти"
+                "Институциональный интерес к криптовалютам продолжает расти",
             ],
             "context": "Рост происходит на фоне заявлений регуляторов о разработке четких правил для криптовалютного рынка.",
             "what_next": "Аналитики ожидают продолжения роста при сохранении позитивного регуляторного фона.",
@@ -223,11 +210,10 @@ FEW_SHOT_EXAMPLES = [
                 "tone": "neutral",
                 "length": "short",
                 "audience": "general",
-                "confidence": 0.95
-            }
-        }
+                "confidence": 0.95,
+            },
+        },
     },
-
     {
         "category": "tech",
         "style": "analytical",
@@ -241,7 +227,7 @@ FEW_SHOT_EXAMPLES = [
             "why_important": [
                 "GPT-5 демонстрирует значительный прогресс в логическом мышлении",
                 "Gemini Pro интегрируется с Google Workspace, меняя рабочие процессы",
-                "Конкуренция ускоряет инновации в области ИИ"
+                "Конкуренция ускоряет инновации в области ИИ",
             ],
             "context": "Рынок ИИ растет экспоненциально, с прогнозируемым объемом $1.8 трлн к 2030 году.",
             "what_next": "Ожидается интеграция новых моделей в корпоративные решения и потребительские приложения.",
@@ -251,10 +237,10 @@ FEW_SHOT_EXAMPLES = [
                 "tone": "insightful",
                 "length": "medium",
                 "audience": "pro",
-                "confidence": 0.92
-            }
-        }
-    }
+                "confidence": 0.92,
+            },
+        },
+    },
 ]
 
 # ============================================================================
@@ -320,8 +306,8 @@ OUTPUT_SCHEMA = {
         "tone": "string (neutral|insightful|critical|optimistic)",
         "length": "string (short|medium|long)",
         "audience": "string (general|pro)",
-        "confidence": "number (0.0-1.0, оценка качества)"
-    }
+        "confidence": "number (0.0-1.0, оценка качества)",
+    },
 }
 
 # ============================================================================
@@ -390,7 +376,7 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         length_description=length_config["description"],
         max_words=length_config["max_words"],
         audience_description=audience_config["description"],
-        tone_name=tone_config["name"]
+        tone_name=tone_config["name"],
     )
 
     # Build user prompt
@@ -404,13 +390,15 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         min_importance=input_payload.get("min_importance", 0.6),
         min_credibility=input_payload.get("min_credibility", 0.7),
         style_name=style_config["name"],
-        output_schema=json.dumps(OUTPUT_SCHEMA, indent=2, ensure_ascii=False)
+        output_schema=json.dumps(OUTPUT_SCHEMA, indent=2, ensure_ascii=False),
     )
 
     return system_prompt, user_prompt
 
 
-def validate_sources(sources: List[Dict[str, Any]], min_importance: float = 0.6, min_credibility: float = 0.7) -> Dict[str, Any]:
+def validate_sources(
+    sources: List[Dict[str, Any]], min_importance: float = 0.6, min_credibility: float = 0.7
+) -> Dict[str, Any]:
     """
     Validate sources meet quality threshold.
 
@@ -445,15 +433,10 @@ def validate_sources(sources: List[Dict[str, Any]], min_importance: float = 0.6,
             "valid": False,
             "valid_sources": [],
             "skipped_count": skipped_count,
-            "reason": f"low importance/credibility (min: {min_importance}/{min_credibility})"
+            "reason": f"low importance/credibility (min: {min_importance}/{min_credibility})",
         }
 
-    return {
-        "valid": True,
-        "valid_sources": valid_sources,
-        "skipped_count": skipped_count,
-        "reason": None
-    }
+    return {"valid": True, "valid_sources": valid_sources, "skipped_count": skipped_count, "reason": None}
 
 
 def get_style_config(style_profile: str) -> Dict[str, Any]:
@@ -495,6 +478,7 @@ def get_audience_config(audience: str) -> Dict[str, Any]:
 # QUALITY CHECKS
 # ============================================================================
 
+
 def validate_output_schema(output: Dict[str, Any]) -> Dict[str, Any]:
     """
     Validate output matches expected schema.
@@ -527,10 +511,7 @@ def validate_output_schema(output: Dict[str, Any]) -> Dict[str, Any]:
         if not isinstance(confidence, (int, float)) or not 0.0 <= confidence <= 1.0:
             errors.append("Confidence must be a number between 0.0 and 1.0")
 
-    return {
-        "valid": len(errors) == 0,
-        "errors": errors
-    }
+    return {"valid": len(errors) == 0, "errors": errors}
 
 
 def calculate_confidence_score(output: Dict[str, Any], sources_count: int) -> float:

@@ -5,9 +5,11 @@
 
 import sys
 import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from database.events_service import get_events_service
@@ -18,6 +20,7 @@ import logging
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 async def load_sample_events():  # noqa: E302
     """Загрузить примеры событий в базу данных."""
@@ -40,7 +43,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.9,
             "unique_hash": "bitcoin-halving-2025",
-            "metadata": {"type": "halving", "coin": "bitcoin"}
+            "metadata": {"type": "halving", "coin": "bitcoin"},
         },
         {
             "title": "Ethereum 2.0 Upgrade",
@@ -54,7 +57,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.85,
             "unique_hash": "ethereum-upgrade-2025",
-            "metadata": {"type": "upgrade", "coin": "ethereum"}
+            "metadata": {"type": "upgrade", "coin": "ethereum"},
         },
         {
             "title": "Solana Network Upgrade",
@@ -68,7 +71,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "solana-upgrade-2025",
-            "metadata": {"type": "upgrade", "coin": "solana"}
+            "metadata": {"type": "upgrade", "coin": "solana"},
         },
         {
             "title": "Chainlink Oracle Update",
@@ -82,7 +85,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.6,
             "unique_hash": "chainlink-oracle-2025",
-            "metadata": {"type": "oracle", "coin": "chainlink"}
+            "metadata": {"type": "oracle", "coin": "chainlink"},
         },
         {
             "title": "Cardano Hard Fork",
@@ -96,9 +99,8 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "cardano-hardfork-2025",
-            "metadata": {"type": "hardfork", "coin": "cardano"}
+            "metadata": {"type": "hardfork", "coin": "cardano"},
         },
-
         # Sports Events
         {
             "title": "FIFA World Cup 2026",
@@ -112,7 +114,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.8,
             "unique_hash": "fifa-world-cup-2026",
-            "metadata": {"type": "tournament", "sport": "football"}
+            "metadata": {"type": "tournament", "sport": "football"},
         },
         {
             "title": "NBA Finals 2025",
@@ -126,7 +128,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "nba-finals-2025",
-            "metadata": {"type": "finals", "sport": "basketball"}
+            "metadata": {"type": "finals", "sport": "basketball"},
         },
         {
             "title": "Wimbledon Championships",
@@ -140,7 +142,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "wimbledon-2025",
-            "metadata": {"type": "tournament", "sport": "tennis"}
+            "metadata": {"type": "tournament", "sport": "tennis"},
         },
         {
             "title": "Olympic Games Paris 2025",
@@ -154,7 +156,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.95,
             "unique_hash": "olympics-paris-2025",
-            "metadata": {"type": "olympics", "sport": "multi"}
+            "metadata": {"type": "olympics", "sport": "multi"},
         },
         {
             "title": "Formula 1 Monaco Grand Prix",
@@ -168,9 +170,8 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.65,
             "unique_hash": "f1-monaco-2025",
-            "metadata": {"type": "race", "sport": "f1"}
+            "metadata": {"type": "race", "sport": "f1"},
         },
-
         # Tech Events
         {
             "title": "Apple WWDC 2025",
@@ -184,7 +185,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "apple-wwdc-2025",
-            "metadata": {"type": "conference", "company": "apple"}
+            "metadata": {"type": "conference", "company": "apple"},
         },
         {
             "title": "Google I/O 2025",
@@ -198,7 +199,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.8,
             "unique_hash": "google-io-2025",
-            "metadata": {"type": "conference", "company": "google"}
+            "metadata": {"type": "conference", "company": "google"},
         },
         {
             "title": "Microsoft Build 2025",
@@ -212,7 +213,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "microsoft-build-2025",
-            "metadata": {"type": "conference", "company": "microsoft"}
+            "metadata": {"type": "conference", "company": "microsoft"},
         },
         {
             "title": "CES 2025",
@@ -226,7 +227,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.85,
             "unique_hash": "ces-2025",
-            "metadata": {"type": "exhibition", "industry": "electronics"}
+            "metadata": {"type": "exhibition", "industry": "electronics"},
         },
         {
             "title": "AWS re:Invent 2025",
@@ -240,9 +241,8 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.8,
             "unique_hash": "aws-reinvent-2025",
-            "metadata": {"type": "conference", "company": "aws"}
+            "metadata": {"type": "conference", "company": "aws"},
         },
-
         # World/Politics Events
         {
             "title": "G7 Summit 2025",
@@ -256,7 +256,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "g7-summit-2025",
-            "metadata": {"type": "summit", "organization": "g7"}
+            "metadata": {"type": "summit", "organization": "g7"},
         },
         {
             "title": "UN Climate Change Conference",
@@ -270,7 +270,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.9,
             "unique_hash": "cop30-2025",
-            "metadata": {"type": "conference", "organization": "un"}
+            "metadata": {"type": "conference", "organization": "un"},
         },
         {
             "title": "World Economic Forum",
@@ -284,7 +284,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.8,
             "unique_hash": "wef-davos-2025",
-            "metadata": {"type": "forum", "organization": "wef"}
+            "metadata": {"type": "forum", "organization": "wef"},
         },
         {
             "title": "NATO Summit 2025",
@@ -298,7 +298,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "nato-summit-2025",
-            "metadata": {"type": "summit", "organization": "nato"}
+            "metadata": {"type": "summit", "organization": "nato"},
         },
         {
             "title": "IMF Annual Meetings",
@@ -312,9 +312,8 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "imf-annual-2025",
-            "metadata": {"type": "meeting", "organization": "imf"}
+            "metadata": {"type": "meeting", "organization": "imf"},
         },
-
         # Markets/Finance Events
         {
             "title": "Federal Reserve Meeting",
@@ -328,7 +327,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.85,
             "unique_hash": "fed-meeting-2025-01",
-            "metadata": {"type": "meeting", "organization": "federal_reserve"}
+            "metadata": {"type": "meeting", "organization": "federal_reserve"},
         },
         {
             "title": "ECB Interest Rate Decision",
@@ -342,7 +341,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.8,
             "unique_hash": "ecb-meeting-2025-01",
-            "metadata": {"type": "meeting", "organization": "ecb"}
+            "metadata": {"type": "meeting", "organization": "ecb"},
         },
         {
             "title": "Earnings Season Q1 2025",
@@ -356,7 +355,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "earnings-q1-2025",
-            "metadata": {"type": "earnings", "quarter": "q1"}
+            "metadata": {"type": "earnings", "quarter": "q1"},
         },
         {
             "title": "OPEC+ Meeting",
@@ -370,7 +369,7 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.7,
             "unique_hash": "opec-meeting-2025-02",
-            "metadata": {"type": "meeting", "organization": "opec"}
+            "metadata": {"type": "meeting", "organization": "opec"},
         },
         {
             "title": "G20 Finance Ministers Meeting",
@@ -384,8 +383,8 @@ async def load_sample_events():  # noqa: E302
             "link": "",
             "importance": 0.75,
             "unique_hash": "g20-finance-2025",
-            "metadata": {"type": "meeting", "organization": "g20"}
-        }
+            "metadata": {"type": "meeting", "organization": "g20"},
+        },
     ]
 
     logger.info(f"Загружаем {len(sample_events)} событий...")
@@ -405,6 +404,7 @@ async def load_sample_events():  # noqa: E302
 
     logger.info(f"📊 Всего сохранено: {stored_count} из {len(sample_events)} событий")
 
+
 async def main():  # noqa: E302
     """Основная функция."""
     try:
@@ -412,6 +412,7 @@ async def main():  # noqa: E302
     except Exception as e:
         logger.error(f"❌ Критическая ошибка: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
