@@ -102,6 +102,39 @@ const EventsPage: React.FC<EventsPageProps> = () => {
   const filteredEvents = subcategory === 'all' 
     ? events
     : events.filter(e => e.subcategory === subcategory);
+  
+  // Группировка событий по group_name и дате
+  const { groupedEvents, standaloneEvents } = React.useMemo(() => {
+    const groups: Record<string, Event[]> = {};
+    const standalone: Event[] = [];
+    
+    filteredEvents.forEach(event => {
+      // Группируем только если есть group_name и это спорт или крипто
+      if (event.group_name && (event.category === 'sports' || event.category === 'crypto')) {
+        const date = new Date(event.starts_at).toDateString();
+        const key = `${event.group_name}|${date}`;
+        
+        if (!groups[key]) {
+          groups[key] = [];
+        }
+        groups[key].push(event);
+      } else {
+        standalone.push(event);
+      }
+    });
+    
+    // Разбиваем группы: если <3 событий - в standalone
+    const finalGroups: Record<string, Event[]> = {};
+    Object.entries(groups).forEach(([key, evts]) => {
+      if (evts.length >= 3) {
+        finalGroups[key] = evts;
+      } else {
+        standalone.push(...evts);
+      }
+    });
+    
+    return { groupedEvents: finalGroups, standaloneEvents: standalone };
+  }, [filteredEvents]);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)]">
@@ -227,15 +260,125 @@ const EventsPage: React.FC<EventsPageProps> = () => {
           </Card>
         )}
 
-        {!loading && !error && filteredEvents.length > 0 && (
+        {!loading && !error && (filteredEvents.length > 0 || Object.keys(groupedEvents).length > 0) && (
           <div className="space-y-3">
-            {filteredEvents.map((event) => (
+            {/* Группы событий */}
+            {Object.entries(groupedEvents).map(([key, evts]) => (
+              <GroupedEventCard key={key} events={evts} groupKey={key} />
+            ))}
+            
+            {/* Отдельные события */}
+            {standaloneEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>
         )}
       </div>
     </div>
+  );
+};
+
+// Компонент для группы событий (например, матчи одной лиги в один день)
+const GroupedEventCard: React.FC<{ events: Event[]; groupKey: string }> = ({ events, groupKey }) => {
+  const [expanded, setExpanded] = useState(false);
+  
+  if (events.length === 0) return null;
+  
+  const [groupName, dateStr] = groupKey.split('|');
+  const firstEvent = events[0];
+  const date = new Date(dateStr);
+  
+  const getCategoryIcon = () => {
+    const icons: Record<string, string> = {
+      sports: '🏆',
+      crypto: '🪙',
+      tech: '💻',
+      markets: '📈',
+      world: '🌍'
+    };
+    return icons[firstEvent.category] || '📅';
+  };
+  
+  const formatGroupDate = () => {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    if (date.toDateString() === now.toDateString()) return 'Today';
+    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+    
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+  
+  return (
+    <Card 
+      className={`cursor-pointer transition-all hover:shadow-md ${
+        expanded ? 'shadow-lg' : ''
+      }`}
+      onClick={() => setExpanded(!expanded)}
+    >
+      <div className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-1">
+              <span className="text-xl">{getCategoryIcon()}</span>
+              <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary border border-primary/20">
+                {events.length} events
+              </span>
+            </div>
+            
+            <h3 className="font-semibold text-[var(--color-text)] mb-1">{groupName}</h3>
+            
+            <p className="text-sm text-[var(--color-text)]-secondary">
+              {formatGroupDate()} • {firstEvent.subcategory}
+            </p>
+          </div>
+          
+          <ChevronDown 
+            className={`w-5 h-5 text-[var(--color-text)]-secondary transition-transform ${
+              expanded ? 'rotate-180' : ''
+            }`}
+          />
+        </div>
+        
+        {/* Список событий в группе */}
+        {expanded && (
+          <div className="mt-4 pt-4 border-t border-[var(--color-border)] space-y-2">
+            {events.map((event, idx) => (
+              <div 
+                key={event.id} 
+                className={`py-2 ${idx > 0 ? 'border-t border-[var(--color-border)]/50' : ''}`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-[var(--color-text)]">{event.title}</h4>
+                    <p className="text-xs text-[var(--color-text)]-secondary mt-0.5">
+                      {new Date(event.starts_at).toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                      })}
+                      {event.location && ` • ${event.location}`}
+                    </p>
+                  </div>
+                  {event.link && (
+                    <a
+                      href={event.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-primary hover:text-primary/80 text-xs ml-2"
+                    >
+                      🔗
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
   );
 };
 

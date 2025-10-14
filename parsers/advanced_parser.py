@@ -134,7 +134,8 @@ class AdvancedParser:
 
     async def _init_session(self):
         """Инициализация HTTP сессии."""
-        timeout = aiohttp.ClientTimeout(total=30, connect=10)
+        # Увеличенный timeout для медленных источников (WEF, World Bank, IMF)
+        timeout = aiohttp.ClientTimeout(total=60, connect=15, sock_read=45)
         connector = aiohttp.TCPConnector(limit=100, limit_per_host=10)
 
         headers = {
@@ -230,6 +231,43 @@ class AdvancedParser:
             logger.error(f"Ошибка загрузки {url}: {e}")
             return False, None, None
 
+    async def _fetch_content_with_retry(self, url: str, max_retries: int = 3) -> Tuple[bool, str, Optional[bytes]]:
+        """
+        Загрузка контента с retry и exponential backoff.
+
+        Args:
+            url: URL для загрузки
+            max_retries: Максимальное количество попыток (по умолчанию 3)
+
+        Returns:
+            Кортеж (success, content_type, content_bytes)
+        """
+        for attempt in range(max_retries):
+            try:
+                success, content_type, content = await self._fetch_content(url)
+
+                if success:
+                    if attempt > 0:
+                        logger.info(f"Успешно загружено с попытки {attempt + 1}: {url}")
+                    return success, content_type, content
+
+                # Если не успешно и есть еще попытки - ждем
+                if attempt < max_retries - 1:
+                    wait_time = 2**attempt  # 1s, 2s, 4s
+                    logger.debug(f"Повтор через {wait_time}s (попытка {attempt + 2}/{max_retries}): {url}")
+                    await asyncio.sleep(wait_time)
+
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    logger.error(f"Не удалось загрузить после {max_retries} попыток: {url} - {e}")
+                    return False, None, None
+
+                wait_time = 2**attempt
+                logger.debug(f"Ошибка, повтор через {wait_time}s: {url} - {e}")
+                await asyncio.sleep(wait_time)
+
+        return False, None, None
+
     def _extract_with_newsplease(self, url: str, content: bytes) -> Optional[Dict[str, str]]:
         """
         Извлечение контента с помощью news-please.
@@ -241,30 +279,31 @@ class AdvancedParser:
         Returns:
             Словарь с title и maintext или None
         """
+        # Сначала пробуем from_url (правильный способ для NewsPlease)
         try:
-            # Сохраняем контент во временный файл для news-please
-            import tempfile
-            import os
-
-            with tempfile.NamedTemporaryFile(mode="wb", suffix=".html", delete=False) as f:
-                f.write(content)
-                temp_path = f.name
-
-            try:
-                article = NewsPlease.from_file(temp_path)
-
-                if article and article.get("title") and article.get("maintext"):
-                    return {
-                        "title": clean_text(article["title"]),
-                        "maintext": clean_text(article["maintext"]),
-                        "method": "news-please",
-                    }
-
-            finally:
-                os.unlink(temp_path)
-
+            article = NewsPlease.from_url(url, timeout=30)
+            if article and article.maintext:
+                return {
+                    "title": clean_text(article.title or ""),
+                    "maintext": clean_text(article.maintext),
+                    "method": "newsplease_url",
+                }
         except Exception as e:
-            logger.debug(f"news-please failed for {url}: {e}")
+            logger.debug(f"newsplease from_url failed for {url}: {e}")
+
+        # Fallback на from_html если URL не сработал
+        try:
+            content_str = content.decode("utf-8", errors="ignore")
+            article = NewsPlease.from_html(content_str, url=url)
+
+            if article and article.maintext:
+                return {
+                    "title": clean_text(article.title or ""),
+                    "maintext": clean_text(article.maintext),
+                    "method": "newsplease_html",
+                }
+        except Exception as e:
+            logger.debug(f"newsplease from_html failed for {url}: {e}")
 
         return None
 
@@ -403,8 +442,8 @@ class AdvancedParser:
             try:
                 logger.info(f"[{category}/{subcategory}] {url} -> START")
 
-                # Загружаем контент
-                success, content_type, content = await self._fetch_content(url)
+                # Загружаем контент с retry механизмом
+                success, content_type, content = await self._fetch_content_with_retry(url, max_retries=3)
                 if not success or not content:
                     logger.warning(f"[{category}/{subcategory}] {url} -> FAIL (fetch)")
                     return {"success": False, "reason": "fetch_failed"}
@@ -430,18 +469,55 @@ class AdvancedParser:
         """Обработка RSS источника."""
         try:
             feed = feedparser.parse(content)
+
+            # Проверить на ошибки парсинга RSS
+            if feed.bozo:
+                logger.warning(f"RSS parsing error for {url}: {feed.bozo_exception}")
+                # Попробовать исправить encoding
+                if "encoding" in str(feed.bozo_exception).lower():
+                    try:
+                        content_str = content.decode("utf-8", errors="ignore")
+                        feed = feedparser.parse(content_str)
+                    except Exception as e:
+                        logger.debug(f"Failed to fix encoding: {e}")
+
             if not feed.entries:
                 return {"success": False, "reason": "no_entries"}
 
             processed_count = 0
             saved_count = 0
 
-            for entry in feed.entries[:5]:  # Обрабатываем только первые 5 записей
+            # Обрабатываем до 50 записей вместо 5
+            max_entries = getattr(self, "max_rss_entries", 50)
+            for entry in feed.entries[:max_entries]:
                 try:
                     # Извлекаем данные из RSS
                     title = clean_text(entry.get("title", ""))
                     link = entry.get("link", "")
-                    summary = clean_text(entry.get("summary", ""))
+
+                    # Каскадное извлечение контента: content > description > summary
+                    article_content = ""
+                    if hasattr(entry, "content") and entry.content:
+                        article_content = clean_text(entry.content[0].value)
+                    elif hasattr(entry, "description") and entry.description:
+                        article_content = clean_text(entry.description)
+                    else:
+                        article_content = clean_text(entry.get("summary", ""))
+
+                    # Извлечь дату публикации
+                    from datetime import datetime, timezone
+
+                    pub_date = None
+                    if hasattr(entry, "published_parsed") and entry.published_parsed:
+                        try:
+                            pub_date = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+                        except Exception:
+                            pass
+                    elif hasattr(entry, "updated_parsed") and entry.updated_parsed:
+                        try:
+                            pub_date = datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
+                        except Exception:
+                            pass
 
                     if not title:
                         continue
@@ -449,7 +525,7 @@ class AdvancedParser:
                     processed_count += 1
 
                     # Оценка важности и достоверности
-                    text_for_ai = f"{title} {summary}".strip()
+                    text_for_ai = f"{title} {article_content}".strip()
                     if not text_for_ai:
                         continue
 
@@ -463,13 +539,14 @@ class AdvancedParser:
                     # Сохраняем в БД
                     news_item = {
                         "title": title,
-                        "content": summary,
+                        "content": article_content,
                         "link": link,
                         "source": name,
                         "category": category,
                         "subcategory": subcategory,
                         "importance": importance,
                         "credibility": credibility,
+                        "published_at": pub_date,  # Сохраняем реальную дату публикации
                     }
 
                     # Используем асинхронный сервис БД

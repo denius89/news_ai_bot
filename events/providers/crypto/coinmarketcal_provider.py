@@ -29,11 +29,11 @@ class CoinMarketCalProvider(BaseEventProvider):
     def __init__(self):
         """Initialize CoinMarketCal provider."""
         super().__init__("coinmarketcal", "crypto")
-        self.api_key = os.getenv("COINMARKETCAL_TOKEN")
+        self.api_key = os.getenv("COINMARKETCAL_API_KEY")
         self.base_url = "https://developers.coinmarketcal.com/v1"
 
         if not self.api_key:
-            logger.warning("COINMARKETCAL_TOKEN not set, provider will be disabled")
+            logger.warning("COINMARKETCAL_API_KEY not set, provider will be disabled")
 
     async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
@@ -54,18 +54,27 @@ class CoinMarketCalProvider(BaseEventProvider):
             if not self.session:
                 self.session = aiohttp.ClientSession(headers={"x-api-key": self.api_key})
 
-            # CoinMarketCal events endpoint
+            # CoinMarketCal API v1 - используем правильный формат параметров
             url = f"{self.base_url}/events"
             params = {
-                "dateRangeStart": start_date.strftime("%d/%m/%Y"),
-                "dateRangeEnd": end_date.strftime("%d/%m/%Y"),
-                "max": 100,  # Max results per request
+                # Новый формат дат (YYYY-MM-DD вместо DD/MM/YYYY)
+                "dateRangeStart": start_date.strftime("%Y-%m-%d"),
+                "dateRangeEnd": end_date.strftime("%Y-%m-%d"),
+                "max": 100,
+                "page": 1,
+                "showOnly": "hot_events",  # Только важные события
             }
 
             # Apply rate limit (100 req/day)
             await self.rate_limiter.acquire()
 
             async with self.session.get(url, params=params) as response:
+                if response.status == 400:
+                    # Ошибка 400 может быть из-за неверного токена или лимитов
+                    logger.warning("CoinMarketCal API 400 - проверьте токен или API лимиты")
+                    logger.info("Получите токен на https://coinmarketcal.com/en/api или используйте scraping")
+                    return []
+
                 if response.status != 200:
                     logger.error(f"CoinMarketCal API error: {response.status}")
                     return []

@@ -255,16 +255,41 @@ class EventsService:
                 }
                 rows.append(row)
 
-            # Insert into events_new table
-            # Note: Using regular insert since unique_hash constraint may not exist yet
-            # TODO: After Supabase migration, switch to upsert with unique_hash
+            # Insert/Update into events_new table
+            # Стратегия: фильтруем дубликаты до вставки, вставляем только новые
             try:
-                result = safe_execute(supabase.table("events_new").insert(rows))
+                # Получаем существующие unique_hash из БД для проверки дубликатов
+                existing_hashes = set()
+                try:
+                    hash_list = [row["unique_hash"] for row in rows if row.get("unique_hash")]
+                    if hash_list:
+                        existing = safe_execute(
+                            supabase.table("events_new").select("unique_hash").in_("unique_hash", hash_list)
+                        )
+                        existing_hashes = {e["unique_hash"] for e in (existing.data or [])}
+                        logger.info(f"📊 Найдено существующих событий: {len(existing_hashes)} из {len(hash_list)}")
+                except Exception as e:
+                    logger.debug(f"Не удалось проверить существующие hash: {e}")
+
+                # Фильтруем только новые события
+                new_rows = [row for row in rows if row.get("unique_hash") not in existing_hashes]
+
+                if not new_rows:
+                    logger.info("✅ Все события уже существуют в БД (0 новых)")
+                    return 0
+
+                logger.info(
+                    f"💾 Вставка {len(new_rows)} новых событий (пропущено дубликатов: {len(rows) - len(new_rows)})"
+                )
+
+                # Вставляем только новые события
+                result = safe_execute(supabase.table("events_new").insert(new_rows))
                 inserted = len(result.data or [])
-                logger.info(f"✅ Inserted {inserted} events into events_new table")
+                logger.info(f"✅ Inserted {inserted} new events into events_new table")
                 return inserted
+
             except Exception as insert_error:
-                # If insert fails (likely due to duplicates), try without unique_hash
+                # If insert fails, try without unique_hash (fallback)
                 logger.warning(f"Insert failed, retrying without unique_hash: {insert_error}")
 
                 # Remove unique_hash from rows

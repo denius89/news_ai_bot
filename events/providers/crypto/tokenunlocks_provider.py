@@ -5,6 +5,7 @@ Fetches token unlock events from TokenUnlocks.app.
 """
 
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List
 
@@ -28,7 +29,9 @@ class TokenUnlocksProvider(BaseEventProvider):
     def __init__(self):
         """Initialize TokenUnlocks provider."""
         super().__init__("tokenunlocks", "crypto")
-        self.base_url = "https://token.unlocks.app/api"
+        # Используем альтернативный публичный endpoint
+        self.base_url = "https://www.tokenunlocks.app"
+        self.api_key = os.getenv("TOKEN_UNLOCKS_API_KEY")  # Опционально
 
     async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """
@@ -43,29 +46,62 @@ class TokenUnlocksProvider(BaseEventProvider):
         """
         try:
             if not self.session:
-                self.session = aiohttp.ClientSession()
+                headers = {}
+                if self.api_key:
+                    headers["Authorization"] = f"Bearer {self.api_key}"
+                self.session = aiohttp.ClientSession(headers=headers)
 
-            # Fetch upcoming unlocks
-            url = f"{self.base_url}/unlocks"
-            params = {
-                "from": start_date.strftime("%Y-%m-%d"),
-                "to": end_date.strftime("%Y-%m-%d"),
-            }
+            # TokenUnlocks закрыл публичный API, но есть RSS альтернатива
+            # Пробуем RSS endpoint (обычно публичный)
+            url = f"{self.base_url}/rss"
 
             # Apply rate limit (conservative: 1 req/sec)
             await self.rate_limiter.acquire()
 
-            async with self.session.get(url, params=params) as response:
+            async with self.session.get(url) as response:
+                if response.status == 403:
+                    logger.warning("TokenUnlocks API requires authentication - provider temporarily disabled")
+                    logger.info("Добавьте TOKEN_UNLOCKS_API_KEY в .env для включения провайдера")
+                    return []
+
                 if response.status != 200:
                     logger.error(f"TokenUnlocks API error: {response.status}")
                     return []
 
-                data = await response.json()
-                unlocks = data.get("unlocks", [])
+                # Если это RSS - парсим XML
+                content = await response.text()
+
+                # Проверяем это RSS или JSON
+                if content.strip().startswith("<"):
+                    # RSS format - парсим через feedparser
+                    import feedparser
+
+                    feed = feedparser.parse(content)
+                    unlocks = []
+
+                    for entry in feed.entries[:50]:
+                        # Извлекаем данные из RSS entry
+                        unlocks.append(
+                            {
+                                "title": entry.get("title", ""),
+                                "description": entry.get("summary", ""),
+                                "link": entry.get("link", ""),
+                                "pub_date": entry.get("published_parsed"),
+                            }
+                        )
+                else:
+                    # JSON format
+                    data = await response.json()
+                    unlocks = data.get("unlocks", [])
 
                 events = []
                 for unlock in unlocks:
-                    event = self._parse_unlock(unlock)
+                    # Проверяем формат данных (RSS или JSON)
+                    if "pub_date" in unlock:  # RSS формат
+                        event = self._parse_rss_entry(unlock)
+                    else:  # JSON формат
+                        event = self._parse_unlock(unlock)
+
                     if event:
                         normalized = self.normalize_event(event)
                         if normalized:
@@ -77,6 +113,57 @@ class TokenUnlocksProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error fetching TokenUnlocks events: {e}")
             return []
+
+    def _parse_rss_entry(self, entry: Dict) -> Dict:
+        """
+        Parse RSS entry to standard format.
+
+        Args:
+            entry: RSS entry data
+
+        Returns:
+            Parsed event dictionary
+        """
+        try:
+            import time
+            from datetime import timezone
+
+            title = entry.get("title", "").strip()
+            if not title:
+                return None
+
+            # Извлекаем токен из заголовка (обычно формат: "TOKEN - Unlock event")
+            token_name = title.split("-")[0].strip() if "-" in title else title
+
+            # Парсим дату публикации
+            pub_date = entry.get("pub_date")
+            if pub_date:
+                starts_at = datetime.fromtimestamp(time.mktime(pub_date), tz=timezone.utc)
+            else:
+                starts_at = datetime.now(timezone.utc)
+
+            description = entry.get("description", "")
+            link = entry.get("link", "")
+
+            return {
+                "title": f"{token_name} Token Unlock",
+                "starts_at": starts_at,
+                "ends_at": None,
+                "subcategory": "unlock",
+                "importance": 0.6,
+                "description": description[:500] if description else f"Token unlock event for {token_name}",
+                "link": link,
+                "location": "Blockchain",
+                "organizer": token_name or "Token Project",
+                "group_name": token_name,
+                "metadata": {
+                    "token_name": token_name,
+                    "source": "TokenUnlocks RSS",
+                },
+            }
+        except Exception as e:
+            logger.error(f"Error parsing RSS entry: {e}")
+            return None
 
     def _parse_unlock(self, unlock: Dict) -> Dict:
         """

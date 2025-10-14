@@ -45,23 +45,41 @@ class CoinGeckoProvider(BaseEventProvider):
             if not self.session:
                 self.session = aiohttp.ClientSession()
 
-            # CoinGecko events endpoint
-            url = f"{self.base_url}/events"
-            params = {
-                "from_date": start_date.strftime("%Y-%m-%d"),
-                "to_date": end_date.strftime("%Y-%m-%d"),
-            }
+            # CoinGecko /events и /coins/list/new deprecated
+            # Используем /search/trending для трендовых монет (стабильный API v3)
+            url = f"{self.base_url}/search/trending"
 
             # Apply rate limit (Free tier: 10 req/min)
             await self.rate_limiter.acquire()
 
-            async with self.session.get(url, params=params) as response:
+            async with self.session.get(url) as response:
                 if response.status != 200:
                     logger.error(f"CoinGecko API error: {response.status}")
                     return []
 
+                # Trending endpoint возвращает: {"coins": [...], "nfts": [...], "categories": [...]}
                 data = await response.json()
-                events = data.get("data", [])
+                trending_coins = data.get("coins", [])
+
+                # Создаем события из трендовых монет
+                events = []
+                from datetime import timezone
+
+                now = datetime.now(timezone.utc)
+
+                for item in trending_coins[:15]:  # Топ 15 трендовых монет
+                    coin = item.get("item", {})
+                    # Создаем событие "Trending Crypto"
+                    event = {
+                        "title": coin.get("name", "Unknown"),
+                        "description": f"Trending cryptocurrency #{len(events)+1} on CoinGecko",
+                        "event_type": "trending",
+                        "coins": [coin.get("symbol", "")],
+                        "coin_id": coin.get("id", ""),
+                        "market_cap_rank": coin.get("market_cap_rank"),
+                        "activated_at": now.isoformat(),
+                    }
+                    events.append(event)
 
                 normalized_events = []
                 for event in events:
@@ -79,6 +97,7 @@ class CoinGeckoProvider(BaseEventProvider):
     def _parse_event(self, event: Dict) -> Dict:
         """
         Parse CoinGecko event to standard format.
+        Поддерживает как старый формат (events), так и новый (listings).
 
         Args:
             event: Raw event from CoinGecko API
@@ -87,6 +106,75 @@ class CoinGeckoProvider(BaseEventProvider):
             Parsed event dictionary
         """
         try:
+            # Trending формат
+            if "event_type" in event and event["event_type"] == "trending":
+                symbol = event.get("coins", [""])[0]
+                rank = len(event.get("description", "").split("#")) - 1  # Извлекаем ранг из описания
+                title = f"🔥 {event.get('title', 'Unknown')} ({symbol.upper()}) - Trending #{rank}"
+
+                # Парсим дату
+                activated_at = event.get("activated_at")
+                if not activated_at:
+                    from datetime import timezone
+
+                    activated_at = datetime.now(timezone.utc).isoformat()
+
+                try:
+                    starts_at = datetime.fromisoformat(activated_at.replace("Z", "+00:00"))
+                except Exception:
+                    from datetime import timezone
+
+                    starts_at = datetime.now(timezone.utc)
+
+                coin_id = event.get("coin_id", "")
+                market_cap_rank = event.get("market_cap_rank")
+
+                description = event.get("description", "")
+                if market_cap_rank:
+                    description += f" | Market Cap Rank: #{market_cap_rank}"
+
+                return {
+                    "title": title,
+                    "starts_at": starts_at,
+                    "ends_at": starts_at,
+                    "description": description,
+                    "event_type": "trending",
+                    "importance": 0.75,  # Трендовые монеты важны
+                    "subcategory": "trending",
+                    "group_name": "Trending Crypto",
+                    "coins": event.get("coins", []),
+                    "source_link": f"https://www.coingecko.com/en/coins/{coin_id}" if coin_id else "",
+                }
+
+            # Старый формат (listings) - для обратной совместимости
+            if "activated_at" in event and "event_type" not in event:
+                title = f"{event.get('title', 'Unknown')} ({event.get('symbol', '').upper()}) - New Listing"
+
+                activated_at = event.get("activated_at")
+                if not activated_at:
+                    return None
+
+                try:
+                    starts_at = datetime.fromisoformat(activated_at.replace("Z", "+00:00"))
+                except Exception:
+                    from datetime import timezone
+
+                    starts_at = datetime.now(timezone.utc)
+
+                return {
+                    "title": title,
+                    "starts_at": starts_at,
+                    "ends_at": starts_at,
+                    "description": event.get("description") or f"New {event.get('title')} listing on CoinGecko",
+                    "event_type": "listing",
+                    "importance": 0.7,
+                    "subcategory": "listing",
+                    "group_name": event.get("title", "Crypto"),
+                    "coins": [event.get("symbol", "")],
+                    "source_link": f"https://www.coingecko.com/en/coins/{event.get('id', '')}",
+                }
+
+            # Старый формат (events) - для обратной совместимости
             title = event.get("title", "").strip()
             if not title:
                 return None

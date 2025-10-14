@@ -54,34 +54,54 @@ class FootballDataProvider(BaseEventProvider):
             if not self.session:
                 self.session = aiohttp.ClientSession(headers={"X-Auth-Token": self.api_key})
 
-            # Fetch matches with rate limiting
-            url = f"{self.base_url}/matches"
-            params = {
-                "dateFrom": start_date.strftime("%Y-%m-%d"),
-                "dateTo": end_date.strftime("%Y-%m-%d"),
-            }
+            # Free tier ограничен - запрашиваем конкретные топ-лиги
+            # ID лиг:
+            # 2001 = UEFA Champions League
+            # 2146 = UEFA Europa League
+            # 2283 = UEFA Conference League
+            # 2000 = FIFA World Cup
+            # 2015 = Ligue 1 (France)
+            # 2021 = Premier League (England)
+            # 2002 = Bundesliga (Germany)
+            # 2014 = La Liga (Spain)
+            # 2019 = Serie A (Italy)
+            free_tier_competitions = [2001, 2146, 2283, 2000, 2015, 2021, 2002, 2014, 2019]
 
-            # Apply rate limit
-            await self.rate_limiter.acquire()
+            all_events = []
 
-            async with self.session.get(url, params=params) as response:
-                if response.status != 200:
-                    logger.error(f"Football-Data API error: {response.status}")
-                    return []
+            for comp_id in free_tier_competitions:
+                try:
+                    # Fetch matches для конкретной лиги
+                    url = f"{self.base_url}/competitions/{comp_id}/matches"
+                    params = {
+                        "dateFrom": start_date.strftime("%Y-%m-%d"),
+                        "dateTo": end_date.strftime("%Y-%m-%d"),
+                    }
 
-                data = await response.json()
-                matches = data.get("matches", [])
+                    # Apply rate limit
+                    await self.rate_limiter.acquire()
 
-                events = []
-                for match in matches:
-                    event = self._parse_match(match)
-                    if event:
-                        normalized = self.normalize_event(event)
-                        if normalized:
-                            events.append(normalized)
+                    async with self.session.get(url, params=params) as response:
+                        if response.status != 200:
+                            logger.debug(f"Football-Data API error for comp {comp_id}: {response.status}")
+                            continue
 
-                logger.info(f"Fetched {len(events)} events from Football-Data")
-                return [e for e in events if e is not None]
+                        data = await response.json()
+                        matches = data.get("matches", [])
+
+                        for match in matches:
+                            event = self._parse_match(match)
+                            if event:
+                                normalized = self.normalize_event(event)
+                                if normalized:
+                                    all_events.append(normalized)
+
+                except Exception as e:
+                    logger.debug(f"Error fetching competition {comp_id}: {e}")
+                    continue
+
+            logger.info(f"Fetched {len(all_events)} events from Football-Data")
+            return [e for e in all_events if e is not None]
 
         except Exception as e:
             logger.error(f"Error fetching Football-Data events: {e}")

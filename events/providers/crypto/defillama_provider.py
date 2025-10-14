@@ -73,6 +73,9 @@ class DefiLlamaProvider(BaseEventProvider):
     def _check_protocol_for_events(self, protocol: Dict, start_date: datetime, end_date: datetime) -> Dict:
         """
         Check if protocol has events in date range.
+        Создает события для:
+        1. Новых запусков протоколов
+        2. Значительных изменений TVL (>50% за день)
 
         Args:
             protocol: Protocol data from API
@@ -83,7 +86,39 @@ class DefiLlamaProvider(BaseEventProvider):
             Event dictionary or None
         """
         try:
-            # Check if protocol was launched in date range
+            # 1. Check TVL changes (большие изменения = важное событие)
+            change_1d = protocol.get("change_1d")
+            change_7d = protocol.get("change_7d")
+            tvl = protocol.get("tvl", 0)
+
+            # Если TVL изменился больше чем на 50% за день - это событие!
+            if change_1d and abs(change_1d) > 50 and tvl > 1_000_000:  # TVL > $1M
+                now = datetime.now(timezone.utc)
+                change_type = "surge" if change_1d > 0 else "drop"
+
+                # Форматируем change_7d только если он есть
+                change_7d_str = f" (7d: {change_7d:+.1f}%)" if change_7d else ""
+
+                return {
+                    "title": f"🔥 {protocol.get('name')} TVL {change_type.upper()} {abs(change_1d):.1f}%",
+                    "starts_at": now,
+                    "ends_at": None,
+                    "subcategory": "defi",
+                    "importance": min(0.9, 0.6 + abs(change_1d) / 200),  # Выше изменение - важнее
+                    "description": f"{protocol.get('name')} TVL changed {change_1d:+.1f}% in 24h{change_7d_str}. Current TVL: ${tvl:,.0f}",
+                    "link": protocol.get("url", ""),
+                    "group_name": f"DeFi TVL {change_type.title()}s",
+                    "metadata": {
+                        "protocol_name": protocol.get("name"),
+                        "chain": protocol.get("chain"),
+                        "category": protocol.get("category"),
+                        "tvl": tvl,
+                        "change_1d": change_1d,
+                        "change_7d": change_7d,
+                    },
+                }
+
+            # 2. Check if protocol was launched in date range
             launch_date = protocol.get("listedAt")
             if launch_date:
                 launch_dt = datetime.fromtimestamp(launch_date, tz=timezone.utc)
@@ -94,13 +129,14 @@ class DefiLlamaProvider(BaseEventProvider):
                         "ends_at": None,
                         "subcategory": "defi",
                         "importance": 0.75,
-                        "description": f"Launch of {protocol.get('name')} on {protocol.get('chain', 'multiple chains')}",
+                        "description": f"Launch of {protocol.get('name')} on {protocol.get('chain', 'multiple chains')}. TVL: ${tvl:,.0f}",
                         "link": protocol.get("url", ""),
+                        "group_name": "New DeFi Protocols",
                         "metadata": {
                             "protocol_name": protocol.get("name"),
                             "chain": protocol.get("chain"),
                             "category": protocol.get("category"),
-                            "tvl": protocol.get("tvl"),
+                            "tvl": tvl,
                         },
                     }
 

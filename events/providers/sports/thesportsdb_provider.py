@@ -45,32 +45,59 @@ class TheSportsDBProvider(BaseEventProvider):
             if not self.session:
                 self.session = aiohttp.ClientSession()
 
-            events = []
+            # Список поддерживаемых видов спорта
+            sports = [
+                "Soccer",  # Футбол
+                "Basketball",  # Баскетбол (NBA, EuroLeague, etc)
+                "Ice Hockey",  # Хоккей (NHL, KHL, etc)
+                "Tennis",  # Теннис (ATP, WTA)
+                "Baseball",  # Бейсбол (MLB)
+                "American Football",  # Американский футбол (NFL)
+                "Rugby",  # Регби
+                "Cricket",  # Крикет
+                "Volleyball",  # Волейбол
+                "Handball",  # Гандбол
+            ]
 
-            # Fetch events for each day in range
-            current_date = start_date.date()
-            end_date_only = end_date.date()
+            all_events = []
 
-            while current_date <= end_date_only:
-                day_events = await self._fetch_events_for_date(current_date)
-                events.extend(day_events)
-                current_date += timedelta(days=1)
+            # Fetch events for each sport and each day in range
+            # Ограничиваем до 7 дней чтобы не делать слишком много запросов
+            max_days = min(7, (end_date.date() - start_date.date()).days + 1)
 
-            logger.info(f"Fetched {len(events)} events from TheSportsDB")
-            return events
+            for sport in sports:
+                try:
+                    current_date = start_date.date()
+
+                    for day_offset in range(max_days):
+                        fetch_date = current_date + timedelta(days=day_offset)
+                        day_events = await self._fetch_events_for_date(fetch_date, sport)
+                        all_events.extend(day_events)
+                except Exception as e:
+                    logger.debug(f"Error fetching {sport}: {e}")
+                    continue
+
+            logger.info(f"Fetched {len(all_events)} events from TheSportsDB ({len(sports)} sports)")
+            return all_events
 
         except Exception as e:
             logger.error(f"Error fetching TheSportsDB events: {e}")
             return []
 
-    async def _fetch_events_for_date(self, date) -> List[Dict]:
-        """Fetch events for a specific date."""
+    async def _fetch_events_for_date(self, date, sport: str = "Soccer") -> List[Dict]:
+        """
+        Fetch events for a specific date and sport.
+
+        Args:
+            date: Date to fetch events for
+            sport: Sport name (Soccer, Basketball, Ice Hockey, Tennis, etc.)
+        """
         try:
             # TheSportsDB endpoint for events by date
             url = f"{self.base_url}/eventsday.php"
             params = {
                 "d": date.strftime("%Y-%m-%d"),
-                "s": "Soccer",  # Can be expanded to other sports
+                "s": sport,
             }
 
             # Apply rate limit (conservative: ~100 req/hour)
@@ -188,13 +215,25 @@ class TheSportsDBProvider(BaseEventProvider):
         """Determine subcategory based on sport."""
         sport_lower = sport.lower()
 
-        if "soccer" in sport_lower or "football" in sport_lower:
+        if "soccer" in sport_lower:
             return "football"
         elif "basketball" in sport_lower:
             return "basketball"
+        elif "hockey" in sport_lower:
+            return "hockey"
         elif "tennis" in sport_lower:
             return "tennis"
+        elif "baseball" in sport_lower:
+            return "baseball"
+        elif "american football" in sport_lower or sport_lower == "football":
+            return "american_football"
+        elif "rugby" in sport_lower:
+            return "rugby"
         elif "cricket" in sport_lower:
             return "cricket"
+        elif "volleyball" in sport_lower:
+            return "volleyball"
+        elif "handball" in sport_lower:
+            return "handball"
         else:
             return "other"

@@ -126,7 +126,11 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 
+# Загружаем .env перед импортом провайдеров (они проверяют токены при инициализации)
+from dotenv import load_dotenv
 from core.reactor import reactor, Events
+
+load_dotenv()
 
 logger = logging.getLogger("events_parser")
 
@@ -221,7 +225,7 @@ class EventsParser:
             name_mapping = {
                 "coinmarketcal": "CoinMarketCalProvider",
                 "coingecko": "CoinGeckoProvider",
-                "defillama": "DeFiLlamaProvider",
+                "defillama": "DefiLlamaProvider",
                 "tokenunlocks": "TokenUnlocksProvider",
                 "football_data": "FootballDataProvider",
                 "thesportsdb": "TheSportsDBProvider",
@@ -230,7 +234,7 @@ class EventsParser:
                 "gosugamers": "GosugamersProvider",
                 "github_releases": "GitHubReleasesProvider",
                 "oecd_events": "OECDProvider",
-                "un_sc_programme": "UNSecurityCouncilProvider",
+                "un_sc": "UNSecurityCouncilProvider",
             }
 
             if provider_name in name_mapping:
