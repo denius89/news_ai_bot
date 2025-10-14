@@ -73,31 +73,33 @@ check_process_brief() {
     local process_name="$1"
     local lock_file="$2"
     
-    # Проверяем по имени процесса
-    local pid=$(pgrep -f "$process_name" | head -1)
-    
-    if [ -n "$pid" ]; then
-        echo -e "⚠️ Процесс ${CYAN}$process_name${NC} уже запущен (PID: ${YELLOW}$pid${NC})"
-        log "INFO" "Процесс $process_name запущен (PID: $pid)"
-        
-        # Проверяем lock файл
-        if [ -f "$lock_file" ]; then
-            local lock_pid=$(cat "$lock_file")
-            if [ "$lock_pid" = "$pid" ]; then
-                echo -e "  ${GREEN}✅ Lock файл соответствует процессу${NC}"
-                log "INFO" "Lock файл $lock_file соответствует процессу"
-                return 0
-            else
-                echo -e "  ${RED}❌ Lock файл устарел${NC}"
-                log "WARNING" "Lock файл $lock_file устарел (содержит PID: $lock_pid)"
-            fi
+    # Сначала проверяем PID-файл
+    if [ -f "$lock_file" ]; then
+        local lock_pid=$(cat "$lock_file")
+        if ps -p $lock_pid > /dev/null 2>&1; then
+            echo -e "✅ Процесс ${CYAN}$process_name${NC} запущен (PID: ${GREEN}$lock_pid${NC})"
+            log "INFO" "Процесс $process_name запущен (PID: $lock_pid)"
+            return 0
+        else
+            echo -e "⚠️ PID-файл существует, но процесс ${CYAN}$process_name${NC} (PID: ${RED}$lock_pid${NC}) не найден"
+            log "WARNING" "PID-файл существует, но процесс $process_name (PID: $lock_pid) не найден"
+            return 1
         fi
-        
-        return 1
     else
-        echo -e "✅ Процесс ${CYAN}$process_name${NC} не запущен"
-        log "INFO" "Процесс $process_name не запущен"
-        return 0
+        # Проверяем по имени процесса (только Python процессы, исключая bash)
+        local pid=$(pgrep -f "$process_name" | while read p; do
+            ps -p $p -o command= | grep -q "^/.*Python" && echo $p && break
+        done | head -1)
+        
+        if [ -n "$pid" ]; then
+            echo -e "⚠️ Процесс ${CYAN}$process_name${NC} запущен (PID: ${YELLOW}$pid${NC}), но PID-файл отсутствует"
+            log "WARNING" "Процесс $process_name запущен (PID: $pid), но PID-файл отсутствует"
+            return 1
+        else
+            echo -e "✅ Процесс ${CYAN}$process_name${NC} не запущен"
+            log "INFO" "Процесс $process_name не запущен"
+            return 0
+        fi
     fi
 }
 
@@ -333,10 +335,10 @@ run_brief_check() {
     
     echo ""
     echo -e "${BLUE}📊 Статус:${NC}"
-    echo -e "  Flask WebApp: $([ $flask_running -eq 1 ] && echo "${GREEN}запущен${NC}" || echo "${YELLOW}остановлен${NC}")"
-    echo -e "  Telegram Bot: $([ $bot_running -eq 1 ] && echo "${GREEN}запущен${NC}" || echo "${YELLOW}остановлен${NC}")"
+    echo -e "  Flask WebApp: $([ $flask_running -eq 0 ] && echo "${GREEN}запущен${NC}" || echo "${YELLOW}остановлен${NC}")"
+    echo -e "  Telegram Bot: $([ $bot_running -eq 0 ] && echo "${GREEN}запущен${NC}" || echo "${YELLOW}остановлен${NC}")"
     
-    if [ $flask_running -eq 1 ] && [ $bot_running -eq 1 ]; then
+    if [ $flask_running -eq 0 ] && [ $bot_running -eq 0 ]; then
         echo -e "${GREEN}✅ Все сервисы работают${NC}"
         log "SUCCESS" "Все сервисы работают"
         return 0

@@ -41,6 +41,11 @@ sports:
     api_key_required: false
     description: "Multi-sport events database"
   
+  espn:
+    enabled: true
+    api_key_required: false
+    description: "NBA, NHL, MLB, Tennis from ESPN API"
+  
   pandascore:
     enabled: true
     api_key_required: true
@@ -124,7 +129,7 @@ world:
     api_key_required: false
     description: "Global elections calendar"
   
-  un_sc_programme:
+  un_sc:
     enabled: true
     api_key_required: false
     description: "UN Security Council meetings"

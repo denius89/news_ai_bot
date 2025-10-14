@@ -108,6 +108,11 @@ class TheSportsDBProvider(BaseEventProvider):
                     return []
 
                 data = await response.json()
+
+                # API может вернуть null если нет событий
+                if not data:
+                    return []
+
                 events_data = data.get("events")
 
                 if not events_data:

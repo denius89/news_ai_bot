@@ -229,6 +229,7 @@ class EventsParser:
                 "tokenunlocks": "TokenUnlocksProvider",
                 "football_data": "FootballDataProvider",
                 "thesportsdb": "TheSportsDBProvider",
+                "espn": "ESPNProvider",
                 "pandascore": "PandaScoreProvider",
                 "liquipedia": "LiquipediaProvider",
                 "gosugamers": "GosugamersProvider",
