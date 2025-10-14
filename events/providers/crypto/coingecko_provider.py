@@ -143,7 +143,7 @@ class CoinGeckoProvider(BaseEventProvider):
                     "subcategory": "trending",
                     "group_name": "Trending Crypto",
                     "coins": event.get("coins", []),
-                    "source_link": f"https://www.coingecko.com/en/coins/{coin_id}" if coin_id else "",
+                    "link": f"https://www.coingecko.com/en/coins/{coin_id}" if coin_id else "",
                 }
 
             # Старый формат (listings) - для обратной совместимости
@@ -171,7 +171,7 @@ class CoinGeckoProvider(BaseEventProvider):
                     "subcategory": "listing",
                     "group_name": event.get("title", "Crypto"),
                     "coins": [event.get("symbol", "")],
-                    "source_link": f"https://www.coingecko.com/en/coins/{event.get('id', '')}",
+                    "link": f"https://www.coingecko.com/en/coins/{event.get('id', '')}",
                 }
 
             # Старый формат (events) - для обратной совместимости

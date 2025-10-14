@@ -188,6 +188,12 @@ class ESPNProvider(BaseEventProvider):
             # Extract sport name for group_name
             sport_name = self._extract_sport_name(sport_path)
 
+            # Generate link if not provided by API
+            event_id = event.get("id", "")
+            event_link = event.get("link") or (
+                f"https://www.espn.com/{sport_path}/game/_/gameId/{event_id}" if event_id else ""
+            )
+
             return {
                 "title": title,
                 "starts_at": starts_at,
@@ -195,7 +201,7 @@ class ESPNProvider(BaseEventProvider):
                 "subcategory": subcategory,
                 "importance": importance,
                 "description": description[:500],
-                "link": event.get("link", ""),
+                "link": event_link,
                 "location": competition.get("venue", {}).get("fullName", ""),
                 "organizer": league or sport_name,
                 "group_name": league or sport_name,

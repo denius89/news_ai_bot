@@ -230,8 +230,8 @@ class PandaScoreProvider(BaseEventProvider):
                 "subcategory": subcategory,
                 "importance": importance,
                 "description": f"{tournament_name} - {match_format}",
-                "link": match.get("official_stream_url", "")
-                or f"https://www.pandascore.co/{game_slug}/matches/{match.get('id')}",
+                "link": match.get("official_stream_url")
+                or f"https://www.google.com/search?q={team1}+vs+{team2}+esports+{game_name}",
                 "location": "Online",
                 "organizer": tournament_name or f"{game_name} League",
                 "group_name": tournament_name,  # Group by tournament

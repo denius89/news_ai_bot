@@ -147,6 +147,9 @@ class FootballDataProvider(BaseEventProvider):
             # Get venue/stadium if available
             venue = match.get("venue") or "Stadium TBA"
 
+            # Format date for link
+            match_date = starts_at.strftime("%Y-%m-%d")
+
             return {
                 "title": title,
                 "starts_at": starts_at,
@@ -155,7 +158,7 @@ class FootballDataProvider(BaseEventProvider):
                 "subcategory": subcategory,
                 "importance": importance,
                 "description": f"{competition_name} - {status}",
-                "link": f"https://www.football-data.org/matches/{match.get('id')}",
+                "link": f"https://www.google.com/search?q={home_team}+vs+{away_team}+{match_date}",
                 "location": venue,
                 "organizer": competition_name or "Football Association",
                 "group_name": competition_name,  # Название лиги для группировки
