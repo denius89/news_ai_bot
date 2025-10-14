@@ -86,6 +86,9 @@ class FinnhubProvider(BaseEventProvider):
                 "token": self.api_key,
             }
 
+            # Apply rate limit (Free: 60 req/min)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     return []
@@ -117,6 +120,9 @@ class FinnhubProvider(BaseEventProvider):
                 "token": self.api_key,
             }
 
+            # Apply rate limit (Free: 60 req/min)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     return []
@@ -147,6 +153,9 @@ class FinnhubProvider(BaseEventProvider):
                 "to": end_date.strftime("%Y-%m-%d"),
                 "token": self.api_key,
             }
+
+            # Apply rate limit (Free: 60 req/min)
+            await self.rate_limiter.acquire()
 
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
@@ -190,6 +199,8 @@ class FinnhubProvider(BaseEventProvider):
                 "importance": 0.7,
                 "description": f"Quarterly earnings report for {symbol}",
                 "link": f"https://finnhub.io/quote/{symbol}",
+                "location": "Financial Markets",
+                "organizer": symbol,
                 "metadata": {
                     "symbol": symbol,
                     "eps_estimate": earning.get("epsEstimate"),
@@ -224,6 +235,8 @@ class FinnhubProvider(BaseEventProvider):
                 "importance": 0.8,
                 "description": f"Initial Public Offering of {name}",
                 "link": f"https://finnhub.io/quote/{symbol}",
+                "location": "Stock Exchange",
+                "organizer": name or symbol,
                 "metadata": {
                     "symbol": symbol,
                     "name": name,
@@ -261,6 +274,8 @@ class FinnhubProvider(BaseEventProvider):
                 "importance": importance,
                 "description": f"{event_name} - {economic.get('country', '')}",
                 "link": "https://finnhub.io/calendar/economic",
+                "location": economic.get("country") or "Global",
+                "organizer": "Economic Bureau",
                 "metadata": {
                     "country": economic.get("country"),
                     "impact": impact,

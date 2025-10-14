@@ -73,6 +73,9 @@ class TheSportsDBProvider(BaseEventProvider):
                 "s": "Soccer",  # Can be expanded to other sports
             }
 
+            # Apply rate limit (conservative: ~100 req/hour)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     return []
@@ -151,7 +154,8 @@ class TheSportsDBProvider(BaseEventProvider):
                 "importance": importance,
                 "description": f"{league} - {sport}",
                 "link": f"https://www.thesportsdb.com/event/{event.get('idEvent')}",
-                "location": event.get("strVenue", ""),
+                "location": event.get("strVenue") or "Venue TBA",
+                "organizer": league or f"{sport.title()} League",
                 "group_name": league or sport,  # Лига или спорт для группировки
                 "metadata": {
                     "event_id": event.get("idEvent"),

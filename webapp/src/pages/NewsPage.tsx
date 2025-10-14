@@ -72,8 +72,8 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
         setLoadingMore(true);
       }
 
-      console.log(`🔍 Fetching news: /api/latest?page=${page}&limit=20`);
-      const response = await fetch(`/api/latest?page=${page}&limit=20`);
+      console.log(`🔍 Fetching news: /api/news/latest?page=${page}&limit=20`);
+      const response = await fetch(`/api/news/latest?page=${page}&limit=20`);
       
       console.log(`📡 Response status: ${response.status}`);
       
@@ -113,48 +113,18 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       } else {
         throw new Error(data.message || 'Ошибка получения данных');
       }
-           } catch (error) {
-             console.error('❌ Error fetching news:', error);
+    } catch (error) {
+      console.error('❌ Error fetching news:', error);
+      console.error('📍 Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        page,
+        timestamp: new Date().toISOString()
+      });
       
-             // Fallback to mock data if API fails
-                    const now = new Date();
-                    const fallbackNews: NewsItem[] = [
-                      {
-                        id: '1',
-                        title: 'Bitcoin достигает новых максимумов на фоне институционального интереса',
-                        content: 'Криптовалюта Bitcoin показала значительный рост в последние дни, достигнув новых максимумов...',
-                        source: 'CoinDesk',
-                        category: 'crypto',
-                        publishedAt: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(), // 2 часа назад
-                        credibility: 0.92,
-                        importance: 0.88,
-                        url: 'https://example.com/bitcoin-news',
-                      },
-                      {
-                        id: '2',
-                        title: 'ИИ-революция: новые достижения в области машинного обучения',
-                        content: 'Исследователи представили новую архитектуру нейронных сетей, которая может...',
-                        source: 'TechCrunch',
-                        category: 'tech',
-                        publishedAt: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(), // 4 часа назад
-                        credibility: 0.89,
-                        importance: 0.85,
-                        url: 'https://example.com/ai-news',
-                      },
-                      {
-                        id: '3',
-                        title: 'Чемпионат мира по футболу: обновления и результаты',
-                        content: 'Вчера состоялись ключевые матчи чемпионата мира по футболу...',
-                        source: 'ESPN',
-                        category: 'sports',
-                        publishedAt: new Date(now.getTime() - 6 * 60 * 60 * 1000).toISOString(), // 6 часов назад
-                        credibility: 0.95,
-                        importance: 0.72,
-                        url: 'https://example.com/sports-news',
-                      },
-                    ];
-      
-      setNews(fallbackNews);
+      // Показываем пустой список при ошибке
+      if (page === 1) {
+        setNews([]);
+      }
       setHasMoreNews(false);
     } finally {
       setLoading(false);
@@ -234,7 +204,9 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   };
 
   const getImportanceStars = (importance: number) => {
-    const stars = Math.round(importance * 5);
+    // Защита от NaN, undefined, null и отрицательных значений
+    const safeImportance = Math.max(0, Math.min(1, importance || 0));
+    const stars = Math.round(safeImportance * 5);
     return '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
   };
 

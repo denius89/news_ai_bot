@@ -104,48 +104,401 @@ def format_news(news: list[dict], limit: int = 5, min_importance: float = 0.4) -
 
 def format_events(events: list[dict], limit: int = 5) -> str:
     """
-    Список ближайших событий (HTML) в новом формате.
-    - время, заголовок, важность
-    - метрики: факт/прогноз/предыдущее
+    Список ближайших событий (HTML) с category-specific форматированием.
+
+    Автоматически определяет категорию события и применяет
+    соответствующий форматтер для красивого отображения.
+
+    Args:
+        events: Список событий (dict с полями category, subcategory, metadata)
+        limit: Максимальное количество событий для отображения
+
+    Returns:
+        Отформатированная HTML-строка для Telegram
     """
     if not events:
         return "⚠️ Нет свежих событий"
 
     lines = ["📅 <b>Предстоящие события</b>"]
-    for i, ev in enumerate(events[:limit], start=1):
-        # дата/время
-        when = _fmt_dt(ev.get("event_time"))
-        # заголовок
-        title = escape(ev.get("title") or "—")
 
-        # важность (нормализуем 0-3 в 0-1)
-        importance_raw = float(ev.get("importance") or 0)
-        importance = importance_raw / 3.0 if importance_raw > 0 else 0
+    for i, event in enumerate(events[:limit], start=1):
+        category = event.get("category", "").lower()
+        subcategory = event.get("subcategory", "").lower()
 
-        # Определяем уровень важности
-        if importance >= 0.8:
-            importance_text = "Высокая"
-            importance_icon = "🔥"
-        elif importance >= 0.5:
-            importance_text = "Средняя"
-            importance_icon = "⚡"
+        # Category + subcategory routing
+        if category == "sports":
+            # Esports subcategories
+            if subcategory in [
+                "dota2",
+                "csgo",
+                "lol",
+                "valorant",
+                "pubg",
+                "overwatch",
+                "fifa_esports",
+                "rocket_league",
+                "starcraft",
+                "esports_general",
+            ]:
+                text = format_event_esports(event)
+            else:
+                # Traditional sports
+                text = format_event_sports(event)
+
+        elif category == "crypto":
+            text = format_event_crypto(event)
+
+        elif category == "tech":
+            text = format_event_tech(event)
+
+        elif category == "markets":
+            text = format_event_markets(event)
+
+        elif category == "world":
+            text = format_event_world(event)
+
         else:
-            importance_text = "Низкая"
-            importance_icon = "💤"
+            # Fallback для legacy событий или неизвестных категорий
+            text = format_event_generic(event)
 
-        # метрики
-        fact = escape(ev.get("fact") or "—")
-        forecast = escape(ev.get("forecast") or "—")
-        previous = escape(ev.get("previous") or "—")
-
-        lines.append(
-            f"\n<b>{i}. {title}</b>\n"
-            f"📅 {when}\n"
-            f"{importance_icon} <b>Важность:</b> {importance_text}\n"
-            f"📊 <b>Фактическое:</b> {fact} · <b>Прогноз:</b> {forecast} · <b>Предыдущее:</b> {previous}"
-        )
+        lines.append(f"\n<b>{i}.</b> {text}")
 
     return _clamp_tg("\n".join(lines))
+
+
+# -------- Category-specific event formatters --------
+
+
+def format_event_sports(event: dict) -> str:
+    """
+    Форматирование традиционных спортивных событий.
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    metadata = event.get("metadata", {})
+    subcategory = event.get("subcategory", "general")
+
+    # Футбол
+    if subcategory == "football":
+        home = metadata.get("home_team", "")
+        away = metadata.get("away_team", "")
+        competition = metadata.get("competition", "")
+        matchday = metadata.get("matchday", "")
+        status = metadata.get("status", "Scheduled")
+
+        title_text = f"{home} vs {away}" if home and away else event.get("title", "")
+        comp_text = competition if competition else ""
+        matchday_text = f" • Matchday {matchday}" if matchday else ""
+
+        return (
+            f"⚽ <b>{escape(title_text)}</b>\n"
+            f"🏆 {escape(comp_text)}{matchday_text}\n"
+            f"📅 {_fmt_dt(event.get('starts_at'))}\n"
+            f"⚡ Status: {escape(status)}"
+        )
+
+    # Баскетбол
+    elif subcategory == "basketball":
+        home = metadata.get("home_team", "")
+        away = metadata.get("away_team", "")
+        league = metadata.get("league", metadata.get("competition", ""))
+
+        title_text = f"{home} vs {away}" if home and away else event.get("title", "")
+
+        return f"🏀 <b>{escape(title_text)}</b>\n" f"🏆 {escape(league)}\n" f"📅 {_fmt_dt(event.get('starts_at'))}"
+
+    # Хоккей
+    elif subcategory == "hockey":
+        home = metadata.get("home_team", "")
+        away = metadata.get("away_team", "")
+        league = metadata.get("league", metadata.get("competition", ""))
+
+        title_text = f"{home} vs {away}" if home and away else event.get("title", "")
+
+        return f"🏒 <b>{escape(title_text)}</b>\n" f"🏆 {escape(league)}\n" f"📅 {_fmt_dt(event.get('starts_at'))}"
+
+    # Общий формат для других видов спорта
+    else:
+        return (
+            f"🏆 <b>{escape(event.get('title', ''))}</b>\n"
+            f"📅 {_fmt_dt(event.get('starts_at'))}\n"
+            f"📍 {escape(event.get('location', ''))}"
+            if event.get("location")
+            else ""
+        )
+
+
+def format_event_esports(event: dict) -> str:
+    """
+    Форматирование киберспортивных событий.
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    metadata = event.get("metadata", {})
+    subcategory = event.get("subcategory", "esports_general")
+
+    team1 = metadata.get("team1", metadata.get("home_team", ""))
+    team2 = metadata.get("team2", metadata.get("away_team", ""))
+    tournament = metadata.get("tournament", metadata.get("competition", ""))
+    game = metadata.get("game", subcategory.upper())
+    format_type = metadata.get("format", "BO3")
+
+    # Game-specific icons
+    game_icons = {
+        "dota2": "🐉",
+        "csgo": "🔫",
+        "lol": "⚔️",
+        "valorant": "🎯",
+        "pubg": "🎮",
+        "overwatch": "🎮",
+        "starcraft": "🎮",
+    }
+    icon = game_icons.get(subcategory, "🎮")
+
+    title_text = f"{team1} vs {team2}" if team1 and team2 else event.get("title", "")
+
+    lines = [
+        f"{icon} <b>{escape(title_text)}</b>",
+        f"🏆 {escape(tournament)} ({escape(game)})",
+        f"📅 {_fmt_dt(event.get('starts_at'))}",
+    ]
+
+    if format_type:
+        lines.append(f"⚔️ Format: {escape(format_type)}")
+
+    return "\n".join(lines)
+
+
+def format_event_crypto(event: dict) -> str:
+    """
+    Форматирование криптовалютных событий.
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    metadata = event.get("metadata", {})
+    subcategory = event.get("subcategory", "general")
+
+    coins = metadata.get("coins", [])
+    vote_count = metadata.get("vote_count", 0)
+    categories = metadata.get("categories", [])
+    proof = metadata.get("proof", "")
+
+    # Subcategory icons
+    subcategory_icons = {
+        "mainnet": "🚀",
+        "airdrop": "💸",
+        "listing": "📈",
+        "token_unlock": "🔓",
+        "hard_fork": "⚡",
+        "protocol_upgrade": "🔧",
+        "dao": "🏛️",
+        "nft": "🖼️",
+        "defi": "🏦",
+    }
+    icon = subcategory_icons.get(subcategory, "🪙")
+
+    lines = [
+        f"{icon} <b>{escape(event.get('title', ''))}</b>",
+        f"📅 {_fmt_dt(event.get('starts_at'))}",
+    ]
+
+    if coins:
+        coins_text = ", ".join(coins[:3])
+        if len(coins) > 3:
+            coins_text += f" +{len(coins) - 3} more"
+        lines.append(f"💰 Coins: {escape(coins_text)}")
+
+    if vote_count > 0:
+        lines.append(f"👥 Votes: {vote_count:,}")
+
+    if categories:
+        cats_text = ", ".join(categories[:3])
+        lines.append(f"🏷️ {escape(cats_text)}")
+
+    if proof:
+        lines.append(f'🔗 <a href="{escape(proof)}">Proof</a>')
+
+    return "\n".join(lines)
+
+
+def format_event_markets(event: dict) -> str:
+    """
+    Форматирование рыночных/экономических событий.
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    metadata = event.get("metadata", {})
+
+    country = event.get("location", "")
+    country_code = metadata.get("country_code", "")
+    fact = metadata.get("fact", event.get("fact", "—"))
+    forecast = metadata.get("forecast", event.get("forecast", "—"))
+    previous = metadata.get("previous", event.get("previous", "—"))
+
+    # Country flag
+    flag = country_flag(country_code) if country_code else ""
+
+    lines = [
+        f"📈 <b>{escape(event.get('title', ''))}</b>",
+    ]
+
+    if flag and country:
+        lines.append(f"{flag} {escape(country)}")
+    elif country:
+        lines.append(f"🌍 {escape(country)}")
+
+    lines.append(f"📅 {_fmt_dt(event.get('starts_at'))}")
+
+    # Metrics (только если не "—")
+    if fact != "—" or forecast != "—" or previous != "—":
+        lines.append(
+            f"📊 Факт: {escape(str(fact))} · " f"Прогноз: {escape(str(forecast))} · " f"Пред.: {escape(str(previous))}"
+        )
+
+    return "\n".join(lines)
+
+
+def format_event_tech(event: dict) -> str:
+    """
+    Форматирование технологических событий.
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    metadata = event.get("metadata", {})
+    subcategory = event.get("subcategory", "general")
+
+    # Software releases
+    if subcategory == "software_release":
+        version = metadata.get("version", "")
+        project = metadata.get("project", "")
+        link = event.get("link", "")
+
+        title_text = event.get("title", "")
+        if project and version:
+            project_text = f"{project} v{version}"
+        elif project:
+            project_text = project
+        else:
+            project_text = ""
+
+        lines = [
+            f"💻 <b>{escape(title_text)}</b>",
+        ]
+
+        if project_text:
+            lines.append(f"📦 {escape(project_text)}")
+
+        lines.append(f"📅 {_fmt_dt(event.get('starts_at'))}")
+
+        if link:
+            lines.append(f'🔗 <a href="{escape(link)}">Link</a>')
+
+        return "\n".join(lines)
+
+    # Conferences
+    elif subcategory == "conference":
+        location = event.get("location", "")
+        organizer = event.get("organizer", "")
+
+        lines = [
+            f"🎤 <b>{escape(event.get('title', ''))}</b>",
+        ]
+
+        if location:
+            lines.append(f"📍 {escape(location)}")
+
+        lines.append(f"📅 {_fmt_dt(event.get('starts_at'))}")
+
+        if organizer:
+            lines.append(f"🏛️ {escape(organizer)}")
+
+        return "\n".join(lines)
+
+    # General tech events
+    else:
+        lines = [
+            f"💻 <b>{escape(event.get('title', ''))}</b>",
+            f"📅 {_fmt_dt(event.get('starts_at'))}",
+        ]
+
+        if event.get("description"):
+            desc = _short(event.get("description", ""), 150)
+            lines.append(f"📝 {escape(desc)}")
+
+        return "\n".join(lines)
+
+
+def format_event_world(event: dict) -> str:
+    """
+    Форматирование мировых событий (политика, климат, ООН).
+
+    Args:
+        event: Event dictionary с metadata
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    location = event.get("location", "")
+    organizer = event.get("organizer", "")
+
+    lines = [
+        f"🌍 <b>{escape(event.get('title', ''))}</b>",
+    ]
+
+    if location:
+        lines.append(f"📍 {escape(location)}")
+
+    lines.append(f"📅 {_fmt_dt(event.get('starts_at'))}")
+
+    if organizer:
+        lines.append(f"🏛️ {escape(organizer)}")
+
+    if event.get("description"):
+        desc = _short(event.get("description", ""), 150)
+        lines.append(f"📋 {escape(desc)}")
+
+    return "\n".join(lines)
+
+
+def format_event_generic(event: dict) -> str:
+    """
+    Общий форматтер для событий без специфической категории.
+
+    Args:
+        event: Event dictionary
+
+    Returns:
+        Formatted event string для Telegram
+    """
+    lines = [
+        f"📅 <b>{escape(event.get('title', ''))}</b>",
+        f"🕐 {_fmt_dt(event.get('starts_at'))}",
+    ]
+
+    if event.get("location"):
+        lines.append(f"📍 {escape(event.get('location', ''))}")
+
+    return "\n".join(lines)
 
 
 # -------- AI-дайджест --------

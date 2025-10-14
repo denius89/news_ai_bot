@@ -72,15 +72,15 @@ class EventsService:
             return []
 
         try:
-            # Build query
+            # Build query - reading from events_new table
             query = (
-                supabase.table("events")
+                supabase.table("events_new")
                 .select(
-                    "id, title, category, subcategory, event_time, country, currency, "
-                    "importance, fact, forecast, previous, source, group_name, metadata, created_at"
+                    "id, title, category, subcategory, starts_at, ends_at, "
+                    "importance, description, location, organizer, source, link, group_name, metadata, created_at"
                 )
-                .gte("event_time", from_date.isoformat())
-                .lte("event_time", to_date.isoformat())
+                .gte("starts_at", from_date.isoformat())
+                .lte("starts_at", to_date.isoformat())
             )
 
             # Add category filter if specified
@@ -88,7 +88,7 @@ class EventsService:
                 query = query.eq("category", category)
 
             # Order by event time
-            query = query.order("event_time", desc=False)
+            query = query.order("starts_at", desc=False)
 
             # Execute query
             result = safe_execute(query)
@@ -98,26 +98,35 @@ class EventsService:
             events = []
             for event_data in events_data:
                 try:
-                    # Parse event_time to datetime
-                    event_time_str = event_data.get("event_time")
-                    if isinstance(event_time_str, str):
-                        starts_at = datetime.fromisoformat(event_time_str.replace("Z", "+00:00"))
+                    # Parse starts_at to datetime
+                    starts_at_str = event_data.get("starts_at")
+                    if isinstance(starts_at_str, str):
+                        starts_at = datetime.fromisoformat(starts_at_str.replace("Z", "+00:00"))
                     else:
-                        starts_at = event_time_str
+                        starts_at = starts_at_str
+
+                    # Parse ends_at if available
+                    ends_at = None
+                    ends_at_str = event_data.get("ends_at")
+                    if ends_at_str:
+                        if isinstance(ends_at_str, str):
+                            ends_at = datetime.fromisoformat(ends_at_str.replace("Z", "+00:00"))
+                        else:
+                            ends_at = ends_at_str
 
                     event = EventRecord(
                         id=event_data.get("id", 0),
                         title=event_data.get("title", ""),
-                        category=event_data.get("category") or "general",  # Default to "general" if null
+                        category=event_data.get("category") or "general",
                         subcategory=event_data.get("subcategory", ""),
                         starts_at=starts_at,
-                        ends_at=None,  # Events don't have end_time in current schema
+                        ends_at=ends_at,
                         source=event_data.get("source", ""),
-                        link="",  # No link field in current schema
-                        importance=float(event_data.get("importance", 1)) / 10.0,  # Convert 1-10 to 0.1-1.0
-                        description=event_data.get("fact", ""),  # Use fact as description
-                        location=event_data.get("country", ""),  # Use country as location
-                        organizer=None,
+                        link=event_data.get("link", ""),
+                        importance=float(event_data.get("importance", 0.5)),  # Already 0.0-1.0 in events_new
+                        description=event_data.get("description", ""),
+                        location=event_data.get("location", ""),
+                        organizer=event_data.get("organizer"),
                         group_name=event_data.get("group_name"),
                         metadata=event_data.get("metadata", {}),
                         created_at=datetime.fromisoformat(
@@ -192,6 +201,99 @@ class EventsService:
             asyncio.set_event_loop(loop)
 
         return loop.run_until_complete(self.get_upcoming_events(days_ahead, category, min_importance))
+
+    async def insert_events(self, events_data: List[Dict]) -> int:
+        """
+        Insert events into the database (events_new table).
+
+        Args:
+            events_data: List of event dictionaries
+
+        Returns:
+            Number of events inserted
+        """
+        if not supabase:
+            logger.warning("⚠️ Supabase не подключён, события не будут сохранены.")
+            return 0
+
+        if not events_data:
+            logger.info("Нет событий для вставки")
+            return 0
+
+        try:
+            # Prepare rows for insertion
+            rows = []
+            for event in events_data:
+                # Create unique hash for deduplication
+                unique_hash = self._create_event_hash(
+                    event.get("title", ""), event.get("starts_at"), event.get("source", "")
+                )
+
+                row = {
+                    "title": event.get("title"),
+                    "category": event.get("category"),
+                    "subcategory": event.get("subcategory"),
+                    "starts_at": (
+                        event.get("starts_at").isoformat()
+                        if isinstance(event.get("starts_at"), datetime)
+                        else event.get("starts_at")
+                    ),
+                    "ends_at": (
+                        event.get("ends_at").isoformat()
+                        if isinstance(event.get("ends_at"), datetime)
+                        else event.get("ends_at")
+                    ),
+                    "source": event.get("source"),
+                    "link": event.get("link"),
+                    "importance": event.get("importance"),
+                    "description": event.get("description"),
+                    "location": event.get("location"),
+                    "organizer": event.get("organizer"),
+                    "metadata": event.get("metadata", {}),
+                    "group_name": event.get("group_name"),
+                    "unique_hash": unique_hash,
+                }
+                rows.append(row)
+
+            # Insert into events_new table
+            # Note: Using regular insert since unique_hash constraint may not exist yet
+            # TODO: After Supabase migration, switch to upsert with unique_hash
+            try:
+                result = safe_execute(supabase.table("events_new").insert(rows))
+                inserted = len(result.data or [])
+                logger.info(f"✅ Inserted {inserted} events into events_new table")
+                return inserted
+            except Exception as insert_error:
+                # If insert fails (likely due to duplicates), try without unique_hash
+                logger.warning(f"Insert failed, retrying without unique_hash: {insert_error}")
+
+                # Remove unique_hash from rows
+                rows_without_hash = []
+                for row in rows:
+                    row_copy = row.copy()
+                    row_copy.pop("unique_hash", None)
+                    rows_without_hash.append(row_copy)
+
+                result = safe_execute(supabase.table("events_new").insert(rows_without_hash))
+                inserted = len(result.data or [])
+                logger.info(f"✅ Inserted {inserted} events (without unique_hash)")
+                return inserted
+
+        except Exception as e:
+            logger.error(f"❌ Error inserting events: {e}")
+            return 0
+
+    def _create_event_hash(self, title: str, starts_at, source: str) -> str:
+        """Create unique hash for event deduplication."""
+        import hashlib
+
+        if isinstance(starts_at, datetime):
+            starts_at_str = starts_at.isoformat()
+        else:
+            starts_at_str = str(starts_at)
+
+        raw = f"{title.lower().strip()}|{starts_at_str}|{source.lower()}"
+        return hashlib.sha256(raw.encode()).hexdigest()
 
 
 # Global instance

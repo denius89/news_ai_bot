@@ -57,35 +57,11 @@ def get_news_stats_today() -> Dict:
         today_count = today_result.count if today_result.count else 0
         yesterday_count = yesterday_result.count if yesterday_result.count else 0
 
-        # Если сегодня нет новостей, показываем последние доступные данные
-        if today_count == 0:
-            # Берем новости за последние 7 дней
-            week_ago = datetime.now() - timedelta(days=7)
-            recent_query = supabase.table("news").select("id", count="exact").gte("published_at", week_ago.isoformat())
-            recent_result = safe_execute(recent_query)
-            today_count = recent_result.count if recent_result.count else 0
-
-            # Для изменения берем предыдущую неделю
-            two_weeks_ago = datetime.now() - timedelta(days=14)
-            prev_week_query = (
-                supabase.table("news")
-                .select("id", count="exact")
-                .gte("published_at", two_weeks_ago.isoformat())
-                .lt("published_at", week_ago.isoformat())
-            )
-            prev_week_result = safe_execute(prev_week_query)
-            prev_week_count = prev_week_result.count if prev_week_result.count else 0
-
-            if prev_week_count > 0:
-                change_percent = round(((today_count - prev_week_count) / prev_week_count) * 100)
-            else:
-                change_percent = 100 if today_count > 0 else 0
+        # Всегда сравниваем сегодня с вчера для консистентности
+        if yesterday_count > 0:
+            change_percent = round(((today_count - yesterday_count) / yesterday_count) * 100)
         else:
-            # Вычисляем процент изменения для сегодняшних новостей
-            if yesterday_count > 0:
-                change_percent = round(((today_count - yesterday_count) / yesterday_count) * 100)
-            else:
-                change_percent = 100 if today_count > 0 else 0
+            change_percent = 100 if today_count > 0 else 0
 
         return {"count": today_count, "change": change_percent}
 
@@ -129,9 +105,16 @@ def get_active_sources_stats() -> Dict:
         else:
             prev_sources = 0
 
-        change = active_sources - prev_sources
+        # Изменение в процентах для консистентности с другими метриками
+        if prev_sources > 0:
+            change_percent = round(((active_sources - prev_sources) / prev_sources) * 100)
+        else:
+            change_percent = 100 if active_sources > 0 else 0
 
-        return {"count": active_sources, "change": change}
+        logger.info(
+            f"🔍 DEBUG active_sources: {active_sources}, prev_sources: {prev_sources}, change_percent: {change_percent}"
+        )
+        return {"count": active_sources, "change": change_percent}
 
     except Exception as e:
         logger.error(f"Ошибка получения статистики источников: {e}")
@@ -188,9 +171,13 @@ def get_ai_digests_stats() -> Dict:
         prev_result = safe_execute(prev_digests_query)
         prev_digests_count = prev_result.count if prev_result.count else 0
 
-        change = digests_count - prev_digests_count
+        # Процент изменения вместо абсолютного значения
+        if prev_digests_count > 0:
+            change_percent = round(((digests_count - prev_digests_count) / prev_digests_count) * 100)
+        else:
+            change_percent = 100 if digests_count > 0 else 0
 
-        return {"count": digests_count, "change": change}
+        return {"count": digests_count, "change": change_percent}
 
     except Exception as e:
         logger.error(f"Ошибка получения статистики дайджестов: {e}")

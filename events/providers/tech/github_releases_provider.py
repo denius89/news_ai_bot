@@ -93,6 +93,9 @@ class GitHubReleasesProvider(BaseEventProvider):
             url = f"{self.base_url}/repos/{repo}/releases"
             params = {"per_page": 10}
 
+            # Apply rate limit (Authenticated: 5000 req/hour = ~83 req/min)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     logger.error(f"GitHub API error for {repo}: {response.status}")
@@ -145,13 +148,17 @@ class GitHubReleasesProvider(BaseEventProvider):
                 "title": f"{project_name} {tag_name} Released",
                 "starts_at": published_at,
                 "ends_at": None,
-                "subcategory": "software",
+                "subcategory": "software_release",
                 "importance": importance,
                 "description": release.get("body", "")[:500],  # Limit description length
                 "link": release.get("html_url", ""),
-                "organizer": repo.split("/")[0],
+                "location": "GitHub",
+                "organizer": repo.split("/")[0] or "Open Source Community",
+                "group_name": project_name,
                 "metadata": {
                     "repo": repo,
+                    "project": project_name,
+                    "version": tag_name,
                     "tag_name": tag_name,
                     "is_prerelease": is_prerelease,
                     "author": release.get("author", {}).get("login"),

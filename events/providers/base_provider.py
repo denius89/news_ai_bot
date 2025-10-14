@@ -8,7 +8,9 @@ import hashlib
 import logging
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Optional
+
+from events.providers.rate_limiter import get_rate_limiter, RateLimiter
 
 logger = logging.getLogger("base_provider")
 
@@ -21,18 +23,29 @@ class BaseEventProvider(ABC):
     the fetch_events method.
     """
 
-    def __init__(self, name: str, category: str):
+    def __init__(self, name: str, category: str, rate_limiter: Optional[RateLimiter] = None):
         """
         Initialize base provider.
 
         Args:
             name: Provider name (e.g., 'coingecko', 'football_data')
             category: Event category (e.g., 'crypto', 'sports')
+            rate_limiter: Optional custom rate limiter (default: auto from config)
         """
         self.name = name
         self.category = category
         self.session = None
-        logger.info(f"Initialized {name} provider for {category} category")
+
+        # Set up rate limiter
+        if rate_limiter is not None:
+            self.rate_limiter = rate_limiter
+        else:
+            self.rate_limiter = get_rate_limiter(name)
+
+        logger.info(
+            f"Initialized {name} provider for {category} category "
+            f"(rate: {self.rate_limiter.calls_per_second:.2f} req/sec)"
+        )
 
     @abstractmethod
     async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
@@ -57,8 +70,28 @@ class BaseEventProvider(ABC):
 
         Returns:
             List of event dictionaries
+
+        Note:
+            Use self.rate_limiter.acquire() before making API requests
+            to respect rate limits.
         """
         pass
+
+    async def _rate_limited_request(self, session, method: str, url: str, **kwargs):
+        """
+        Make a rate-limited HTTP request.
+
+        Args:
+            session: aiohttp session
+            method: HTTP method (get, post, etc.)
+            url: Request URL
+            **kwargs: Additional arguments for request
+
+        Returns:
+            aiohttp response
+        """
+        await self.rate_limiter.acquire()
+        return await getattr(session, method)(url, **kwargs)
 
     def create_unique_hash(self, title: str, starts_at: datetime, source: str) -> str:
         """

@@ -52,6 +52,9 @@ class CoinGeckoProvider(BaseEventProvider):
                 "to_date": end_date.strftime("%Y-%m-%d"),
             }
 
+            # Apply rate limit (Free tier: 10 req/min)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     logger.error(f"CoinGecko API error: {response.status}")
@@ -121,8 +124,8 @@ class CoinGeckoProvider(BaseEventProvider):
                 "importance": importance,
                 "description": event.get("description", ""),
                 "link": event.get("website", ""),
-                "location": event.get("venue", ""),
-                "organizer": event.get("organizer", ""),
+                "location": event.get("venue") or "Global",
+                "organizer": event.get("organizer") or "Community",
                 "group_name": group_name,  # Монета для группировки
                 "metadata": {
                     "event_type": event_type,

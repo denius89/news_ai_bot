@@ -47,6 +47,9 @@ class UNSecurityCouncilProvider(BaseEventProvider):
                 self.session = aiohttp.ClientSession()
 
             # Fetch programme of work page
+            # Apply rate limit (HTML scraping: conservative 60 req/hour)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(self.base_url) as response:
                 if response.status != 200:
                     logger.error(f"UN SC website error: {response.status}")

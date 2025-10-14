@@ -125,6 +125,8 @@ async def fetch_and_store_events(
                 "description": event.description,
                 "location": event.location,
                 "organizer": event.organizer,
+                "metadata": getattr(event, "metadata", {}),
+                "group_name": getattr(event, "group_name", None),
             }
             events_data.append(event_data)
 

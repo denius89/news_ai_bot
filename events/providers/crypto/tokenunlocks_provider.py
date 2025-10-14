@@ -52,6 +52,9 @@ class TokenUnlocksProvider(BaseEventProvider):
                 "to": end_date.strftime("%Y-%m-%d"),
             }
 
+            # Apply rate limit (conservative: 1 req/sec)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     logger.error(f"TokenUnlocks API error: {response.status}")
@@ -117,6 +120,8 @@ class TokenUnlocksProvider(BaseEventProvider):
                 "importance": importance,
                 "description": description,
                 "link": unlock.get("project_url", ""),
+                "location": "Blockchain",
+                "organizer": token_name or "Token Project",
                 "metadata": {
                     "token_name": token_name,
                     "token_symbol": unlock.get("token_symbol"),

@@ -70,7 +70,7 @@ const App: React.FC = () => {
   // Функция для получения количества новых новостей (публичный endpoint)
   const fetchUnreadNewsCount = async () => {
     try {
-      const response = await fetch('/api/latest');
+      const response = await fetch('/api/news/latest');
       if (response.ok) {
         const data = await response.json();
         if (data.status === 'success') {

@@ -54,12 +54,15 @@ class FootballDataProvider(BaseEventProvider):
             if not self.session:
                 self.session = aiohttp.ClientSession(headers={"X-Auth-Token": self.api_key})
 
-            # Fetch matches
+            # Fetch matches with rate limiting
             url = f"{self.base_url}/matches"
             params = {
                 "dateFrom": start_date.strftime("%Y-%m-%d"),
                 "dateTo": end_date.strftime("%Y-%m-%d"),
             }
+
+            # Apply rate limit
+            await self.rate_limiter.acquire()
 
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
@@ -121,6 +124,9 @@ class FootballDataProvider(BaseEventProvider):
             # Get match status
             status = match.get("status", "SCHEDULED")
 
+            # Get venue/stadium if available
+            venue = match.get("venue") or "Stadium TBA"
+
             return {
                 "title": title,
                 "starts_at": starts_at,
@@ -130,7 +136,8 @@ class FootballDataProvider(BaseEventProvider):
                 "importance": importance,
                 "description": f"{competition_name} - {status}",
                 "link": f"https://www.football-data.org/matches/{match.get('id')}",
-                "location": match.get("venue", ""),
+                "location": venue,
+                "organizer": competition_name or "Football Association",
                 "group_name": competition_name,  # Название лиги для группировки
                 "metadata": {
                     "match_id": match.get("id"),
@@ -139,6 +146,7 @@ class FootballDataProvider(BaseEventProvider):
                     "away_team": away_team,
                     "status": status,
                     "matchday": match.get("matchday"),
+                    "venue": venue,
                 },
             }
 

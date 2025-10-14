@@ -183,7 +183,11 @@ def api_latest_news():
                         "content": n.get("content"),
                         "source": n.get("source"),
                         "url": n.get("link"),  # Добавляем ссылку на новость
-                        "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
+                        "published_at": (
+                            n.get("published_at").isoformat()
+                            if hasattr(n.get("published_at"), "isoformat")
+                            else n.get("published_at")
+                        ),
                         "category": n.get("category"),
                         "credibility": n.get("credibility"),
                         "importance": n.get("importance"),
@@ -276,7 +280,11 @@ def api_latest_news_weighted():
                         "content": n.get("content"),
                         "source": n.get("source"),
                         "url": n.get("link"),
-                        "published_at": n.get("published_at").isoformat() if n.get("published_at") else None,
+                        "published_at": (
+                            n.get("published_at").isoformat()
+                            if hasattr(n.get("published_at"), "isoformat")
+                            else n.get("published_at")
+                        ),
                         "category": n.get("category"),
                         "credibility": n.get("credibility"),
                         "importance": n.get("importance"),

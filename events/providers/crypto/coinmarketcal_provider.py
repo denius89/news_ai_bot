@@ -62,6 +62,9 @@ class CoinMarketCalProvider(BaseEventProvider):
                 "max": 100,  # Max results per request
             }
 
+            # Apply rate limit (100 req/day)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(url, params=params) as response:
                 if response.status != 200:
                     logger.error(f"CoinMarketCal API error: {response.status}")
@@ -138,6 +141,8 @@ class CoinMarketCalProvider(BaseEventProvider):
                 "importance": importance,
                 "description": description[:500] if description else "",
                 "link": event.get("source", ""),
+                "location": "Blockchain",
+                "organizer": group_name or "Crypto Community",
                 "group_name": group_name,  # Монета для группировки
                 "metadata": {
                     "coins": coin_names,

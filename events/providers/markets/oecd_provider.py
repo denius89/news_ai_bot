@@ -47,6 +47,9 @@ class OECDProvider(BaseEventProvider):
                 self.session = aiohttp.ClientSession()
 
             # Fetch OECD events page
+            # Apply rate limit (HTML scraping: conservative 60 req/hour)
+            await self.rate_limiter.acquire()
+
             async with self.session.get(self.base_url) as response:
                 if response.status != 200:
                     logger.error(f"OECD website error: {response.status}")

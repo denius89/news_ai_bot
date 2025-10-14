@@ -11,16 +11,39 @@ router = Router()
 async def send_events(
     target: types.Message | types.CallbackQuery,
     limit: int = 5,
-    min_importance: int = 1,
+    min_importance: float = 0.5,
 ):
-    """Отправка ближайших событий из базы."""
-    db_service = get_sync_service()
-    events = db_service.get_latest_events(limit=limit)
-    if not events:
-        text = "⚠️ Нет свежих событий"
+    """Отправка ближайших событий из базы (новая таблица events_new с metadata)."""
+    from database.db_models import supabase
+    from datetime import datetime, timezone, timedelta
+
+    if not supabase:
+        text = "⚠️ База данных недоступна"
     else:
-        filtered = [e for e in events if (e.get("importance") or 0) >= min_importance]
-        text = "⚠️ Нет событий с нужным приоритетом" if not filtered else format_events(filtered, limit=limit)
+        # Читаем из events_new (с metadata!)
+        now = datetime.now(timezone.utc)
+        future = now + timedelta(days=30)
+
+        result = (
+            supabase.table("events_new")
+            .select("*")
+            .gte("starts_at", now.isoformat())
+            .lte("starts_at", future.isoformat())
+            .order("starts_at")
+            .limit(limit * 2)  # Берем больше для фильтрации
+            .execute()
+        )
+
+        events = result.data or []
+
+        if not events:
+            text = "⚠️ Нет свежих событий"
+        else:
+            # Фильтруем по importance
+            filtered = [e for e in events if (e.get("importance") or 0) >= min_importance]
+            filtered = filtered[:limit]
+
+            text = "⚠️ Нет событий с нужным приоритетом" if not filtered else format_events(filtered, limit=limit)
 
     if isinstance(target, types.Message):
         await target.answer(

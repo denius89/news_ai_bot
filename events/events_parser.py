@@ -146,6 +146,8 @@ class Event:
     description: Optional[str] = None
     location: Optional[str] = None
     organizer: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+    group_name: Optional[str] = None
 
 
 class EventsParser:
@@ -223,7 +225,12 @@ class EventsParser:
                 "tokenunlocks": "TokenUnlocksProvider",
                 "football_data": "FootballDataProvider",
                 "thesportsdb": "TheSportsDBProvider",
-                "github_releases": "GithubReleasesProvider",
+                "pandascore": "PandaScoreProvider",
+                "liquipedia": "LiquipediaProvider",
+                "gosugamers": "GosugamersProvider",
+                "github_releases": "GitHubReleasesProvider",
+                "oecd_events": "OECDProvider",
+                "un_sc_programme": "UNSecurityCouncilProvider",
             }
 
             if provider_name in name_mapping:
@@ -312,13 +319,11 @@ class EventsParser:
             if deduplicated_events:
                 reactor.emit_sync(
                     Events.EVENT_DETECTED,
-                    {
-                        "events_count": len(deduplicated_events),
-                        "providers_used": providers,
-                        "start_date": start_date.isoformat(),
-                        "end_date": end_date.isoformat(),
-                        "timestamp": datetime.utcnow().isoformat(),
-                    },
+                    events_count=len(deduplicated_events),
+                    providers_used=providers,
+                    start_date=start_date.isoformat(),
+                    end_date=end_date.isoformat(),
+                    timestamp=datetime.utcnow().isoformat(),
                 )
 
                 # Эмитим каждое важное событие отдельно
@@ -326,14 +331,12 @@ class EventsParser:
                     if event.importance > 0.7:  # Только важные события
                         reactor.emit_sync(
                             Events.EVENT_DETECTED,
-                            {
-                                "title": event.title,
-                                "category": event.category,
-                                "importance": event.importance,
-                                "starts_at": event.starts_at.isoformat(),
-                                "source": event.source,
-                                "link": event.link,
-                            },
+                            title=event.title,
+                            category=event.category,
+                            importance=event.importance,
+                            starts_at=event.starts_at.isoformat(),
+                            source=event.source,
+                            link=event.link,
                         )
 
             return deduplicated_events
@@ -405,9 +408,11 @@ class EventsParser:
             ends_at = self._parse_datetime(event_dict.get("ends_at"))
 
             # Optional fields
-            description = event_dict.get("description", "").strip() or None
-            location = event_dict.get("location", "").strip() or None
-            organizer = event_dict.get("organizer", "").strip() or None
+            description = (event_dict.get("description") or "").strip() or None
+            location = (event_dict.get("location") or "").strip() or None
+            organizer = (event_dict.get("organizer") or "").strip() or None
+            metadata = event_dict.get("metadata") or {}
+            group_name = (event_dict.get("group_name") or "").strip() or None
 
             return Event(
                 title=title,
@@ -421,6 +426,8 @@ class EventsParser:
                 description=description,
                 location=location,
                 organizer=organizer,
+                metadata=metadata,
+                group_name=group_name,
             )
 
         except Exception as e:
