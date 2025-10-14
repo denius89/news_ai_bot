@@ -1,7 +1,6 @@
 from aiogram import types, Router, F
 from aiogram.filters import Command
 
-from database.service import get_sync_service
 from telegram_bot.utils.formatters import format_events
 from telegram_bot.keyboards import back_inline_keyboard
 
