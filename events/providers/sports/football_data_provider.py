@@ -144,8 +144,18 @@ class FootballDataProvider(BaseEventProvider):
             # Get match status
             status = match.get("status", "SCHEDULED")
 
-            # Get venue/stadium if available
-            venue = match.get("venue") or "Stadium TBA"
+            # Get venue/stadium - Football-Data API не предоставляет точный стадион
+            # Используем area (страну) или город команды
+            venue_data = match.get("venue")
+            if venue_data:
+                venue = venue_data
+            else:
+                # Fallback: берем страну из area
+                area = match.get("area", {})
+                if isinstance(area, dict):
+                    venue = area.get("name", "Stadium TBA")
+                else:
+                    venue = "Stadium TBA"
 
             # Format date for link
             match_date = starts_at.strftime("%Y-%m-%d")
