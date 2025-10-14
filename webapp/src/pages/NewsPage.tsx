@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
+import { useTelegramUser } from '../hooks/useTelegramUser';
+import { useAuth } from '../context/AuthContext';
 import { 
   Newspaper, 
   Cpu, 
@@ -51,6 +53,12 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreNews, setHasMoreNews] = useState(true);
+  const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
+
+  // Get user data from authentication context
+  const { userData } = useTelegramUser();
+  const { authHeaders } = useAuth();
+  const userId = userData?.user_id;
 
   const categories = [
     { id: 'all', label: 'Все', icon: <Newspaper className="w-4 h-4" /> },
@@ -72,8 +80,17 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
         setLoadingMore(true);
       }
 
-      console.log(`🔍 Fetching news: /api/news/latest?page=${page}&limit=20`);
-      const response = await fetch(`/api/news/latest?page=${page}&limit=20`);
+      // Build API URL with filtering
+      let apiUrl = `/api/news/latest?page=${page}&limit=20`;
+      
+      if (userId) {
+        apiUrl += `&filter_by_subscriptions=true`;
+      }
+
+      console.log(`🔍 Fetching news: ${apiUrl}`);
+      const response = await fetch(apiUrl, {
+        headers: authHeaders
+      });
       
       console.log(`📡 Response status: ${response.status}`);
       
@@ -85,6 +102,9 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       console.log(`📊 API response:`, data);
       
       if (data.status === 'success') {
+        // Set filter indicator
+        setIsFilteredBySubscriptions(data.filtered_by_subscriptions || false);
+        
         // Transform API data to match our interface
         const transformedNews: NewsItem[] = data.data.map((item: any) => ({
           id: item.id || Math.random().toString(),
@@ -134,8 +154,10 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   };
 
   useEffect(() => {
-    fetchNews(1);
-  }, []);
+    if (userId !== undefined) {
+      fetchNews(1);
+    }
+  }, [userId]);
 
   const loadMoreNews = async () => {
     if (!hasMoreNews || loadingMore) {
@@ -298,9 +320,16 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  PulseAI отбирает новости с наибольшей вероятностью интереса.
-                </p>
+                <div className="mt-3 text-center">
+                  {isFilteredBySubscriptions && (
+                    <p className="text-xs text-primary font-medium mb-1">
+                      ✨ Показаны новости по вашим подпискам
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    PulseAI отбирает новости с наибольшей вероятностью интереса.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </motion.section>

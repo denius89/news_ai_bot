@@ -130,15 +130,74 @@ def events():
 @news_bp.route("/latest")
 @news_bp.route("/api/latest")  # Добавляем альтернативный маршрут для совместимости
 def api_latest_news():
-    """API endpoint для получения последних новостей."""
+    """
+    API endpoint для получения последних новостей.
+
+    Query params:
+        page: номер страницы (default: 1)
+        limit: количество новостей на странице (default: 20)
+        filter_by_subscriptions: фильтровать по предпочтениям пользователя (default: false)
+        user_id: UUID пользователя (требуется если filter_by_subscriptions=true)
+    """
     try:
         # Получаем параметры пагинации
         page = int(request.args.get("page", 1))
         limit = int(request.args.get("limit", 20))
 
+        # Параметры фильтрации по предпочтениям
+        filter_by_subscriptions = request.args.get("filter_by_subscriptions", "false").lower() == "true"
         # Получаем новости из базы данных
         db_service = get_sync_service()
-        all_news = db_service.get_latest_news(limit=1000)  # Получаем больше для пагинации
+        
+        # Оптимизация: загружаем только нужное количество + небольшой буфер для пагинации
+        fetch_limit = min(limit * 3, 100)  # Максимум 100 новостей для фильтрации
+        all_news = db_service.get_latest_news(limit=fetch_limit)
+
+        # Фильтрация по предпочтениям пользователя
+        user_id = None
+        if filter_by_subscriptions:
+            from flask import g
+            logger.info(f"🔍 Запрос фильтрации: filter_by_subscriptions={filter_by_subscriptions}")
+            # Проверяем аутентификацию только если нужна фильтрация
+            if hasattr(g, "current_user") and g.current_user:
+                user_id = g.current_user["user_id"]
+                logger.info(f"✅ Получен user_id из аутентификации: {user_id}")
+            else:
+                logger.warning(f"⚠️ Нет данных аутентификации в g.current_user")
+
+        if filter_by_subscriptions and user_id:
+            from database.db_models import get_active_categories
+
+            logger.info(f"🔍 Фильтрация новостей для пользователя {user_id}")
+            active_cats = get_active_categories(user_id)
+            full_categories = active_cats.get('full_categories', [])
+            subcategories = active_cats.get('subcategories', {})
+            logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories}")
+
+            # Если есть активные предпочтения, фильтруем
+            if full_categories or subcategories:
+                logger.info(f"✅ Применяем фильтрацию: {len(all_news)} новостей до фильтрации")
+                filtered_news = []
+                for news_item in all_news:
+                    category = news_item.get('category')
+                    subcategory = news_item.get('subcategory')
+
+                    # Проверяем: либо вся категория включена, либо конкретная подкатегория
+                    if category in full_categories:
+                        logger.debug(f"✅ Новость {category} добавлена (полная категория)")
+                        filtered_news.append(news_item)
+                    elif category in subcategories and subcategory in subcategories[category]:
+                        logger.debug(f"✅ Новость {category}/{subcategory} добавлена (подкатегория)")
+                        filtered_news.append(news_item)
+                    else:
+                        logger.debug(f"❌ Новость {category}/{subcategory} отфильтрована")
+
+                all_news = filtered_news
+                logger.info(
+                    f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации"
+                )
+            else:
+                logger.info(f"⚠️ Нет активных предпочтений для фильтрации")
 
         # Сортируем по важности, достоверности и свежести
         import datetime
@@ -189,6 +248,7 @@ def api_latest_news():
                             else n.get("published_at")
                         ),
                         "category": n.get("category"),
+                        "subcategory": n.get("subcategory"),
                         "credibility": n.get("credibility"),
                         "importance": n.get("importance"),
                     }
@@ -202,6 +262,7 @@ def api_latest_news():
                     "has_next": end_idx < total,
                     "has_prev": page > 1,
                 },
+                "filtered_by_subscriptions": filter_by_subscriptions and user_id is not None,
             }
         )
     except Exception as e:

@@ -1,146 +1,172 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export interface UserPreferences {
-  preferred_category: string;
-  preferred_style: string;
-  preferred_period: string;
-  min_importance: number;
-  enable_smart_filtering: boolean;
-  enable_gestures: boolean;
-  enable_haptic_feedback: boolean;
+export interface CategoryPreference {
+  [categoryId: string]: string[] | null; // null = all subcategories, [] = disabled, [sub1, sub2] = specific
 }
 
-const DEFAULT_PREFERENCES: UserPreferences = {
-  preferred_category: 'all',
-  preferred_style: 'analytical',
-  preferred_period: 'today',
-  min_importance: 0.3,
-  enable_smart_filtering: true,
-  enable_gestures: true,
-  enable_haptic_feedback: true,
-};
-
-const STORAGE_KEY = 'pulseai_user_preferences';
-
-export const useUserPreferences = (userId?: string) => {
-  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Загружаем предпочтения из localStorage при инициализации
-  useEffect(() => {
-    const loadPreferences = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setPreferences({ ...DEFAULT_PREFERENCES, ...parsed });
-        }
-      } catch (error) {
-        console.warn('Failed to load preferences from localStorage:', error);
-      } finally {
-        setIsLoading(false);
-      }
+export interface CategoryStructure {
+  [categoryId: string]: {
+    name: string;
+    emoji?: string;
+    subcategories: {
+      [subcategoryId: string]: {
+        name: string;
+        icon?: string;
+        sources?: Array<{ name: string; url: string }>;
+      };
     };
+  };
+}
 
-    loadPreferences();
-  }, []);
+interface UseUserPreferencesReturn {
+  preferences: CategoryPreference;
+  categoriesStructure: CategoryStructure;
+  loading: boolean;
+  error: string | null;
+  updatePreferences: (preferences: CategoryPreference) => Promise<boolean>;
+  refreshPreferences: () => Promise<void>;
+}
 
-  // Загружаем предпочтения с сервера, если есть userId
-  useEffect(() => {
-    if (!userId || isLoading) return;
+/**
+ * Hook для управления предпочтениями категорий пользователя
+ * 
+ * Функциональность:
+ * - Быстрая загрузка предпочтений и категорий
+ * - Мгновенное обновление UI
+ * - Debounced сохранение изменений (300ms)
+ * - Работает только в Telegram WebApp (userId всегда доступен)
+ */
+export const useUserPreferences = (
+  userId: string,
+  authHeaders: Record<string, string>
+): UseUserPreferencesReturn => {
+  const [preferences, setPreferences] = useState<CategoryPreference>({});
+  const [categoriesStructure, setCategoriesStructure] = useState<CategoryStructure>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    const loadServerPreferences = async () => {
-      try {
-        const response = await fetch(`/api/users/preferences?user_id=${userId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.status === 'success') {
-            const serverPrefs = data.data;
-            const mergedPrefs = { ...DEFAULT_PREFERENCES, ...serverPrefs };
-            setPreferences(mergedPrefs);
-            
-            // Сохраняем в localStorage для быстрого доступа
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(mergedPrefs));
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to load preferences from server:', error);
-      }
-    };
+  // Debounce timer для сохранения
+  const [saveTimer, setSaveTimer] = useState<NodeJS.Timeout | null>(null);
 
-    loadServerPreferences();
-  }, [userId, isLoading]);
-
-  // Сохраняем предпочтения в localStorage и на сервер
-  const savePreferences = useCallback(async (newPreferences: Partial<UserPreferences>) => {
-    const updatedPreferences = { ...preferences, ...newPreferences };
-    setPreferences(updatedPreferences);
-
-    // Сохраняем в localStorage
+  // Загрузка предпочтений и категорий
+  const loadPreferences = useCallback(async () => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPreferences));
-    } catch (error) {
-      console.warn('Failed to save preferences to localStorage:', error);
-    }
+      setLoading(true);
+      setError(null);
 
-    // Сохраняем на сервер, если есть userId
-    if (userId) {
-      try {
-        const response = await fetch('/api/users/preferences', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            ...updatedPreferences,
-          }),
-        });
+      // Параллельная загрузка для максимальной скорости
+      const [categoriesRes, preferencesRes] = await Promise.all([
+        fetch('/api/categories'),
+        fetch('/api/user/category-preferences', {
+          headers: authHeaders
+        })
+      ]);
 
-        if (!response.ok) {
-          console.warn('Failed to save preferences to server:', response.statusText);
-        }
-      } catch (error) {
-        console.warn('Failed to save preferences to server:', error);
+      if (!categoriesRes.ok || !preferencesRes.ok) {
+        throw new Error('Failed to fetch data');
       }
+
+      const categoriesData = await categoriesRes.json();
+      const preferencesData = await preferencesRes.json();
+
+      const newPreferences = preferencesData.data?.preferences || {};
+      const newCategoriesStructure = categoriesData.data || {};
+
+      // Обновляем состояние
+      setPreferences(newPreferences);
+      setCategoriesStructure(newCategoriesStructure);
+
+      console.log('✅ Preferences loaded successfully');
+
+    } catch (err) {
+      console.error('❌ Error loading preferences:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      
+      // Устанавливаем пустые значения при ошибке
+      setPreferences({});
+      setCategoriesStructure({});
+    } finally {
+      setLoading(false);
     }
-  }, [preferences, userId]);
+  }, [userId, authHeaders]);
 
-  // Сбрасываем предпочтения к значениям по умолчанию
-  const resetPreferences = useCallback(async () => {
-    await savePreferences(DEFAULT_PREFERENCES);
-  }, [savePreferences]);
+  // Обновление предпочтений с debounce
+  const updatePreferences = useCallback(async (newPreferences: CategoryPreference): Promise<boolean> => {
+    try {
+      // Мгновенное обновление UI
+      setPreferences(newPreferences);
 
-  // Получаем предпочтения для генерации дайджеста
-  const getDigestPreferences = useCallback(() => {
-    return {
-      category: preferences.preferred_category,
-      style: preferences.preferred_style,
-      period: preferences.preferred_period,
-      min_importance: preferences.min_importance,
-      enable_smart_filtering: preferences.enable_smart_filtering,
+      // Очищаем предыдущий таймер
+      if (saveTimer) {
+        clearTimeout(saveTimer);
+      }
+
+      // Устанавливаем новый таймер с минимальной задержкой
+      const timer = setTimeout(async () => {
+        try {
+          console.log('💾 Saving preferences to server...');
+          
+          const response = await fetch('/api/user/category-preferences', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...authHeaders
+            },
+            body: JSON.stringify({
+              preferences: newPreferences
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to save preferences');
+          }
+
+          console.log('✅ Preferences saved successfully');
+          return true;
+        } catch (err) {
+          console.error('❌ Error saving preferences:', err);
+          setError(err instanceof Error ? err.message : 'Failed to save preferences');
+          return false;
+        }
+      }, 300); // 300ms debounce
+
+      setSaveTimer(timer);
+      return true;
+
+    } catch (err) {
+      console.error('❌ Error updating preferences:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update preferences');
+      return false;
+    }
+  }, [authHeaders, saveTimer]);
+
+  // Принудительное обновление
+  const refreshPreferences = useCallback(async () => {
+    await loadPreferences();
+  }, [loadPreferences]);
+
+  // Автоматическая загрузка при изменении userId
+  useEffect(() => {
+    if (userId) {
+      loadPreferences();
+    }
+  }, [userId, loadPreferences]);
+
+  // Очистка таймера при размонтировании
+  useEffect(() => {
+    return () => {
+      if (saveTimer) {
+        clearTimeout(saveTimer);
+      }
     };
-  }, [preferences]);
-
-  // Обновляем предпочтения после генерации дайджеста
-  const updateAfterDigestGeneration = useCallback(async (
-    category: string,
-    style: string,
-    period: string
-  ) => {
-    await savePreferences({
-      preferred_category: category,
-      preferred_style: style,
-      preferred_period: period,
-    });
-  }, [savePreferences]);
+  }, [saveTimer]);
 
   return {
     preferences,
-    isLoading,
-    savePreferences,
-    resetPreferences,
-    getDigestPreferences,
-    updateAfterDigestGeneration,
+    categoriesStructure,
+    loading,
+    error,
+    updatePreferences,
+    refreshPreferences
   };
 };

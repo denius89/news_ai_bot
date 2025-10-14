@@ -1835,3 +1835,154 @@ def get_digest_analytics_history(days: int = 7) -> List[dict]:
     except Exception as e:
         logger.error(f"❌ Error getting analytics history: {e}")
         return []
+
+
+# =============================================================================
+# USER CATEGORY PREFERENCES FUNCTIONS (JSONB-based)
+# =============================================================================
+
+
+def get_user_category_preferences(user_id: str) -> Dict:
+    """
+    Получить предпочтения категорий пользователя из JSONB поля.
+
+    Args:
+        user_id: User ID (UUID string)
+
+    Returns:
+        Dict с предпочтениями категорий:
+        {
+            "sports": ["football", "basketball"],  # конкретные подкатегории
+            "crypto": null,                         # вся категория
+            "markets": [],                          # отключена
+        }
+        Пустой dict {} если предпочтений нет
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return {}
+
+    try:
+        result = safe_execute(
+            supabase.table("user_preferences")
+            .select("category_preferences")
+            .eq("user_id", user_id)
+        )
+
+        if result.data and len(result.data) > 0:
+            preferences = result.data[0].get("category_preferences", {})
+            logger.debug(f"Получены предпочтения для пользователя {user_id}: {preferences}")
+            return preferences
+        else:
+            logger.debug(f"Предпочтения не найдены для пользователя {user_id}, возвращаем пустой dict")
+            return {}
+
+    except Exception as e:
+        logger.error(f"Ошибка при получении предпочтений пользователя {user_id}: {e}")
+        return {}
+
+
+def upsert_user_category_preferences(user_id: str, preferences: Dict) -> bool:
+    """
+    Сохранить/обновить предпочтения категорий пользователя.
+
+    Args:
+        user_id: User ID (UUID string)
+        preferences: Dict с предпочтениями категорий
+            {
+                "sports": ["football"],
+                "crypto": null,
+                "markets": []
+            }
+
+    Returns:
+        True если успешно сохранено, False в противном случае
+    """
+    if not supabase:
+        logger.error("Supabase не инициализирован")
+        return False
+
+    try:
+        # Upsert preferences (создать или обновить)
+        result = safe_execute(
+            supabase.table("user_preferences")
+            .upsert(
+                {
+                    "user_id": user_id,
+                    "category_preferences": preferences,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                },
+                on_conflict="user_id"
+            )
+        )
+
+        if result.data:
+            logger.info(f"✅ Предпочтения сохранены для пользователя {user_id}")
+            return True
+        else:
+            logger.error(f"❌ Не удалось сохранить предпочтения для пользователя {user_id}")
+            return False
+
+    except Exception as e:
+        logger.error(f"❌ Ошибка при сохранении предпочтений пользователя {user_id}: {e}")
+        return False
+
+
+def get_active_categories(user_id: str) -> Dict[str, List[str]]:
+    """
+    Получить активные категории и подкатегории для фильтрации контента.
+
+    Парсит JSONB структуру и возвращает два списка:
+    - full_categories: категории с null (показывать все подкатегории)
+    - subcategories: dict категорий с конкретными подкатегориями
+
+    Args:
+        user_id: User ID (UUID string)
+
+    Returns:
+        Dict с активными категориями:
+        {
+            'full_categories': ['crypto', 'tech'],  # null в JSONB
+            'subcategories': {
+                'sports': ['football', 'basketball'],
+                'markets': ['earnings']
+            }
+        }
+
+    Логика:
+        - null = включена вся категория → добавляем в full_categories
+        - ["sub1", "sub2"] = конкретные подкатегории → добавляем в subcategories
+        - [] или отсутствует = отключена → пропускаем
+    """
+    preferences = get_user_category_preferences(user_id)
+
+    if not preferences:
+        # Если предпочтений нет, возвращаем пустые списки
+        # (значит показываем весь контент без фильтрации)
+        logger.debug(f"Нет предпочтений для пользователя {user_id}, фильтрация не применяется")
+        return {
+            'full_categories': [],
+            'subcategories': {}
+        }
+
+    full_categories = []
+    subcategories = {}
+
+    for category, value in preferences.items():
+        if value is None:
+            # null = вся категория включена
+            full_categories.append(category)
+        elif isinstance(value, list) and len(value) > 0:
+            # Список подкатегорий (не пустой)
+            subcategories[category] = value
+        # Пустой список [] или другие значения = пропускаем (отключена)
+
+    logger.debug(
+        f"Активные категории для пользователя {user_id}: "
+        f"full={full_categories}, subcategories={subcategories}"
+    )
+
+    return {
+        'full_categories': full_categories,
+        'subcategories': subcategories
+    }

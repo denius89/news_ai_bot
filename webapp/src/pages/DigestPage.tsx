@@ -380,7 +380,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
           period,
           limit: 10,
           user_id: userId,
-          save: true
+          save: true,
+          use_user_preferences: true  // Использовать предпочтения пользователя для фильтрации
         })
       });
       

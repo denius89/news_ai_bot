@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
 import { Card } from '../components/ui/Card';
+import { useTelegramUser } from '../hooks/useTelegramUser';
+import { useAuth } from '../context/AuthContext';
 
 interface Event {
   id: number;
@@ -42,16 +44,24 @@ const EventsPage: React.FC<EventsPageProps> = () => {
   const [subcategory, setSubcategory] = useState<string>('all');
   const [dateRange, setDateRange] = useState<'today' | 'week' | 'month'>('week');
   const [categories, setCategories] = useState<Record<string, CategoryInfo>>({});
+  const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
+
+  // Get user data from authentication context
+  const { userData } = useTelegramUser();
+  const { authHeaders } = useAuth();
+  const userId = userData?.user_id;
 
   // Fetch categories on mount
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // Fetch events when filters change
+  // Fetch events when filters change or userId becomes available
   useEffect(() => {
-    fetchEvents();
-  }, [category, dateRange]);
+    if (userId !== undefined) {
+      fetchEvents();
+    }
+  }, [category, dateRange, userId]);
 
   const fetchCategories = async () => {
     try {
@@ -74,13 +84,21 @@ const EventsPage: React.FC<EventsPageProps> = () => {
       const days = dateRange === 'today' ? 1 : dateRange === 'week' ? 7 : 30;
       const categoryParam = category !== 'all' ? `&category=${category}` : '';
 
-      const response = await fetch(
-        `/api/events/upcoming?days=${days}${categoryParam}`
-      );
+      // Build API URL with filtering
+      let apiUrl = `/api/events/upcoming?days=${days}${categoryParam}`;
+      
+      if (userId) {
+        apiUrl += `&filter_by_subscriptions=true`;
+      }
+
+      const response = await fetch(apiUrl, {
+        headers: authHeaders
+      });
       const data = await response.json();
 
       if (data.success) {
         setEvents(data.data.events || []);
+        setIsFilteredBySubscriptions(data.data.filtered_by_subscriptions || false);
       } else {
         setError(data.error || 'Failed to fetch events');
       }
@@ -152,6 +170,15 @@ const EventsPage: React.FC<EventsPageProps> = () => {
             Refresh
           </button>
         </div>
+        
+        {/* Filter indicator */}
+        {isFilteredBySubscriptions && (
+          <div className="mt-2">
+            <p className="text-xs text-primary font-medium text-center">
+              ✨ Показаны события по вашим подпискам
+            </p>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="mt-3 space-y-2">

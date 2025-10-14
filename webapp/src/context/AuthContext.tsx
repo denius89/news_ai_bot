@@ -52,14 +52,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = Boolean(user);
 
-  // Retry логика для получения initData
-  const getInitDataWithRetry = async (maxAttempts = 3): Promise<string> => {
+  // Retry логика для получения initData (оптимизировано для скорости)
+  const getInitDataWithRetry = async (maxAttempts = 2): Promise<string> => {
     for (let i = 0; i < maxAttempts; i++) {
       const initData = window.Telegram?.WebApp?.initData;
       if (initData) return initData;
       
       if (i < maxAttempts - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 100)); // Уменьшено с 500ms до 100ms
       }
     }
     throw new Error('Failed to get initData after retries');

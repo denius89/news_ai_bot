@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
 import { MobileHeader } from '../components/ui/Header';
+import { useTelegramUser } from '../hooks/useTelegramUser';
+import { useAuth } from '../context/AuthContext';
+import { useUserPreferences } from '../hooks/useUserPreferences';
 
 interface Category {
   id: string;
@@ -17,105 +19,138 @@ interface Category {
   }[];
 }
 
-interface NotificationSettings {
-  push: boolean;
-  email: boolean;
-  digest: boolean;
-  events: boolean;
-  frequency: 'instant' | 'hourly' | 'daily' | 'weekly';
-}
-
 interface SettingsPageProps {
   theme: 'light' | 'dark';
   onThemeToggle: () => void;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    push: true,
-    email: false,
-    digest: true,
-    events: true,
-    frequency: 'daily',
-  });
-  const [loading, setLoading] = useState(true);
-  const [userInfo, setUserInfo] = useState({
-    name: '',
-    email: '',
-    timezone: 'Europe/Moscow',
-  });
+  // Get user data from Telegram WebApp
+  const { userData } = useTelegramUser();
+  const { authHeaders } = useAuth();
+  const userId = userData?.user_id || '';
 
-  const mockCategories: Category[] = [
-    {
-      id: 'crypto',
-      name: 'Криптовалюты',
-      icon: '₿',
-      enabled: true,
-      subcategories: [
-        { id: 'bitcoin', name: 'Bitcoin', enabled: true },
-        { id: 'ethereum', name: 'Ethereum', enabled: true },
-        { id: 'altcoins', name: 'Альткоины', enabled: false },
-        { id: 'defi', name: 'DeFi', enabled: true },
-      ],
-    },
-    {
-      id: 'tech',
-      name: 'Технологии',
-      icon: '🤖',
-      enabled: true,
-      subcategories: [
-        { id: 'ai', name: 'ИИ', enabled: true },
-        { id: 'blockchain', name: 'Блокчейн', enabled: false },
-        { id: 'startups', name: 'Стартапы', enabled: true },
-      ],
-    },
-    {
-      id: 'sports',
-      name: 'Спорт',
-      icon: '⚽',
-      enabled: false,
-      subcategories: [
-        { id: 'football', name: 'Футбол', enabled: false },
-        { id: 'basketball', name: 'Баскетбол', enabled: false },
-        { id: 'tennis', name: 'Теннис', enabled: false },
-      ],
-    },
-  ];
+  // Use preferences hook with userId and authHeaders
+  const {
+    preferences: userPreferences,
+    categoriesStructure,
+    loading: preferencesLoading,
+    error: preferencesError,
+    updatePreferences
+  } = useUserPreferences(userId, authHeaders);
 
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setLoading(false);
-    }, 1000);
-  }, []);
+  // Map preferences to UI format with useMemo for performance
+  const categories = useMemo(() => {
+    if (!categoriesStructure) return [];
+
+    return Object.entries(categoriesStructure).map(([catId, catData]: [string, any]) => {
+      const userCatPref = userPreferences ? userPreferences[catId] : undefined;
+
+      // Default behavior: if no preferences set, enable all categories
+      // Category enabled if: no preference (undefined), null (all), or array with items
+      const categoryEnabled = userCatPref === undefined || userCatPref === null || (Array.isArray(userCatPref) && userCatPref.length > 0);
+
+      // Map subcategories
+      const subcategories = Object.entries(catData.subcategories || {}).map(([subId, subData]: [string, any]) => {
+        let subEnabled = false;
+
+        if (userCatPref === undefined || userCatPref === null) {
+          // If no preference or category is "all", all subcategories enabled
+          subEnabled = true;
+        } else if (Array.isArray(userCatPref)) {
+          // If specific subcategories selected
+          subEnabled = userCatPref.includes(subId);
+        }
+
+        return {
+          id: subId,
+          name: subData.name || subId,
+          enabled: subEnabled
+        };
+      });
+
+      return {
+        id: catId,
+        name: catData.name || catId,
+        icon: catData.emoji || '📁',
+        enabled: categoryEnabled,
+        subcategories
+      };
+    });
+  }, [categoriesStructure, userPreferences]);
+
+
+  const savePreferences = async (updatedCategories: Category[]) => {
+    try {
+      // Convert UI format to API format (JSONB)
+      const preferences: Record<string, string[] | null> = {};
+
+      updatedCategories.forEach(cat => {
+        if (!cat.enabled) {
+          // Category disabled = empty array
+          preferences[cat.id] = [];
+        } else {
+          // Check if all subcategories enabled
+          const enabledSubs = cat.subcategories.filter(sub => sub.enabled);
+          const allEnabled = enabledSubs.length === cat.subcategories.length;
+
+          if (allEnabled) {
+            // All subcategories = null (entire category)
+            preferences[cat.id] = null;
+          } else if (enabledSubs.length > 0) {
+            // Specific subcategories
+            preferences[cat.id] = enabledSubs.map(sub => sub.id);
+          } else {
+            // No subcategories enabled = disabled
+            preferences[cat.id] = [];
+          }
+        }
+      });
+
+      // Use the hook's updatePreferences method
+      await updatePreferences(preferences);
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+    }
+  };
 
   const toggleCategory = (categoryId: string) => {
-    setCategories(prev => prev.map(cat => 
-      cat.id === categoryId 
-        ? { ...cat, enabled: !cat.enabled }
-        : cat
-    ));
+    const updated = categories.map(cat => {
+      if (cat.id === categoryId) {
+        const newEnabled = !cat.enabled;
+        // If category is disabled, disable all subcategories
+        const updatedSubcategories = cat.subcategories.map(sub => ({
+          ...sub,
+          enabled: newEnabled,
+        }));
+        return { ...cat, enabled: newEnabled, subcategories: updatedSubcategories };
+      }
+      return cat;
+    });
+    // Save preferences (will trigger useMemo recalculation)
+    savePreferences(updated);
   };
 
   const toggleSubcategory = (categoryId: string, subcategoryId: string) => {
-    setCategories(prev => prev.map(cat => 
-      cat.id === categoryId 
-        ? {
-            ...cat,
-            subcategories: cat.subcategories.map(sub => 
-              sub.id === subcategoryId 
-                ? { ...sub, enabled: !sub.enabled }
-                : sub
-            )
+    const updated = categories.map(cat => {
+      if (cat.id === categoryId) {
+        const updatedSubcategories = cat.subcategories.map(sub => {
+          if (sub.id === subcategoryId) {
+            return { ...sub, enabled: !sub.enabled };
           }
-        : cat
-    ));
-  };
+          return sub;
+        });
 
-  const updateNotificationSettings = (key: keyof NotificationSettings, value: any) => {
-    setNotifications(prev => ({ ...prev, [key]: value }));
+        // If all subcategories are disabled, disable the parent category
+        const allSubcategoriesDisabled = updatedSubcategories.every(sub => !sub.enabled);
+        const newCategoryEnabled = !allSubcategoriesDisabled;
+
+        return { ...cat, enabled: newCategoryEnabled, subcategories: updatedSubcategories };
+      }
+      return cat;
+    });
+    // Save preferences (will trigger useMemo recalculation)
+    savePreferences(updated);
   };
 
   const containerVariants = {
@@ -129,23 +164,25 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { y: 20, opacity: 0 },
     visible: {
-      opacity: 1,
       y: 0,
+      opacity: 1,
       transition: {
-        duration: 0.5,
+        type: 'spring' as const,
+        stiffness: 100,
+        damping: 10,
       },
     },
   };
 
-  if (loading) {
+  if (preferencesLoading) {
     return (
       <div className="min-h-screen bg-bg">
         <MobileHeader title="Настройки" subtitle="Загрузка..." />
         <main className="container-main">
           <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
+            {[1, 2, 3].map((i) => (
               <Card key={i} className="animate-pulse">
                 <CardHeader>
                   <div className="h-4 bg-surface-alt rounded w-3/4"></div>
@@ -163,11 +200,37 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
     );
   }
 
+  // Show error state
+  if (preferencesError) {
+    return (
+      <div className="min-h-screen bg-bg">
+        <MobileHeader
+          title="Настройки"
+          subtitle="Ошибка загрузки"
+        />
+        <main className="container-main">
+          <Card>
+            <CardContent className="text-center py-8">
+              <p className="text-red-500 mb-4">❌ Ошибка загрузки настроек</p>
+              <p className="text-sm text-gray-500 mb-4">{preferencesError}</p>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Обновить страницу
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="Настройки" 
-        subtitle="Персонализация и уведомления"
+        subtitle="Выбор категорий для персонализации"
       />
       
       <main className="container-main">
@@ -177,66 +240,23 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
           animate="visible"
           className="space-y-6"
         >
-          {/* User Profile */}
+          {/* Info Block */}
           <motion.section variants={itemVariants}>
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Профиль пользователя</CardTitle>
-                <CardDescription>
-                  Основная информация о вашем аккаунте
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-text mb-2 block">
-                    Имя
-                  </label>
-                  <Input
-                    value={userInfo.name}
-                    onChange={(e) => setUserInfo(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Введите ваше имя"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-text mb-2 block">
-                    Email
-                  </label>
-                  <Input
-                    type="email"
-                    value={userInfo.email}
-                    onChange={(e) => setUserInfo(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="Введите ваш email"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-text mb-2 block">
-                    Часовой пояс
-                  </label>
-                  <select 
-                    className="input w-full"
-                    value={userInfo.timezone}
-                    onChange={(e) => setUserInfo(prev => ({ ...prev, timezone: e.target.value }))}
-                  >
-                    <option value="Europe/Moscow">Москва (UTC+3)</option>
-                    <option value="Europe/London">Лондон (UTC+0)</option>
-                    <option value="America/New_York">Нью-Йорк (UTC-5)</option>
-                    <option value="Asia/Tokyo">Токио (UTC+9)</option>
-                  </select>
-                </div>
-                <Button variant="primary" className="w-full">
-                  Сохранить изменения
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+              <p className="text-sm text-text">
+                ✨ Выберите интересующие категории и подкатегории. 
+                Настройки автоматически сохраняются и применяются к новостям и событиям.
+              </p>
+            </div>
           </motion.section>
 
           {/* Categories */}
           <motion.section variants={itemVariants}>
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Категории новостей</CardTitle>
+                <CardTitle className="text-lg">Персонализация контента</CardTitle>
                 <CardDescription>
-                  Выберите интересующие вас категории и подкатегории
+                  Выберите категории и подкатегории для отображения в новостях и календаре
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -264,18 +284,20 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
                       
                       {category.enabled && (
                         <div className="space-y-2">
-                          {category.subcategories.map((subcategory) => (
-                            <div key={subcategory.id} className="flex items-center justify-between py-2 px-3 bg-surface-alt rounded-lg">
-                              <span className="text-sm text-text">{subcategory.name}</span>
+                          <p className="text-xs text-muted-strong mb-2">Подкатегории:</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            {category.subcategories.map((subcategory) => (
                               <Button
-                                variant={subcategory.enabled ? 'primary' : 'secondary'}
+                                key={subcategory.id}
+                                variant={subcategory.enabled ? 'primary' : 'outline'}
                                 size="sm"
                                 onClick={() => toggleSubcategory(category.id, subcategory.id)}
+                                className="justify-start text-sm"
                               >
-                                {subcategory.enabled ? 'Вкл' : 'Выкл'}
+                                {subcategory.name}
                               </Button>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -285,138 +307,33 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
             </Card>
           </motion.section>
 
-          {/* Notifications */}
+          {/* Coming Soon: Notifications */}
           <motion.section variants={itemVariants}>
-            <Card>
+            <Card className="opacity-60 pointer-events-none">
               <CardHeader>
-                <CardTitle className="text-lg">Уведомления</CardTitle>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  Уведомления
+                  <span className="text-sm text-primary font-normal">Скоро</span>
+                </CardTitle>
                 <CardDescription>
-                  Настройте получение уведомлений
+                  Push-уведомления, email-дайджесты и настройка частоты
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-text">Push-уведомления</h4>
-                      <p className="text-sm text-muted-strong">Получать уведомления в браузере</p>
-                    </div>
-                    <Button
-                      variant={notifications.push ? 'primary' : 'secondary'}
-                      size="sm"
-                      onClick={() => updateNotificationSettings('push', !notifications.push)}
-                    >
-                      {notifications.push ? 'Включено' : 'Выключено'}
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-text">Email-уведомления</h4>
-                      <p className="text-sm text-muted-strong">Получать дайджесты на email</p>
-                    </div>
-                    <Button
-                      variant={notifications.email ? 'primary' : 'secondary'}
-                      size="sm"
-                      onClick={() => updateNotificationSettings('email', !notifications.email)}
-                    >
-                      {notifications.email ? 'Включено' : 'Выключено'}
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-text">AI-дайджесты</h4>
-                      <p className="text-sm text-muted-strong">Персональные дайджесты от ИИ</p>
-                    </div>
-                    <Button
-                      variant={notifications.digest ? 'primary' : 'secondary'}
-                      size="sm"
-                      onClick={() => updateNotificationSettings('digest', !notifications.digest)}
-                    >
-                      {notifications.digest ? 'Включено' : 'Выключено'}
-                    </Button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-text">Важные события</h4>
-                      <p className="text-sm text-muted-strong">Уведомления о важных событиях</p>
-                    </div>
-                    <Button
-                      variant={notifications.events ? 'primary' : 'secondary'}
-                      size="sm"
-                      onClick={() => updateNotificationSettings('events', !notifications.events)}
-                    >
-                      {notifications.events ? 'Включено' : 'Выключено'}
-                    </Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-text mb-2 block">
-                    Частота уведомлений
-                  </label>
-                  <select 
-                    className="input w-full"
-                    value={notifications.frequency}
-                    onChange={(e) => updateNotificationSettings('frequency', e.target.value)}
-                  >
-                    <option value="instant">Мгновенно</option>
-                    <option value="hourly">Каждый час</option>
-                    <option value="daily">Ежедневно</option>
-                    <option value="weekly">Еженедельно</option>
-                  </select>
-                </div>
-              </CardContent>
             </Card>
           </motion.section>
 
-          {/* Export/Import */}
+          {/* Coming Soon: Profile */}
           <motion.section variants={itemVariants}>
-            <Card>
+            <Card className="opacity-60 pointer-events-none">
               <CardHeader>
-                <CardTitle className="text-lg">Экспорт и импорт</CardTitle>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  Профиль
+                  <span className="text-sm text-primary font-normal">Скоро</span>
+                </CardTitle>
                 <CardDescription>
-                  Управление настройками и данными
+                  Имя, email, часовой пояс и другие настройки
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button variant="secondary" className="w-full">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Экспорт настроек
-                  </Button>
-                  <Button variant="secondary" className="w-full">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
-                    </svg>
-                    Импорт настроек
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.section>
-
-          {/* Danger Zone */}
-          <motion.section variants={itemVariants}>
-            <Card className="border-error/20">
-              <CardHeader>
-                <CardTitle className="text-lg text-error">Опасная зона</CardTitle>
-                <CardDescription>
-                  Необратимые действия с вашим аккаунтом
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button variant="secondary" className="w-full text-error border-error/20 hover:bg-error/10">
-                  Сбросить все настройки
-                </Button>
-                <Button variant="secondary" className="w-full text-error border-error/20 hover:bg-error/10">
-                  Удалить аккаунт
-                </Button>
-              </CardContent>
             </Card>
           </motion.section>
         </motion.div>

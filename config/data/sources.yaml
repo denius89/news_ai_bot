@@ -178,6 +178,44 @@ sports:
         url: https://liquipedia.net/rss
       - name: ESPN Esports
         url: https://www.espn.com/espn/rss/esports/news
+  # Дополнительные подкатегории для событий
+  hockey:
+    icon: hockey
+    sources:
+      - name: NHL
+        url: https://www.nhl.com/rss
+      - name: ESPN NHL
+        url: https://www.espn.com/espn/rss/nhl/news
+  champions_league:
+    icon: football
+    sources:
+      - name: UEFA Champions League
+        url: https://www.uefa.com/rssfeed/championsleague/rss.xml
+  premier_league:
+    icon: football
+    sources:
+      - name: Premier League
+        url: https://www.premierleague.com/rss
+  lol:
+    icon: esports
+    sources:
+      - name: LoL Esports
+        url: https://lolesports.com/rss
+  overwatch:
+    icon: esports
+    sources:
+      - name: Overwatch League
+        url: https://overwatchleague.com/rss
+  r6siege:
+    icon: esports
+    sources:
+      - name: Rainbow Six Esports
+        url: https://www.ubisoft.com/rss
+  valorant:
+    icon: esports
+    sources:
+      - name: Valorant Esports
+        url: https://valorantesports.com/rss
   other:
     icon: sports_other
     sources:

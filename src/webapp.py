@@ -62,8 +62,17 @@ def authenticate_request():
 
         # Проверяем, является ли endpoint публичным
         is_public = any(request.path.startswith(path) for path in public_paths)
+        
+        # Специальная обработка для endpoints с условной аутентификацией
+        needs_conditional_auth = (
+            request.path.startswith("/api/news/latest") and 
+            request.args.get("filter_by_subscriptions", "false").lower() == "true"
+        ) or (
+            request.path.startswith("/api/events/upcoming") and 
+            request.args.get("filter_by_subscriptions", "false").lower() == "true"
+        )
 
-        if not is_public:
+        if not is_public or needs_conditional_auth:
             # Для защищенных endpoints проверяем аутентификацию
             bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
             auth_result = verify_telegram_auth(

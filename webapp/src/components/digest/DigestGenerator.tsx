@@ -4,7 +4,7 @@ import { X, Sparkles, Brain, Briefcase, Smile, CalendarDays, Filter, Globe2, Coi
 import { DigestMagicProgress } from './DigestMagicProgress';
 import { cn } from '../../lib/utils';
 import { useDrag } from '@use-gesture/react';
-import { useUserPreferences } from '../../hooks/useUserPreferences';
+// import { useUserPreferences } from '../../hooks/useUserPreferences';
 import { initHoloMotion } from '../../utils/holoMotion';
 import '../../styles/holographic.css';
 
@@ -53,7 +53,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
   isOpen,
   onClose,
   onGenerate,
-  userId
+  userId: _userId
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedDigest, setGeneratedDigest] = useState<string>('');
@@ -62,27 +62,28 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
   const [deviceOrientation, setDeviceOrientation] = useState({ alpha: 0, beta: 0, gamma: 0 });
   
   // Используем хук предпочтений пользователя
-  const {
-    preferences,
-    isLoading: preferencesLoading,
-    savePreferences,
-    updateAfterDigestGeneration
-  } = useUserPreferences(userId);
+  // Временно отключено - используется старый интерфейс
+  // const {
+  //   preferences,
+  //   isLoading: preferencesLoading,
+  //   savePreferences,
+  //   updateAfterDigestGeneration
+  // } = useUserPreferences(userId);
 
-  // Состояния для выбранных значений (инициализируются из предпочтений)
-  const [selectedCategory, setSelectedCategory] = useState(preferences.preferred_category);
-  const [selectedStyle, setSelectedStyle] = useState(preferences.preferred_style);
-  const [selectedPeriod, setSelectedPeriod] = useState(preferences.preferred_period);
+  // Состояния для выбранных значений (временно с дефолтными значениями)
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStyle, setSelectedStyle] = useState("analytical");
+  const [selectedPeriod, setSelectedPeriod] = useState("today");
   const [selectedLength, setSelectedLength] = useState('medium');
 
   // Синхронизируем состояния с предпочтениями при их загрузке
-  useEffect(() => {
-    if (!preferencesLoading) {
-      setSelectedCategory(preferences.preferred_category);
-      setSelectedStyle(preferences.preferred_style);
-      setSelectedPeriod(preferences.preferred_period);
-    }
-  }, [preferences, preferencesLoading]);
+  // useEffect(() => {
+  //   if (!preferencesLoading) {
+  //     setSelectedCategory(preferences.preferred_category);
+  //     setSelectedStyle(preferences.preferred_style);
+  //     setSelectedPeriod(preferences.preferred_period);
+  //   }
+  // }, [preferences, preferencesLoading]);
 
   // Определяем тему на основе CSS класса или data-атрибута основного приложения
   useEffect(() => {
@@ -173,7 +174,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
 
   // ФУНКЦИИ ДЛЯ МОБИЛЬНЫХ ЖЕСТОВ И HAPTIC FEEDBACK
   const triggerHapticFeedback = (type: 'light' | 'medium' | 'heavy' = 'light') => {
-    if (!preferences.enable_haptic_feedback || !navigator.vibrate) return;
+    // if (!preferences.enable_haptic_feedback || !navigator.vibrate) return;
+    if (!navigator.vibrate) return;
     
     const patterns = {
       light: [10],
@@ -199,7 +201,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
   // ЖЕСТЫ ДЛЯ КАТЕГОРИЙ
   const categoryBind = useDrag(
     ({ direction: [dx], distance }) => {
-      if (!preferences.enable_gestures || isGenerating) return;
+      // if (!preferences.enable_gestures || isGenerating) return;
+      if (isGenerating) return;
       
       // Горизонтальный swipe для переключения категорий
       if (Math.abs(dx) > Math.abs(distance[0]) * 0.7) {
@@ -266,7 +269,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
       setGeneratedDigest(digest);
       
       // Сохраняем предпочтения после успешной генерации
-      await updateAfterDigestGeneration(selectedCategory, selectedStyle, selectedPeriod);
+      // await updateAfterDigestGeneration(selectedCategory, selectedStyle, selectedPeriod);
       
       // Сразу закрываем модальное окно после успешной генерации
       handleClose();
@@ -291,19 +294,19 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
   const handleCategorySelect = async (category: string) => {
     setSelectedCategory(category);
     triggerHapticFeedback('light');
-    await savePreferences({ preferred_category: category });
+    // await savePreferences({ preferred_category: category });
   };
 
   const handleStyleSelect = async (style: string) => {
     setSelectedStyle(style);
     triggerHapticFeedback('medium');
-    await savePreferences({ preferred_style: style });
+    // await savePreferences({ preferred_style: style });
   };
 
   const handlePeriodSelect = async (period: string) => {
     setSelectedPeriod(period);
     triggerHapticFeedback('light');
-    await savePreferences({ preferred_period: period });
+    // await savePreferences({ preferred_period: period });
   };
 
   if (!isOpen) return null;

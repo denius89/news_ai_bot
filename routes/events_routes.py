@@ -270,12 +270,17 @@ def get_upcoming_events():
     - days: Number of days to look ahead (default: 30)
     - category: Filter by category
     - min_importance: Minimum importance threshold
+    - filter_by_subscriptions: Filter by user preferences (default: false)
+    - user_id: UUID пользователя (требуется если filter_by_subscriptions=true)
     """
     try:
         # Parse query parameters
         days = int(request.args.get("days", 30))
         category = request.args.get("category")
         min_importance = float(request.args.get("min_importance", 0.0))
+
+        # Параметры фильтрации по предпочтениям
+        filter_by_subscriptions = request.args.get("filter_by_subscriptions", "false").lower() == "true"
 
         # Validate parameters
         if days <= 0 or days > 365:
@@ -307,6 +312,40 @@ def get_upcoming_events():
         events = events_service.get_upcoming_events_sync(
             days_ahead=days, category=category, min_importance=min_importance
         )
+
+        # Фильтрация по предпочтениям пользователя
+        user_id = None
+        if filter_by_subscriptions:
+            from flask import g
+            # Проверяем аутентификацию только если нужна фильтрация
+            if hasattr(g, "current_user") and g.current_user:
+                user_id = g.current_user["user_id"]
+
+        if filter_by_subscriptions and user_id:
+            from database.db_models import get_active_categories
+
+            active_cats = get_active_categories(user_id)
+            full_categories = active_cats.get('full_categories', [])
+            subcategories = active_cats.get('subcategories', {})
+
+            # Если есть активные предпочтения, фильтруем
+            if full_categories or subcategories:
+                filtered_events = []
+                for event in events:
+                    event_category = event.category
+                    event_subcategory = event.subcategory
+
+                    # Проверяем: либо вся категория включена, либо конкретная подкатегория
+                    if event_category in full_categories:
+                        filtered_events.append(event)
+                    elif event_category in subcategories and event_subcategory in subcategories[event_category]:
+                        filtered_events.append(event)
+
+                events = filtered_events
+                logger.info(
+                    f"Фильтрация событий по предпочтениям пользователя {user_id}: "
+                    f"{len(filtered_events)} событий"
+                )
 
         # Convert to JSON format
         events_data = []
@@ -341,6 +380,7 @@ def get_upcoming_events():
                         "category": category,
                         "min_importance": min_importance,
                     },
+                    "filtered_by_subscriptions": filter_by_subscriptions and user_id is not None,
                 },
             }
         )

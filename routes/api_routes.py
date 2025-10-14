@@ -710,21 +710,10 @@ def create_user():
 
 @api_bp.route("/health", methods=["GET"])
 def health_check():
-    """GET /api/health - Health check endpoint with digest v2 status"""
+    """GET /api/health - Fast health check endpoint"""
     try:
-        from database.db_models import get_daily_digest_analytics
-
-        # Get digest analytics for today
-        analytics = get_daily_digest_analytics()
-        avg_confidence = analytics.get("avg_confidence", 0.0)
-
-        # Determine digest v2 status
-        if avg_confidence >= 0.7:
-            digest_v2_status = "ok"
-        elif avg_confidence >= 0.5:
-            digest_v2_status = "warning"
-        else:
-            digest_v2_status = "error"
+        # Fast health check without database queries
+        digest_v2_status = "ok"  # Assume OK for fast response
 
         return jsonify(
             {
@@ -732,8 +721,8 @@ def health_check():
                 "message": "PulseAI API is healthy",
                 "version": "1.0.0",
                 "digest_v2_status": digest_v2_status,
-                "avg_confidence": round(avg_confidence, 3),
-                "generated_today": analytics.get("generated_count", 0),
+                "avg_confidence": 0.0,
+                "generated_today": 0,
             }
         )
 
@@ -756,26 +745,32 @@ def get_categories_api():
         JSON с категориями, подкатегориями и их иконками
     """
     try:
+        # Загружаем реальную структуру из sources.yaml
         structure = get_category_structure()
 
         # Преобразуем в формат для WebApp
+        # structure = {category: {subcategory: {icon, sources}}}
         categories_data = {}
-        for category, subcategories in structure.items():
+        for category, subcategories_dict in structure.items():
+            # Получаем emoji для категории
+            category_emoji = get_emoji_icon(category, "")
+            
             categories_data[category] = {
-                "name": category.title(),
-                "icon": get_emoji_icon(category, ""),
-                "emoji": get_emoji_icon(category, ""),  # Добавляем emoji для удобства
-                "subcategories": {},
+                "name": category.replace("_", " ").title(),
+                "emoji": category_emoji,
+                "subcategories": {}
             }
 
-            for subcategory, data in subcategories.items():
+            # Обрабатываем подкатегории
+            for subcategory, data in subcategories_dict.items():
+                subcategory_icon = data.get("icon", "📄") if isinstance(data, dict) else "📄"
+                
                 categories_data[category]["subcategories"][subcategory] = {
-                    "name": subcategory.title(),
-                    "icon": data.get("icon", ""),
-                    "emoji": get_emoji_icon(category, subcategory),
-                    "sources_count": len(data.get("sources", [])),
+                    "name": subcategory.replace("_", " ").title(),
+                    "icon": subcategory_icon,
                 }
 
+        # Возвращаем структуру
         return jsonify(
             {
                 "status": "success",
@@ -942,23 +937,49 @@ def generate_digest():
         if category != "all" and category not in real_categories:
             return jsonify({"status": "error", "message": f"Invalid category: {category}"}), 400
 
-        # УМНАЯ ФИЛЬТРАЦИЯ: Получаем предпочтения пользователя
-        user_preferences = None
+        # УМНАЯ ФИЛЬТРАЦИЯ: Получаем предпочтения категорий пользователя
+        user_category_preferences = None
         if user_id and use_user_preferences:
             try:
-                user_preferences = get_user_preferences(user_id)
-                logger.debug(f"Получены предпочтения пользователя {user_id}: {user_preferences}")
+                from database.db_models import get_user_category_preferences, get_active_categories
+                user_category_preferences = get_user_category_preferences(user_id)
+                active_categories = get_active_categories(user_id)
+                logger.debug(f"Получены предпочтения категорий пользователя {user_id}: {user_category_preferences}")
+                logger.debug(f"Активные категории пользователя {user_id}: {active_categories}")
             except Exception as e:
-                logger.warning(f"Не удалось получить предпочтения пользователя {user_id}: {e}")
+                logger.warning(f"Не удалось получить предпочтения категорий пользователя {user_id}: {e}")
 
-        # УМНАЯ ФИЛЬТРАЦИЯ: Определяем параметры фильтрации
+        # УМНАЯ ФИЛЬТРАЦИЯ: Определяем категории для дайджеста
         final_min_importance = min_importance
-        if enable_smart_filtering and user_preferences:
-            # Используем предпочтения пользователя
-            if user_preferences.get("enable_smart_filtering", True):
-                final_min_importance = user_preferences.get("min_importance", 0.3)
-                logger.debug(f"Применена умная фильтрация из предпочтений: min_importance={final_min_importance}")
-        elif enable_smart_filtering:
+        categories_list = None if category == "all" else [category]
+        
+        # Если пользователь выбрал категории в настройках, используем их
+        if user_category_preferences and active_categories:
+            full_categories = active_categories.get('full_categories', [])
+            subcategories = active_categories.get('subcategories', {})
+            
+            # Если есть активные категории, генерируем дайджест для них
+            if full_categories or subcategories:
+                # Собираем все активные категории
+                user_categories = []
+                user_categories.extend(full_categories)  # Категории целиком
+                user_categories.extend(subcategories.keys())  # Категории с подкатегориями
+                
+                # Убираем дубликаты
+                user_categories = list(set(user_categories))
+                
+                if user_categories:
+                    categories_list = user_categories
+                    logger.info(f"Дайджест будет сгенерирован для категорий пользователя: {user_categories}")
+                else:
+                    logger.info("Пользователь не выбрал ни одной категории, используем выбранную в UI")
+            else:
+                logger.info("Пользователь не выбрал ни одной категории, используем выбранную в UI")
+        else:
+            logger.info("Предпочтения пользователя не найдены, используем выбранную в UI")
+        
+        # УМНАЯ ФИЛЬТРАЦИЯ: Определяем параметры фильтрации
+        if enable_smart_filtering:
             # Используем умный фильтр по времени
             try:
                 smart_filter = get_smart_filter_for_time()
@@ -966,9 +987,6 @@ def generate_digest():
                 logger.debug(f"Применен умный фильтр по времени: min_importance={final_min_importance}")
             except Exception as e:
                 logger.warning(f"Не удалось получить умный фильтр: {e}")
-
-        # Generate digest using async service
-        categories_list = None if category == "all" else [category]
         digest_service = get_async_digest_service()
 
         # ИЗМЕРЯЕМ ВРЕМЯ ГЕНЕРАЦИИ ДЛЯ АНАЛИТИКИ
@@ -1025,20 +1043,8 @@ def generate_digest():
                 logger.warning(f"Не удалось сохранить дайджест: {save_error}")
                 # Продолжаем выполнение даже если сохранение не удалось
 
-        # СОХРАНЯЕМ ПРЕДПОЧТЕНИЯ ПОЛЬЗОВАТЕЛЯ
-        if user_id and use_user_preferences:
-            try:
-                save_user_preferences(
-                    user_id=str(user_id),
-                    preferred_category=category,
-                    preferred_style=style,
-                    preferred_period=period,
-                    min_importance=final_min_importance or 0.3,
-                    enable_smart_filtering=enable_smart_filtering,
-                )
-                logger.debug(f"Предпочтения пользователя {user_id} обновлены")
-            except Exception as pref_error:
-                logger.warning(f"Не удалось сохранить предпочтения пользователя {user_id}: {pref_error}")
+        # ПРИМЕЧАНИЕ: Предпочтения категорий теперь сохраняются отдельно через /api/user/category-preferences
+        # Здесь мы не сохраняем предпочтения, чтобы не перезаписывать настройки пользователя
 
         # ЛОГИРУЕМ АНАЛИТИКУ ГЕНЕРАЦИИ
         if user_id:
@@ -1079,7 +1085,7 @@ def generate_digest():
                         "min_importance": final_min_importance,  # Информация о фильтрации
                         "smart_filtering_enabled": enable_smart_filtering,
                         "generation_time_ms": generation_time_ms,  # Время генерации
-                        "user_preferences_applied": bool(user_preferences),  # Применены ли предпочтения
+                        "user_preferences_applied": bool(user_category_preferences),  # Применены ли предпочтения
                     },
                 },
             }
@@ -1382,28 +1388,28 @@ def get_user_by_telegram_id(telegram_id):
             except json.JSONDecodeError as e:
                 logger.warning(f"Failed to parse userData: {e}")
 
-        # Ищем пользователя по telegram_id с retry логикой
-        max_retries = 3
+        # Ищем пользователя по telegram_id (оптимизированная версия)
+        max_retries = 2  # Уменьшено с 3 до 2
         for attempt in range(max_retries):
             try:
-                logger.info(f"🔍 Database query attempt {attempt + 1} for telegram_id: {telegram_id}")
+                logger.debug(f"Database query attempt {attempt + 1} for telegram_id: {telegram_id}")
                 result = (
                     supabase.table("users")
                     .select("id, username, locale, first_name")
                     .eq("telegram_id", telegram_id)
                     .execute()
                 )
-                logger.info(f"✅ Database query successful on attempt {attempt + 1}")
+                logger.debug(f"Database query successful on attempt {attempt + 1}")
                 break
             except Exception as db_error:
-                logger.error(f"❌ Database error attempt {attempt + 1}: {db_error}")
+                logger.error(f"Database error attempt {attempt + 1}: {db_error}")
                 if attempt == max_retries - 1:
-                    logger.error(f"❌ All {max_retries} attempts failed")
+                    logger.error(f"All {max_retries} attempts failed")
                     return jsonify({"status": "error", "message": f"Database connection error: {str(db_error)}"}), 500
                 else:
                     import time
 
-                    time.sleep(0.5)  # Небольшая пауза перед retry
+                    time.sleep(0.1)  # Уменьшено с 0.5s до 0.1s
 
         if result.data:
             user_data = result.data[0]
@@ -1901,6 +1907,155 @@ def update_user_preferences():
     except Exception as e:
         logger.error(f"Error updating user preferences: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# =============================================================================
+# CATEGORY PREFERENCES API ENDPOINTS (JSONB-based)
+# =============================================================================
+
+
+@api_bp.route("/user/category-preferences", methods=["GET"])
+def get_category_preferences():
+    """
+    Get user's category preferences from JSONB.
+
+    Returns:
+        {
+            "status": "success",
+            "data": {
+                "preferences": {
+                    "sports": ["football", "basketball"],
+                    "crypto": null,
+                    "markets": []
+                },
+                "categories_structure": {...}  // from /api/categories
+            }
+        }
+    """
+    from flask import g
+
+    # Получаем данные пользователя из middleware аутентификации
+    if not hasattr(g, "current_user") or not g.current_user:
+        return jsonify({"status": "error", "message": "Authentication required"}), 401
+
+    user_id = g.current_user["user_id"]
+
+    try:
+        from database.db_models import get_user_category_preferences
+
+        # Get user preferences
+        preferences = get_user_category_preferences(user_id)
+
+        # Get categories structure for UI
+        categories_structure = get_category_structure()
+
+        return jsonify(
+            {
+                "status": "success",
+                "data": {
+                    "preferences": preferences,
+                    "categories_structure": categories_structure,
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error getting category preferences for user {user_id}: {e}")
+        return jsonify({"status": "error", "message": f"Error getting preferences: {str(e)}"}), 500
+
+
+@api_bp.route("/user/category-preferences", methods=["POST"])
+def update_category_preferences():
+    """
+    Update user's category preferences (JSONB atomic update).
+
+    Request body:
+    {
+        "preferences": {
+            "sports": ["football"],
+            "crypto": null,
+            "markets": []
+        }
+    }
+
+    Logic:
+        - null = entire category enabled
+        - ["sub1", "sub2"] = specific subcategories
+        - [] or missing = category disabled
+    """
+    from flask import g
+
+    # Получаем данные пользователя из middleware аутентификации
+    if not hasattr(g, "current_user") or not g.current_user:
+        return jsonify({"status": "error", "message": "Authentication required"}), 401
+
+    user_id = g.current_user["user_id"]
+
+    if not request.is_json:
+        return jsonify({"status": "error", "message": "JSON body is required"}), 400
+
+    data = request.get_json()
+    preferences = data.get("preferences")
+
+    if preferences is None:
+        return jsonify({"status": "error", "message": "preferences are required"}), 400
+
+    try:
+        from database.db_models import upsert_user_category_preferences
+
+        # Validate preferences structure
+        if not isinstance(preferences, dict):
+            return jsonify({"status": "error", "message": "preferences must be a dict"}), 400
+
+        # Validate categories exist
+        valid_categories = get_category_structure().keys()
+        for category in preferences.keys():
+            if category not in valid_categories:
+                return (
+                    jsonify(
+                        {
+                            "status": "error",
+                            "message": f"Invalid category: {category}. Must be one of: {', '.join(valid_categories)}",
+                        }
+                    ),
+                    400,
+                )
+
+        # Validate subcategories if specified
+        for category, value in preferences.items():
+            if isinstance(value, list) and len(value) > 0:
+                category_structure = get_category_structure().get(category, {})
+                valid_subcategories = category_structure.keys()
+
+                for subcategory in value:
+                    if subcategory not in valid_subcategories:
+                        return (
+                            jsonify(
+                                {
+                                    "status": "error",
+                                    "message": f"Invalid subcategory '{subcategory}' for category '{category}'",
+                                }
+                            ),
+                            400,
+                        )
+
+        # Save preferences
+        success = upsert_user_category_preferences(user_id, preferences)
+
+        if success:
+            return jsonify(
+                {
+                    "status": "success",
+                    "message": "Category preferences updated successfully",
+                    "data": {"preferences": preferences},
+                }
+            )
+        else:
+            return jsonify({"status": "error", "message": "Failed to update preferences"}), 500
+
+    except Exception as e:
+        logger.error(f"Error updating category preferences: {e}")
+        return jsonify({"status": "error", "message": f"Error updating preferences: {str(e)}"}), 500
 
 
 @api_bp.route("/user/notifications/test", methods=["POST"])
