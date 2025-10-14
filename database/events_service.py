@@ -263,10 +263,16 @@ class EventsService:
                 try:
                     hash_list = [row["unique_hash"] for row in rows if row.get("unique_hash")]
                     if hash_list:
-                        existing = safe_execute(
-                            supabase.table("events_new").select("unique_hash").in_("unique_hash", hash_list)
-                        )
-                        existing_hashes = {e["unique_hash"] for e in (existing.data or [])}
+                        # Проверяем батчами по 500 hash (чтобы не превысить URL лимит)
+                        HASH_CHECK_BATCH = 500
+                        for i in range(0, len(hash_list), HASH_CHECK_BATCH):
+                            hash_batch = hash_list[i : i + HASH_CHECK_BATCH]
+                            existing = safe_execute(
+                                supabase.table("events_new").select("unique_hash").in_("unique_hash", hash_batch)
+                            )
+                            if existing.data:
+                                existing_hashes.update(e["unique_hash"] for e in existing.data)
+
                         logger.info(f"📊 Найдено существующих событий: {len(existing_hashes)} из {len(hash_list)}")
                 except Exception as e:
                     logger.debug(f"Не удалось проверить существующие hash: {e}")
@@ -282,11 +288,19 @@ class EventsService:
                     f"💾 Вставка {len(new_rows)} новых событий (пропущено дубликатов: {len(rows) - len(new_rows)})"
                 )
 
-                # Вставляем только новые события
-                result = safe_execute(supabase.table("events_new").insert(new_rows))
-                inserted = len(result.data or [])
-                logger.info(f"✅ Inserted {inserted} new events into events_new table")
-                return inserted
+                # Вставляем батчами по 100 (чтобы не превысить лимит URL)
+                BATCH_SIZE = 100
+                total_inserted = 0
+
+                for i in range(0, len(new_rows), BATCH_SIZE):
+                    batch = new_rows[i : i + BATCH_SIZE]
+                    result = safe_execute(supabase.table("events_new").insert(batch))
+                    batch_inserted = len(result.data or [])
+                    total_inserted += batch_inserted
+                    logger.debug(f"  Batch {i//BATCH_SIZE + 1}: вставлено {batch_inserted}/{len(batch)}")
+
+                logger.info(f"✅ Inserted {total_inserted} new events into events_new table")
+                return total_inserted
 
             except Exception as insert_error:
                 # If insert fails, try without unique_hash (fallback)
@@ -299,10 +313,18 @@ class EventsService:
                     row_copy.pop("unique_hash", None)
                     rows_without_hash.append(row_copy)
 
-                result = safe_execute(supabase.table("events_new").insert(rows_without_hash))
-                inserted = len(result.data or [])
-                logger.info(f"✅ Inserted {inserted} events (without unique_hash)")
-                return inserted
+                # Вставляем батчами по 100
+                BATCH_SIZE = 100
+                total_inserted = 0
+
+                for i in range(0, len(rows_without_hash), BATCH_SIZE):
+                    batch = rows_without_hash[i : i + BATCH_SIZE]
+                    result = safe_execute(supabase.table("events_new").insert(batch))
+                    batch_inserted = len(result.data or [])
+                    total_inserted += batch_inserted
+
+                logger.info(f"✅ Inserted {total_inserted} events (without unique_hash)")
+                return total_inserted
 
         except Exception as e:
             logger.error(f"❌ Error inserting events: {e}")
