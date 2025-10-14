@@ -164,7 +164,7 @@ def api_latest_news():
                 user_id = g.current_user["user_id"]
                 logger.info(f"✅ Получен user_id из аутентификации: {user_id}")
             else:
-                logger.warning(f"⚠️ Нет данных аутентификации в g.current_user")
+                logger.warning("⚠️ Нет данных аутентификации в g.current_user")
 
         if filter_by_subscriptions and user_id:
             from database.db_models import get_active_categories
@@ -196,7 +196,7 @@ def api_latest_news():
                 all_news = filtered_news
                 logger.info(f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации")
             else:
-                logger.info(f"⚠️ Нет активных предпочтений для фильтрации")
+                logger.info("⚠️ Нет активных предпочтений для фильтрации")
 
         # Сортируем по важности, достоверности и свежести
         import datetime

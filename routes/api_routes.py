@@ -917,8 +917,6 @@ def generate_digest():
 
         # ИМПОРТЫ ДЛЯ НОВОЙ ФУНКЦИОНАЛЬНОСТИ
         from database.db_models import (
-            get_user_preferences,
-            save_user_preferences,
             log_digest_generation,
             get_smart_filter_for_time,
         )
