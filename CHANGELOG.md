@@ -5,7 +5,29 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект следует [Semantic Versioning](https://semver.org/lang/ru/).
 
-## [Unreleased] - 2025-10-13
+## [Unreleased] - 2025-10-14
+
+### Добавлено
+- **Унификация Cloudflare URL** - централизованное управление Cloudflare Tunnel URL через единую точку конфигурации
+- **API endpoint /api/config/urls** - публичный endpoint для получения актуальных URL конфигурации
+- **React хук useApiConfig** - автоматическое получение и кэширование API конфигурации на фронтенде
+- **Runtime конфигурация** - не требует пересборки фронтенда при смене Cloudflare URL
+
+### Улучшено
+- **EventsPage.tsx** - заменены хардкод URL на относительные пути `/api/events/*`
+- **vite.config.ts** - автоматическое чтение allowedHosts из переменных окружения
+- **webapp.py** - CORS origins и CSP policy теперь используют `CLOUDFLARE_TUNNEL_URL` из конфига
+- **check_processes.sh** - получение URL напрямую из `config/core/cloudflare.py`
+- **Документация** - обновлены README.md и webapp/README.md с инструкциями по конфигурации
+
+### Изменено
+- **Cloudflare URL управление** - теперь URL меняется только в `.env` вместо 8+ файлов
+- **Структура проекта** - все отчёты перемещены из корня в `docs/reports/`
+
+### Исправлено
+- **Хардкод URL** - устранены все хардкод вхождения Cloudflare URL в проекте
+
+## [2025-10-13]
 
 ### Улучшено
 - **Shell-скрипты управления v2.0** - объединение и улучшение скриптов

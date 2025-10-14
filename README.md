@@ -482,6 +482,45 @@ PulseAI реализует многоуровневую систему безо�
 
 **Подробнее:** [docs/SECURITY.md](docs/SECURITY.md)
 
+## ⚙️ Конфигурация Cloudflare Tunnel
+
+PulseAI использует **единую точку конфигурации** для Cloudflare Tunnel URL:
+
+### Источник истины
+- **Файл:** `config/core/cloudflare.py`
+- **Переменная окружения:** `CLOUDFLARE_TUNNEL_URL`
+- **Значение по умолчанию:** `https://scoring-side-receives-hudson.trycloudflare.com`
+
+### Как изменить URL
+
+1. **Обновите переменную окружения:**
+   ```bash
+   export CLOUDFLARE_TUNNEL_URL="https://your-new-url.trycloudflare.com"
+   ```
+
+2. **Или обновите .env файл** в `config_files/environment/.env`:
+   ```
+   CLOUDFLARE_TUNNEL_URL=https://your-new-url.trycloudflare.com
+   ```
+
+3. **Перезапустите сервисы:**
+   ```bash
+   ./stop_services.sh
+   ./start_services.sh
+   ```
+
+### Где используется
+
+- ✅ **Backend:** `src/webapp.py` (CORS, CSP policy)
+- ✅ **Frontend:** Динамическая загрузка через `/api/config/urls`
+- ✅ **Vite:** Автоматическая настройка allowedHosts
+- ✅ **Scripts:** `check_processes.sh`, `generate_vite_config.py`
+- ✅ **Telegram Bot:** `telegram_bot/handlers/dashboard.py`
+
+**Важно:** Больше не нужно менять URL в нескольких местах — всё управляется из одного источника!
+
+**Подробный отчёт:** [docs/reports/CLOUDFLARE_URL_UNIFICATION_REPORT.md](docs/reports/CLOUDFLARE_URL_UNIFICATION_REPORT.md)
+
 ## 📄 Лицензия
 
 Этот проект лицензирован под MIT License - см. [LICENSE](LICENSE) файл для деталей.

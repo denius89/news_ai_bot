@@ -34,11 +34,19 @@ Modern React-based web application for managing PulseAI notifications with a cle
 # Install dependencies
 npm install
 
+# Configure environment (optional for dev)
+# Create .env file in webapp/ directory with:
+# VITE_CLOUDFLARE_TUNNEL_URL=https://your-subdomain.trycloudflare.com
+# или
+# CLOUDFLARE_TUNNEL_URL=https://your-subdomain.trycloudflare.com
+
 # Start development server
 npm run dev
 ```
 
 The app will be available at `http://localhost:3000`
+
+**Note:** Environment variables are optional in development mode. The app will use relative API paths through Vite proxy.
 
 ### Building for Production
 

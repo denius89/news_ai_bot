@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 import { fileURLToPath, URL } from 'node:url'
@@ -6,6 +6,13 @@ import { fileURLToPath, URL } from 'node:url'
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
   const isProduction = mode === 'production' || command === 'build'
+  
+  // Загружаем переменные окружения
+  const env = loadEnv(mode, process.cwd(), '')
+  
+  // Извлекаем домен из Cloudflare URL для allowedHosts
+  const cloudflareUrl = env.VITE_CLOUDFLARE_TUNNEL_URL || env.CLOUDFLARE_TUNNEL_URL || ''
+  const cloudflareDomain = cloudflareUrl.replace('https://', '').replace('http://', '')
   
   return {
     plugins: [react()],
@@ -23,9 +30,9 @@ export default defineConfig(({ command, mode }) => {
         allowedHosts: [
           'localhost',
           '127.0.0.1',
-          'design-treasures-titten-formation.trycloudflare.com',
+          cloudflareDomain,
           '.trycloudflare.com'
-        ],
+        ].filter(Boolean),
         headers: {
           'Cross-Origin-Embedder-Policy': 'unsafe-none',
           'Cross-Origin-Opener-Policy': 'unsafe-none',

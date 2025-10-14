@@ -12,6 +12,7 @@ from config.core.settings import VERSION, DEBUG, WEBAPP_PORT, WEBAPP_HOST, REACT
 from utils.auth.telegram_auth import verify_telegram_auth
 from routes.news_routes import news_bp
 from routes.events_routes import register_events_routes
+from routes.config_routes import config_bp
 
 # webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
@@ -47,11 +48,12 @@ def authenticate_request():
         # Публичные API endpoints, которые не требуют аутентификации
         public_paths = [
             "/api/health",
+            "/api/config",  # Конфигурация - публичный доступ
             "/api/users/by-telegram-id",  # Только для первичной аутентификации
             "/api/categories",
             "/api/digests/categories",
             "/api/digests/styles",
-            "/api/latest",
+            "/api/news/latest",  # Новости - публичный доступ
             "/api/dashboard/stats",
             "/api/dashboard/latest_news",
             "/api/dashboard/news_trend",
@@ -97,10 +99,12 @@ def process_telegram_request():
 
 
 # Настройка CORS для Telegram WebApp
+from config.core.cloudflare import CLOUDFLARE_TUNNEL_URL
+
 CORS(
     app,
     origins=[  # noqa: E305
-        "https://design-treasures-titten-formation.trycloudflare.com",
+        CLOUDFLARE_TUNNEL_URL,
         "https://*.trycloudflare.com",
         "https://telegram.org",
         "https://web.telegram.org",
@@ -114,9 +118,10 @@ def set_frame_options(response):
     """Устанавливает заголовки для разрешения встраивания в iframe"""
     response.headers["X-Frame-Options"] = "ALLOWALL"
     # Обновленная CSP политика для Telegram WebApp
+    # Используем конфигурацию из cloudflare.py
     csp_policy = (
         "frame-ancestors *; "
-        "connect-src 'self' https://*.trycloudflare.com https://telegram.org https://web.telegram.org wss://*.telegram.org wss://*.web.telegram.org data:; "
+        f"connect-src 'self' {CLOUDFLARE_TUNNEL_URL} https://*.trycloudflare.com https://telegram.org https://web.telegram.org wss://*.telegram.org wss://*.web.telegram.org data:; "
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://telegram.org; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
@@ -240,7 +245,8 @@ def index():
 
 
 # Регистрируем маршруты
-app.register_blueprint(news_bp)
+app.register_blueprint(config_bp)  # Config routes - должен быть первым
+app.register_blueprint(news_bp, url_prefix="/api/news")
 register_events_routes(app)  # Register events routes
 # webapp_bp удален - конфликтовал с serve_react()
 app.register_blueprint(api_bp)

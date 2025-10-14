@@ -212,15 +212,12 @@ check_cloudflare() {
 import sys
 sys.path.append('/Users/denisfedko/news_ai_bot')
 try:
-    from config.core.cloudflare import get_webapp_url
-    print(get_webapp_url())
-except:
-    try:
-        from config.cloudflare import get_webapp_url
-        print(get_webapp_url())
-    except:
-        print('https://element-rangers-button-stages.trycloudflare.com')
-" 2>/dev/null || echo "https://element-rangers-button-stages.trycloudflare.com")
+    from config.core.cloudflare import CLOUDFLARE_TUNNEL_URL
+    print(CLOUDFLARE_TUNNEL_URL)
+except Exception as e:
+    print(f'Error: {e}', file=sys.stderr)
+    sys.exit(1)
+" 2>/dev/null || echo "ERROR: Cannot load Cloudflare configuration")
         
         echo -e "   ${CYAN}URL:${NC} $WEBAPP_URL"
         log "INFO" "Cloudflare URL: $WEBAPP_URL"
