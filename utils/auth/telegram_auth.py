@@ -19,22 +19,22 @@ logger = logging.getLogger(__name__)
 def get_user_uuid_by_telegram_id(telegram_id: int) -> Optional[str]:
     """
     Получить UUID пользователя по Telegram ID из базы данных.
-    
+
     Args:
         telegram_id: Telegram ID пользователя
-        
+
     Returns:
         UUID пользователя или None если не найден
     """
     try:
         from database.db_models import supabase
-        
+
         if not supabase:
             logger.error("Supabase не инициализирован")
             return None
-            
+
         result = supabase.table("users").select("id").eq("telegram_id", telegram_id).execute()
-        
+
         if result.data and len(result.data) > 0:
             user_uuid = result.data[0]["id"]
             logger.debug(f"Found user UUID {user_uuid} for telegram_id {telegram_id}")
@@ -42,7 +42,7 @@ def get_user_uuid_by_telegram_id(telegram_id: int) -> Optional[str]:
         else:
             logger.warning(f"User not found for telegram_id {telegram_id}")
             return None
-            
+
     except Exception as e:
         logger.error(f"Error getting user UUID for telegram_id {telegram_id}: {e}")
         return None
@@ -346,7 +346,7 @@ def verify_telegram_auth(
                 if user_data:
                     telegram_id = user_data["id"]
                     log_auth_attempt(telegram_id, True, "initData_HMAC")
-                    
+
                     # Получаем реальный UUID из базы данных
                     real_user_id = get_user_uuid_by_telegram_id(telegram_id)
                     if not real_user_id:
@@ -355,7 +355,7 @@ def verify_telegram_auth(
                             "success": False,
                             "message": "User not found in database",
                         }
-                    
+
                     return {
                         "success": True,
                         "user_id": real_user_id,  # Реальный UUID из базы данных
@@ -370,7 +370,7 @@ def verify_telegram_auth(
     if session_data and session_data.get("user_id") and session_data.get("telegram_id"):
         telegram_id = session_data["telegram_id"]
         log_auth_attempt(telegram_id, True, "session")
-        
+
         # Проверяем что session содержит UUID, а не Telegram ID
         session_user_id = session_data["user_id"]
         if len(session_user_id) > 10:  # UUID длиннее чем Telegram ID
@@ -391,7 +391,7 @@ def verify_telegram_auth(
                     "success": False,
                     "message": "User not found in database",
                 }
-            
+
             return {
                 "success": True,
                 "user_id": real_user_id,  # Реальный UUID из базы данных
@@ -408,7 +408,7 @@ def verify_telegram_auth(
             telegram_id = user_info.get("id")
             if telegram_id:
                 log_auth_attempt(telegram_id, True, "userData_fallback")
-                
+
                 # Получаем реальный UUID из базы данных
                 real_user_id = get_user_uuid_by_telegram_id(telegram_id)
                 if not real_user_id:
@@ -417,7 +417,7 @@ def verify_telegram_auth(
                         "success": False,
                         "message": "User not found in database",
                     }
-                
+
                 return {
                     "success": True,
                     "user_id": real_user_id,  # Реальный UUID из базы данных

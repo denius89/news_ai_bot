@@ -275,7 +275,7 @@ def get_recent_news():
     """Получает последние новости для дашборда (оптимизированная версия)."""
     try:
         limit = request.args.get("limit", 10, type=int)
-        
+
         # Возвращаем моковые данные для быстрого ответа
         mock_news = [
             {
@@ -285,12 +285,12 @@ def get_recent_news():
                 "category": "tech",
                 "published_at": datetime.now().isoformat(),
                 "credibility": 0.8,
-                "importance": 0.7
+                "importance": 0.7,
             }
             for i in range(1, min(limit + 1, 6))
         ]
-        
-        result = type('MockResult', (), {'data': mock_news})()
+
+        result = type("MockResult", (), {"data": mock_news})()
 
         # Форматируем данные
         news_data = []

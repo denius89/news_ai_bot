@@ -148,7 +148,7 @@ def api_latest_news():
         filter_by_subscriptions = request.args.get("filter_by_subscriptions", "false").lower() == "true"
         # Получаем новости из базы данных
         db_service = get_sync_service()
-        
+
         # Оптимизация: загружаем только нужное количество + небольшой буфер для пагинации
         fetch_limit = min(limit * 3, 100)  # Максимум 100 новостей для фильтрации
         all_news = db_service.get_latest_news(limit=fetch_limit)
@@ -157,6 +157,7 @@ def api_latest_news():
         user_id = None
         if filter_by_subscriptions:
             from flask import g
+
             logger.info(f"🔍 Запрос фильтрации: filter_by_subscriptions={filter_by_subscriptions}")
             # Проверяем аутентификацию только если нужна фильтрация
             if hasattr(g, "current_user") and g.current_user:
@@ -170,8 +171,8 @@ def api_latest_news():
 
             logger.info(f"🔍 Фильтрация новостей для пользователя {user_id}")
             active_cats = get_active_categories(user_id)
-            full_categories = active_cats.get('full_categories', [])
-            subcategories = active_cats.get('subcategories', {})
+            full_categories = active_cats.get("full_categories", [])
+            subcategories = active_cats.get("subcategories", {})
             logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories}")
 
             # Если есть активные предпочтения, фильтруем
@@ -179,8 +180,8 @@ def api_latest_news():
                 logger.info(f"✅ Применяем фильтрацию: {len(all_news)} новостей до фильтрации")
                 filtered_news = []
                 for news_item in all_news:
-                    category = news_item.get('category')
-                    subcategory = news_item.get('subcategory')
+                    category = news_item.get("category")
+                    subcategory = news_item.get("subcategory")
 
                     # Проверяем: либо вся категория включена, либо конкретная подкатегория
                     if category in full_categories:
@@ -193,9 +194,7 @@ def api_latest_news():
                         logger.debug(f"❌ Новость {category}/{subcategory} отфильтрована")
 
                 all_news = filtered_news
-                logger.info(
-                    f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации"
-                )
+                logger.info(f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации")
             else:
                 logger.info(f"⚠️ Нет активных предпочтений для фильтрации")
 

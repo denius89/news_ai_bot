@@ -1863,11 +1863,7 @@ def get_user_category_preferences(user_id: str) -> Dict:
         return {}
 
     try:
-        result = safe_execute(
-            supabase.table("user_preferences")
-            .select("category_preferences")
-            .eq("user_id", user_id)
-        )
+        result = safe_execute(supabase.table("user_preferences").select("category_preferences").eq("user_id", user_id))
 
         if result.data and len(result.data) > 0:
             preferences = result.data[0].get("category_preferences", {})
@@ -1905,14 +1901,13 @@ def upsert_user_category_preferences(user_id: str, preferences: Dict) -> bool:
     try:
         # Upsert preferences (создать или обновить)
         result = safe_execute(
-            supabase.table("user_preferences")
-            .upsert(
+            supabase.table("user_preferences").upsert(
                 {
                     "user_id": user_id,
                     "category_preferences": preferences,
                     "updated_at": datetime.now(timezone.utc).isoformat(),
                 },
-                on_conflict="user_id"
+                on_conflict="user_id",
             )
         )
 
@@ -1960,10 +1955,7 @@ def get_active_categories(user_id: str) -> Dict[str, List[str]]:
         # Если предпочтений нет, возвращаем пустые списки
         # (значит показываем весь контент без фильтрации)
         logger.debug(f"Нет предпочтений для пользователя {user_id}, фильтрация не применяется")
-        return {
-            'full_categories': [],
-            'subcategories': {}
-        }
+        return {"full_categories": [], "subcategories": {}}
 
     full_categories = []
     subcategories = {}
@@ -1978,11 +1970,7 @@ def get_active_categories(user_id: str) -> Dict[str, List[str]]:
         # Пустой список [] или другие значения = пропускаем (отключена)
 
     logger.debug(
-        f"Активные категории для пользователя {user_id}: "
-        f"full={full_categories}, subcategories={subcategories}"
+        f"Активные категории для пользователя {user_id}: " f"full={full_categories}, subcategories={subcategories}"
     )
 
-    return {
-        'full_categories': full_categories,
-        'subcategories': subcategories
-    }
+    return {"full_categories": full_categories, "subcategories": subcategories}

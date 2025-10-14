@@ -317,6 +317,7 @@ def get_upcoming_events():
         user_id = None
         if filter_by_subscriptions:
             from flask import g
+
             # Проверяем аутентификацию только если нужна фильтрация
             if hasattr(g, "current_user") and g.current_user:
                 user_id = g.current_user["user_id"]
@@ -325,8 +326,8 @@ def get_upcoming_events():
             from database.db_models import get_active_categories
 
             active_cats = get_active_categories(user_id)
-            full_categories = active_cats.get('full_categories', [])
-            subcategories = active_cats.get('subcategories', {})
+            full_categories = active_cats.get("full_categories", [])
+            subcategories = active_cats.get("subcategories", {})
 
             # Если есть активные предпочтения, фильтруем
             if full_categories or subcategories:
@@ -343,8 +344,7 @@ def get_upcoming_events():
 
                 events = filtered_events
                 logger.info(
-                    f"Фильтрация событий по предпочтениям пользователя {user_id}: "
-                    f"{len(filtered_events)} событий"
+                    f"Фильтрация событий по предпочтениям пользователя {user_id}: " f"{len(filtered_events)} событий"
                 )
 
         # Convert to JSON format
