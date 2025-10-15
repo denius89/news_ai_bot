@@ -1107,9 +1107,9 @@ def get_digest_history():
     user_id = g.current_user["user_id"]
     limit = int(request.args.get("limit", 20))
     offset = int(request.args.get("offset", 0))
-    # Параметры пока не используются; зарезервированы для будущих фильтров
-    # include_deleted = request.args.get("include_deleted", "false").lower() == "true"
-    # include_archived = request.args.get("include_archived", "false").lower() == "true"
+    # Параметры фильтрации
+    include_deleted = request.args.get("include_deleted", "false").lower() == "true"
+    include_archived = request.args.get("include_archived", "false").lower() == "true"
 
     logger.info(f"🔍 Getting digest history for user {user_id} (method: {g.current_user['method']})")
 
@@ -1128,7 +1128,13 @@ def get_digest_history():
 
         # Get user's digest history with soft delete support
         db_service = get_sync_service()
-        digests = db_service.get_user_digests(str(user_uuid), limit=limit)
+        digests = db_service.get_user_digests(
+            str(user_uuid),
+            limit=limit,
+            offset=offset,
+            include_deleted=include_deleted,
+            include_archived=include_archived,
+        )
 
         # Format digests for response (updated for new schema after migration)
         formatted_digests = []
@@ -1240,6 +1246,10 @@ def get_digest_by_id(digest_id):
 @api_bp.route("/digests/<digest_id>", methods=["DELETE"])
 def soft_delete_digest(digest_id):
     """Soft delete specific digest by ID."""
+    import time
+
+    start_time = time.time()
+
     user_id = request.args.get("user_id")
     permanent = request.args.get("permanent", "false").lower() == "true"
 
@@ -1265,6 +1275,9 @@ def soft_delete_digest(digest_id):
             # Мягкое удаление
             success = db_soft_delete_digest(digest_id=str(digest_id), user_id=str(user_uuid))
             message = "Digest moved to trash"
+
+        elapsed = time.time() - start_time
+        logger.info(f"⏱️ Delete digest {digest_id[:8]}... (permanent={permanent}) took {elapsed:.3f}s")
 
         if success:
             return jsonify({"status": "success", "message": message, "deleted": True})
@@ -1307,6 +1320,10 @@ def restore_digest(digest_id):
 @api_bp.route("/digests/<digest_id>/archive", methods=["POST"])
 def archive_digest(digest_id):
     """Archive digest."""
+    import time
+
+    start_time = time.time()
+
     user_id = request.args.get("user_id")
 
     if not user_id:
@@ -1322,6 +1339,9 @@ def archive_digest(digest_id):
 
         success = db_archive_digest(digest_id=str(digest_id), user_id=str(user_uuid))
 
+        elapsed = time.time() - start_time
+        logger.info(f"⏱️ Archive digest {digest_id[:8]}... took {elapsed:.3f}s")
+
         if success:
             return jsonify({"status": "success", "message": "Digest archived successfully", "archived": True})
         else:
@@ -1335,6 +1355,10 @@ def archive_digest(digest_id):
 @api_bp.route("/digests/<digest_id>/unarchive", methods=["POST"])
 def unarchive_digest(digest_id):
     """Unarchive digest."""
+    import time
+
+    start_time = time.time()
+
     user_id = request.args.get("user_id")
 
     if not user_id:
@@ -1349,6 +1373,9 @@ def unarchive_digest(digest_id):
             return jsonify({"status": "error", "message": "User not found"}), 404
 
         success = db_unarchive_digest(digest_id=str(digest_id), user_id=str(user_uuid))
+
+        elapsed = time.time() - start_time
+        logger.info(f"⏱️ Unarchive digest {digest_id[:8]}... took {elapsed:.3f}s")
 
         if success:
             return jsonify({"status": "success", "message": "Digest unarchived successfully", "unarchived": True})
