@@ -2,6 +2,7 @@ import logging
 import os
 from flask import Flask, send_from_directory, redirect, session, request, g
 from flask_cors import CORS
+from flask_caching import Cache
 from datetime import timedelta
 
 import sys
@@ -38,6 +39,13 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(hours=24),
 )
+
+# Flask-Caching configuration
+cache = Cache(app, config={
+    'CACHE_TYPE': 'simple',  # In-memory cache
+    'CACHE_DEFAULT_TIMEOUT': 300,  # 5 minutes default
+    'CACHE_THRESHOLD': 500  # Max 500 items in cache
+})
 
 
 # Middleware для единой аутентификации
@@ -247,6 +255,34 @@ def serve_react(path=""):
         )
 
 
+# Admin Panel - React SPA routes
+@app.route("/admin")
+@app.route("/admin/")
+@app.route("/admin/<path:path>")
+def serve_admin(path=""):
+    """Обслуживает Admin Panel React приложение"""
+    try:
+        if path == "" or path == "/" or not path:
+            # Для корневого admin route отдаём index.html
+            return send_from_directory(REACT_DIST_PATH, "index.html")
+        
+        # Попробовать отдать статический файл (для assets)
+        try:
+            return send_from_directory(REACT_DIST_PATH, path)
+        except BaseException:
+            # React Router fallback для всех admin/* маршрутов
+            return send_from_directory(REACT_DIST_PATH, "index.html")
+    except FileNotFoundError:
+        return (
+            f"""
+            <h1>React не собран</h1>
+            <p>Запустите: <code>cd webapp && npm run build</code></p>
+            <p>Папка {REACT_DIST_PATH} не найдена.</p>
+            """,
+            404,
+        )
+
+
 # Главная страница перенаправляет на React
 @app.route("/")
 def index():
@@ -263,6 +299,10 @@ app.register_blueprint(dashboard_api)
 # WebSocket blueprint removed - using FastAPI now
 # app.register_blueprint(ws_bp)
 app.register_blueprint(metrics_bp)
+
+# Admin Panel API
+from routes.admin_routes import admin_bp
+app.register_blueprint(admin_bp)  # url_prefix='/admin/api' уже в Blueprint
 
 # WebSocket initialization removed - using FastAPI now
 # if REACTOR_ENABLED:
@@ -302,11 +342,11 @@ if __name__ == "__main__":
     #         socketio.run(app, host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG, allow_unsafe_werkzeug=True)
     #     else:
     #         logger.error("❌ SocketIO не инициализирован, запускаем обычный Flask")
-    #         app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+    #         app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG, threaded=True)
     # else:
     #     # Обычный Flask запуск
-    #     app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+    #     app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG, threaded=True)
 
     # Запускаем обычный Flask без WebSocket
     logger.info("⚠️ WebSocket отключен, запускаем обычный Flask")
-    app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG)
+    app.run(host=WEBAPP_HOST, port=WEBAPP_PORT, debug=DEBUG, threaded=True)

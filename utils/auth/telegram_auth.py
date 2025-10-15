@@ -224,10 +224,18 @@ def validate_telegram_auth_headers(request_headers: Dict[str, str]) -> bool:
             logger.warning(f"Failed to parse initData: {e}")
             return False
 
-    # Если есть user data, проверяем его формат
+    # Если есть user data, проверяем его формат (Base64-кодированный JSON)
     if user_data:
         try:
-            json.loads(user_data)
+            import base64
+
+            # Пробуем декодировать Base64 → JSON
+            try:
+                user_data_json = base64.b64decode(user_data).decode('utf-8')
+                json.loads(user_data_json)
+            except (base64.binascii.Error, UnicodeDecodeError):
+                # Fallback: plain JSON без Base64
+                json.loads(user_data)
         except json.JSONDecodeError as e:
             logger.warning(f"Invalid user data format: {e}")
             return False
@@ -257,11 +265,20 @@ def get_telegram_user_id_from_headers(request_headers: Dict[str, str]) -> Option
         except (ValueError, json.JSONDecodeError, KeyError) as e:
             logger.debug(f"Failed to extract user ID from initData: {e}")
 
-    # Затем пробуем извлечь из user data
+    # Затем пробуем извлечь из user data (Base64-кодированный)
     user_data = request_headers.get("X-Telegram-User-Data")
     if user_data:
         try:
-            user_info = json.loads(user_data)
+            import base64
+
+            # Пробуем декодировать Base64
+            try:
+                user_data_json = base64.b64decode(user_data).decode('utf-8')
+                user_info = json.loads(user_data_json)
+            except (base64.binascii.Error, UnicodeDecodeError):
+                # Fallback: plain JSON без Base64
+                user_info = json.loads(user_data)
+
             user_id = user_info.get("id")
             if user_id:
                 return int(user_id)
@@ -400,11 +417,21 @@ def verify_telegram_auth(
                 "message": "Session authentication successful",
             }
 
-    # 3. ПРИОРИТЕТ 3: Fallback JSON аутентификация
+    # 3. ПРИОРИТЕТ 3: Fallback JSON аутентификация (Base64-кодированный)
     user_data_header = request_headers.get("X-Telegram-User-Data")
     if user_data_header:
         try:
-            user_info = json.loads(user_data_header)
+            import base64
+
+            # Декодируем Base64 → UTF-8 JSON
+            try:
+                user_data_json = base64.b64decode(user_data_header).decode('utf-8')
+                user_info = json.loads(user_data_json)
+            except (base64.binascii.Error, UnicodeDecodeError) as decode_error:
+                # Fallback: возможно это старый формат (plain JSON без Base64)
+                logger.debug(f"Base64 decode failed, trying plain JSON: {decode_error}")
+                user_info = json.loads(user_data_header)
+
             telegram_id = user_info.get("id")
             if telegram_id:
                 log_auth_attempt(telegram_id, True, "userData_fallback")

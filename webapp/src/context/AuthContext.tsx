@@ -65,49 +65,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     throw new Error('Failed to get initData after retries');
   };
 
-  // Безопасная сериализация Telegram пользователя
-  // Функция для нормализации Unicode символов
-  const normalizeUnicodeText = (text: string): string => {
-    if (!text) return text;
-    
-    // Нормализуем Unicode символы (NFD -> NFC)
-    return text
-      .normalize('NFD')  // Разбиваем составные символы
-      .replace(/[\u0300-\u036f]/g, '')  // Убираем диакритические знаки
-      .replace(/[^\x00-\x7F]/g, (char) => {
-        // Заменяем не-ASCII символы на ASCII аналоги
-        const replacements: Record<string, string> = {
-          '𝕀': 'I', '𝕧': 'v', '𝕒': 'a', '𝕟': 'n',
-          '𝔸': 'A', '𝔹': 'B', 'ℂ': 'C', '𝔻': 'D',
-          '𝔼': 'E', '𝔽': 'F', '𝔾': 'G', 'ℍ': 'H',
-          '𝕁': 'J', '𝕂': 'K', '𝕃': 'L',
-          '𝕄': 'M', 'ℕ': 'N', '𝕆': 'O', 'ℙ': 'P',
-          'ℚ': 'Q', 'ℝ': 'R', '𝕊': 'S', '𝕋': 'T',
-          '𝕌': 'U', '𝕍': 'V', '𝕎': 'W', '𝕏': 'X',
-          '𝕐': 'Y', 'ℤ': 'Z'
-        };
-        return replacements[char] || char;
-      });
-  };
-
+  // Безопасная сериализация Telegram пользователя с Base64 кодированием
   const serializeTelegramUser = (tgUser: TelegramUser): string => {
     try {
-      // Создаем нормализованную копию пользователя
-      const normalizedUser = {
-        ...tgUser,
-        first_name: normalizeUnicodeText(tgUser.first_name || ''),
-        last_name: normalizeUnicodeText(tgUser.last_name || ''),
-        username: normalizeUnicodeText(tgUser.username || '')
-      };
+      // НЕ нормализуем Unicode - сохраняем оригинальные данные
+      // Но кодируем в Base64 для безопасной передачи через HTTP headers
+      const userJson = JSON.stringify(tgUser);
       
-      return JSON.stringify(normalizedUser);
+      // Кодируем UTF-8 строку в Base64 для совместимости с HTTP headers (ISO-8859-1)
+      // btoa() требует Latin-1, поэтому сначала encodeURIComponent → unescape
+      const base64 = btoa(unescape(encodeURIComponent(userJson)));
+      
+      return base64;
     } catch (e) {
-      console.error('Error stringifying tgUser:', e);
-      return JSON.stringify({
+      console.error('Error encoding tgUser to Base64:', e);
+      // Fallback: минимальные данные в Base64
+      const fallbackJson = JSON.stringify({
         id: tgUser.id,
-        first_name: normalizeUnicodeText(tgUser.first_name || ''),
-        username: normalizeUnicodeText(tgUser.username || '')
+        first_name: tgUser.first_name || '',
+        username: tgUser.username || ''
       });
+      return btoa(unescape(encodeURIComponent(fallbackJson)));
     }
   };
 
@@ -120,7 +98,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const tgWebApp = window.Telegram?.WebApp;
       const tgUser = tgWebApp?.user || tgWebApp?.initDataUnsafe?.user;
       
+      // Исключение для админ панели в DEV режиме
+      const isAdminPanel = window.location.pathname.startsWith('/admin');
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isCloudflareTunnel = window.location.hostname.includes('trycloudflare.com');
+      
       if (!tgWebApp || !tgUser) {
+        if (isAdminPanel && (isLocalhost || isCloudflareTunnel)) {
+          console.log('🔓 DEV mode: bypassing Telegram auth for admin panel');
+          // Создаём fake user для админ панели в DEV режиме
+          const fakeUser: TelegramUser = {
+            id: 999999999,
+            first_name: 'Dev Admin',
+            username: 'dev_admin',
+            language_code: 'en'
+          };
+          
+          // Создаём fake auth headers
+          const headers = {
+            'X-Telegram-Init-Data': '',
+            'X-Telegram-User-Data': serializeTelegramUser(fakeUser)
+          };
+          setAuthHeaders(headers);
+          
+          // Создаём fake user data
+          const fakeUserData: UserData = {
+            user_id: 'dev-admin-999999999',
+            telegram_id: 999999999,
+            username: 'dev_admin',
+            locale: 'en',
+            first_name: 'Dev Admin',
+            telegram_user: fakeUser
+          };
+          
+          setUser(fakeUserData);
+          setLoading(false);
+          return;
+        }
+        
         throw new Error('Приложение должно запускаться только через Telegram WebApp');
       }
 

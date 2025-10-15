@@ -16,7 +16,7 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / "config_files" / "en
 
 # Основной URL Cloudflare Tunnel
 CLOUDFLARE_TUNNEL_URL = os.getenv(
-    "CLOUDFLARE_TUNNEL_URL", "https://democrats-divorce-sheer-activities.trycloudflare.com"
+    "CLOUDFLARE_TUNNEL_URL", "https://step-everywhere-gem-electronic.trycloudflare.com"
 )
 
 # Локальный URL для туннеля

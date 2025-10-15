@@ -101,6 +101,8 @@ from datetime import datetime, timezone
 from typing import List, Dict, Optional
 from pathlib import Path
 import sys
+import threading
+from queue import Queue, Empty
 
 import httpx
 from supabase import create_client, create_async_client, Client, AsyncClient
@@ -126,6 +128,12 @@ class DatabaseService:
     Separate instances should be used for sync and async operations.
     """
 
+    # Connection pool для переиспользования клиентов
+    _sync_pool = Queue(maxsize=5)
+    _async_pool = Queue(maxsize=5)
+    _pool_initialized = False
+    _lock = threading.Lock()
+
     def __init__(self, async_mode: bool = False):
         """
         Initialize database service.
@@ -137,28 +145,73 @@ class DatabaseService:
         self.sync_client: Optional[Client] = None
         self.async_client: Optional[AsyncClient] = None
 
+        # Инициализируем pool если нужно
+        self._ensure_pool_initialized()
+
         if async_mode:
             self._init_async_client()
         else:
             self._init_sync_client()
 
+    def _ensure_pool_initialized(self):
+        """Инициализация connection pool"""
+        if not DatabaseService._pool_initialized:
+            with DatabaseService._lock:
+                if not DatabaseService._pool_initialized:
+                    # Создаем 5 клиентов для pool
+                    for _ in range(5):
+                        try:
+                            sync_client = self._create_sync_client()
+                            DatabaseService._sync_pool.put(sync_client)
+                        except:
+                            pass
+                    DatabaseService._pool_initialized = True
+
+    def _get_from_pool(self) -> Optional[Client]:
+        """Получить клиент из pool"""
+        try:
+            return DatabaseService._sync_pool.get_nowait()
+        except Empty:
+            return None
+
+    def _return_to_pool(self, client: Client):
+        """Вернуть клиент в pool"""
+        try:
+            DatabaseService._sync_pool.put_nowait(client)
+        except:
+            pass  # Pool full, ignore
+
     def _init_sync_client(self):
-        """Initialize synchronous Supabase client."""
+        """Initialize synchronous Supabase client with connection pooling."""
         if not SUPABASE_URL or not SUPABASE_KEY:
             logger.warning("⚠️ Supabase credentials not found")
             return
 
-        try:
-            # Принудительно отключаем HTTP/2 для решения pseudo-header ошибки
-            import os
+        # Попробуем получить клиент из pool
+        self.sync_client = self._get_from_pool()
+        
+        if not self.sync_client:
+            # Создаем новый клиент если pool пуст
+            try:
+                # Принудительно отключаем HTTP/2 для решения pseudo-header ошибки
+                import os
 
-            os.environ["HTTPX_NO_HTTP2"] = "1"
-            os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
+                os.environ["HTTPX_NO_HTTP2"] = "1"
+                os.environ["SUPABASE_HTTP2_DISABLED"] = "1"
 
-            self.sync_client = create_client(SUPABASE_URL, SUPABASE_KEY)
-            logger.info("✅ Sync Supabase client initialized with HTTP/2 disabled via environment")
-        except Exception as e:
-            logger.error("❌ Failed to initialize Sync Supabase: %s", e)
+                self.sync_client = self._create_sync_client()
+                logger.info("✅ New sync Supabase client created with HTTP/2 disabled")
+            except Exception as e:
+                logger.error("❌ Failed to initialize Sync Supabase: %s", e)
+
+    def _create_sync_client(self) -> Client:
+        """Создать новый sync клиент"""
+        return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+    def __del__(self):
+        """Возвращаем клиент в pool при удалении объекта"""
+        if self.sync_client and not self.async_mode:
+            self._return_to_pool(self.sync_client)
 
     def _init_async_client(self):
         """Initialize asynchronous Supabase client."""
@@ -670,13 +723,23 @@ class DatabaseService:
             logger.error("❌ Error saving digest: %s", e)
             return None
 
-    def get_user_digests(self, user_id: str, limit: int = 10) -> List[Dict]:
+    def get_user_digests(
+        self, 
+        user_id: str, 
+        limit: int = 10,
+        offset: int = 0,
+        include_deleted: bool = False,
+        include_archived: bool = False
+    ) -> List[Dict]:
         """
-        Get user digests.
+        Get user digests with filtering support.
 
         Args:
             user_id: User ID
             limit: Maximum number of digests to return
+            offset: Number of digests to skip
+            include_deleted: Include deleted digests
+            include_archived: Include archived digests
 
         Returns:
             List of digest data
@@ -686,9 +749,26 @@ class DatabaseService:
                 self.sync_client.table("digests")
                 .select("*")
                 .eq("user_id", user_id)
-                .order("created_at", desc=True)
-                .limit(limit)
             )
+            
+            # Фильтрация по статусу
+            if include_deleted and include_archived:
+                # Все дайджесты
+                pass
+            elif include_deleted and not include_archived:
+                # Только удаленные (не архивированные)
+                query = query.not_.is_("deleted_at", "null")
+                query = query.eq("archived", False)
+            elif not include_deleted and include_archived:
+                # Только архивированные (не удаленные)
+                query = query.is_("deleted_at", "null")
+                query = query.eq("archived", True)
+            else:  # not include_deleted and not include_archived
+                # Только активные (не удаленные и не архивированные)
+                query = query.is_("deleted_at", "null")
+                query = query.eq("archived", False)
+            
+            query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
 
             result = self.safe_execute(query)
             return result.data if result.data else []
