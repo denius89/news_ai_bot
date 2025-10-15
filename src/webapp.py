@@ -41,11 +41,14 @@ app.config.update(
 )
 
 # Flask-Caching configuration
-cache = Cache(app, config={
-    'CACHE_TYPE': 'simple',  # In-memory cache
-    'CACHE_DEFAULT_TIMEOUT': 300,  # 5 minutes default
-    'CACHE_THRESHOLD': 500  # Max 500 items in cache
-})
+cache = Cache(
+    app,
+    config={
+        "CACHE_TYPE": "simple",  # In-memory cache
+        "CACHE_DEFAULT_TIMEOUT": 300,  # 5 minutes default
+        "CACHE_THRESHOLD": 500,  # Max 500 items in cache
+    },
+)
 
 
 # Middleware для единой аутентификации
@@ -265,7 +268,7 @@ def serve_admin(path=""):
         if path == "" or path == "/" or not path:
             # Для корневого admin route отдаём index.html
             return send_from_directory(REACT_DIST_PATH, "index.html")
-        
+
         # Попробовать отдать статический файл (для assets)
         try:
             return send_from_directory(REACT_DIST_PATH, path)
@@ -302,6 +305,7 @@ app.register_blueprint(metrics_bp)
 
 # Admin Panel API
 from routes.admin_routes import admin_bp
+
 app.register_blueprint(admin_bp)  # url_prefix='/admin/api' уже в Blueprint
 
 # WebSocket initialization removed - using FastAPI now

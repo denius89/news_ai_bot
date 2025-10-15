@@ -189,7 +189,7 @@ class DatabaseService:
 
         # Попробуем получить клиент из pool
         self.sync_client = self._get_from_pool()
-        
+
         if not self.sync_client:
             # Создаем новый клиент если pool пуст
             try:
@@ -724,12 +724,12 @@ class DatabaseService:
             return None
 
     def get_user_digests(
-        self, 
-        user_id: str, 
+        self,
+        user_id: str,
         limit: int = 10,
         offset: int = 0,
         include_deleted: bool = False,
-        include_archived: bool = False
+        include_archived: bool = False,
     ) -> List[Dict]:
         """
         Get user digests with filtering support.
@@ -745,12 +745,8 @@ class DatabaseService:
             List of digest data
         """
         try:
-            query = (
-                self.sync_client.table("digests")
-                .select("*")
-                .eq("user_id", user_id)
-            )
-            
+            query = self.sync_client.table("digests").select("*").eq("user_id", user_id)
+
             # Фильтрация по статусу
             if include_deleted and include_archived:
                 # Все дайджесты
@@ -767,7 +763,7 @@ class DatabaseService:
                 # Только активные (не удаленные и не архивированные)
                 query = query.is_("deleted_at", "null")
                 query = query.eq("archived", False)
-            
+
             query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
 
             result = self.safe_execute(query)

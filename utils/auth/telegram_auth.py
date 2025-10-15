@@ -231,7 +231,7 @@ def validate_telegram_auth_headers(request_headers: Dict[str, str]) -> bool:
 
             # Пробуем декодировать Base64 → JSON
             try:
-                user_data_json = base64.b64decode(user_data).decode('utf-8')
+                user_data_json = base64.b64decode(user_data).decode("utf-8")
                 json.loads(user_data_json)
             except (base64.binascii.Error, UnicodeDecodeError):
                 # Fallback: plain JSON без Base64
@@ -273,7 +273,7 @@ def get_telegram_user_id_from_headers(request_headers: Dict[str, str]) -> Option
 
             # Пробуем декодировать Base64
             try:
-                user_data_json = base64.b64decode(user_data).decode('utf-8')
+                user_data_json = base64.b64decode(user_data).decode("utf-8")
                 user_info = json.loads(user_data_json)
             except (base64.binascii.Error, UnicodeDecodeError):
                 # Fallback: plain JSON без Base64
@@ -425,7 +425,7 @@ def verify_telegram_auth(
 
             # Декодируем Base64 → UTF-8 JSON
             try:
-                user_data_json = base64.b64decode(user_data_header).decode('utf-8')
+                user_data_json = base64.b64decode(user_data_header).decode("utf-8")
                 user_info = json.loads(user_data_json)
             except (base64.binascii.Error, UnicodeDecodeError) as decode_error:
                 # Fallback: возможно это старый формат (plain JSON без Base64)
