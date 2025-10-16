@@ -32,19 +32,55 @@ class GitHubReleasesProvider(BaseEventProvider):
         self.base_url = "https://api.github.com"
         self.api_key = os.getenv("GITHUB_TOKEN")
 
-        # Major projects to track
-        self.tracked_repos = [
-            "kubernetes/kubernetes",
-            "nodejs/node",
-            "python/cpython",
-            "rust-lang/rust",
-            "golang/go",
-            "microsoft/vscode",
-            "docker/docker",
-            "tensorflow/tensorflow",
-            "pytorch/pytorch",
-            "facebook/react",
-        ]
+        # Major projects to track (categorized)
+        self.tracked_repos = {
+            # AI/ML projects
+            "ai": [
+                "tensorflow/tensorflow",
+                "pytorch/pytorch",
+                "openai/openai-python",
+                "huggingface/transformers",
+                "microsoft/DeepSpeed",
+                "facebookresearch/llama",
+            ],
+            # General software
+            "software": [
+                "kubernetes/kubernetes",
+                "nodejs/node",
+                "python/cpython",
+                "rust-lang/rust",
+                "golang/go",
+                "microsoft/vscode",
+                "docker/docker",
+                "facebook/react",
+            ],
+            # Hardware/Systems
+            "hardware": [
+                "torvalds/linux",
+                "raspberrypi/linux",
+                "u-boot/u-boot",
+                "NVIDIA/cuda-samples",
+            ],
+            # Cybersecurity
+            "cybersecurity": [
+                "metasploit-framework/metasploit-framework",
+                "sqlmapproject/sqlmap",
+                "OWASP/CheatSheetSeries",
+                "openssl/openssl",
+                "wireshark/wireshark",
+            ],
+            # Startups/Tools
+            "startups": [
+                "vercel/next.js",
+                "supabase/supabase",
+                "strapi/strapi",
+            ],
+        }
+
+        # Flatten for backward compatibility
+        self.all_repos = []
+        for category_repos in self.tracked_repos.values():
+            self.all_repos.extend(category_repos)
 
         if not self.api_key:
             logger.warning("GITHUB_TOKEN not set, provider will be disabled")
@@ -76,7 +112,7 @@ class GitHubReleasesProvider(BaseEventProvider):
             events = []
 
             # Fetch releases for each tracked repo
-            for repo in self.tracked_repos:
+            for repo in self.all_repos:
                 repo_events = await self._fetch_repo_releases(repo, start_date, end_date)
                 events.extend(repo_events)
 
@@ -144,11 +180,14 @@ class GitHubReleasesProvider(BaseEventProvider):
             # Extract project name from repo
             project_name = repo.split("/")[1]
 
+            # Determine subcategory based on repo
+            subcategory = self._determine_subcategory(repo, tag_name)
+
             return {
                 "title": f"{project_name} {tag_name} Released",
                 "starts_at": published_at,
                 "ends_at": None,
-                "subcategory": "software_release",
+                "subcategory": subcategory,
                 "importance": importance,
                 "description": release.get("body", "")[:500],  # Limit description length
                 "link": release.get("html_url", ""),
@@ -168,3 +207,23 @@ class GitHubReleasesProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing release: {e}")
             return None
+
+    def _determine_subcategory(self, repo: str, tag_name: str) -> str:
+        """Determine subcategory based on repository."""
+        # Check category from tracked_repos
+        for category, repos in self.tracked_repos.items():
+            if repo in repos:
+                return category
+
+        # Fallback: parse from repo name
+        repo_lower = repo.lower()
+        if any(word in repo_lower for word in ["ai", "ml", "deep", "neural", "llm", "gpt", "transformers"]):
+            return "ai"
+        elif any(word in repo_lower for word in ["linux", "kernel", "driver", "hardware", "cuda", "gpu"]):
+            return "hardware"
+        elif any(word in repo_lower for word in ["security", "crypto", "ssl", "auth", "vuln", "hack"]):
+            return "cybersecurity"
+        elif any(word in repo_lower for word in ["startup", "saas", "platform"]):
+            return "startups"
+        else:
+            return "software"

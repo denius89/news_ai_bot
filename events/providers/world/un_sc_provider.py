@@ -98,13 +98,16 @@ class UNSecurityCouncilProvider(BaseEventProvider):
             if not title:
                 return None
 
+            # Determine subcategory based on meeting title/content
+            subcategory = self._determine_subcategory(title)
+
             # For now, return a generic event
             # In production, this would parse actual meeting dates and details
             return {
                 "title": f"UN Security Council Meeting: {title}",
                 "starts_at": datetime.now(timezone.utc),
                 "ends_at": None,
-                "subcategory": "diplomacy",
+                "subcategory": subcategory,
                 "importance": 0.85,
                 "description": "UN Security Council meeting",
                 "link": self.base_url,
@@ -116,3 +119,51 @@ class UNSecurityCouncilProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing meeting element: {e}")
             return None
+
+    def _determine_subcategory(self, title: str) -> str:
+        """Determine subcategory based on meeting title."""
+        title_lower = title.lower()
+
+        # Conflicts - военные конфликты, угрозы миру
+        if any(
+            word in title_lower
+            for word in [
+                "conflict",
+                "war",
+                "military",
+                "armed",
+                "hostilities",
+                "aggression",
+                "invasion",
+                "peacekeeping",
+                "ceasefire",
+            ]
+        ):
+            return "conflicts"
+
+        # Sanctions - санкции, эмбарго
+        elif any(
+            word in title_lower
+            for word in [
+                "sanction",
+                "embargo",
+                "restriction",
+                "measure",
+                "panel",
+                "monitoring",
+                "asset freeze",
+                "travel ban",
+            ]
+        ):
+            return "sanctions"
+
+        # Migration - беженцы, миграция
+        elif any(
+            word in title_lower
+            for word in ["refugee", "migration", "humanitarian", "displaced", "asylum", "relocation"]
+        ):
+            return "migration"
+
+        # Diplomacy - дипломатические встречи, переговоры (default)
+        else:
+            return "diplomacy"

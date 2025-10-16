@@ -185,6 +185,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       if (archivedData.status === 'success') {
         const archivedHistoryDigests = processDigests(archivedData.data.digests);
+        console.log('📦 Loaded ARCHIVED digests:', archivedHistoryDigests.length, archivedHistoryDigests.map(d => d.id.substring(0, 8)));
         setArchivedDigests(archivedHistoryDigests);
         
         // Добавить отзывы из архивированных дайджестов
@@ -204,6 +205,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       if (deletedData.status === 'success') {
         const deletedHistoryDigests = processDigests(deletedData.data.digests);
+        console.log('🗑️  Loaded DELETED digests:', deletedHistoryDigests.length, deletedHistoryDigests.map(d => d.id.substring(0, 8)));
         setDeletedDigests(deletedHistoryDigests);
         
         // Добавить отзывы из удаленных дайджестов
@@ -423,10 +425,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const getCurrentDigests = () => {
     switch (activeTab) {
       case 'active':
+        console.log('📋 Showing ACTIVE digests:', digests.length);
         return digests;
       case 'archived':
+        console.log('📦 Showing ARCHIVED digests:', archivedDigests.length);
         return archivedDigests;
       case 'deleted':
+        console.log('🗑️  Showing DELETED digests:', deletedDigests.length);
         return deletedDigests;
       default:
         return digests;

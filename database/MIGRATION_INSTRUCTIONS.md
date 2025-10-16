@@ -61,6 +61,46 @@ created_at  | timestamptz  | now()
 updated_at  | timestamptz  | now()
 ```
 
+## Миграция soft delete для дайджестов
+
+Если вам нужно добавить поддержку архивирования и мягкого удаления дайджестов:
+
+### Через Supabase Dashboard
+
+```sql
+-- Add soft delete and archive columns to digests table
+ALTER TABLE digests 
+ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ NULL,
+ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE;
+
+-- Add indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_digests_deleted ON digests(deleted_at);
+CREATE INDEX IF NOT EXISTS idx_digests_archived ON digests(archived);
+CREATE INDEX IF NOT EXISTS idx_digests_active ON digests(user_id, created_at DESC) 
+WHERE deleted_at IS NULL AND archived = FALSE;
+
+-- Add comments for documentation
+COMMENT ON COLUMN digests.deleted_at IS 'Timestamp when digest was soft deleted (NULL = active)';
+COMMENT ON COLUMN digests.archived IS 'Whether digest is archived (TRUE = archived, FALSE = active)';
+```
+
+### Проверка миграции
+
+```sql
+SELECT column_name, data_type, column_default 
+FROM information_schema.columns 
+WHERE table_name = 'digests' AND column_name IN ('deleted_at', 'archived')
+ORDER BY ordinal_position;
+```
+
+Ожидаемый результат:
+```
+column_name | data_type            | column_default
+------------|----------------------|----------------
+deleted_at  | timestamp with tz    | NULL
+archived    | boolean              | false
+```
+
 ## После миграции
 
 Запустите тесты, чтобы убедиться, что все работает:

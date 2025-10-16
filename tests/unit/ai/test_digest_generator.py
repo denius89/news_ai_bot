@@ -5,7 +5,7 @@
 import pytest
 import asyncio
 from datetime import datetime, timezone
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
 from models.news import NewsItem
 from digests.generator import generate_digest, _convert_v2_to_text
@@ -102,7 +102,7 @@ async def test_generate_digest_v2_fallback_to_legacy():
             # Mock legacy service
             with patch("digests.generator.DigestAIService") as mock_service:
                 mock_instance = MagicMock()
-                mock_instance.build_digest.return_value = "Legacy digest result"
+                mock_instance.build_digest = AsyncMock(return_value="Legacy digest result")
                 mock_service.return_value = mock_instance
 
                 result = await generate_digest(limit=10, category="tech", ai=True, style="analytical", use_v2=True)
@@ -137,7 +137,7 @@ async def test_generate_digest_legacy_mode():
         # Mock legacy service
         with patch("digests.generator.DigestAIService") as mock_service:
             mock_instance = MagicMock()
-            mock_instance.build_digest.return_value = "Legacy digest result"
+            mock_instance.build_digest = AsyncMock(return_value="Legacy digest result")
             mock_service.return_value = mock_instance
 
             result = await generate_digest(limit=10, category="tech", ai=True, style="analytical", use_v2=False)

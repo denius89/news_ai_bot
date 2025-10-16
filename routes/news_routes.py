@@ -144,59 +144,94 @@ def api_latest_news():
         page = int(request.args.get("page", 1))
         limit = int(request.args.get("limit", 20))
 
-        # Параметры фильтрации по предпочтениям
+        # Параметры фильтрации
         filter_by_subscriptions = request.args.get("filter_by_subscriptions", "false").lower() == "true"
+        selected_category = request.args.get("category")
+        selected_subcategory = request.args.get("subcategory")
+
+        # Поддержка старого параметра 'categories' для обратной совместимости
+        if not selected_category:
+            categories_param = request.args.get("categories")
+            if categories_param:
+                selected_category = categories_param.split(",")[0]
+
         # Получаем новости из базы данных
         db_service = get_sync_service()
 
-        # Оптимизация: загружаем только нужное количество + небольшой буфер для пагинации
-        fetch_limit = min(limit * 3, 100)  # Максимум 100 новостей для фильтрации
-        all_news = db_service.get_latest_news(limit=fetch_limit)
+        # Увеличиваем буфер для корректной пагинации после фильтрации
+        fetch_limit = min(limit * 5, 500)  # Увеличен буфер для более точной пагинации
 
-        # Фильтрация по предпочтениям пользователя
+        logger.info(
+            f"📊 [API] News request: page={page}, category={selected_category}, "
+            f"subcategory={selected_subcategory}, filter_by_subs={filter_by_subscriptions}"
+        )
+
+        # Получаем user_id для фильтрации по подпискам
         user_id = None
         if filter_by_subscriptions:
             from flask import g
 
-            logger.info(f"🔍 Запрос фильтрации: filter_by_subscriptions={filter_by_subscriptions}")
-            # Проверяем аутентификацию только если нужна фильтрация
             if hasattr(g, "current_user") and g.current_user:
                 user_id = g.current_user["user_id"]
                 logger.info(f"✅ Получен user_id из аутентификации: {user_id}")
             else:
                 logger.warning("⚠️ Нет данных аутентификации в g.current_user")
 
+        # ЛОГИКА МЯГКОЙ ФИЛЬТРАЦИИ (Вариант A - Discovery Mode)
         if filter_by_subscriptions and user_id:
             from database.db_models import get_active_categories
 
-            logger.info(f"🔍 Фильтрация новостей для пользователя {user_id}")
-            active_cats = get_active_categories(user_id)
-            full_categories = active_cats.get("full_categories", [])
-            subcategories = active_cats.get("subcategories", {})
-            logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories}")
+            # Если выбрана конкретная категория - показываем её НЕЗАВИСИМО от подписки (discovery mode)
+            if selected_category:
+                logger.info(f"🔍 Discovery mode: показываем категорию {selected_category} независимо от подписки")
+                all_news = db_service.get_latest_news(categories=[selected_category], limit=fetch_limit)
 
-            # Если есть активные предпочтения, фильтруем
-            if full_categories or subcategories:
-                logger.info(f"✅ Применяем фильтрацию: {len(all_news)} новостей до фильтрации")
-                filtered_news = []
-                for news_item in all_news:
-                    category = news_item.get("category")
-                    subcategory = news_item.get("subcategory")
-
-                    # Проверяем: либо вся категория включена, либо конкретная подкатегория
-                    if category in full_categories:
-                        logger.debug(f"✅ Новость {category} добавлена (полная категория)")
-                        filtered_news.append(news_item)
-                    elif category in subcategories and subcategory in subcategories[category]:
-                        logger.debug(f"✅ Новость {category}/{subcategory} добавлена (подкатегория)")
-                        filtered_news.append(news_item)
-                    else:
-                        logger.debug(f"❌ Новость {category}/{subcategory} отфильтрована")
-
-                all_news = filtered_news
-                logger.info(f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации")
+                # Дополнительная фильтрация по подкатегории
+                if selected_subcategory:
+                    logger.info(f"🔍 Фильтрация по подкатегории: {selected_subcategory}")
+                    all_news = [n for n in all_news if n.get("subcategory") == selected_subcategory]
+                    logger.info(f"📊 После фильтрации по подкатегории: {len(all_news)} новостей")
             else:
-                logger.info("⚠️ Нет активных предпочтений для фильтрации")
+                # Фильтруем по подпискам пользователя
+                logger.info(f"🔍 Фильтрация новостей по подпискам пользователя {user_id}")
+                active_cats = get_active_categories(user_id)
+                full_categories = active_cats.get("full_categories", [])
+                subcategories_filter = active_cats.get("subcategories", {})
+                logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories_filter}")
+
+                # Загружаем новости
+                all_news = db_service.get_latest_news(limit=fetch_limit)
+
+                # Если есть активные предпочтения, фильтруем
+                if full_categories or subcategories_filter:
+                    logger.info(f"✅ Применяем фильтрацию: {len(all_news)} новостей до фильтрации")
+                    filtered_news = []
+                    for news_item in all_news:
+                        category = news_item.get("category")
+                        subcategory = news_item.get("subcategory")
+
+                        # Проверяем: либо вся категория включена, либо конкретная подкатегория
+                        if category in full_categories:
+                            filtered_news.append(news_item)
+                        elif category in subcategories_filter and subcategory in subcategories_filter[category]:
+                            filtered_news.append(news_item)
+
+                    all_news = filtered_news
+                    logger.info(f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации")
+                else:
+                    logger.info("⚠️ Нет активных предпочтений для фильтрации")
+        else:
+            # Без фильтра по подпискам
+            if selected_category:
+                logger.info(f"🔍 Фильтрация по категории без подписок: {selected_category}")
+                all_news = db_service.get_latest_news(categories=[selected_category], limit=fetch_limit)
+
+                if selected_subcategory:
+                    logger.info(f"🔍 Фильтрация по подкатегории: {selected_subcategory}")
+                    all_news = [n for n in all_news if n.get("subcategory") == selected_subcategory]
+                    logger.info(f"📊 После фильтрации по подкатегории: {len(all_news)} новостей")
+            else:
+                all_news = db_service.get_latest_news(limit=fetch_limit)
 
         # Сортируем по важности, достоверности и свежести
         import datetime
@@ -230,6 +265,10 @@ def api_latest_news():
         start_idx = (page - 1) * limit
         end_idx = start_idx + limit
         paginated_news = all_news[start_idx:end_idx]
+
+        logger.info(
+            f"✅ [API] Returning {len(paginated_news)} news items, " f"total={total}, has_next={end_idx < total}"
+        )
 
         return jsonify(
             {

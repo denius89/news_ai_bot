@@ -12,7 +12,7 @@
 - **Статус:** ✅ Запущен
 - **PID:** 10552, 10535 (2 процесса - нормально)
 - **URL локальный:** http://localhost:8001/webapp
-- **URL внешний:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **URL внешний:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 - **Режим:** Debug ON, Threading ON
 - **Порт:** 8001
 
@@ -20,18 +20,18 @@
 - **Статус:** ✅ Запущен
 - **PID:** 31852
 - **Бот:** @PulseAIDigest_bot (ID: 8062922612)
-- **WebApp URL:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **WebApp URL:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 - **Статус:** Готов к работе
 
 ### 3. Cloudflare Tunnel
 - **Статус:** ✅ Запущен
 - **PID:** 4788
-- **URL:** https://step-everywhere-gem-electronic.trycloudflare.com
+- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com
 - **Направление:** localhost:8001
 
 ### 4. Admin Panel
 - **Статус:** ✅ Полностью функционален
-- **URL:** https://step-everywhere-gem-electronic.trycloudflare.com/admin
+- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/admin
 - **Функции:** Dashboard, Metrics, Logs, Config
 - **Аутентификация:** Telegram WebApp + Admin privileges
 
@@ -51,11 +51,11 @@
 
 **Старые URL (не работают):**
 - ❌ `https://democrats-divorce-sheer-activities.trycloudflare.com`
-- ❌ `https://column-cosmetic-greater-advert.trycloudflare.com`
+- ❌ `https://founded-shopper-miss-kruger.trycloudflare.com`
 - ❌ `https://scoring-side-receives-hudson.trycloudflare.com`
 
 **Актуальный URL:**
-- ✅ `https://step-everywhere-gem-electronic.trycloudflare.com`
+- ✅ `https://founded-shopper-miss-kruger.trycloudflare.com`
 
 ---
 
@@ -67,10 +67,10 @@
 curl -s "http://localhost:8001/api/health"
 
 # WebApp Health
-curl -s -I "https://step-everywhere-gem-electronic.trycloudflare.com/webapp"
+curl -s -I "https://founded-shopper-miss-kruger.trycloudflare.com/webapp"
 
 # Admin Panel Health
-curl -s -I "https://step-everywhere-gem-electronic.trycloudflare.com/admin"
+curl -s -I "https://founded-shopper-miss-kruger.trycloudflare.com/admin"
 ```
 
 ### Логи
@@ -125,12 +125,12 @@ pkill -9 cloudflared && cd /Users/denisfedko/news_ai_bot && cloudflared tunnel -
 ## 🔐 Доступ и безопасность
 
 ### WebApp
-- **URL:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 - **Аутентификация:** Telegram WebApp
 - **Доступ:** Все пользователи Telegram
 
 ### Admin Panel
-- **URL:** https://step-everywhere-gem-electronic.trycloudflare.com/admin
+- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/admin
 - **Аутентификация:** Telegram WebApp + Admin privileges
 - **DEV режим:** Доступ с localhost и Cloudflare tunnels
 
@@ -148,7 +148,7 @@ pkill -9 cloudflared && cd /Users/denisfedko/news_ai_bot && cloudflared tunnel -
 **Основной файл:** `config_files/environment/.env`
 
 **Ключевые переменные:**
-- `CLOUDFLARE_TUNNEL_URL=https://step-everywhere-gem-electronic.trycloudflare.com`
+- `CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com`
 - `TELEGRAM_BOT_TOKEN=...`
 - `SUPABASE_URL=...`
 - `SUPABASE_KEY=...`

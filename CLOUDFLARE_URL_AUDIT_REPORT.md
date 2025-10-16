@@ -1,7 +1,7 @@
 # 🔍 Полный аудит Cloudflare URL в проекте PulseAI
 
 **Дата проверки:** 2025-10-15 17:25  
-**Текущий рабочий URL:** `https://step-everywhere-gem-electronic.trycloudflare.com`
+**Текущий рабочий URL:** `https://founded-shopper-miss-kruger.trycloudflare.com`
 
 ---
 
@@ -21,11 +21,11 @@
 
 **Файл:** `config/core/cloudflare.py`
 - **Статус:** ✅ Обновлён
-- **URL:** `https://step-everywhere-gem-electronic.trycloudflare.com`
+- **URL:** `https://founded-shopper-miss-kruger.trycloudflare.com`
 - **Код:**
   ```python
   CLOUDFLARE_TUNNEL_URL = os.getenv(
-      "CLOUDFLARE_TUNNEL_URL", "https://step-everywhere-gem-electronic.trycloudflare.com"
+      "CLOUDFLARE_TUNNEL_URL", "https://founded-shopper-miss-kruger.trycloudflare.com"
   )
   ```
 
@@ -33,7 +33,7 @@
 
 **Файлы:** `.env` и `config_files/environment/.env`
 - **Статус:** ✅ Обновлены
-- **Переменная:** `CLOUDFLARE_TUNNEL_URL=https://step-everywhere-gem-electronic.trycloudflare.com`
+- **Переменная:** `CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com`
 
 ### 3. Frontend Authentication
 
@@ -111,14 +111,14 @@
 - **Статус:** ❌ Содержит старый URL
 - **Текущее содержимое:**
   ```yaml
-  tunnel: column-cosmetic-greater-advert
-  credentials-file: /Users/denisfedko/.cloudflared/column-cosmetic-greater-advert.json
+  tunnel: founded-shopper-miss-kruger
+  credentials-file: /Users/denisfedko/.cloudflared/founded-shopper-miss-kruger.json
   
   ingress:
-    - hostname: column-cosmetic-greater-advert.trycloudflare.com
+    - hostname: founded-shopper-miss-kruger.trycloudflare.com
       service: http://localhost:8001
       originRequest:
-        httpHostHeader: column-cosmetic-greater-advert.trycloudflare.com
+        httpHostHeader: founded-shopper-miss-kruger.trycloudflare.com
   ```
 
 **⚠️ ПРОБЛЕМА:**
@@ -136,10 +136,10 @@
 - **Статус:** ⚠️ Содержит старый URL в примере
 - **Строка 492:**
   ```markdown
-  - **Значение по умолчанию:** `https://column-cosmetic-greater-advert.trycloudflare.com`
+  - **Значение по умолчанию:** `https://founded-shopper-miss-kruger.trycloudflare.com`
   ```
 
-**Действие:** Обновить на `https://step-everywhere-gem-electronic.trycloudflare.com` или указать, что это пример.
+**Действие:** Обновить на `https://founded-shopper-miss-kruger.trycloudflare.com` или указать, что это пример.
 
 ### 3. Script для обновления конфигурации
 
@@ -208,8 +208,8 @@
 | 1 | `config/core/cloudflare.py` | Код (default) | ✅ OK | `step-everywhere-gem-electronic` |
 | 2 | `.env` | Переменная окружения | ✅ OK | `step-everywhere-gem-electronic` |
 | 3 | `config_files/environment/.env` | Переменная окружения | ✅ OK | `step-everywhere-gem-electronic` |
-| 4 | `cloudflare-tunnel.yaml` | Конфиг (не используется) | ⚠️ Старый | `column-cosmetic-greater-advert` |
-| 5 | `README.md` (строка 492) | Документация | ⚠️ Старый | `column-cosmetic-greater-advert` |
+| 4 | `cloudflare-tunnel.yaml` | Конфиг (не используется) | ⚠️ Старый | `founded-shopper-miss-kruger` |
+| 5 | `README.md` (строка 492) | Документация | ⚠️ Старый | `founded-shopper-miss-kruger` |
 | 6 | `scripts/update_cloudflare_config.py` | Скрипт | ⚠️ Старый | `postcards-simple-investigators-negotiation` |
 | 7 | `src/webapp.py` | Код (wildcard) | ✅ OK | `*.trycloudflare.com` |
 | 8 | `webapp/vite.config.ts` | Код (wildcard) | ✅ OK | `.trycloudflare.com` |
@@ -230,7 +230,7 @@
 ### Текущий рабочий URL
 
 ```
-https://step-everywhere-gem-electronic.trycloudflare.com
+https://founded-shopper-miss-kruger.trycloudflare.com
 ```
 
 **Используется в:**

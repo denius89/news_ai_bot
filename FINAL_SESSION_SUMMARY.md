@@ -41,7 +41,7 @@ TypeError: Failed to execute 'fetch' on 'Window': String contains non ISO-8859-1
 
 **Актуальный URL:**
 ```
-https://step-everywhere-gem-electronic.trycloudflare.com
+https://founded-shopper-miss-kruger.trycloudflare.com
 ```
 
 ### 3. ✅ Полный аудит и документация Cloudflare URL
@@ -168,10 +168,10 @@ ps aux | grep -E "(src/webapp.py|telegram_bot|cloudflared)" | grep -v grep
 curl -s "http://localhost:8001/api/health" | head -3
 
 # Проверить WebApp
-open https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+open https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 
 # Проверить Admin Panel
-open https://step-everywhere-gem-electronic.trycloudflare.com/admin
+open https://founded-shopper-miss-kruger.trycloudflare.com/admin
 ```
 
 ---

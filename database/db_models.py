@@ -977,16 +977,16 @@ def get_user_digests(
             pass
         elif include_deleted and not include_archived:
             # Только удаленные (не архивированные)
-            query = query.not_.is_("deleted_at", "null")
-            query = query.or_("archived.is.null,archived.eq.false")
+            query = query.not_.is_("deleted_at", "null")  # deleted = TRUE
+            query = query.eq("archived", False)
         elif not include_deleted and include_archived:
             # Только архивированные (не удаленные)
-            query = query.is_("deleted_at", "null")
+            query = query.is_("deleted_at", "null")  # deleted = FALSE
             query = query.eq("archived", True)
         else:  # not include_deleted and not include_archived
             # Только активные (не удаленные и не архивированные)
-            query = query.is_("deleted_at", "null")
-            query = query.or_("archived.is.null,archived.eq.false")
+            query = query.is_("deleted_at", "null")  # deleted = FALSE
+            query = query.eq("archived", False)
 
         result = query.order("created_at", desc=True).range(offset, offset + limit - 1).execute()
 

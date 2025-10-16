@@ -25,7 +25,11 @@ class TestSourcesYAML:
 
     def test_yaml_is_valid(self):
         """Проверяет, что YAML файл валиден"""
-        sources_file = Path(__file__).parent.parent / "config" / "sources.yaml"
+        # Правильный путь к sources.yaml (от корня проекта)
+        project_root = Path(__file__).parent.parent.parent.parent
+        sources_file = project_root / "config" / "data" / "sources.yaml"
+
+        assert sources_file.exists(), f"sources.yaml not found at {sources_file}"
 
         with open(sources_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
@@ -279,7 +283,8 @@ class TestWebAppAPI:
 
         for category_id, category_data in categories_data.items():
             assert "name" in category_data
-            assert "icon" in category_data
+            # API возвращает "emoji" а не "icon"
+            assert "emoji" in category_data or "icon" in category_data
             assert "subcategories" in category_data
             assert isinstance(category_data["subcategories"], dict)
 
@@ -310,11 +315,11 @@ class TestDatabaseIntegration:
 
     def test_parsers_use_categories_service(self):
         """Проверяет, что парсеры используют services/categories"""
-        from parsers import rss_parser
+        from parsers import unified_parser
 
-        # Проверяем, что функция load_sources существует и использует новый сервис
-        assert hasattr(rss_parser, "load_sources")
-        assert hasattr(rss_parser, "parse_source")
+        # Проверяем, что UnifiedParser доступен
+        assert hasattr(unified_parser, "UnifiedParser")
+        assert hasattr(unified_parser, "parse_source")
 
 
 if __name__ == "__main__":

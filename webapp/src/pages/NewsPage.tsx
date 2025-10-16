@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
+import { ChipsCarousel } from '../components/ui/ChipsCarousel';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
 import { 
   Newspaper, 
-  Cpu, 
-  Globe, 
-  TrendingUp, 
-  Coins, 
-  Trophy, 
   ExternalLink,
   X,
   Star
@@ -23,6 +19,7 @@ interface NewsItem {
   content: string;
   source: string;
   category: string;
+  subcategory?: string; // ДОБАВЛЕНО: поддержка подкатегорий
   publishedAt: string;
   credibility: number;
   importance: number;
@@ -45,32 +42,212 @@ function getNewsLabel(count: number) {
   return "новостей";
 }
 
+// Маппинг icon codes в emoji
+function getEmojiFromIconCode(iconCode: string): string {
+  const iconMap: Record<string, string> = {
+    // Crypto
+    'btc': '₿',
+    'bitcoin': '₿',
+    'eth': 'Ξ',
+    'ethereum': 'Ξ',
+    'altcoin': '🪙',
+    'altcoins': '🪙',
+    'defi': '🏦',
+    'nft': '🖼️',
+    'gamefi': '🎮',
+    'exchange': '💱',
+    'exchanges': '💱',
+    'regulation': '⚖️',
+    'security': '🔒',
+    'market_trends': '📊',
+    
+    // Sports - Football leagues
+    'football': '⚽',
+    'champions_league': '⚽',
+    'europa_league': '⚽',
+    'conference_league': '⚽',
+    'premier_league': '⚽',
+    'bundesliga': '⚽',
+    'la_liga': '⚽',
+    'serie_a': '⚽',
+    'ligue_1': '⚽',
+    'world_cup': '⚽',
+    // Sports - Other sports
+    'basketball': '🏀',
+    'tennis': '🎾',
+    'hockey': '🏒',
+    'ufc': '🥊',
+    'ufc_mma': '🥊',
+    'cricket': '🏏',
+    'baseball': '⚾',
+    'american_football': '🏈',
+    'rugby': '🏉',
+    'volleyball': '🏐',
+    'handball': '🤾',
+    'badminton': '🏸',
+    'table_tennis': '🏓',
+    // Sports - Esports
+    'esports': '🎮',
+    'dota2': '🎮',
+    'csgo': '🔫',
+    'lol': '🎮',
+    'valorant': '🎮',
+    'overwatch': '🎮',
+    'r6siege': '🎮',
+    'other': '🏆',
+    'formula1': '🏎️',
+    
+    // Markets
+    'stocks': '📈',
+    'forex': '💱',
+    'commodities': '🛢️',
+    'bonds': '📊',
+    'indices': '📉',
+    'ipos': '📋',
+    'earnings': '💰',
+    'dividends': '💸',
+    'splits': '✂️',
+    'rates': '📊',
+    'etf': '📊',
+    'funds_etfs': '📊',
+    'economic_data': '📊',
+    'central_banks': '🏛️',
+    
+    // Tech
+    'ai': '🤖',
+    'software': '💻',
+    'hardware': '🔧',
+    'startups': '🚀',
+    'cybersecurity': '🛡️',
+    'cloud': '☁️',
+    'bigtech': '💻',
+    'blockchain': '⛓️',
+    'blockchain_tech': '⛓️',
+    'conferences': '🎤',
+    
+    // World
+    'politics': '🏛️',
+    'economy': '💼',
+    'science': '🔬',
+    'health': '🏥',
+    'climate': '🌡️',
+    'society': '👥',
+    'conflicts': '⚠️',
+    'elections': '🗳️',
+    'energy': '⚡',
+    'geopolitics': '🌍',
+    'diplomacy': '🤝',
+    'sanctions': '🚫',
+    'organizations': '🏛️',
+    'migration': '👥',
+    'global_risks': '⚠️',
+  };
+  
+  return iconMap[iconCode] || '📄';
+}
+
 const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
+  // Feature flags для быстрого отката
+  const ENABLE_SUBCATEGORY_FILTER = true;
+  const ENABLE_DYNAMIC_CATEGORIES = true;
+
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreNews, setHasMoreNews] = useState(true);
   const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Динамические категории
+  const [categoriesData, setCategoriesData] = useState<any>(null);
+  const [categories, setCategories] = useState<Array<{id: string, label: string, icon: string}>>([]);
+  const [availableSubcategories, setAvailableSubcategories] = useState<Array<{id: string, label: string, icon: string}>>([]);
 
   // Get user data from authentication context
   const { userData } = useTelegramUser();
   const { authHeaders } = useAuth();
   const userId = userData?.user_id;
 
-  const categories = [
-    { id: 'all', label: 'Все', icon: <Newspaper className="w-4 h-4" /> },
-    { id: 'crypto', label: 'Криптовалюты', icon: <Coins className="w-4 h-4" /> },
-    { id: 'tech', label: 'AI и технологии', icon: <Cpu className="w-4 h-4" /> },
-    { id: 'sports', label: 'Спорт и события', icon: <Trophy className="w-4 h-4" /> },
-    { id: 'world', label: 'Новости мира', icon: <Globe className="w-4 h-4" /> },
-    { id: 'markets', label: 'Финансы', icon: <TrendingUp className="w-4 h-4" /> },
-  ];
 
+  // Функция загрузки категорий
+  const loadCategories = useCallback(async () => {
+    try {
+      console.log('[NewsPage] Loading categories...');
+      const response = await fetch('/api/categories', {
+        headers: authHeaders
+      });
+      const data = await response.json();
+      
+      if (data.status === 'success' && data.data) {
+        // Кэшируем полную структуру
+        setCategoriesData(data.data);
+        
+        // Формируем список основных категорий
+        const cats: Array<{id: string, label: string, icon: string}> = [
+          { id: 'all', label: 'Все', icon: '📰' }
+        ];
+        
+        Object.entries(data.data).forEach(([catId, catData]: [string, any]) => {
+          cats.push({
+            id: catId,
+            label: catData.name || catId,
+            icon: catData.emoji || '📁'
+          });
+        });
+        
+        setCategories(cats);
+        console.log('[NewsPage] ✅ Categories loaded:', cats.length);
+      }
+    } catch (error) {
+      console.error('[NewsPage] ❌ Error loading categories:', error);
+      // Fallback на hardcoded категории при ошибке
+      setCategories([
+        { id: 'all', label: 'Все', icon: '📰' },
+        { id: 'crypto', label: 'Криптовалюты', icon: '₿' },
+        { id: 'tech', label: 'AI и технологии', icon: '🤖' },
+        { id: 'sports', label: 'Спорт', icon: '⚽' },
+        { id: 'world', label: 'Мир', icon: '🌍' },
+        { id: 'markets', label: 'Финансы', icon: '📈' },
+      ]);
+    }
+  }, [authHeaders]);
 
-  const fetchNews = async (page: number = 1, isRefresh: boolean = false) => {
+  // Функция загрузки подкатегорий с кэшированием
+  const loadSubcategories = useCallback((categoryId: string) => {
+    console.log('[NewsPage] Loading subcategories for:', categoryId);
+    
+    if (!categoriesData || !categoriesData[categoryId]) {
+      setAvailableSubcategories([]);
+      return;
+    }
+    
+    const categoryData = categoriesData[categoryId];
+    
+    if (categoryData.subcategories) {
+      const subcats: Array<{id: string, label: string, icon: string}> = [
+        { id: '', label: `Все ${categoryData.name}`, icon: '📰' }
+      ];
+      
+      Object.entries(categoryData.subcategories).forEach(([subId, subData]: [string, any]) => {
+        subcats.push({
+          id: subId,
+          label: subData.name || subId,
+          icon: getEmojiFromIconCode(subData.icon || '')
+        });
+      });
+      
+      setAvailableSubcategories(subcats);
+      console.log('[NewsPage] ✅ Subcategories loaded:', subcats.length);
+    } else {
+      setAvailableSubcategories([]);
+    }
+  }, [categoriesData]);
+
+  const fetchNews = useCallback(async (page: number = 1, isRefresh: boolean = false) => {
     try {
       if (isRefresh) {
         // setIsRefreshing удален
@@ -87,7 +264,22 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
         apiUrl += `&filter_by_subscriptions=true`;
       }
 
-      console.log(`🔍 Fetching news: ${apiUrl}`);
+      if (selectedCategory !== 'all') {
+        apiUrl += `&category=${selectedCategory}`;
+      }
+
+      if (ENABLE_SUBCATEGORY_FILTER && selectedSubcategory) {
+        apiUrl += `&subcategory=${selectedSubcategory}`;
+      }
+
+      console.log(`[NewsPage] Fetching news:`, {
+        page,
+        selectedCategory,
+        selectedSubcategory,
+        userId,
+        apiUrl
+      });
+      
       const response = await fetch(apiUrl, {
         headers: authHeaders
       });
@@ -151,13 +343,70 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       setLoadingMore(false);
       // setIsRefreshing удален
     }
-  };
+  }, [userId, authHeaders, selectedCategory, selectedSubcategory, ENABLE_SUBCATEGORY_FILTER]);
 
+  // Обработчик выбора категории
+  const handleCategorySelect = useCallback((categoryId: string) => {
+    console.log('[NewsPage] Category selected:', {
+      categoryId,
+      previousCategory: selectedCategory,
+      timestamp: new Date().toISOString()
+    });
+    
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory(null);
+    setNews([]);
+    setCurrentPage(1);
+    setHasMoreNews(true); // ВАЖНО: сбросить флаг пагинации
+    
+    if (categoryId !== 'all') {
+      loadSubcategories(categoryId);
+    } else {
+      setAvailableSubcategories([]);
+    }
+    
+    // Скролл в начало страницы
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCategory, loadSubcategories]);
+
+  // Обработчик выбора подкатегории
+  const handleSubcategorySelect = useCallback((subcategoryId: string) => {
+    console.log('[NewsPage] Subcategory selected:', {
+      subcategoryId,
+      category: selectedCategory,
+      timestamp: new Date().toISOString()
+    });
+    
+    setSelectedSubcategory(subcategoryId || null);
+    setNews([]);
+    setCurrentPage(1);
+    setHasMoreNews(true);
+    
+    // Скролл в начало
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCategory]);
+
+  // Загрузка категорий при монтировании
   useEffect(() => {
-    if (userId !== undefined) {
+    if (ENABLE_DYNAMIC_CATEGORIES) {
+      loadCategories();
+    }
+  }, [loadCategories, ENABLE_DYNAMIC_CATEGORIES]);
+
+  // Первичная загрузка новостей
+  useEffect(() => {
+    if (userId !== undefined && !isInitialized) {
+      setIsInitialized(true);
       fetchNews(1);
     }
-  }, [userId]);
+  }, [userId, isInitialized, fetchNews]);
+
+  // Автоматическая перезагрузка при изменении фильтров (ТОЛЬКО после инициализации)
+  useEffect(() => {
+    if (isInitialized && categories.length > 0) {
+      fetchNews(1);
+    }
+  }, [selectedCategory, selectedSubcategory, isInitialized, categories.length, fetchNews]);
 
   const loadMoreNews = async () => {
     if (!hasMoreNews || loadingMore) {
@@ -213,10 +462,8 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     };
   }, [hasMoreNews, loadingMore, loading]);
 
-  const filteredNews = news.filter(item => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
-    return matchesCategory;
-  });
+  // УБРАНО: клиентская фильтрация - теперь все фильтры на бэкенде
+  const filteredNews = news;
 
   const truncateText = (text: string, maxLength: number = 200): string => {
     if (text.length <= maxLength) {
@@ -300,29 +547,37 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
           animate="visible"
           className="space-y-6"
         >
-          {/* Category Filters */}
+          {/* Category Filters - Двухуровневый с ChipsCarousel */}
           <motion.section variants={itemVariants}>
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-wrap gap-2 overflow-x-auto">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center ${
-                        selectedCategory === category.id
-                          ? "bg-gradient-to-r from-[#00BFA6]/10 to-[#00E3BE]/10 text-primary shadow-[0_0_6px_rgba(0,191,166,0.2)]"
-                          : "border border-border text-gray-600 dark:text-gray-300 hover:text-primary hover:border-primary/50"
-                      }`}
-                      onClick={() => setSelectedCategory(category.id)}
-                    >
-                      <span className="mr-2">{category.icon}</span>
-                      {category.label}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3 text-center">
-                  {isFilteredBySubscriptions && (
-                    <p className="text-xs text-primary font-medium mb-1">
+              <CardContent className="pt-6 space-y-3">
+                {/* Уровень 1: Основные категории */}
+                <ChipsCarousel
+                  chips={categories}
+                  selectedId={selectedCategory}
+                  onSelect={handleCategorySelect}
+                  label="Категории"
+                />
+                
+                {/* Уровень 2: Подкатегории (показывается только если категория выбрана) */}
+                {selectedCategory !== 'all' && availableSubcategories.length > 0 && (
+                  <ChipsCarousel
+                    chips={availableSubcategories}
+                    selectedId={selectedSubcategory || ''}
+                    onSelect={handleSubcategorySelect}
+                    label="Подкатегории"
+                  />
+                )}
+                
+                {/* Hints и индикаторы */}
+                <div className="mt-3 text-center space-y-1">
+                  {isFilteredBySubscriptions && selectedCategory !== 'all' && (
+                    <p className="text-xs text-primary font-medium">
+                      💡 Показаны новости категории "{categories.find(c => c.id === selectedCategory)?.label}" (независимо от подписки)
+                    </p>
+                  )}
+                  {isFilteredBySubscriptions && selectedCategory === 'all' && (
+                    <p className="text-xs text-primary font-medium">
                       ✨ Показаны новости по вашим подпискам
                     </p>
                   )}
@@ -429,24 +684,46 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
           </motion.section>
         )}
 
-                {/* Empty State */}
-                {filteredNews.length === 0 && (
+                {/* Empty State с динамическими сообщениями */}
+                {filteredNews.length === 0 && !loading && (
                   <motion.section variants={itemVariants} className="text-center py-20">
                     <div className="flex justify-center mb-4">
                       <Newspaper className="w-16 h-16 text-muted" />
                     </div>
                     <h3 className="text-xl font-semibold text-text mb-2">
-                      Новости не найдены
+                      {selectedCategory === 'all' 
+                        ? 'Новости не найдены'
+                        : `Нет новостей в категории "${categories.find(c => c.id === selectedCategory)?.label}"`
+                      }
                     </h3>
                     <p className="text-muted-strong mb-6">
-                      Выберите другую категорию для просмотра новостей
+                      {selectedSubcategory 
+                        ? 'Попробуйте выбрать другую подкатегорию'
+                        : selectedCategory !== 'all'
+                          ? 'Попробуйте выбрать другую категорию или посмотрите все новости'
+                          : 'Попробуйте позже или измените фильтры'
+                      }
                     </p>
-                    <Button 
-                      variant="secondary" 
-                      onClick={() => setSelectedCategory('all')}
-                    >
-                      Показать все новости
-                    </Button>
+                    {selectedCategory !== 'all' && (
+                      <Button 
+                        variant="secondary" 
+                        onClick={() => handleCategorySelect('all')}
+                      >
+                        Показать все новости
+                      </Button>
+                    )}
+                  </motion.section>
+                )}
+
+                {/* Индикатор при малом количестве новостей */}
+                {filteredNews.length > 0 && filteredNews.length < 10 && !hasMoreNews && !loading && (
+                  <motion.section variants={itemVariants}>
+                    <div className="text-center py-4">
+                      <p className="text-sm text-muted-strong">
+                        💡 Найдено всего {filteredNews.length} {getNewsLabel(filteredNews.length)} по выбранным фильтрам.
+                        {selectedCategory !== 'all' && ' Попробуйте расширить критерии поиска.'}
+                      </p>
+                    </div>
                   </motion.section>
                 )}
         </motion.div>

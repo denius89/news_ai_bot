@@ -69,6 +69,20 @@ class FinnhubProvider(BaseEventProvider):
             economic = await self._fetch_economic_calendar(start_date, end_date)
             events.extend(economic)
 
+            # Fetch dividends calendar (if available)
+            try:
+                dividends = await self._fetch_dividends_calendar(start_date, end_date)
+                events.extend(dividends)
+            except Exception as e:
+                logger.debug(f"Dividends calendar not available or error: {e}")
+
+            # Fetch stock splits (if available)
+            try:
+                splits = await self._fetch_splits_calendar(start_date, end_date)
+                events.extend(splits)
+            except Exception as e:
+                logger.debug(f"Splits calendar not available or error: {e}")
+
             logger.info(f"Fetched {len(events)} events from Finnhub")
             return events
 
@@ -178,6 +192,52 @@ class FinnhubProvider(BaseEventProvider):
             logger.error(f"Error fetching economic calendar: {e}")
             return []
 
+    async def _fetch_dividends_calendar(self, start_date: datetime, end_date: datetime) -> List[Dict]:
+        """Fetch dividends calendar."""
+        try:
+            # Finnhub API поддерживает calendar/dividend
+            url = f"{self.base_url}/calendar/dividend"
+            params = {
+                "from": start_date.strftime("%Y-%m-%d"),
+                "to": end_date.strftime("%Y-%m-%d"),
+                "token": self.api_key,
+            }
+
+            await self.rate_limiter.acquire()
+
+            async with self.session.get(url, params=params) as response:
+                if response.status != 200:
+                    return []
+
+                data = await response.json()
+                dividends_data = data.get("data", [])
+
+                events = []
+                for dividend in dividends_data:
+                    event = self._parse_dividend(dividend)
+                    if event:
+                        normalized = self.normalize_event(event)
+                        if normalized:
+                            events.append(normalized)
+
+                return [e for e in events if e is not None]
+
+        except Exception as e:
+            logger.debug(f"Error fetching dividends calendar: {e}")
+            return []
+
+    async def _fetch_splits_calendar(self, start_date: datetime, end_date: datetime) -> List[Dict]:
+        """Fetch stock splits calendar."""
+        try:
+            # Finnhub API поддерживает splits через stock/split
+            # Для простоты используем популярные акции или skip если API не поддерживает
+            # В реальности нужен отдельный endpoint или список символов
+            return []  # TODO: реализовать когда будет доступен endpoint
+
+        except Exception as e:
+            logger.debug(f"Error fetching splits calendar: {e}")
+            return []
+
     def _parse_earning(self, earning: Dict) -> Dict:
         """Parse earning event."""
         try:
@@ -249,6 +309,41 @@ class FinnhubProvider(BaseEventProvider):
             logger.error(f"Error parsing IPO: {e}")
             return None
 
+    def _parse_dividend(self, dividend: Dict) -> Dict:
+        """Parse dividend event."""
+        try:
+            symbol = dividend.get("symbol", "")
+            if not symbol:
+                return None
+
+            date_str = dividend.get("date")
+            if not date_str:
+                return None
+
+            starts_at = datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            amount = dividend.get("amount", 0)
+
+            return {
+                "title": f"{symbol} Dividend Payment (${amount})",
+                "starts_at": starts_at,
+                "ends_at": None,
+                "subcategory": "dividends",
+                "importance": 0.6,
+                "description": f"Dividend payment of ${amount} per share for {symbol}",
+                "link": f"https://finnhub.io/quote/{symbol}",
+                "location": "Financial Markets",
+                "organizer": symbol,
+                "metadata": {
+                    "symbol": symbol,
+                    "amount": amount,
+                    "currency": dividend.get("currency", "USD"),
+                },
+            }
+
+        except Exception as e:
+            logger.error(f"Error parsing dividend: {e}")
+            return None
+
     def _parse_economic(self, economic: Dict) -> Dict:
         """Parse economic event."""
         try:
@@ -266,11 +361,14 @@ class FinnhubProvider(BaseEventProvider):
             impact = economic.get("impact", "").lower()
             importance = 0.9 if impact == "high" else 0.7 if impact == "medium" else 0.5
 
+            # Determine subcategory based on event type
+            subcategory = self._determine_economic_subcategory(event_name)
+
             return {
                 "title": event_name,
                 "starts_at": starts_at,
                 "ends_at": None,
-                "subcategory": "economic_data",
+                "subcategory": subcategory,
                 "importance": importance,
                 "description": f"{event_name} - {economic.get('country', '')}",
                 "link": "https://finnhub.io/calendar/economic",
@@ -287,3 +385,28 @@ class FinnhubProvider(BaseEventProvider):
         except Exception as e:
             logger.error(f"Error parsing economic event: {e}")
             return None
+
+    def _determine_economic_subcategory(self, event_name: str) -> str:
+        """Determine subcategory based on economic event name."""
+        event_lower = event_name.lower()
+
+        # Forex related
+        if any(word in event_lower for word in ["exchange rate", "fx", "forex", "currency"]):
+            return "forex"
+
+        # Central bank rates
+        if any(
+            word in event_lower for word in ["interest rate", "fed rate", "ecb rate", "policy rate", "benchmark rate"]
+        ):
+            return "rates"
+
+        # Bonds
+        if any(word in event_lower for word in ["bond", "treasury", "yield"]):
+            return "bonds"
+
+        # Commodities
+        if any(word in event_lower for word in ["oil", "gold", "silver", "commodity", "crude"]):
+            return "commodities"
+
+        # Default to economic_data
+        return "economic_data"

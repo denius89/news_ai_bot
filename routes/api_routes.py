@@ -935,47 +935,12 @@ def generate_digest():
         if category != "all" and category not in real_categories:
             return jsonify({"status": "error", "message": f"Invalid category: {category}"}), 400
 
-        # УМНАЯ ФИЛЬТРАЦИЯ: Получаем предпочтения категорий пользователя
-        user_category_preferences = None
-        if user_id and use_user_preferences:
-            try:
-                from database.db_models import get_user_category_preferences, get_active_categories
-
-                user_category_preferences = get_user_category_preferences(user_id)
-                active_categories = get_active_categories(user_id)
-                logger.debug(f"Получены предпочтения категорий пользователя {user_id}: {user_category_preferences}")
-                logger.debug(f"Активные категории пользователя {user_id}: {active_categories}")
-            except Exception as e:
-                logger.warning(f"Не удалось получить предпочтения категорий пользователя {user_id}: {e}")
-
-        # УМНАЯ ФИЛЬТРАЦИЯ: Определяем категории для дайджеста
+        # Определяем категории для дайджеста на основе выбора пользователя в UI
         final_min_importance = min_importance
         categories_list = None if category == "all" else [category]
 
-        # Если пользователь выбрал категории в настройках, используем их
-        if user_category_preferences and active_categories:
-            full_categories = active_categories.get("full_categories", [])
-            subcategories = active_categories.get("subcategories", {})
-
-            # Если есть активные категории, генерируем дайджест для них
-            if full_categories or subcategories:
-                # Собираем все активные категории
-                user_categories = []
-                user_categories.extend(full_categories)  # Категории целиком
-                user_categories.extend(subcategories.keys())  # Категории с подкатегориями
-
-                # Убираем дубликаты
-                user_categories = list(set(user_categories))
-
-                if user_categories:
-                    categories_list = user_categories
-                    logger.info(f"Дайджест будет сгенерирован для категорий пользователя: {user_categories}")
-                else:
-                    logger.info("Пользователь не выбрал ни одной категории, используем выбранную в UI")
-            else:
-                logger.info("Пользователь не выбрал ни одной категории, используем выбранную в UI")
-        else:
-            logger.info("Предпочтения пользователя не найдены, используем выбранную в UI")
+        logger.info(f"📋 Генерация дайджеста для категории из UI: {category}")
+        logger.info(f"📋 categories_list: {categories_list}")
 
         # УМНАЯ ФИЛЬТРАЦИЯ: Определяем параметры фильтрации
         if enable_smart_filtering:
@@ -1084,7 +1049,7 @@ def generate_digest():
                         "min_importance": final_min_importance,  # Информация о фильтрации
                         "smart_filtering_enabled": enable_smart_filtering,
                         "generation_time_ms": generation_time_ms,  # Время генерации
-                        "user_preferences_applied": bool(user_category_preferences),  # Применены ли предпочтения
+                        "user_preferences_applied": bool(use_user_preferences),  # Применены ли предпочтения
                     },
                 },
             }

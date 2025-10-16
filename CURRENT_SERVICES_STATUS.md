@@ -10,7 +10,7 @@
 - **Статус:** ✅ Запущен (перезапущен)
 - **PID:** 10552, 10535 (2 процесса - нормально)
 - **URL локальный:** http://localhost:8001/webapp
-- **URL внешний:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **URL внешний:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 - **Режим:** Debug ON, Threading ON
 - **Порт:** 8001
 
@@ -18,12 +18,12 @@
 - **Статус:** ✅ Запущен (перезапущен с новым URL)
 - **PID:** 31852
 - **Статус:** Готов к работе (@PulseAIDigest_bot)
-- **WebApp URL:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **WebApp URL:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 
 ### 3. Cloudflare Tunnel
 - **Статус:** ✅ Запущен (не перезапускался)
 - **PID:** 4788
-- **URL:** https://step-everywhere-gem-electronic.trycloudflare.com
+- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com
 - **Направление:** localhost:8001
 
 ---
@@ -51,11 +51,11 @@
 
 ### WebApp (основное приложение)
 - **Локальный:** http://localhost:8001/webapp
-- **Внешний:** https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+- **Внешний:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 
 ### Admin Panel
 - **Локальный:** http://localhost:8001/admin
-- **Внешний:** https://step-everywhere-gem-electronic.trycloudflare.com/admin
+- **Внешний:** https://founded-shopper-miss-kruger.trycloudflare.com/admin
 
 ### API Endpoints
 - **Health check:** http://localhost:8001/api/health
@@ -116,10 +116,10 @@ curl -s "http://localhost:8001/api/health" | head -3
 ```
 
 ### Проверить внешний доступ
-Откройте в браузере: https://step-everywhere-gem-electronic.trycloudflare.com/webapp
+Откройте в браузере: https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 
 ### Проверить Admin Panel
-Откройте в браузере: https://step-everywhere-gem-electronic.trycloudflare.com/admin
+Откройте в браузере: https://founded-shopper-miss-kruger.trycloudflare.com/admin
 
 ---
 

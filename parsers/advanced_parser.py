@@ -627,9 +627,12 @@ class AdvancedParser:
         except Exception as e:
             return {"success": False, "reason": f"html_parse_error: {e}"}
 
-    async def run(self) -> Dict[str, Any]:
+    async def run(self, auto_retrain: bool = True) -> Dict[str, Any]:
         """
         Запуск парсинга всех источников.
+
+        Args:
+            auto_retrain: Автоматически переобучать модели после парсинга
 
         Returns:
             Словарь с общей статистикой
@@ -680,6 +683,90 @@ class AdvancedParser:
             f"Парсинг завершен: {stats['successful']}/{stats['total_sources']} успешно, "
             f"{stats['total_saved']} новостей сохранено"
         )
+
+        # Автоматическое переобучение моделей после парсинга
+        if auto_retrain and stats.get("total_saved", 0) > 0:
+            try:
+                logger.info("")
+                logger.info("🤖 Запуск автоматического переобучения моделей...")
+
+                from ai_modules.self_tuning_collector import get_self_tuning_collector
+                from ai_modules.self_tuning_trainer import get_self_tuning_trainer
+                from datetime import datetime, timezone, timedelta
+
+                collector = get_self_tuning_collector()
+                trainer = get_self_tuning_trainer()
+
+                # Проверка, включено ли самообучение
+                if not collector.is_enabled() or not trainer.is_enabled():
+                    logger.info("⏭️ Self-tuning отключен в конфигурации")
+                else:
+                    # Проверка интервала переобучения
+                    metadata = trainer._load_existing_metadata()
+                    should_train = False
+
+                    if not metadata:
+                        should_train = True
+                        logger.info("📊 Модели не найдены, требуется первое обучение")
+                    else:
+                        last_training_str = metadata.get("timestamp")
+                        if last_training_str:
+                            last_training = datetime.fromisoformat(last_training_str.replace("Z", "+00:00"))
+                            interval_days = trainer.config.get("self_tuning", {}).get("interval_days", 2)
+                            next_training = last_training + timedelta(days=interval_days)
+                            now = datetime.now(timezone.utc)
+
+                            if now >= next_training:
+                                should_train = True
+                                days_since = (now - last_training).days
+                                logger.info(f"✅ Интервал переобучения достигнут ({days_since} дней)")
+                            else:
+                                remaining = next_training - now
+                                logger.info(f"⏳ До переобучения: {remaining}")
+                        else:
+                            should_train = True
+
+                    if should_train:
+                        # Сбор данных
+                        logger.info("📊 Сбор обучающих данных...")
+                        collection_result = collector.collect_training_data()
+
+                        if collection_result["success"]:
+                            dataset_size = collection_result["dataset_size"]
+                            logger.info(f"✅ Собрано {dataset_size} примеров")
+
+                            # Обучение моделей
+                            logger.info("🧠 Обучение моделей...")
+                            from pathlib import Path
+
+                            dataset_path = Path(collection_result["dataset_path"])
+                            training_result = trainer.train_models(dataset_path)
+
+                            if training_result["success"]:
+                                improvements = training_result.get("improvements", {})
+                                for model_name, result in improvements.items():
+                                    f1_score = result.get("f1_score", 0.0)
+                                    replaced = result.get("replaced", False)
+                                    status = "✅ ЗАМЕНЕНА" if replaced else "⏸️ НЕ ЗАМЕНЕНА"
+                                    logger.info(f"   {model_name}: F1={f1_score:.3f} ({status})")
+
+                                logger.info("🎉 Переобучение завершено!")
+                                stats["retrain_status"] = "success"
+                                stats["retrain_improvements"] = improvements
+                            else:
+                                logger.warning(f"⚠️ Ошибка обучения: {training_result.get('error')}")
+                                stats["retrain_status"] = "training_failed"
+                        else:
+                            logger.warning(f"⚠️ Недостаточно данных: {collection_result.get('error')}")
+                            stats["retrain_status"] = "insufficient_data"
+                    else:
+                        logger.info("⏭️ Переобучение не требуется (интервал не достигнут)")
+                        stats["retrain_status"] = "skipped_interval"
+
+            except Exception as e:
+                logger.error(f"❌ Ошибка автоматического переобучения: {e}")
+                stats["retrain_status"] = "error"
+                stats["retrain_error"] = str(e)
 
         return stats
 

@@ -14,6 +14,7 @@ from typing import Optional, List
 from database.db_models import supabase
 from models.news import NewsItem
 from digests.ai_service import DigestAIService, DigestConfig
+from digests.ai_summary import generate_summary_journalistic_v2
 from core.reactor import reactor, Events
 
 logger = logging.getLogger("generator")
@@ -29,8 +30,11 @@ def _convert_v2_to_text(v2_result: dict) -> str:
     Returns:
         Formatted text string
     """
-    if not v2_result:
+    if v2_result is None:
         return "Ошибка конвертации v2 результата"
+
+    if not v2_result or len(v2_result) == 0:
+        return "<b>Дайджест новостей</b>"
 
     # Extract main content
     title = v2_result.get("title", "Дайджест новостей")
@@ -165,16 +169,15 @@ async def generate_digest(
     config = DigestConfig(max_items=8, include_fallback=True)
     service = DigestAIService(config)
 
+    # Определяем категорию для контекста промта (нужна для всех случаев)
+    digest_category = category or "world"
+
     try:
         if ai:
-            # Определяем категорию для контекста промта
-            digest_category = category or "world"
 
             # Try v2 generation if enabled
             if use_v2:
                 try:
-                    from digests.ai_summary import generate_summary_journalistic_v2
-
                     # Generate v2 digest
                     v2_result = generate_summary_journalistic_v2(
                         news_items=news_items,
@@ -234,13 +237,11 @@ async def generate_digest(
         # Эмитим событие о создании дайджеста
         reactor.emit_sync(
             Events.DIGEST_CREATED,
-            {
-                "title": f'Дайджест {digest_category or "общий"}',
-                "style": style,
-                "items_count": len(news_items),
-                "ai_generated": ai,
-                "timestamp": asyncio.get_event_loop().time() if asyncio.get_event_loop().is_running() else 0,
-            },
+            title=f'Дайджест {digest_category or "общий"}',
+            style=style,
+            items_count=len(news_items),
+            ai_generated=ai,
+            timestamp=asyncio.get_event_loop().time() if asyncio.get_event_loop().is_running() else 0,
         )
 
         logger.info(f"Дайджест создан: {len(news_items)} новостей, AI={ai}")
@@ -249,9 +250,7 @@ async def generate_digest(
     except Exception as e:
         logger.error(f"Ошибка при создании дайджеста: {e}")
         # Эмитим событие об ошибке
-        reactor.emit_sync(
-            Events.DIGEST_CREATED, {"title": "Ошибка создания дайджеста", "error": str(e), "status": "error"}
-        )
+        reactor.emit_sync(Events.DIGEST_CREATED, title="Ошибка создания дайджеста", error=str(e), status="error")
         raise
 
 

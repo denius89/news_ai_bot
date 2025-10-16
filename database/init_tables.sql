@@ -55,8 +55,17 @@ CREATE TABLE IF NOT EXISTS digests (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    uuid REFERENCES users(id) ON DELETE CASCADE,
   summary    text,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz DEFAULT now(),
+  deleted_at timestamptz,
+  archived   boolean DEFAULT FALSE NOT NULL
 );
+
+-- Добавить колонки если таблица уже существует
+ALTER TABLE digests ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
+ALTER TABLE digests ADD COLUMN IF NOT EXISTS archived boolean DEFAULT FALSE NOT NULL;
+
+-- Обновить существующие NULL значения на FALSE
+UPDATE digests SET archived = FALSE WHERE archived IS NULL;
 
 -- =========================
 -- Таблица событий

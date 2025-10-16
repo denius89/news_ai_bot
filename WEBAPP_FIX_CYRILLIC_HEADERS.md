@@ -168,7 +168,7 @@ sleep 5 && grep "https://" logs/cloudflare.log | grep "trycloudflare.com" | head
 
 **Новый URL:**
 ```
-https://step-everywhere-gem-electronic.trycloudflare.com
+https://founded-shopper-miss-kruger.trycloudflare.com
 ```
 
 ---

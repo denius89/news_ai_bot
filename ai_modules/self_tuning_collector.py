@@ -277,8 +277,54 @@ class SelfTuningCollector:
 
             db_service = get_sync_service()
 
-            # Get recent news with AI scores
-            news_items = db_service.get_latest_news(limit=self.max_samples)
+            # Supabase ограничивает до 1000 записей на запрос
+            # Используем прямой запрос с пагинацией для сбора всех данных
+            page_size = 1000
+            total_needed = self.max_samples
+            all_news_items = []
+
+            logger.info(f"Сбор данных с пагинацией (целевой объем: {total_needed:,})")
+
+            # Прямой запрос к Supabase с offset
+            pages = (total_needed + page_size - 1) // page_size
+
+            for page in range(pages):
+                offset = page * page_size
+
+                # Используем прямой API Supabase с range для пагинации
+                try:
+                    result = (
+                        db_service.sync_client.table("news")
+                        .select(
+                            "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
+                        )
+                        .order("published_at", desc=True)
+                        .range(offset, offset + page_size - 1)
+                        .execute()
+                    )
+
+                    batch = result.data or []
+
+                    if not batch:
+                        logger.info(f"Достигнут конец данных на странице {page + 1}")
+                        break
+
+                    all_news_items.extend(batch)
+                    logger.info(
+                        f"Страница {page + 1}/{pages}: получено {len(batch)} записей (всего: {len(all_news_items):,})"
+                    )
+
+                    # Если получили меньше чем page_size, значит это последняя страница
+                    if len(batch) < page_size:
+                        logger.info("Последняя страница достигнута")
+                        break
+
+                except Exception as e:
+                    logger.error(f"Ошибка загрузки страницы {page + 1}: {e}")
+                    break
+
+            news_items = all_news_items[: self.max_samples]
+            logger.info(f"✅ Всего собрано: {len(news_items):,} новостей из БД")
 
             for item in news_items:
                 # Convert to dict if needed

@@ -10,6 +10,14 @@ crypto:
         url: https://btctimes.com/rss
       - name: NewsBTC
         url: https://www.newsbtc.com/feed/
+      - name: Bitcoinist
+        url: https://bitcoinist.com/feed
+      - name: Bitcoin.com News
+        url: https://news.bitcoin.com/feed
+      - name: The Daily Hodl
+        url: https://dailyhodl.com/feed
+      - name: 99Bitcoins News
+        url: https://99bitcoins.com/feed
   ethereum:
     icon: eth
     sources:
@@ -21,6 +29,8 @@ crypto:
         url: https://ethhub.substack.com/feed
       - name: Decrypt ETH
         url: https://decrypt.co/feed
+      - name: U.Today
+        url: https://u.today/rss
   altcoins:
     icon: altcoin
     sources:
@@ -30,6 +40,10 @@ crypto:
         url: https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml&tag=altcoin
       - name: CryptoSlate Altcoins
         url: https://cryptoslate.com/feed/
+      - name: Crypto.News
+        url: https://crypto.news/feed
+      - name: Coingape
+        url: https://coingape.com/feed
   defi:
     icon: defi
     sources:
@@ -41,6 +55,12 @@ crypto:
         url: https://thedefiant.io/feed
       - name: CoinDesk DeFi
         url: https://www.coindesk.com/tag/defi/rss
+      - name: DeFi Pulse Blog
+        url: https://defipulse.com/blog/feed
+      - name: Coin Metrics
+        url: https://coinmetrics.substack.com/feed
+      - name: DappRadar DeFi
+        url: https://dappradar.com/blog/category/defi/feed
   nft:
     icon: nft
     sources:
@@ -72,6 +92,8 @@ crypto:
         url: https://blog.bybit.com/en-US/rss
       - name: Coinbase Blog
         url: https://blog.coinbase.com/feed
+      - name: Kraken Blog
+        url: https://blog.kraken.com/feed
   regulation:
     icon: regulation
     sources:
@@ -81,6 +103,8 @@ crypto:
         url: https://decrypt.co/feed
       - name: CryptoSlate Regulation
         url: https://cryptoslate.com/feed/
+      - name: Blockchain.News
+        url: https://blockchain.news/rss
   security:
     icon: security
     sources:
@@ -99,6 +123,10 @@ crypto:
         url: https://cryptoquant.com/rss
       - name: IntoTheBlock
         url: https://intotheblock.com/feed
+      - name: CryptoPotato
+        url: https://cryptopotato.com/feed
+      - name: AMBCrypto
+        url: https://ambcrypto.com/feed
 
 sports:
   football:
@@ -112,6 +140,10 @@ sports:
         url: https://www.goal.com/feeds/en/news
       - name: ESPN Soccer
         url: https://www.espn.com/espn/rss/soccer/news
+      - name: The Guardian Football
+        url: https://www.theguardian.com/football/rss
+      - name: FourFourTwo
+        url: https://www.fourfourtwo.com/feed
   basketball:
     icon: basketball
     sources:
@@ -123,6 +155,10 @@ sports:
         url: https://bleacherreport.com/articles/nba.rss
       - name: ESPN NBA
         url: https://www.espn.com/espn/rss/nba/news
+      - name: Basketball News
+        url: https://www.basketballnews.com/feed
+      - name: Hoops Hype
+        url: https://hoopshype.com/feed/
   tennis:
     icon: tennis
     sources:
@@ -132,6 +168,10 @@ sports:
         url: https://www.wtatennis.com/rss
       - name: ESPN Tennis
         url: https://www.espn.com/espn/rss/tennis/news
+      - name: Tennis.com
+        url: https://www.tennis.com/rss
+      - name: Tennis World USA
+        url: https://www.tennisworldusa.org/rss.xml
   ufc_mma:
     icon: ufc
     sources:
@@ -150,6 +190,10 @@ sports:
         url: https://www.cricbuzz.com/rss/news
       - name: ICC
         url: https://www.icc-cricket.com/rss/news
+      - name: ESPNcricinfo
+        url: https://www.espncricinfo.com/rss/content/story/feeds/0.xml
+      - name: Cricket World
+        url: https://www.cricketworld.com/feed
   baseball:
     icon: baseball
     sources:
@@ -157,6 +201,10 @@ sports:
         url: http://mlb.mlb.com/partnerxml/gen/news/rss/mlb.xml
       - name: ESPN MLB
         url: https://www.espn.com/espn/rss/mlb/news
+      - name: MLB.com News
+        url: https://www.mlb.com/feeds/news/rss.xml
+      - name: Baseball America
+        url: https://www.baseballamerica.com/feed/
   badminton:
     icon: badminton
     sources:
@@ -178,6 +226,16 @@ sports:
         url: https://liquipedia.net/rss
       - name: ESPN Esports
         url: https://www.espn.com/espn/rss/esports/news
+      - name: GoHa Videogames
+        url: https://www.goha.ru/rss/videogames
+      - name: GoHa Industry
+        url: https://www.goha.ru/rss/industry
+      - name: Esports Insider
+        url: https://esportsinsider.com/feed
+      - name: Dot Esports
+        url: https://dotesports.com/feed
+      - name: ONE Esports
+        url: https://www.oneesports.gg/feed/
   # Дополнительные подкатегории для событий
   hockey:
     icon: hockey
@@ -186,6 +244,10 @@ sports:
         url: https://www.nhl.com/rss
       - name: ESPN NHL
         url: https://www.espn.com/espn/rss/nhl/news
+      - name: NHL.com News
+        url: https://www.nhl.com/info/rss-feeds
+      - name: The Hockey News
+        url: https://thehockeynews.com/feed
   champions_league:
     icon: football
     sources:
@@ -201,6 +263,10 @@ sports:
     sources:
       - name: LoL Esports
         url: https://lolesports.com/rss
+      - name: GoHa League of Legends
+        url: https://www.goha.ru/rss/:League of Legends
+      - name: Blog of Legends
+        url: https://blogoflegends.com/feed
   overwatch:
     icon: esports
     sources:
@@ -216,6 +282,108 @@ sports:
     sources:
       - name: Valorant Esports
         url: https://valorantesports.com/rss
+      - name: GoHa Valorant
+        url: https://www.goha.ru/rss/:VALORANT
+  # Дополнительные футбольные лиги
+  europa_league:
+    icon: football
+    sources:
+      - name: ESPN Europa League
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: OneFootball Europa League
+        url: https://onefootball.com/en/rss
+  conference_league:
+    icon: football
+    sources:
+      - name: ESPN Conference League
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: OneFootball
+        url: https://onefootball.com/en/rss
+  bundesliga:
+    icon: football
+    sources:
+      - name: Bundesliga Official
+        url: https://www.bundesliga.com/en/bundesliga/news/rss
+      - name: ESPN Bundesliga
+        url: https://www.espn.com/espn/rss/soccer/news
+  la_liga:
+    icon: football
+    sources:
+      - name: ESPN La Liga
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Marca La Liga
+        url: https://www.marca.com/rss/futbol/primera.xml
+  serie_a:
+    icon: football
+    sources:
+      - name: ESPN Serie A
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Football Italia
+        url: https://www.football-italia.net/rss
+  ligue_1:
+    icon: football
+    sources:
+      - name: ESPN Ligue 1
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Get French Football
+        url: https://www.getfootballnewsfrance.com/feed/
+  world_cup:
+    icon: football
+    sources:
+      - name: ESPN World Cup
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: FIFA News
+        url: https://www.fifa.com/rss-feeds/news
+  # Дополнительные киберспорт игры
+  dota2:
+    icon: dota2
+    sources:
+      - name: ESPN Esports
+        url: https://www.espn.com/espn/rss/esports/news
+      - name: Dota 2 News
+        url: https://dotesports.com/dota-2/feed
+      - name: Dotabuff Blog
+        url: https://dotabuff.com/blog.rss
+  csgo:
+    icon: csgo
+    sources:
+      - name: HLTV CS:GO
+        url: https://www.hltv.org/rss/news
+      - name: ESPN Esports
+        url: https://www.espn.com/espn/rss/esports/news
+  # Дополнительные виды спорта
+  american_football:
+    icon: american_football
+    sources:
+      - name: ESPN NFL
+        url: https://www.espn.com/espn/rss/nfl/news
+      - name: Pro Football Talk
+        url: https://profootballtalk.nbcsports.com/feed/
+      - name: NFL News
+        url: https://www.nfl.com/feeds/rss/news
+      - name: Bleacher Report NFL
+        url: https://bleacherreport.com/articles/nfl.rss
+  rugby:
+    icon: rugby
+    sources:
+      - name: ESPN Rugby
+        url: https://www.espn.com/espn/rss/rugby/news
+      - name: Rugby World
+        url: https://www.rugbyworld.com/feed
+  volleyball:
+    icon: volleyball
+    sources:
+      - name: Volleyball Magazine
+        url: https://volleyballmag.com/feed/
+      - name: USA Volleyball
+        url: https://usavolleyball.org/feed/
+  handball:
+    icon: handball
+    sources:
+      - name: Handball Planet
+        url: https://handball-planet.com/feed/
+      - name: Team Handball News
+        url: https://www.teamusa.org/usa-team-handball/news.rss
   other:
     icon: sports_other
     sources:
@@ -227,6 +395,16 @@ sports:
         url: https://olympics.com/en/news/rss
       - name: World Athletics
         url: https://worldathletics.org/rss
+      - name: Sky Sports
+        url: https://www.skysports.com/rss/12040
+      - name: FOX Sports
+        url: https://api.foxsports.com/v2/content/optimized-rss
+      - name: CBS Sports
+        url: https://www.cbssports.com/rss/headlines
+      - name: BBC Sport
+        url: http://feeds.bbci.co.uk/sport/rss.xml
+      - name: Sports Illustrated
+        url: https://www.si.com/rss/si_topstories.rss
 
 markets:
   stocks:
@@ -314,6 +492,32 @@ markets:
         url: https://www.bankofengland.co.uk/news/rss
       - name: Federal Reserve
         url: https://www.federalreserve.gov/feeds/press_all.xml
+  # Дополнительные markets подкатегории
+  dividends:
+    icon: dividends
+    sources:
+      - name: Seeking Alpha Dividends
+        url: https://seekingalpha.com/feed/dividends.xml
+      - name: Sure Dividend
+        url: https://www.suredividend.com/feed/
+      - name: Dividend Growth Investor
+        url: https://dividendgrowthinvestor.com/feed/
+  splits:
+    icon: splits
+    sources:
+      - name: Stock Splits News
+        url: https://www.stocksplits.net/feed/
+      - name: Benzinga Stock Splits
+        url: https://www.benzinga.com/feed/stock-splits
+  rates:
+    icon: rates
+    sources:
+      - name: Federal Reserve
+        url: https://www.federalreserve.gov/feeds/press_all.xml
+      - name: Central Banking
+        url: https://www.centralbanking.com/feed/
+      - name: Bank of International Settlements
+        url: https://www.bis.org/rss/rsspubl.htm
 
 tech:
   ai:
@@ -349,6 +553,8 @@ tech:
         url: https://www.tomshardware.com/feeds/all
       - name: PCWorld
         url: https://www.pcworld.com/index.rss
+      - name: GoHa Hardware
+        url: https://www.goha.ru/rss/hardware
   software:
     icon: software
     sources:
@@ -409,6 +615,14 @@ world:
         url: https://rss.dw.com/rdf/rss-en-world
       - name: Al Jazeera
         url: https://www.aljazeera.com/xml/rss/all.xml
+      - name: NBC News World
+        url: https://feeds.nbcnews.com/nbcnews/public/world
+      - name: CBS News World
+        url: https://www.cbsnews.com/latest/rss/world
+      - name: France 24
+        url: https://www.france24.com/en/rss
+      - name: CNN World
+        url: https://rss.cnn.com/rss/cnn_world.rss
   elections:
     icon: elections
     sources:
@@ -418,6 +632,10 @@ world:
         url: http://feeds.bbci.co.uk/news/politics/rss.xml
       - name: Reuters Politics
         url: https://feeds.reuters.com/Reuters/politicsNews
+      - name: The Washington Post Politics
+        url: https://feeds.washingtonpost.com/rss/politics
+      - name: The Guardian Politics
+        url: https://www.theguardian.com/politics/rss
   energy:
     icon: energy
     sources:
@@ -429,6 +647,8 @@ world:
         url: https://www.iea.org/rss/news.xml
       - name: Energy Post
         url: https://energypost.eu/feed/
+      - name: CNBC Energy
+        url: https://www.cnbc.com/id/19836768/device/rss/rss.html
   geopolitics:
     icon: geopolitics
     sources:
@@ -440,6 +660,12 @@ world:
         url: https://carnegieendowment.org/rss
       - name: Foreign Affairs
         url: https://www.foreignaffairs.com/rss.xml
+      - name: The New York Times World
+        url: https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+      - name: The Washington Post World
+        url: https://feeds.washingtonpost.com/rss/world
+      - name: The Guardian World
+        url: https://www.theguardian.com/world/rss
   diplomacy:
     icon: diplomacy
     sources:
@@ -449,6 +675,10 @@ world:
         url: https://www.eeas.europa.eu/eeas-news_en?format=rss
       - name: UN News
         url: https://news.un.org/en/rss
+      - name: NPR World
+        url: https://feeds.npr.org/1004/rss.xml
+      - name: AP News
+        url: https://rsshub.app/apnews/topics/apf-topnews
   sanctions:
     icon: sanctions
     sources:
@@ -469,6 +699,8 @@ world:
         url: https://www.worldbank.org/en/news/all?format=rss
       - name: OECD News
         url: https://www.oecd.org/newsroom/index.rdf
+      - name: Financial Times World
+        url: https://www.ft.com/world?format=rss
   migration:
     icon: migration
     sources:
@@ -496,3 +728,7 @@ world:
         url: https://www.chathamhouse.org/rss.xml
       - name: World Bank Blogs (Dev)
         url: https://blogs.worldbank.org/feed
+      - name: TIME World
+        url: https://time.com/feed/
+      - name: The Economist World
+        url: https://www.economist.com/international/rss.xml

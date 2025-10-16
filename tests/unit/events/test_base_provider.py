@@ -11,8 +11,12 @@ from unittest.mock import Mock
 from events.providers.base_provider import BaseEventProvider
 
 
-class TestProvider(BaseEventProvider):
-    """Test implementation of BaseEventProvider."""
+class MockEventProvider(BaseEventProvider):
+    """Mock implementation of BaseEventProvider for testing."""
+
+    def __init__(self):
+        """Initialize mock provider."""
+        super().__init__(name="test", category="test")
 
     async def fetch_events(self, start_date: datetime, end_date: datetime):
         """Mock implementation."""
@@ -36,14 +40,14 @@ class TestBaseEventProvider:
 
     def test_init(self):
         """Test provider initialization."""
-        provider = TestProvider()
+        provider = MockEventProvider()
         assert provider.name == "test"
         assert provider.category == "test"
         assert provider.session is None
 
     def test_create_unique_hash(self):
         """Test unique hash creation."""
-        provider = TestProvider()
+        provider = MockEventProvider()
         title = "Test Event"
         starts_at = datetime(2025, 1, 15, 12, 0, tzinfo=timezone.utc)
         source = "test_source"
@@ -61,7 +65,7 @@ class TestBaseEventProvider:
 
     def test_normalize_event(self):
         """Test event normalization."""
-        provider = TestProvider()
+        provider = MockEventProvider()
 
         event_data = {
             "title": "  Test Event  ",
@@ -94,7 +98,7 @@ class TestBaseEventProvider:
 
     def test_normalize_event_missing_fields(self):
         """Test event normalization with missing fields."""
-        provider = TestProvider()
+        provider = MockEventProvider()
 
         event_data = {
             "title": "Test Event",
@@ -116,7 +120,7 @@ class TestBaseEventProvider:
 
     def test_normalize_event_invalid(self):
         """Test event normalization with invalid data."""
-        provider = TestProvider()
+        provider = MockEventProvider()
 
         # Missing title
         event_data = {
@@ -128,7 +132,7 @@ class TestBaseEventProvider:
 
     def test_get_info(self):
         """Test provider info."""
-        provider = TestProvider()
+        provider = MockEventProvider()
 
         info = provider.get_info()
 
@@ -139,17 +143,21 @@ class TestBaseEventProvider:
     @pytest.mark.asyncio
     async def test_close(self):
         """Test provider close."""
-        provider = TestProvider()
-        provider.session = Mock()
+        from unittest.mock import AsyncMock
+
+        provider = MockEventProvider()
+        mock_session = AsyncMock()
+        provider.session = mock_session
 
         await provider.close()
 
+        mock_session.close.assert_called_once()
         assert provider.session is None
 
     @pytest.mark.asyncio
     async def test_close_no_session(self):
         """Test provider close without session."""
-        provider = TestProvider()
+        provider = MockEventProvider()
 
         # Should not raise exception
         await provider.close()

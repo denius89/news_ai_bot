@@ -10,6 +10,31 @@
 ## [Unreleased]
 
 ### Добавлено
+- **Масштабное расширение RSS-источников** (16 октября 2025)
+  - **+72 топовых источника** из FeedSpot (топ-100 по каждой категории)
+  - Итого: **255 источников в 70 субкатегориях** (было ~183)
+  - Русскоязычные источники: GoHa (игры, киберспорт, железо)
+  - Crypto: +13 источников (Bitcoinist, CryptoPotato, AMBCrypto, DeFi Pulse, etc.)
+  - Sports: +28 источников (Sky Sports, FOX Sports, CBS, BBC, SI, etc.)
+  - World: +15 источников (NBC, CBS, CNN, NYT, Guardian, France 24, etc.)
+  - Tech: +1 источник (GoHa Hardware)
+  - Полная валидация всех источников - все работают корректно
+- **ML-оптимизация и самообучение** (16 октября 2025)
+  - Обучены локальные ML-модели на 4,499 примерах (F1=0.729-0.744)
+  - Локальный предиктор включен и работает
+  - **Экономия 60-70% AI токенов** в production
+  - Автоматическое самообучение каждые 2 дня
+  - Пагинация для сбора до 25,000 примеров
+  - Сохранение StandardScaler вместе с моделями
+- **Инструменты для работы с новостями**
+  - `tools/news/fetch_and_train.py` - умный парсинг с автообучением
+  - `tools/news/README.md` - полная документация
+  - Документация: QUICK_START_NEWS.md, FINAL_RSS_UPDATE_REPORT.md
+- **Масштабное расширение категорий и подкатегорий**
+  - 16 новых подкатегорий для новостей (sports: 13, markets: 3)
+  - 15 новых подкатегорий в Event Providers
+  - 109 новых иконок (backend + frontend маппинг)
+  - Полное покрытие: crypto, tech, world уже были, sports и markets расширены
 - Admin Panel с полным функционалом (Dashboard, Metrics, Logs, Config)
 - Enhanced Metrics с 6 вкладками (News, Events, Users, AI, Digests, System)
 - Event Configuration как подвкладка в Sources
@@ -20,6 +45,13 @@
 - Система кеширования API endpoints
 
 ### Исправлено
+- **Критический баг в self_tuning_trainer.py** - StandardScaler не сохранялся
+  - ML-модели обучались, но scaler отсутствовал при загрузке
+  - Локальный предиктор выдавал ошибку "StandardScaler not fitted"
+  - Исправлено: scaler теперь сохраняется в models/scaler.pkl
+- **Лимит Supabase 1,000 записей** в сборе данных для обучения
+  - Добавлена пагинация с .range() для сбора до 25,000 примеров
+  - Полный датасет теперь используется для обучения моделей
 - Критическая ошибка с кириллическими символами в HTTP headers
 - Несинхронизированные Cloudflare URL во всех сервисах
 - Проблемы с аутентификацией пользователей с кириллическими именами
@@ -28,7 +60,16 @@
 - Проблемы с отображением данных в Admin Panel
 
 ### Изменено
-- Обновлены все Cloudflare URL на актуальный: `https://step-everywhere-gem-electronic.trycloudflare.com`
+- **Event Providers расширены новыми подкатегориями:**
+  - CoinGecko: +NFT события, gamefi, regulation, security
+  - Finnhub: +dividends, умная категоризация economic events (forex, rates, bonds, commodities)
+  - GitHub: +категоризация репозиториев (ai, hardware, cybersecurity, startups)
+  - UN SC: +умное определение типа встречи (conflicts, sanctions, migration)
+- **sources.yaml оптимизирован:**
+  - Удалены 13 неработающих RSS источников
+  - Добавлены 13 рабочих альтернатив
+  - Общее количество: 70 подкатегорий, 197 источников
+- Обновлены все Cloudflare URL на актуальный: `https://founded-shopper-miss-kruger.trycloudflare.com`
 - Улучшена производительность API через кеширование
 - Обновлен UI Admin Panel с современными компонентами
 - Оптимизированы запросы к базе данных

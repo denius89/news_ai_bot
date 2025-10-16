@@ -291,6 +291,15 @@ class SelfTuningTrainer:
             results["models_trained"].append("credibility")
             results["improvements"]["credibility"] = credibility_result
 
+            # Save scaler (ВАЖНО для использования моделей!)
+            scaler_path = self.models_dir / "scaler.pkl"
+            try:
+                with open(scaler_path, "wb") as f:
+                    pickle.dump(self.scaler, f)
+                logger.info(f"✅ Feature scaler saved: {scaler_path}")
+            except Exception as e:
+                logger.error(f"❌ Error saving scaler: {e}")
+
             # Save metadata
             metadata = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),

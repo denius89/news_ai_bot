@@ -64,7 +64,7 @@
 **Решение:**
 - Запущен Flask WebApp на порту 8001
 - Перезапущен Cloudflare Tunnel
-- Новый URL: `https://democrats-divorce-sheer-activities.trycloudflare.com`
+- Новый URL: `https://founded-shopper-miss-kruger.trycloudflare.com`
 
 **Результат:** WebApp доступен и работает корректно
 
@@ -115,7 +115,7 @@ DROP TABLE IF EXISTS events;
 |--------|--------|-----|------|-----|
 | Flask WebApp | ✅ Запущен | 84016 | 8001 | http://localhost:8001 |
 | Telegram Bot | ✅ Запущен | 56116 | - | - |
-| Cloudflare Tunnel | ✅ Запущен | - | - | https://democrats-divorce-sheer-activities.trycloudflare.com |
+| Cloudflare Tunnel | ✅ Запущен | - | - | https://founded-shopper-miss-kruger.trycloudflare.com |
 | React Dev Server | ✅ Запущен | 70976 | 3000 | http://localhost:3000 |
 
 ---
@@ -141,7 +141,7 @@ DROP TABLE IF EXISTS events;
 ## 🌐 Доступ к WebApp
 
 **Новый URL Cloudflare Tunnel:**  
-https://democrats-divorce-sheer-activities.trycloudflare.com/webapp
+https://founded-shopper-miss-kruger.trycloudflare.com/webapp
 
 **Локальный доступ:**  
 http://localhost:8001/webapp

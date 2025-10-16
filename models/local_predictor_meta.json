@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-10-06T08:34:14.095433+00:00",
-  "dataset_size": 1330,
+  "timestamp": "2025-10-16T19:11:34.962056+00:00",
+  "dataset_size": 4499,
   "model_type": "logreg",
   "features": [
     "title_length",
@@ -22,16 +22,16 @@
     "time_features"
   ],
   "importance_model": {
-    "f1_score": 0.8598531428575815,
+    "f1_score": 0.7289311946503683,
     "improvement": 0.0,
     "replaced": true,
     "model_type": "logreg"
   },
   "credibility_model": {
-    "f1_score": 0.9021988981147808,
+    "f1_score": 0.7435588056063376,
     "improvement": 0.0,
     "replaced": true,
     "model_type": "logreg"
   },
-  "version": 1
+  "version": 6
 }

@@ -60,6 +60,7 @@ class CoinGeckoProvider(BaseEventProvider):
                 # Trending endpoint возвращает: {"coins": [...], "nfts": [...], "categories": [...]}
                 data = await response.json()
                 trending_coins = data.get("coins", [])
+                trending_nfts = data.get("nfts", [])
 
                 # Создаем события из трендовых монет
                 events = []
@@ -67,6 +68,7 @@ class CoinGeckoProvider(BaseEventProvider):
 
                 now = datetime.now(timezone.utc)
 
+                # Обрабатываем трендовые монеты
                 for item in trending_coins[:15]:  # Топ 15 трендовых монет
                     coin = item.get("item", {})
                     # Создаем событие "Trending Crypto"
@@ -77,6 +79,21 @@ class CoinGeckoProvider(BaseEventProvider):
                         "coins": [coin.get("symbol", "")],
                         "coin_id": coin.get("id", ""),
                         "market_cap_rank": coin.get("market_cap_rank"),
+                        "activated_at": now.isoformat(),
+                    }
+                    events.append(event)
+
+                # Обрабатываем трендовые NFT
+                for idx, nft_item in enumerate(trending_nfts[:10]):  # Топ 10 трендовых NFT
+                    nft = nft_item if isinstance(nft_item, dict) else {}
+                    # Создаем событие "Trending NFT"
+                    event = {
+                        "title": nft.get("name", "Unknown NFT"),
+                        "description": f"Trending NFT #{idx+1} on CoinGecko",
+                        "event_type": "nft_trending",
+                        "coins": [nft.get("symbol", "")],
+                        "nft_id": nft.get("id", ""),
+                        "floor_price": nft.get("floor_price_in_native_currency"),
                         "activated_at": now.isoformat(),
                     }
                     events.append(event)
@@ -106,6 +123,44 @@ class CoinGeckoProvider(BaseEventProvider):
             Parsed event dictionary
         """
         try:
+            # NFT Trending формат
+            if "event_type" in event and event["event_type"] == "nft_trending":
+                nft_id = event.get("nft_id", "")
+                floor_price = event.get("floor_price")
+                title = f"🖼️ {event.get('title', 'Unknown NFT')} - Trending NFT"
+
+                if floor_price:
+                    title += f" (Floor: {floor_price})"
+
+                # Парсим дату
+                activated_at = event.get("activated_at")
+                if not activated_at:
+                    from datetime import timezone
+
+                    activated_at = datetime.now(timezone.utc).isoformat()
+
+                try:
+                    starts_at = datetime.fromisoformat(activated_at.replace("Z", "+00:00"))
+                except Exception:
+                    from datetime import timezone
+
+                    starts_at = datetime.now(timezone.utc)
+
+                return {
+                    "title": title,
+                    "starts_at": starts_at,
+                    "ends_at": starts_at,
+                    "description": event.get("description", ""),
+                    "event_type": "nft_trending",
+                    "importance": 0.7,
+                    "subcategory": "nft",
+                    "group_name": "Trending NFTs",
+                    "link": f"https://www.coingecko.com/en/nft/{nft_id}" if nft_id else "",
+                    "metadata": {
+                        "floor_price": floor_price,
+                    },
+                }
+
             # Trending формат
             if "event_type" in event and event["event_type"] == "trending":
                 symbol = event.get("coins", [""])[0]
@@ -230,9 +285,15 @@ class CoinGeckoProvider(BaseEventProvider):
         importance_map = {
             "mainnet": 0.9,
             "launch": 0.85,
-            "upgrade": 0.8,
             "hard fork": 0.85,
+            "upgrade": 0.8,
+            "regulation": 0.8,  # Регуляторные события важны
+            "security": 0.85,  # Хаки и инциденты критичны
+            "hack": 0.9,
+            "exploit": 0.85,
             "airdrop": 0.7,
+            "nft": 0.7,
+            "gamefi": 0.65,
             "listing": 0.65,
             "conference": 0.6,
             "partnership": 0.55,
@@ -247,15 +308,25 @@ class CoinGeckoProvider(BaseEventProvider):
 
     def _determine_subcategory(self, event_type: str) -> str:
         """Determine subcategory based on event type."""
-        if any(word in event_type for word in ["mainnet", "launch", "upgrade", "fork"]):
-            return "protocol"
+        # Новые подкатегории для crypto
+        if any(word in event_type for word in ["nft", "opensea", "blur", "magic eden"]):
+            return "nft"
+        elif any(word in event_type for word in ["gamefi", "game", "play to earn", "p2e"]):
+            return "gamefi"
+        elif any(word in event_type for word in ["regulation", "sec", "cftc", "lawsuit", "court", "compliance"]):
+            return "regulation"
+        elif any(word in event_type for word in ["security", "hack", "exploit", "vulnerability", "breach", "attack"]):
+            return "security"
+        # Существующие подкатегории
+        elif any(word in event_type for word in ["mainnet", "launch", "upgrade", "fork"]):
+            return "mainnet"
         elif any(word in event_type for word in ["airdrop", "token"]):
-            return "token"
+            return "airdrop"
         elif any(word in event_type for word in ["listing", "exchange"]):
-            return "exchange"
+            return "listing"
         elif any(word in event_type for word in ["conference", "meetup", "summit"]):
             return "conference"
         elif any(word in event_type for word in ["partnership", "collaboration"]):
             return "partnership"
         else:
-            return "general"
+            return "bitcoin"  # Default для crypto

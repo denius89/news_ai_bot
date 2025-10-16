@@ -42,3 +42,13 @@ body {
   background-color: var(--color-primary);
   color: white;
 }
+
+/* Hide scrollbar for ChipsCarousel */
+.news-chips-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.news-chips-scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}

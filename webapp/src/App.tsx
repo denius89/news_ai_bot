@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Pages
@@ -8,6 +8,9 @@ import NewsPage from './pages/NewsPage';
 import DigestPage from './pages/DigestPage';
 import EventsPage from './pages/EventsPage';
 import SettingsPage from './pages/SettingsPage';
+
+// Admin Panel
+import { SimpleAdminLayout } from './admin/components/SimpleAdminLayout';
 
 // Components
 import { BottomNavigation } from './components/ui/BottomNavigation';
@@ -25,7 +28,6 @@ const App: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [activePage, setActivePage] = useState('home');
   const [theme, setTheme] = useState<Theme>('light');
-  const [unreadNewsCount, setUnreadNewsCount] = useState(0);
   
   // Аутентификация теперь обрабатывается через AuthProvider
 
@@ -67,34 +69,6 @@ const App: React.FC = () => {
     setTheme(newTheme);
   };
 
-  // Функция для получения количества новых новостей (публичный endpoint)
-  const fetchUnreadNewsCount = async () => {
-    try {
-      const response = await fetch('/api/news/latest');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.status === 'success') {
-          // Считаем новости за последние 2 часа как "новые"
-          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-          const newNewsCount = data.data.filter((item: any) => {
-            const publishedAt = new Date(item.published_at);
-            return publishedAt > twoHoursAgo;
-          }).length;
-          setUnreadNewsCount(newNewsCount);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching unread news count:', error);
-    }
-  };
-
-  // Загружаем количество новых новостей при монтировании и обновляем каждые 5 минут
-  useEffect(() => {
-    fetchUnreadNewsCount();
-    const interval = setInterval(fetchUnreadNewsCount, 5 * 60 * 1000); // 5 минут
-    return () => clearInterval(interval);
-  }, []);
-
   const navigationItems = [
     {
       id: 'home',
@@ -115,12 +89,8 @@ const App: React.FC = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
         </svg>
       ),
-      onClick: () => {
-        setActivePage('news');
-        setUnreadNewsCount(0); // Сбрасываем счетчик при переходе на страницу новостей
-      },
+      onClick: () => setActivePage('news'),
       active: activePage === 'news',
-      badge: unreadNewsCount > 0 ? unreadNewsCount : undefined,
     },
     {
       id: 'digest',
@@ -197,60 +167,89 @@ const App: React.FC = () => {
     <TelegramWebApp>
       <AuthProvider>
         <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <div className="min-h-screen bg-bg">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activePage}
-            initial="initial"
-            animate="in"
-            exit="out"
-            variants={pageVariants}
-            transition={pageTransition}
-          >
-            {renderPage()}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Bottom Navigation for Mobile */}
-        {isMobile && (
-          <BottomNavigation 
-            items={navigationItems}
-            className="fixed bottom-0 inset-x-0 z-50"
+          <AppContent 
+            isMobile={isMobile}
+            activePage={activePage}
+            navigationItems={navigationItems}
+            renderPage={renderPage}
+            pageVariants={pageVariants}
+            pageTransition={pageTransition}
           />
-        )}
-
-        {/* Desktop Navigation */}
-        {!isMobile && (
-          <nav className="fixed top-4 right-4 z-50">
-            <div className="flex items-center space-x-2 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-xl p-2 shadow-soft border border-border/50">
-              {navigationItems.map((item) => (
-                <motion.button
-                  key={item.id}
-                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    item.active 
-                      ? 'bg-primary text-white' 
-                      : 'text-muted hover:text-text hover:bg-surface-alt'
-                  }`}
-                  onClick={item.onClick}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {item.icon}
-                  <span>{item.label}</span>
-                  {item.badge && item.badge > 0 && (
-                    <span className="bg-error text-white text-xs rounded-full px-1.5 py-0.5">
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </span>
-                  )}
-                </motion.button>
-              ))}
-            </div>
-          </nav>
-        )}
-        </div>
         </Router>
       </AuthProvider>
     </TelegramWebApp>
+  );
+};
+
+// Вспомогательный компонент для рендеринга контента
+const AppContent: React.FC<{
+  isMobile: boolean;
+  activePage: string;
+  navigationItems: any[];
+  renderPage: () => React.ReactNode;
+  pageVariants: any;
+  pageTransition: any;
+}> = ({ isMobile, activePage, navigationItems, renderPage, pageVariants, pageTransition }) => {
+  const location = useLocation();
+
+  // Если путь начинается с /admin, рендерим Admin панель
+  if (location.pathname.startsWith('/admin')) {
+    return <SimpleAdminLayout />;
+  }
+
+  // Иначе рендерим обычное приложение
+  return (
+    <div className="min-h-screen bg-bg">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activePage}
+          initial="initial"
+          animate="in"
+          exit="out"
+          variants={pageVariants}
+          transition={pageTransition}
+        >
+          {renderPage()}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Bottom Navigation for Mobile */}
+      {isMobile && (
+        <BottomNavigation 
+          items={navigationItems}
+          className="fixed bottom-0 inset-x-0 z-50"
+        />
+      )}
+
+      {/* Desktop Navigation */}
+      {!isMobile && (
+        <nav className="fixed top-4 right-4 z-50">
+          <div className="flex items-center space-x-2 bg-white/90 dark:bg-surface/90 backdrop-blur-sm rounded-xl p-2 shadow-soft border border-border/50">
+            {navigationItems.map((item) => (
+              <motion.button
+                key={item.id}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  item.active 
+                    ? 'bg-primary text-white' 
+                    : 'text-muted hover:text-text hover:bg-surface-alt'
+                }`}
+                onClick={item.onClick}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className="bg-error text-white text-xs rounded-full px-1.5 py-0.5">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                )}
+              </motion.button>
+            ))}
+          </div>
+        </nav>
+      )}
+    </div>
   );
 };
 
