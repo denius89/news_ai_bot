@@ -36,6 +36,10 @@ __pycache__/
 
 # Конфигурация окружения
 .env
+.env.backup
+.env.backup*
+.env.local
+.env.*.local
 
 # IDE / Editor
 .vscode/
