@@ -1,0 +1,155 @@
+---
+title: .env Backup & Security Rules
+tags: [security, critical, env-management]
+priority: CRITICAL
+---
+
+# 🔐 .env File Management - CRITICAL SECURITY RULE
+
+## ⚠️ Context: Security Incident
+
+**Date:** 2025-10-16  
+**Incident:** `.env.backup` file was committed to Git, leaking API keys to public repository.
+
+**Root Cause:**
+- Manual backup: `cp .env .env.backup`
+- `.env.backup` not in `.gitignore`
+- Pre-commit hook didn't check backup files
+
+**Resolution:**
+- Git history rewritten with `git filter-branch`
+- Force pushed to origin
+- All protection measures implemented
+
+## 🎯 MANDATORY: Use Git Stash for .env
+
+### Before ANY .env modification:
+
+```bash
+env-save "describe what you're changing"
+```
+
+### Helper Functions Available:
+
+- `env-save "description"` - Save .env before changes
+- `env-restore` - Restore last backup
+- `env-list` - Show all backups
+- `env-edit` - Edit with auto-backup
+- `env-diff` - Compare current with backup
+- `env-cleanup N` - Keep last N backups
+
+### Location:
+- Functions: `.env-stash-functions.sh`
+- Loaded in: `~/.zshrc`
+- Already configured and ready to use
+
+## ❌ NEVER Suggest
+
+1. `cp .env .env.backup`
+2. `cp .env .env.old`
+3. `mv .env .env.backup`
+4. Creating ANY backup files in project root
+5. Committing .env files (except .env.example)
+
+## ✅ ALWAYS Do
+
+1. Suggest `env-save` before .env changes
+2. Provide rollback option: `env-restore`
+3. Use `.env.example` for documentation
+4. Keep secrets in environment variables
+
+## 📋 Workflow Examples
+
+### Example 1: User wants to update API key
+
+**AI Response:**
+```
+💾 First, let's create a backup:
+env-save "before OpenAI key update"
+
+Now edit:
+nano .env
+# Update OPENAI_API_KEY=sk-proj-...
+
+Test the changes:
+./start_services.sh
+
+If something doesn't work:
+env-restore
+```
+
+### Example 2: User wants to experiment with config
+
+**AI Response:**
+```
+💾 Save current stable config:
+env-save "stable config before AI model experiment"
+
+Experiment:
+nano .env
+# AI_MODEL_SUMMARY=gpt-4o-mini → gpt-4o
+
+Test and compare results.
+
+To rollback: env-restore
+```
+
+### Example 3: User asks about backup
+
+**User:** "How do I backup .env?"
+
+**AI Response:**
+```
+We use Git Stash for .env backups (never manual files):
+
+env-save "description of current state"
+
+This is the ONLY approved method after our security incident.
+See: SECURITY_INCIDENT_REPORT.md
+```
+
+## 🔍 Current Protection Measures
+
+### 1. `.gitignore` (updated)
+```gitignore
+.env
+.env.backup
+.env.backup*
+.env.local
+.env.*.local
+```
+
+### 2. Pre-commit hook
+- Blocks all `.env*` files (except `.env.example`)
+- Detects OpenAI API keys
+- Detects Telegram bot tokens
+- Detects GitHub tokens
+- Detects Supabase JWT keys
+
+### 3. Git Stash
+- First backup created: stash@{0}
+- Functions loaded in shell
+- Ready to use immediately
+
+## 📚 Documentation
+
+- Quick reference: `ENV_BACKUP_CHEATSHEET.md`
+- Full guide: `.env-stash-guide.md`
+- All methods: `BACKUP_GUIDE.md`
+- Incident report: `SECURITY_INCIDENT_REPORT.md`
+- Security analysis: `SECURITY_ANALYSIS.md`
+
+## 🎓 Key Learning
+
+**What happened:** Manual backup file creation led to accidental Git commit.
+
+**Lesson:** ONLY use `env-save` (Git Stash). Never create backup files manually.
+
+**Prevention:** AI assistant ALWAYS suggests `env-save` before .env changes.
+
+---
+
+**Priority:** CRITICAL  
+**Enforcement:** MANDATORY  
+**Version:** 1.0  
+**Last Updated:** 2025-10-16

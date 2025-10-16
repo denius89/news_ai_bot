@@ -1,0 +1,212 @@
+---
+title: Database Migrations Safety
+tags: [database, migrations, critical]
+priority: HIGH
+---
+
+# 🗄️ Database Migrations Safety Rules
+
+## ⚠️ CRITICAL: Data Loss Prevention
+
+Database migrations can destroy production data if done incorrectly.
+
+## 📍 Migration Files Location
+
+- `database/migrations/` - All migration SQL files
+- Naming: `YYYYMMDD_HHMMSS_description.sql`
+- Never delete old migrations
+
+## 🎯 Before Creating Migration
+
+### ALWAYS:
+
+1. **Backup database first:**
+   ```bash
+   # For production
+   pg_dump -U user -d pulseai > backup_$(date +%Y%m%d).sql
+   
+   # For development
+   env-save "before database migration"
+   ```
+
+2. **Test on development data:**
+   ```bash
+   # Never test migrations on production first!
+   psql -U user -d pulseai_dev -f database/migrations/new_migration.sql
+   ```
+
+3. **Check for breaking changes:**
+   - Dropping columns? → Ensure code doesn't use them
+   - Renaming tables? → Update all queries
+   - Changing types? → Verify data compatibility
+   - Adding NOT NULL? → Ensure default value or data exists
+
+4. **Verify rollback plan:**
+   ```sql
+   -- migration.sql
+   -- Migration: Add user_preferences column
+   ALTER TABLE users ADD COLUMN preferences JSONB DEFAULT '{}';
+   
+   -- Rollback (create separate file):
+   -- rollback_migration.sql
+   ALTER TABLE users DROP COLUMN preferences;
+   ```
+
+## 🚫 NEVER:
+
+1. Drop tables without explicit user confirmation
+2. Delete columns with user data without backup
+3. Change primary keys on existing tables
+4. Run migrations without testing first
+5. Skip migration validation
+6. Edit existing migration files (create new ones)
+
+## ✅ Safe Migration Checklist
+
+Before suggesting migration:
+
+- [ ] Migration has descriptive name
+- [ ] Tested on development database
+- [ ] Rollback script created
+- [ ] No data loss risk assessed
+- [ ] Breaking changes documented
+- [ ] Related code changes identified
+- [ ] Backup plan communicated
+
+## 📋 Migration Templates
+
+### Adding Column (Safe):
+```sql
+-- 20251016_add_user_notifications.sql
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS notifications_enabled BOOLEAN DEFAULT true;
+
+-- Rollback:
+ALTER TABLE users DROP COLUMN IF EXISTS notifications_enabled;
+```
+
+### Adding Table (Safe):
+```sql
+-- 20251016_create_analytics.sql
+CREATE TABLE IF NOT EXISTS analytics (
+    id SERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    data JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Rollback:
+DROP TABLE IF EXISTS analytics;
+```
+
+### Renaming Column (Risky):
+```sql
+-- ⚠️ REQUIRES CODE CHANGES
+-- 20251016_rename_user_name.sql
+
+-- Step 1: Add new column
+ALTER TABLE users ADD COLUMN full_name VARCHAR(255);
+
+-- Step 2: Copy data
+UPDATE users SET full_name = name WHERE full_name IS NULL;
+
+-- Step 3: Update code to use full_name
+-- (Deploy code changes)
+
+-- Step 4: Drop old column (in separate migration after code deployed)
+-- ALTER TABLE users DROP COLUMN name;
+```
+
+### Adding Index (Safe):
+```sql
+-- 20251016_add_news_index.sql
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_news_published_at 
+ON news (published_at DESC);
+
+-- Rollback:
+DROP INDEX IF EXISTS idx_news_published_at;
+```
+
+## 🔍 Validation Before Applying
+
+```bash
+# 1. Check syntax
+psql -U user -d pulseai_dev --dry-run -f migration.sql
+
+# 2. Explain plan (for complex queries)
+EXPLAIN ANALYZE SELECT ...;
+
+# 3. Check affected rows
+SELECT COUNT(*) FROM table WHERE condition;
+
+# 4. Verify constraints
+\d+ table_name
+```
+
+## 🎯 When User Asks for Schema Changes
+
+**AI Response Template:**
+```
+⚠️ This requires a database migration. Let me prepare it safely:
+
+1. First, let's backup:
+   env-save "before adding [column/table/index]"
+
+2. Migration file:
+   database/migrations/20251016_HHMMSS_description.sql
+
+3. Testing plan:
+   - Test on dev database first
+   - Verify no data loss
+   - Check performance impact
+
+4. Rollback plan:
+   [Provide rollback SQL]
+
+Should I proceed with creating the migration?
+```
+
+## 📊 Common Scenarios
+
+### Adding NOT NULL column to existing table:
+```sql
+-- WRONG (will fail if table has data):
+ALTER TABLE users ADD COLUMN email VARCHAR(255) NOT NULL;
+
+-- RIGHT (add nullable first, then add constraint):
+ALTER TABLE users ADD COLUMN email VARCHAR(255);
+UPDATE users SET email = 'placeholder@example.com' WHERE email IS NULL;
+ALTER TABLE users ALTER COLUMN email SET NOT NULL;
+```
+
+### Changing column type:
+```sql
+-- WRONG (may lose data):
+ALTER TABLE news ALTER COLUMN importance TYPE INTEGER;
+
+-- RIGHT (safe conversion):
+ALTER TABLE news ALTER COLUMN importance 
+TYPE INTEGER USING (importance::INTEGER);
+```
+
+## 🆘 If Migration Fails
+
+1. **Stop immediately**
+2. **Do NOT retry** without understanding the issue
+3. **Check logs:** `logs/app.log`
+4. **Rollback if possible:** Run rollback script
+5. **Restore from backup** if rollback fails
+6. **Report to user** what happened
+
+## 📖 References
+
+- Migrations: `database/migrations/`
+- Models: `database/db_models.py`
+- Service: `database/service.py`
+- Init schema: `database/init_tables.sql`
+
+---
+
+**Priority:** HIGH  
+**Impact:** Can destroy production data  
+**Version:** 1.0

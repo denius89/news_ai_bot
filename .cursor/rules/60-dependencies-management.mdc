@@ -1,0 +1,243 @@
+---
+title: Dependencies Management
+tags: [dependencies, safety]
+priority: MEDIUM
+---
+
+# 📦 Dependencies Management Rules
+
+## 🎯 Files to Protect
+
+### Backend (Python):
+- `requirements.txt` - Python dependencies
+- `pyproject.toml` - Project metadata
+
+### Frontend (React):
+- `webapp/package.json` - npm dependencies
+- `webapp/package-lock.json` - Lock file
+
+## ⚠️ NEVER Touch Without Permission
+
+Do NOT modify these files unless user explicitly asks:
+- `requirements.txt`
+- `pyproject.toml`
+- `webapp/package.json`
+
+## ✅ When User Asks to Add Dependency
+
+### Python Package:
+
+**AI Response Template:**
+```
+Adding [package] to dependencies:
+
+1. Check if already installed:
+   pip list | grep [package]
+
+2. Install in venv:
+   source venv/bin/activate
+   pip install [package]==X.Y.Z
+
+3. Test import:
+   python -c "import [package]; print([package].__version__)"
+
+4. Add to requirements.txt:
+   [package]==X.Y.Z
+
+5. Verify environment:
+   pip check
+
+Should I proceed?
+```
+
+### NPM Package:
+
+**AI Response Template:**
+```
+Adding [package] to React app:
+
+1. Navigate to webapp:
+   cd webapp
+
+2. Install package:
+   npm install [package]@X.Y.Z --save
+
+3. Verify installation:
+   npm list [package]
+
+4. Test build:
+   npm run build
+
+Should I proceed?
+```
+
+## 🔍 Before Adding Dependency
+
+### Check:
+1. **Is it really needed?** Can we use existing libraries?
+2. **Security:** Check npm audit / pip audit
+3. **Maintenance:** When was last update?
+4. **License:** Compatible with project?
+5. **Size:** Impact on bundle size?
+
+### Research:
+```bash
+# Python
+pip show [package]
+pip install --dry-run [package]
+
+# NPM
+npm info [package]
+npm view [package] versions
+```
+
+## 🚫 NEVER:
+
+1. Install packages globally (`sudo pip install`)
+2. Use `pip install` without version pin
+3. Modify `package-lock.json` manually
+4. Delete dependencies without checking usage
+5. Upgrade all packages at once (`pip install --upgrade-all`)
+
+## ✅ Safe Upgrade Process
+
+### Python:
+```bash
+# 1. Backup
+env-save "before upgrading [package]"
+
+# 2. Check current version
+pip show [package]
+
+# 3. Check available versions
+pip index versions [package]
+
+# 4. Upgrade one package
+pip install [package]==X.Y.Z
+
+# 5. Run tests
+pytest tests/
+
+# 6. Update requirements.txt
+pip freeze | grep [package] >> requirements.txt
+
+# 7. Verify
+pip check
+```
+
+### NPM:
+```bash
+# 1. Check outdated
+cd webapp
+npm outdated
+
+# 2. Check specific package
+npm view [package] versions
+
+# 3. Update one package
+npm install [package]@latest
+
+# 4. Test build
+npm run build
+
+# 5. Run tests
+npm test
+```
+
+## 🔧 Handling Conflicts
+
+### Python (pip):
+```bash
+# If conflict detected:
+pip check
+
+# Show dependency tree:
+pipdeptree
+
+# Resolve conflict:
+pip install [package1]==X.Y.Z [package2]==A.B.C
+```
+
+### NPM:
+```bash
+# If conflict:
+npm ls [package]
+
+# Fix:
+npm dedupe
+npm audit fix
+```
+
+## 📋 Common Scenarios
+
+### User: "Add OpenAI Python SDK"
+
+**AI Response:**
+```
+Let's add OpenAI SDK:
+
+1. Check version compatibility:
+   pip index versions openai
+   Latest: 1.3.5
+
+2. Install:
+   pip install openai==1.3.5
+
+3. Update requirements.txt:
+   openai==1.3.5
+
+4. Test import:
+   python -c "import openai; print(openai.__version__)"
+
+Proceed?
+```
+
+### User: "Update all packages"
+
+**AI Response:**
+```
+⚠️ Updating all packages at once is risky. Better approach:
+
+1. Check what's outdated:
+   pip list --outdated
+
+2. Update critical packages one by one:
+   - Security patches: Yes
+   - Minor versions: Test each
+   - Major versions: Review breaking changes
+
+3. Test after each update:
+   pytest tests/
+
+Should I start with security patches only?
+```
+
+## 🛡️ Security Checks
+
+### Before adding new package:
+```bash
+# Python
+pip install safety
+safety check
+
+# NPM
+npm audit
+
+# Check package reputation:
+# - GitHub stars
+# - Recent commits
+# - Known vulnerabilities
+```
+
+## 📖 References
+
+- Python deps: `requirements.txt`
+- Project config: `pyproject.toml`
+- Frontend deps: `webapp/package.json`
+- Virtual env: `venv/`
+
+---
+
+**Priority:** MEDIUM  
+**Impact:** Can break environment  
+**Version:** 1.0

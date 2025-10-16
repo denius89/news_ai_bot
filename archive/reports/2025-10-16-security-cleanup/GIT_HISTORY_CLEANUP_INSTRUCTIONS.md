@@ -276,3 +276,4 @@ chmod +x cleanup_git_history.sh
 **Создано:** 16 октября 2025  
 **Для репозитория:** denius89/news_ai_bot
 
+

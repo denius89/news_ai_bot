@@ -1,0 +1,209 @@
+---
+title: Testing Requirements
+tags: [testing, quality]
+priority: MEDIUM
+---
+
+# 🧪 Testing Requirements
+
+## 🎯 Test Before Suggesting "Done"
+
+**ALWAYS run tests** before telling user the work is complete.
+
+## 📍 Test Locations
+
+- `tests/` - All test files
+- `tests/unit/` - Unit tests
+- `tests/integration/` - Integration tests
+- `tests/external/` - External API tests (require keys)
+
+## ✅ Before Marking Task Complete
+
+### 1. Run relevant tests:
+
+```bash
+# All tests
+pytest tests/ -v
+
+# Specific module
+pytest tests/test_ai_summary.py -v
+
+# Specific test
+pytest tests/test_ai_summary.py::test_function_name -v
+
+# With coverage
+pytest tests/ --cov=digests --cov-report=html
+```
+
+### 2. Check linter:
+
+```bash
+# Flake8
+flake8 . --max-line-length=100
+
+# Black (formatting)
+black --check .
+
+# isort (imports)
+isort --check .
+```
+
+### 3. Verify functionality:
+
+```bash
+# Start services and test manually
+./start_services.sh
+
+# Check logs
+tail -f logs/app.log
+```
+
+## 🚫 NEVER:
+
+1. Say "Done" without running tests
+2. Skip tests because "it should work"
+3. Ignore test failures
+4. Commit code that breaks tests
+5. Remove tests to make build pass
+
+## ✅ When Adding New Feature
+
+### Required:
+
+1. **Add tests** for new functionality:
+```python
+# tests/test_new_feature.py
+def test_new_feature():
+    result = new_feature(input)
+    assert result == expected
+```
+
+2. **Run tests** before suggesting commit:
+```bash
+pytest tests/test_new_feature.py -v
+```
+
+3. **Update existing tests** if behavior changed:
+```python
+# Update assertions to match new behavior
+```
+
+## 📋 Test Quality Standards
+
+### Good Test:
+```python
+def test_importance_scorer_high_impact_news():
+    """Test that market-moving news gets high importance score."""
+    news = {
+        "title": "Federal Reserve raises interest rates by 0.5%",
+        "content": "Major policy change affecting all markets..."
+    }
+    
+    score = importance_scorer.score(news)
+    
+    assert score >= 0.7, f"Expected high score, got {score}"
+    assert score <= 1.0, f"Score out of range: {score}"
+```
+
+### Bad Test:
+```python
+def test_stuff():
+    # Not descriptive
+    result = do_thing()
+    assert result  # What are we testing?
+```
+
+## 🎯 When Tests Fail
+
+**AI Response Template:**
+```
+⚠️ Tests failed:
+
+[Show error output]
+
+Debugging:
+1. Error location: [file:line]
+2. Expected: [value]
+3. Actual: [value]
+4. Likely cause: [explanation]
+
+Suggested fix:
+[code fix]
+
+Should I apply this fix?
+```
+
+## 📊 Test Coverage
+
+### Aim for:
+- New code: 80%+ coverage
+- Critical paths: 100% coverage (auth, payment, data loss)
+- Utilities: 70%+ coverage
+
+### Check coverage:
+```bash
+pytest tests/ --cov=. --cov-report=html
+open htmlcov/index.html
+```
+
+## 🔧 Common Test Scenarios
+
+### Testing AI prompts:
+```python
+@pytest.mark.skipif(not os.getenv("OPENAI_API_KEY"), 
+                    reason="No API key")
+def test_importance_prompt():
+    """Test importance scoring prompt."""
+    result = score_importance(sample_news)
+    assert 0 <= result["importance"] <= 1
+    assert "reasoning" in result
+```
+
+### Testing database:
+```python
+def test_save_news(test_db):
+    """Test saving news to database."""
+    news = create_test_news()
+    saved = db.save_news(news)
+    
+    assert saved.id is not None
+    assert saved.title == news["title"]
+```
+
+### Testing API:
+```python
+def test_digest_endpoint(client):
+    """Test digest API endpoint."""
+    response = client.get("/api/digest/latest")
+    
+    assert response.status_code == 200
+    assert "news" in response.json()
+```
+
+## 🆘 Skipping Tests (Rarely)
+
+Only skip if:
+1. External service unavailable
+2. Missing credentials (mark with pytest.skip)
+3. Long-running performance tests
+
+```python
+@pytest.mark.skipif(
+    not os.getenv("OPENAI_API_KEY"),
+    reason="No API key available"
+)
+def test_with_api():
+    pass
+```
+
+## 📖 References
+
+- Tests: `tests/`
+- Test config: `pytest.ini`, `pyproject.toml`
+- CI config: `.github/workflows/`
+
+---
+
+**Priority:** MEDIUM  
+**Impact:** Code quality  
+**Version:** 1.0

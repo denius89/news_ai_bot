@@ -1,0 +1,188 @@
+---
+title: Git Commit Standards
+tags: [git, commits]
+priority: LOW
+---
+
+# 📝 Git Commit Standards
+
+## 🎯 Conventional Commits Format
+
+Use this format for ALL commits:
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+## 📋 Types
+
+- `feat` - New feature
+- `fix` - Bug fix
+- `docs` - Documentation only
+- `style` - Formatting, missing semicolons, etc
+- `refactor` - Code change that neither fixes a bug nor adds a feature
+- `perf` - Performance improvement
+- `test` - Adding tests
+- `chore` - Updating build tasks, package manager configs, etc
+- `security` - Security fixes, updates
+
+## ✅ Good Commit Examples
+
+```bash
+feat(digests): add AI importance scoring v2
+
+- Implement new importance algorithm
+- Add credibility threshold validation
+- Update prompts in prompts_v2.py
+
+Closes #123
+
+---
+
+fix(auth): prevent token expiration error
+
+- Add token refresh logic
+- Handle expired tokens gracefully
+
+Fixes #456
+
+---
+
+security: remove leaked .env files and add protection
+
+- Remove .env.backup and .env.backup2 from repository
+- Update .gitignore to prevent future leaks
+- Add pre-commit hook to block secrets
+- Add security incident documentation
+
+---
+
+docs(readme): update installation instructions
+
+Add section about environment setup and API keys
+```
+
+## 🚫 Bad Commit Examples
+
+```bash
+# Too vague
+update stuff
+fix bug
+changes
+
+# Not descriptive
+wip
+temp
+test
+
+# No type
+updated readme
+fixed the thing
+```
+
+## 🎯 When Creating Commits for User
+
+**Template:**
+```bash
+git add [files]
+git commit -m "type(scope): description
+
+- Change 1
+- Change 2
+- Change 3"
+```
+
+**Example:**
+```
+Shall I commit these changes?
+
+git add digests/prompts_v2.py tests/test_ai_summary.py
+git commit -m "feat(ai): improve news importance scoring
+
+- Add confidence threshold to importance prompt
+- Enhance self-check validation
+- Update tests for new scoring logic"
+```
+
+## 📊 Scope Examples for PulseAI
+
+- `ai` - AI modules, prompts
+- `digests` - Digest generation
+- `database` - DB changes
+- `auth` - Authentication
+- `webapp` - React frontend
+- `api` - API routes
+- `tests` - Testing
+- `config` - Configuration
+- `security` - Security related
+
+## 🔍 Before Committing
+
+### ALWAYS check:
+1. **Linter passes:** `flake8 .`
+2. **Tests pass:** `pytest tests/`
+3. **No secrets:** Pre-commit hook will catch
+4. **Staged files are intentional:** `git status`
+
+### NEVER commit:
+- `.env` files (hook will block)
+- Debug print statements
+- Commented code without explanation
+- TODO comments without ticket number
+- Large binary files
+
+## 🆘 If Commit Was Wrong
+
+```bash
+# Not pushed yet - amend:
+git commit --amend -m "new message"
+
+# Not pushed yet - undo:
+git reset --soft HEAD~1
+
+# Already pushed - revert:
+git revert HEAD
+
+# Never force push to main unless security incident!
+```
+
+## 📖 Breaking Changes
+
+If commit introduces breaking changes:
+
+```bash
+git commit -m "feat(api)!: change news endpoint response format
+
+BREAKING CHANGE: News endpoint now returns array instead of object.
+
+Before: { news: [...] }
+After: [...]
+
+Migration: Update client code to handle array response."
+```
+
+## 🎯 When User Asks to Commit
+
+**AI Response:**
+```
+Ready to commit. Suggested message:
+
+feat(scope): description
+
+- Change 1
+- Change 2
+
+Should I proceed with:
+git add [files]
+git commit -m "..."
+```
+
+---
+
+**Priority:** LOW  
+**Impact:** Code organization  
+**Version:** 1.0

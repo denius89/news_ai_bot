@@ -1,0 +1,169 @@
+---
+alwaysApply: true
+---
+# 🤖 AI Prompts Management Rules
+
+## 📍 Source of Truth
+
+**ALWAYS use:** `digests/prompts_v2.py`
+
+- This is the SINGLE source of truth for all AI prompts
+- Do NOT create prompts in route handlers or other files
+- Do NOT hardcode prompts in code
+
+## 🎯 When Modifying Prompts
+
+### ALWAYS:
+
+1. **Test before suggesting changes:**
+   ```python
+   # In tests/test_ai_summary.py
+   pytest tests/test_ai_summary.py -v
+   ```
+
+2. **Follow structured format:**
+   ```python
+   {
+       "system": "Role and context",
+       "user": "Task description",
+       "examples": [...],  # 1-2 examples
+       "schema": {...},    # JSON Schema for output
+       "output_format": "Expected format"
+   }
+   ```
+
+3. **Add self-check instructions** in prompts:
+   ```
+   Before responding, verify:
+   - Importance score is realistic
+   - All required fields present
+   - Output follows schema
+   ```
+
+4. **Update tests** after prompt changes:
+   ```python
+   # tests/test_ai_summary.py
+   def test_new_prompt_behavior():
+       # Test new behavior
+   ```
+
+## 📋 Prompt Quality Gates
+
+### For news filtering:
+- `importance >= 0.6` (threshold)
+- `credibility >= 0.7` (threshold)
+- Both must pass to include news
+
+### For structured outputs:
+- ALWAYS use JSON Schema validation
+- ALWAYS specify expected fields
+- ALWAYS validate output against schema
+
+## 🚫 NEVER:
+
+1. Remove validation from prompts
+2. Skip quality gates checks
+3. Hardcode prompts outside `prompts_v2.py`
+4. Change system prompts without testing
+5. Remove self-check instructions
+
+## ✅ Example: Adding New Prompt
+
+```python
+# digests/prompts_v2.py
+
+IMPORTANCE_PROMPT_V2 = {
+    "system": """You are an AI analyst for financial news.
+    Your task is to evaluate news importance for investors.
+    
+    Use scale 0.0-1.0 where:
+    - 0.0-0.3: Minor news, no market impact
+    - 0.4-0.6: Moderate importance
+    - 0.7-0.9: High importance, market-moving
+    - 1.0: Critical, immediate action needed
+    """,
+    
+    "user": "Evaluate this news: {news_text}",
+    
+    "examples": [
+        {
+            "news": "Federal Reserve raises rates by 0.25%",
+            "importance": 0.85,
+            "reasoning": "Direct market impact, affects all assets"
+        }
+    ],
+    
+    "schema": {
+        "type": "object",
+        "properties": {
+            "importance": {"type": "number", "minimum": 0, "maximum": 1},
+            "reasoning": {"type": "string"},
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        },
+        "required": ["importance", "reasoning", "confidence"]
+    },
+    
+    "output_format": "JSON only, no markdown"
+}
+
+# Then update DigestAIService to use it
+```
+
+## 🔍 Multi-Prompt Chains (MPC)
+
+When using chains (analyzer → synthesizer → editor):
+
+1. **One responsibility per stage**
+2. **Log each stage:** `prompt_name`, `model`, `latency`, `tokens`, `confidence`
+3. **Pass context between stages** clearly
+4. **Validate output at each stage**
+
+Example:
+```python
+# Stage 1: Analyze
+analysis = analyze_news(news)
+
+# Stage 2: Synthesize  
+summary = synthesize_analysis(analysis)
+
+# Stage 3: Edit
+final = edit_summary(summary)
+
+# Log all stages
+logger.info(f"MPC chain: analyze={analysis.confidence}, synthesize={summary.confidence}")
+```
+
+## 📊 Prompt Performance
+
+### Monitor:
+- Response time (should be < 5s for gpt-4o-mini)
+- Token usage (aim for < 800 tokens per request)
+- Success rate (> 95%)
+- Quality scores (importance/credibility accuracy)
+
+### If degraded:
+1. Check if model changed (AI_MODEL_SUMMARY in .env)
+2. Review recent prompt changes
+3. Check API rate limits
+4. Review logs: `logs/app.log`
+
+## 🎓 Best Practices
+
+1. **Prompt versioning:** Use `_V2`, `_V3` suffixes, keep old versions
+2. **A/B testing:** Test new prompts alongside old ones
+3. **Gradual rollout:** Test on sample data first
+4. **Document changes:** Update docstrings with reasoning
+5. **No PII in prompts:** Never include personal data
+
+## 📖 References
+
+- Prompt source: `digests/prompts_v2.py`
+- Service: `digests/ai_service.py`
+- Tests: `tests/test_ai_summary.py`
+- Config: `config/data/ai_optimization.yaml`
+
+---
+
+**Priority:** HIGH  
+**Impact:** Direct effect on news quality  
+**Version:** 1.0

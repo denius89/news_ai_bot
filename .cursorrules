@@ -1,0 +1,59 @@
+# PulseAI - Cursor AI Rules
+
+## 🔐 CRITICAL: .env File Management
+
+### Before ANY .env changes - ALWAYS create backup:
+
+```bash
+env-save "describe what you're changing"
+```
+
+### NEVER suggest:
+- ❌ `cp .env .env.backup`
+- ❌ Creating backup files in project root
+- ❌ Any manual file copying for .env
+
+### ALWAYS use Git Stash:
+- ✅ `env-save "description"` - before changes
+- ✅ `env-restore` - to rollback
+- ✅ `env-list` - to see backups
+
+## 🛡️ Security
+
+- NEVER commit .env files (except .env.example)
+- ALWAYS use environment variables for secrets
+- Pre-commit hook blocks secrets - respect it
+- Reference: SECURITY_INCIDENT_REPORT.md for context
+
+## 🏗️ Architecture
+
+- Layers: ai_modules/, digests/, core/, routes/, database/, webapp/, tools/
+- No cross-layer imports
+- Prompts source of truth: digests/prompts_v2.py
+- Config: config/core/settings.py
+
+## 📝 Code Style
+
+- Python: PEP8, typing, Google docstrings
+- React: Function components, hooks, Tailwind
+- Imports: stdlib → 3rd party → local
+
+## 🔧 Development
+
+- Run tests after changes
+- Check linter before suggesting completion
+- Use project scripts in tools/
+- Follow existing patterns
+
+## 📚 Documentation
+
+Quick references:
+- .env backup: ENV_BACKUP_CHEATSHEET.md
+- Full guide: .cursor/rules
+- Security: SECURITY_INCIDENT_REPORT.md
+
+---
+
+**For full rules see:** `.cursor/rules`
+
+
