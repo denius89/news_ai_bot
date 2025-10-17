@@ -84,7 +84,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     let timeoutId: NodeJS.Timeout;
     const throttledHandleScroll = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleScroll, 100);
+      timeoutId = setTimeout(handleScroll, 300);
     };
 
     window.addEventListener('scroll', throttledHandleScroll, { passive: true });
@@ -203,7 +203,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     let timeoutId: NodeJS.Timeout;
     const throttledHandleScroll = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleScroll, 100);
+      timeoutId = setTimeout(handleScroll, 300);
     };
 
     window.addEventListener('scroll', throttledHandleScroll, { passive: true });

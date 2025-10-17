@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -6,6 +6,7 @@ import { Header } from '../components/ui/Header';
 import { Rocket, Bot, Calendar, Settings, BarChart3, Newspaper, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
+import { shouldReduceMotion, logDevicePerformanceInfo } from '../utils/performance';
 
 interface HomePageProps {
   theme: 'light' | 'dark';
@@ -41,10 +42,13 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
   const { authHeaders } = useAuth();
 
   useEffect(() => {
+    // Логируем информацию о производительности устройства
+    logDevicePerformanceInfo();
+    
     fetchDashboardStats();
     
-    // Обновляем данные каждые 30 секунд
-    const interval = setInterval(fetchDashboardStats, 30000);
+    // Обновляем данные каждые 5 минут (вместо 30 секунд) для экономии батареи
+    const interval = setInterval(fetchDashboardStats, 300000);
     
     return () => clearInterval(interval);
   }, []);
@@ -87,27 +91,46 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  // Определяем, нужно ли отключить анимации для экономии батареи
+  const reduceMotion = useMemo(() => shouldReduceMotion(), []);
 
-         const itemVariants = {
-           hidden: { opacity: 0, y: 20 },
-           visible: {
-             opacity: 1,
-             y: 0,
-             transition: {
-               duration: 0.5,
-               ease: 'easeOut' as const,
-             },
-           },
-         };
+  const containerVariants = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1 },
+      };
+    }
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          duration: 0.3,
+          // Убрали staggerChildren для экономии ресурсов
+        },
+      },
+    };
+  }, [reduceMotion]);
+
+  const itemVariants = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1 },
+      };
+    }
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          duration: 0.3,
+          ease: 'easeOut' as const,
+        },
+      },
+    };
+  }, [reduceMotion]);
 
   const formatChange = (change: number): string => {
     if (change > 0) {
@@ -218,11 +241,10 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                 <motion.div
                   key={stat.label}
                   variants={itemVariants}
-                  transition={{ delay: index * 0.1 }}
                   className={`h-full flex flex-col justify-between items-center text-center 
                               bg-white dark:bg-surface-alt rounded-2xl 
                               shadow-[0_1px_6px_rgba(0,0,0,0.04)] 
-                              py-5 px-4 transition-all duration-300 hover:scale-[1.01]
+                              py-5 px-4 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}
                               ${stat.label.length > 25 ? "min-h-[140px]" : "min-h-[120px]"}`}
                 >
                   <div className="text-2xl font-semibold text-text dark:text-white">{stat.value}</div>
@@ -250,13 +272,12 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
               Быстрые действия
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {quickActions.map((action, index) => (
+              {quickActions.map((action) => (
                 <motion.div
                   key={action.title}
                   variants={itemVariants}
-                  transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="h-full hover:shadow-lg hover:scale-[1.01] transition-all duration-300 cursor-pointer group"
+                  <Card className={`h-full hover:shadow-lg ${!reduceMotion ? 'hover:scale-[1.01]' : ''} transition-all duration-300 cursor-pointer group`}
                         onClick={() => onNavigate?.(action.page)}>
                     <CardHeader>
                       <div className="flex items-center space-x-3">

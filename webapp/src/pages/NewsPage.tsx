@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -6,6 +6,7 @@ import { MobileHeader } from '../components/ui/Header';
 import { ChipsCarousel } from '../components/ui/ChipsCarousel';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
+import { shouldReduceMotion } from '../utils/performance';
 import { 
   Newspaper, 
   ExternalLink,
@@ -401,14 +402,18 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       setIsInitialized(true);
       fetchNews(1);
     }
-  }, [userId, isInitialized, fetchNews]);
+    // fetchNews убран из зависимостей чтобы избежать бесконечных циклов
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, isInitialized]);
 
   // Автоматическая перезагрузка при изменении фильтров (ТОЛЬКО после инициализации)
   useEffect(() => {
     if (isInitialized && categories.length > 0) {
       fetchNews(1);
     }
-  }, [selectedCategory, selectedSubcategory, isInitialized, categories.length, fetchNews]);
+    // fetchNews убран из зависимостей чтобы избежать бесконечных циклов
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCategory, selectedSubcategory, isInitialized, categories.length]);
 
   const loadMoreNews = async () => {
     if (!hasMoreNews || loadingMore) {
@@ -453,11 +458,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       }
     };
 
-    // Добавляем throttling для производительности
+    // Добавляем throttling для производительности (увеличен до 300ms для экономии батареи)
     let timeoutId: NodeJS.Timeout;
     const throttledHandleScroll = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(handleScroll, 100);
+      timeoutId = setTimeout(handleScroll, 300);
     };
 
     window.addEventListener('scroll', throttledHandleScroll, { passive: true });
@@ -489,23 +494,45 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     return '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  // Определяем, нужно ли отключить анимации
+  const reduceMotion = useMemo(() => shouldReduceMotion(), []);
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-    },
-  };
+  const containerVariants = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1 },
+      };
+    }
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          duration: 0.2,
+          // Убрали staggerChildren - экономит много ресурсов
+        },
+      },
+    };
+  }, [reduceMotion]);
+
+  const itemVariants = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        hidden: { opacity: 1 },
+        visible: { opacity: 1 },
+      };
+    }
+    return {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          duration: 0.2,
+        },
+      },
+    };
+  }, [reduceMotion]);
 
   if (loading) {
     return (
@@ -602,13 +629,12 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
           {/* News List */}
           <motion.section variants={itemVariants}>
             <div className="space-y-4">
-              {filteredNews.map((item, index) => (
-                <motion.div
+              {filteredNews.map((item) => (
+                <div
                   key={item.id}
-                  variants={itemVariants}
-                  transition={{ delay: index * 0.1 }}
+                  className={`bg-white dark:bg-surface-alt rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''} p-5`}
                 >
-                  <div className="bg-white dark:bg-surface-alt rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] transition-all duration-300 hover:scale-[1.01] p-5">
+                  <div>
                     <div className="flex justify-between items-start">
                       <h3 className="text-lg font-semibold text-text dark:text-white leading-snug">
                         {truncateText(item.title, 100)}
@@ -651,7 +677,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </motion.section>

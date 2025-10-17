@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,6 +19,7 @@ import { TelegramWebApp } from './components/TelegramWebApp';
 // Utils
 import { initializeTheme, toggleTheme, getThemePreference, type Theme } from './utils/theme';
 import { AuthProvider } from './context/AuthContext';
+import { shouldReduceMotion } from './utils/performance';
 
 // Styles
 import './styles/index.css';
@@ -128,17 +129,36 @@ const App: React.FC = () => {
     },
   ];
 
-  const pageVariants = {
-    initial: { opacity: 0, x: 20 },
-    in: { opacity: 1, x: 0 },
-    out: { opacity: 0, x: -20 },
-  };
+  // Определяем нужно ли упростить анимации
+  const reduceMotion = useMemo(() => shouldReduceMotion(), []);
 
-         const pageTransition = {
-           type: 'tween' as const,
-           ease: 'anticipate' as const,
-           duration: 0.3,
-         };
+  const pageVariants = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        initial: { opacity: 1 },
+        in: { opacity: 1 },
+        out: { opacity: 1 },
+      };
+    }
+    return {
+      initial: { opacity: 0 },
+      in: { opacity: 1 },
+      out: { opacity: 0 },
+    };
+  }, [reduceMotion]);
+
+  const pageTransition = useMemo(() => {
+    if (reduceMotion) {
+      return {
+        duration: 0,
+      };
+    }
+    return {
+      type: 'tween' as const,
+      ease: 'easeOut' as const,
+      duration: 0.2,
+    };
+  }, [reduceMotion]);
 
   const renderPage = () => {
     const pageProps = { 
