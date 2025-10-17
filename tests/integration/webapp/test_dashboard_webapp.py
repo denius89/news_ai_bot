@@ -35,13 +35,13 @@ async def test_dashboard_command():
     assert "reply_markup" in kwargs
     assert kwargs["parse_mode"] == "HTML"
 
-    # Check keyboard structure
+    # Check keyboard structure - using InlineKeyboardMarkup
     keyboard = kwargs["reply_markup"]
-    assert keyboard.resize_keyboard is True
-    assert len(keyboard.keyboard) == 1
-    assert len(keyboard.keyboard[0]) == 1
+    assert hasattr(keyboard, "inline_keyboard")
+    assert len(keyboard.inline_keyboard) == 2  # WebApp button + Back button
+    assert len(keyboard.inline_keyboard[0]) == 1
 
-    button = keyboard.keyboard[0][0]
+    button = keyboard.inline_keyboard[0][0]
     assert "Открыть Dashboard" in button.text
     assert button.web_app is not None
     assert "webapp" in button.web_app.url
@@ -59,5 +59,5 @@ def test_webapp_url_config():
     assert "webapp_url" in source
     assert "/webapp" in source
 
-    # Should have TODO for moving to config
-    assert "TODO" in source or "config" in source.lower()
+    # URL should use WEBAPP_URL from config (not hardcoded)
+    assert "WEBAPP_URL" in source or "config" in source.lower()
