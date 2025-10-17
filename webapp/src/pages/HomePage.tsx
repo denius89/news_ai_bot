@@ -18,11 +18,11 @@ interface DashboardStats {
     count: number;
     change: number;
   };
-  active_sources: {
+  active_users: {
     count: number;
     change: number;
   };
-  categories: {
+  events_week: {
     count: number;
     change: number;
   };
@@ -127,13 +127,13 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
 
   const statsData = stats ? [
     { label: 'Новостей сегодня', value: stats.news_today.count.toLocaleString(), trend: formatChange(stats.news_today.change), color: getChangeColor(stats.news_today.change) },
-    { label: 'Активных источников', value: stats.active_sources.count.toString(), trend: stats.active_sources.change > 0 ? `+${stats.active_sources.change}` : stats.active_sources.change < 0 ? `${stats.active_sources.change}` : 'стабильно', color: getChangeColor(stats.active_sources.change) },
-    { label: 'Категорий', value: stats.categories.count.toString(), trend: 'стабильно', color: 'text-muted-strong' },
-    { label: 'AI дайджестов', value: stats.ai_digests.count.toString(), trend: stats.ai_digests.change > 0 ? `+${stats.ai_digests.change}` : stats.ai_digests.change < 0 ? `${stats.ai_digests.change}` : 'стабильно', color: getChangeColor(stats.ai_digests.change) },
+    { label: 'Активных пользователей', value: stats.active_users.count.toString(), trend: formatChange(stats.active_users.change), color: getChangeColor(stats.active_users.change) },
+    { label: 'Событий на неделю', value: stats.events_week.count.toString(), trend: formatChange(stats.events_week.change), color: getChangeColor(stats.events_week.change) },
+    { label: 'AI дайджестов', value: stats.ai_digests.count.toString(), trend: formatChange(stats.ai_digests.change), color: getChangeColor(stats.ai_digests.change) },
   ] : [
     { label: 'Новостей сегодня', value: '...', trend: '...', color: 'text-muted-strong' },
-    { label: 'Активных источников', value: '...', trend: '...', color: 'text-muted-strong' },
-    { label: 'Категорий', value: '...', trend: '...', color: 'text-muted-strong' },
+    { label: 'Активных пользователей', value: '...', trend: '...', color: 'text-muted-strong' },
+    { label: 'Событий на неделю', value: '...', trend: '...', color: 'text-muted-strong' },
     { label: 'AI дайджестов', value: '...', trend: '...', color: 'text-muted-strong' },
   ];
 

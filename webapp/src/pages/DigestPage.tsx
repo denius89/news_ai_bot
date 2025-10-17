@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { MobileHeader } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
-import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown, ArrowUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
@@ -49,6 +49,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
   const [selectedDigest, setSelectedDigest] = useState<DigestItem | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, 'up' | 'down'>>({});
+  const [showScrollTop, setShowScrollTop] = useState(false);
   
   // 🚀 Гибридный подход: useTelegramUser для UI, useAuth для API
   const { userData } = useTelegramUser();
@@ -240,6 +241,30 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     }
   }, [userId]);
 
+  // Scroll detection for "scroll to top" button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    const throttledHandleScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Soft delete digest function
   const softDeleteDigest = async (digestId: string) => {
@@ -960,6 +985,25 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             </div>
           </motion.div>
         </div>
+      )}
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={scrollToTop}
+          className="fixed bottom-20 right-4 z-40 
+                     bg-primary hover:bg-primary/90 
+                     text-white 
+                     rounded-full p-3 
+                     shadow-lg hover:shadow-xl 
+                     transition-all duration-300"
+          aria-label="Прокрутить вверх"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </motion.button>
       )}
     </div>
   );

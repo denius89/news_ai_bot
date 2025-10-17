@@ -105,7 +105,12 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[N
         return [_dummy_news()]
 
     try:
-        query = supabase.table("news").select("*").order("published_at", desc=True).limit(limit)
+        query = (
+            supabase.table("news")
+            .select("id, uid, title, content, link, published_at, source, category, importance, credibility")
+            .order("published_at", desc=True)
+            .limit(limit)
+        )
 
         if category:
             query = query.eq("category", category.lower())

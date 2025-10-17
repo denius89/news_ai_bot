@@ -232,7 +232,9 @@ class NotificationService:
                 return []
 
             # Build query
-            query = supabase.table("events_new").select("*")
+            query = supabase.table("events_new").select(
+                "id, title, category, subcategory, starts_at, importance, description, link"
+            )
 
             # Filter by categories
             categories = prefs.get("categories", [])
@@ -251,6 +253,9 @@ class NotificationService:
             end_date = now + timedelta(days=7)
             query = query.gte("starts_at", now.isoformat())
             query = query.lte("starts_at", end_date.isoformat())
+
+            # Add limit to prevent loading too many events
+            query = query.limit(50)
 
             # Execute query
             result = query.execute()

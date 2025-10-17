@@ -10,7 +10,8 @@ import {
   Newspaper, 
   ExternalLink,
   X,
-  Star
+  Star,
+  ArrowUp
 } from 'lucide-react';
 
 interface NewsItem {
@@ -161,6 +162,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   const [hasMoreNews, setHasMoreNews] = useState(true);
   const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Динамические категории
   const [categoriesData, setCategoriesData] = useState<any>(null);
@@ -421,13 +423,16 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
   // Убрали свайп - оставляем только infinite scroll вниз
 
-  // Infinite scroll functionality
+  // Infinite scroll functionality + показ кнопки "вверх"
   useEffect(() => {
     const handleScroll = () => {
       // Более точная проверка достижения низа
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight;
       const clientHeight = window.innerHeight;
+      
+      // Показываем кнопку "вверх" если проскроллили больше 300px
+      setShowScrollTop(scrollTop > 300);
       
       // Загружаем когда дошли до 200px от низа
       const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
@@ -461,6 +466,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       clearTimeout(timeoutId);
     };
   }, [hasMoreNews, loadingMore, loading]);
+
+  // Функция прокрутки вверх
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // УБРАНО: клиентская фильтрация - теперь все фильтры на бэкенде
   const filteredNews = news;
@@ -728,6 +738,25 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                 )}
         </motion.div>
       </main>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={scrollToTop}
+          className="fixed bottom-20 right-4 z-40 
+                     bg-primary hover:bg-primary/90 
+                     text-white 
+                     rounded-full p-3 
+                     shadow-lg hover:shadow-xl 
+                     transition-all duration-300"
+          aria-label="Прокрутить вверх"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </motion.button>
+      )}
 
       {/* News Modal */}
       {selectedNews && (

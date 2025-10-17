@@ -6,7 +6,7 @@ API endpoints для статистики дашборда PulseAI.
 """
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 from flask import Blueprint, jsonify, request
 
@@ -31,11 +31,11 @@ def get_news_stats_today() -> Dict:
         return {"count": 0, "change": 0}
 
     try:
-        # Сегодняшняя дата
-        today = datetime.now().date()
+        # Сегодняшняя дата в UTC (для стабильности)
+        today = datetime.now(timezone.utc).date()
         yesterday = today - timedelta(days=1)
 
-        # Новости за сегодня
+        # Новости за сегодня (UTC)
         today_query = (
             supabase.table("news")
             .select("id", count="exact")
@@ -43,7 +43,7 @@ def get_news_stats_today() -> Dict:
             .lt("published_at", (today + timedelta(days=1)).isoformat())
         )
 
-        # Новости за вчера
+        # Новости за вчера (UTC)
         yesterday_query = (
             supabase.table("news")
             .select("id", count="exact")
@@ -70,77 +70,104 @@ def get_news_stats_today() -> Dict:
         return {"count": 0, "change": 0}
 
 
-def get_active_sources_stats() -> Dict:
-    """Получает статистику активных источников."""
+def get_active_users_stats() -> Dict:
+    """Получает статистику активных пользователей."""
     if not supabase:
         return {"count": 0, "change": 0}
 
     try:
-        # Активные источники - получаем все источники и считаем уникальные
-        sources_query = supabase.table("news").select("source").limit(1000)  # Ограничиваем для производительности
+        today = datetime.now()
+        week_ago = today - timedelta(days=7)
+        two_weeks_ago = today - timedelta(days=14)
 
-        result = safe_execute(sources_query)
-        if result.data:
-            unique_sources = set(item["source"] for item in result.data if item.get("source"))
-            active_sources = len(unique_sources)
+        # Уникальные пользователи за последнюю неделю (создавали дайджесты)
+        current_users_query = (
+            supabase.table("digests").select("user_id").gte("created_at", week_ago.isoformat()).limit(1000)
+        )
+
+        current_result = safe_execute(current_users_query)
+        if current_result.data:
+            unique_current_users = set(item["user_id"] for item in current_result.data if item.get("user_id"))
+            active_users = len(unique_current_users)
         else:
-            active_sources = 0
+            active_users = 0
 
-        # Источники за предыдущую неделю
-        week_ago = datetime.now() - timedelta(days=7)
-        two_weeks_ago = datetime.now() - timedelta(days=14)
-
-        prev_sources_query = (
-            supabase.table("news")
-            .select("source")
-            .gte("published_at", two_weeks_ago.isoformat())
-            .lt("published_at", week_ago.isoformat())
+        # Уникальные пользователи за предыдущую неделю
+        prev_users_query = (
+            supabase.table("digests")
+            .select("user_id")
+            .gte("created_at", two_weeks_ago.isoformat())
+            .lt("created_at", week_ago.isoformat())
             .limit(1000)
         )
 
-        prev_result = safe_execute(prev_sources_query)
+        prev_result = safe_execute(prev_users_query)
         if prev_result.data:
-            prev_unique_sources = set(item["source"] for item in prev_result.data if item.get("source"))
-            prev_sources = len(prev_unique_sources)
+            unique_prev_users = set(item["user_id"] for item in prev_result.data if item.get("user_id"))
+            prev_users = len(unique_prev_users)
         else:
-            prev_sources = 0
+            prev_users = 0
 
-        # Изменение в процентах для консистентности с другими метриками
-        if prev_sources > 0:
-            change_percent = round(((active_sources - prev_sources) / prev_sources) * 100)
+        # Процент изменения
+        if prev_users > 0:
+            change_percent = round(((active_users - prev_users) / prev_users) * 100)
         else:
-            change_percent = 100 if active_sources > 0 else 0
+            change_percent = 100 if active_users > 0 else 0
 
         logger.info(
-            f"🔍 DEBUG active_sources: {active_sources}, prev_sources: {prev_sources}, change_percent: {change_percent}"
+            f"👥 Активные пользователи: текущая неделя={active_users}, предыдущая={prev_users}, изменение={change_percent}%"
         )
-        return {"count": active_sources, "change": change_percent}
+        return {"count": active_users, "change": change_percent}
 
     except Exception as e:
-        logger.error(f"Ошибка получения статистики источников: {e}")
+        logger.error(f"Ошибка получения статистики пользователей: {e}")
         return {"count": 0, "change": 0}
 
 
-def get_categories_stats() -> Dict:
-    """Получает статистику категорий."""
+def get_events_stats() -> Dict:
+    """Получает статистику событий на неделю."""
     if not supabase:
         return {"count": 0, "change": 0}
 
     try:
-        # Активные категории - получаем все категории и считаем уникальные
-        categories_query = supabase.table("news").select("category")
+        # События на следующие 7 дней
+        now = datetime.now(timezone.utc)
+        week_later = now + timedelta(days=7)
 
-        result = safe_execute(categories_query)
-        if result.data:
-            unique_categories = set(item["category"] for item in result.data if item.get("category"))
-            active_categories = len(unique_categories)
+        current_events_query = (
+            supabase.table("events_new")
+            .select("id", count="exact")
+            .gte("starts_at", now.isoformat())
+            .lte("starts_at", week_later.isoformat())
+        )
+
+        current_result = safe_execute(current_events_query)
+        current_count = current_result.count if current_result.count else 0
+
+        # События за предыдущую неделю (для тренда)
+        week_ago = now - timedelta(days=7)
+
+        prev_events_query = (
+            supabase.table("events_new")
+            .select("id", count="exact")
+            .gte("starts_at", week_ago.isoformat())
+            .lte("starts_at", now.isoformat())
+        )
+
+        prev_result = safe_execute(prev_events_query)
+        prev_count = prev_result.count if prev_result.count else 0
+
+        # Процент изменения
+        if prev_count > 0:
+            change_percent = round(((current_count - prev_count) / prev_count) * 100)
         else:
-            active_categories = 0
+            change_percent = 100 if current_count > 0 else 0
 
-        return {"count": active_categories, "change": 0}  # Стабильно
+        logger.info(f"📅 События: текущая неделя={current_count}, предыдущая={prev_count}, изменение={change_percent}%")
+        return {"count": current_count, "change": change_percent}
 
     except Exception as e:
-        logger.error(f"Ошибка получения статистики категорий: {e}")
+        logger.error(f"Ошибка получения статистики событий: {e}")
         return {"count": 0, "change": 0}
 
 
@@ -188,16 +215,18 @@ def get_ai_digests_stats() -> Dict:
 def get_dashboard_stats():
     """Получает быструю статистику для дашборда (оптимизированная версия)."""
     try:
-        # Возвращаем кэшированную/приблизительную статистику для быстрого ответа
+        # Получаем реальные данные из БД
+        logger.info("📊 Загружаем статистику дашборда...")
+
         stats = {
-            "news_today": {"count": 150, "change": 12},  # Приблизительные данные
-            "active_sources": {"count": 45, "change": 3},
-            "categories": {"count": 5, "change": 0},
-            "ai_digests": {"count": 8, "change": 2},
+            "news_today": get_news_stats_today(),
+            "active_users": get_active_users_stats(),
+            "events_week": get_events_stats(),
+            "ai_digests": get_ai_digests_stats(),
         }
 
-        logger.info(f"Получена быстрая статистика дашборда: {stats}")
-        return jsonify({"success": True, "data": stats, "timestamp": datetime.now().isoformat(), "cached": True})
+        logger.info(f"✅ Получена статистика дашборда: {stats}")
+        return jsonify({"success": True, "data": stats, "timestamp": datetime.now().isoformat(), "cached": False})
 
     except Exception as e:
         logger.error(f"Ошибка получения статистики дашборда: {e}")
@@ -208,8 +237,8 @@ def get_dashboard_stats():
                     "error": str(e),
                     "data": {
                         "news_today": {"count": 0, "change": 0},
-                        "active_sources": {"count": 0, "change": 0},
-                        "categories": {"count": 0, "change": 0},
+                        "active_users": {"count": 0, "change": 0},
+                        "events_week": {"count": 0, "change": 0},
                         "ai_digests": {"count": 0, "change": 0},
                     },
                 }

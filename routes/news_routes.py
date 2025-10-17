@@ -159,8 +159,9 @@ def api_latest_news():
         # Получаем новости из базы данных
         db_service = get_sync_service()
 
-        # Увеличиваем буфер для корректной пагинации после фильтрации
-        fetch_limit = min(limit * 5, 500)  # Увеличен буфер для более точной пагинации
+        # Разумный буфер для пагинации после фильтрации
+        # Увеличиваем буфер для поддержки большего количества страниц
+        fetch_limit = min(limit * page * 2, 500)  # Динамически увеличиваем для deep pagination
 
         logger.info(
             f"📊 [API] News request: page={page}, category={selected_category}, "
@@ -200,27 +201,43 @@ def api_latest_news():
                 subcategories_filter = active_cats.get("subcategories", {})
                 logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories_filter}")
 
-                # Загружаем новости
-                all_news = db_service.get_latest_news(limit=fetch_limit)
+                # ОПТИМИЗАЦИЯ: загружаем новости целенаправленно по категориям подписки
+                # Вместо загрузки всех новостей и фильтрации, загружаем сразу нужные категории
+                all_news = []
 
-                # Если есть активные предпочтения, фильтруем
-                if full_categories or subcategories_filter:
-                    logger.info(f"✅ Применяем фильтрацию: {len(all_news)} новостей до фильтрации")
-                    filtered_news = []
-                    for news_item in all_news:
-                        category = news_item.get("category")
-                        subcategory = news_item.get("subcategory")
+                if full_categories:
+                    # Если есть полные категории - загружаем их
+                    logger.info(f"📊 Загружаем новости для полных категорий: {full_categories}")
+                    for category in full_categories:
+                        category_news = db_service.get_latest_news(
+                            categories=[category],
+                            limit=fetch_limit // len(full_categories) if len(full_categories) > 0 else fetch_limit,
+                        )
+                        all_news.extend(category_news)
 
-                        # Проверяем: либо вся категория включена, либо конкретная подкатегория
-                        if category in full_categories:
-                            filtered_news.append(news_item)
-                        elif category in subcategories_filter and subcategory in subcategories_filter[category]:
-                            filtered_news.append(news_item)
+                if subcategories_filter:
+                    # Загружаем новости для категорий с подкатегориями
+                    logger.info(f"📊 Загружаем новости для подкатегорий: {subcategories_filter}")
+                    for category, subcats in subcategories_filter.items():
+                        # Загружаем больше новостей из категории для фильтрации по подкатегориям
+                        category_limit = min(fetch_limit * 3, 500)  # x3 для фильтрации по подкатегориям
+                        category_news = db_service.get_latest_news(categories=[category], limit=category_limit)
+                        # Фильтруем по нужным подкатегориям
+                        filtered_category_news = [n for n in category_news if n.get("subcategory") in subcats]
+                        all_news.extend(filtered_category_news)
+                        logger.info(
+                            f"📊 Категория {category}: загружено {len(category_news)}, "
+                            f"отфильтровано {len(filtered_category_news)} по подкатегориям {subcats}"
+                        )
 
-                    all_news = filtered_news
-                    logger.info(f"🎯 Фильтрация завершена: {len(filtered_news)} новостей после фильтрации")
-                else:
-                    logger.info("⚠️ Нет активных предпочтений для фильтрации")
+                logger.info(f"📊 Всего загружено новостей по подпискам: {len(all_news)}")
+
+                # Новости уже отфильтрованы при загрузке, дополнительная фильтрация не нужна
+                if not all_news and (full_categories or subcategories_filter):
+                    logger.warning("⚠️ Нет новостей по подпискам пользователя")
+                elif not (full_categories or subcategories_filter):
+                    logger.info("⚠️ Нет активных предпочтений - загружаем все новости")
+                    all_news = db_service.get_latest_news(limit=fetch_limit)
         else:
             # Без фильтра по подпискам
             if selected_category:
@@ -331,21 +348,50 @@ def api_latest_news_weighted():
 
         logger.info(f"📊 Запрос взвешенного распределения: page={page}, limit={limit}, mode={distribution_mode}")
 
-        # Получаем новости по категориям
+        # Получаем новости по категориям (ОПТИМИЗИРОВАНО: 1 запрос вместо N)
         news_by_category = {}
         all_categories = get_categories()
         db_service = get_sync_service()
 
-        for category in all_categories:
-            try:
-                category_news = db_service.get_latest_news(
-                    categories=[category], limit=100
-                )  # ИСПРАВЛЕНО: передаем список
-                news_by_category[category] = category_news
-                logger.debug(f"Категория {category}: {len(category_news)} новостей")
-            except Exception as e:
-                logger.warning(f"Ошибка получения новостей для категории {category}: {e}")
-                news_by_category[category] = []
+        try:
+            # Используем RPC функцию для batch загрузки (1 запрос вместо 10+)
+            from database.db_models import supabase
+
+            if supabase:
+                result = supabase.rpc(
+                    "get_news_by_categories_batch", {"cats": all_categories, "limit_per_category": 50}
+                ).execute()
+
+                # Группируем результаты по категориям
+                for category in all_categories:
+                    news_by_category[category] = []
+
+                for news_item in result.data or []:
+                    cat = news_item.get("category")
+                    if cat in news_by_category:
+                        news_by_category[cat].append(news_item)
+
+                logger.info(f"✅ Batch загрузка: {len(result.data or [])} новостей из {len(all_categories)} категорий")
+            else:
+                # Fallback на старый способ если RPC недоступен
+                for category in all_categories:
+                    try:
+                        category_news = db_service.get_latest_news(categories=[category], limit=50)
+                        news_by_category[category] = category_news
+                    except Exception as e:
+                        logger.warning(f"Ошибка получения новостей для категории {category}: {e}")
+                        news_by_category[category] = []
+
+        except Exception as e:
+            logger.error(f"Ошибка batch загрузки новостей: {e}")
+            # Fallback на старый способ
+            for category in all_categories:
+                try:
+                    category_news = db_service.get_latest_news(categories=[category], limit=50)
+                    news_by_category[category] = category_news
+                except Exception as e:
+                    logger.warning(f"Ошибка получения новостей для категории {category}: {e}")
+                    news_by_category[category] = []
 
         # Применяем взвешенное распределение
         if distribution_mode == "weighted":
@@ -453,32 +499,61 @@ def api_distribution_stats():
         from services.categories import get_categories
         from utils.ai.news_distribution import get_category_weights
 
-        # Получаем статистику по категориям
+        # Получаем статистику по категориям (ОПТИМИЗИРОВАНО: SQL aggregation)
         categories = get_categories()
         category_stats = {}
         total_news = 0
-        db_service = get_sync_service()
 
-        for category in categories:
-            try:
-                category_news = db_service.get_latest_news(categories=[category], limit=1000)
-                category_stats[category] = {
-                    "count": len(category_news),
-                    "avg_importance": (
-                        sum(float(n.get("importance", 0.5)) for n in category_news) / len(category_news)
-                        if category_news
-                        else 0
-                    ),
-                    "avg_credibility": (
-                        sum(float(n.get("credibility", 0.5)) for n in category_news) / len(category_news)
-                        if category_news
-                        else 0
-                    ),
-                }
-                total_news += len(category_news)
-            except Exception as e:
-                logger.warning(f"Ошибка получения статистики для категории {category}: {e}")
-                category_stats[category] = {"count": 0, "avg_importance": 0, "avg_credibility": 0}
+        try:
+            # Используем RPC функцию для агрегации (1 запрос вместо N)
+            from database.db_models import supabase
+
+            if supabase:
+                result = supabase.rpc("get_all_category_stats").execute()
+
+                # Преобразуем результат в словарь
+                for row in result.data or []:
+                    category_stats[row["category"]] = {
+                        "count": row["count"],
+                        "avg_importance": row["avg_importance"],
+                        "avg_credibility": row["avg_credibility"],
+                    }
+                    total_news += row["count"]
+
+                # Добавляем категории без новостей
+                for category in categories:
+                    if category not in category_stats:
+                        category_stats[category] = {"count": 0, "avg_importance": 0, "avg_credibility": 0}
+
+                logger.info(f"✅ Статистика получена через RPC: {len(category_stats)} категорий, {total_news} новостей")
+            else:
+                # Fallback на старый способ
+                raise Exception("Supabase not available")
+
+        except Exception as e:
+            logger.error(f"Ошибка получения статистики через RPC: {e}, fallback на старый способ")
+            # Fallback: загружаем данные по категориям
+            db_service = get_sync_service()
+            for category in categories:
+                try:
+                    category_news = db_service.get_latest_news(categories=[category], limit=1000)
+                    category_stats[category] = {
+                        "count": len(category_news),
+                        "avg_importance": (
+                            sum(float(n.get("importance", 0.5)) for n in category_news) / len(category_news)
+                            if category_news
+                            else 0
+                        ),
+                        "avg_credibility": (
+                            sum(float(n.get("credibility", 0.5)) for n in category_news) / len(category_news)
+                            if category_news
+                            else 0
+                        ),
+                    }
+                    total_news += len(category_news)
+                except Exception as e:
+                    logger.warning(f"Ошибка получения статистики для категории {category}: {e}")
+                    category_stats[category] = {"count": 0, "avg_importance": 0, "avg_credibility": 0}
 
         # Получаем веса категорий
         weights = get_category_weights()

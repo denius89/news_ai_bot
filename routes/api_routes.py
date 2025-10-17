@@ -991,7 +991,8 @@ def generate_digest():
                 digest_id = db_service.save_digest(
                     {
                         "user_id": str(user_id),
-                        "summary": digest_text,
+                        "summary": digest_text,  # Для обратной совместимости
+                        "content": digest_text,  # Основное поле для WebApp
                         "category": category,
                         "style": style,
                         "period": period,
@@ -1107,20 +1108,20 @@ def get_digest_history():
         # Format digests for response (updated for new schema after migration)
         formatted_digests = []
         for digest in digests:
+            # Используем content если summary пустой (поддержка новой схемы)
+            content_text = digest.get("content") or digest.get("summary") or ""
+
             formatted_digest = {
                 "id": digest.get("id"),
                 "user_id": digest.get("user_id"),  # Добавляем user_id
-                "summary": digest.get("summary"),
+                "summary": content_text,  # Возвращаем content как summary для обратной совместимости
                 "category": digest.get("category"),
                 "style": digest.get("style"),
                 "period": digest.get("period"),
                 "limit_count": digest.get("limit_count"),
+                "limit": digest.get("limit_count"),  # Добавляем limit для frontend
                 "created_at": digest.get("created_at"),
-                "preview": (
-                    digest.get("summary")[:200] + "..."
-                    if len(digest.get("summary", "")) > 200
-                    else digest.get("summary")
-                ),
+                "preview": (content_text[:200] + "..." if len(content_text) > 200 else content_text),
                 "deleted_at": digest.get("deleted_at"),
                 "archived": digest.get("archived"),
                 "metadata": digest.get("metadata"),

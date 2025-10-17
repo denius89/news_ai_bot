@@ -912,7 +912,8 @@ def save_digest(
         # Полная версия с новыми колонками после миграции
         digest_data = {
             "user_id": str(user_id),
-            "summary": summary,
+            "summary": summary,  # Для обратной совместимости
+            "content": summary,  # Основное поле для нового API
             "category": category,
             "style": style,
             "period": period,
@@ -1606,7 +1607,8 @@ def save_digest_with_metrics(
     try:
         digest_data = {
             "user_id": user_id,
-            "summary": summary,
+            "summary": summary,  # Для обратной совместимости
+            "content": summary,  # Основное поле для нового API
             "category": category,
             "style": style,
             "confidence": confidence,

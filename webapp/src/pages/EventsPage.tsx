@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, ChevronDown } from 'lucide-react';
+import { Calendar, ChevronDown, ArrowUp } from 'lucide-react';
 import { Card } from '../components/ui/Card';
+import { motion } from 'framer-motion';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
 
@@ -45,6 +46,11 @@ const EventsPage: React.FC<EventsPageProps> = () => {
   const [dateRange, setDateRange] = useState<'today' | 'week' | 'month'>('week');
   const [categories, setCategories] = useState<Record<string, CategoryInfo>>({});
   const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  // Pagination для infinite scroll
+  const [displayedCount, setDisplayedCount] = useState(100); // Сколько событий показано
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Get user data from authentication context
   const { userData } = useTelegramUser();
@@ -62,6 +68,36 @@ const EventsPage: React.FC<EventsPageProps> = () => {
       fetchEvents();
     }
   }, [category, dateRange, userId]);
+
+  // Сбрасываем displayedCount при смене подкатегории
+  useEffect(() => {
+    setDisplayedCount(100);
+  }, [subcategory]);
+
+  // Scroll detection for "scroll to top" button
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      setShowScrollTop(scrollTop > 300);
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    const throttledHandleScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const fetchCategories = async () => {
     try {
@@ -97,8 +133,14 @@ const EventsPage: React.FC<EventsPageProps> = () => {
       const data = await response.json();
 
       if (data.success) {
-        setEvents(data.data.events || []);
+        const allEvents = data.data.events || [];
+        
+        // Сохраняем ВСЕ события, но отображаем постепенно
+        setEvents(allEvents);
+        setDisplayedCount(100); // Показываем первые 100
         setIsFilteredBySubscriptions(data.data.filtered_by_subscriptions || false);
+        
+        console.log(`📊 Загружено событий: ${allEvents.length}, показано: 100`);
       } else {
         setError(data.error || 'Failed to fetch events');
       }
@@ -117,9 +159,59 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     return Object.entries(categories[category].subcategories);
   };
 
-  const filteredEvents = subcategory === 'all' 
+  // Фильтрация + пагинация для infinite scroll
+  const allFilteredEvents = subcategory === 'all' 
     ? events
     : events.filter(e => e.subcategory === subcategory);
+  
+  // Показываем только первые displayedCount событий
+  const filteredEvents = allFilteredEvents.slice(0, displayedCount);
+  
+  // Load more events function для infinite scroll
+  const loadMoreEvents = () => {
+    if (loadingMore || displayedCount >= allFilteredEvents.length) {
+      return;
+    }
+    
+    setLoadingMore(true);
+    
+    // Имитируем задержку для плавности
+    setTimeout(() => {
+      const newCount = Math.min(displayedCount + 50, allFilteredEvents.length);
+      setDisplayedCount(newCount);
+      setLoadingMore(false);
+      
+      console.log(`📊 Показано событий: ${newCount} из ${allFilteredEvents.length}`);
+    }, 300);
+  };
+
+  // Infinite scroll для событий
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+      
+      const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
+      
+      if (isNearBottom && !loadingMore && displayedCount < allFilteredEvents.length) {
+        console.log('🔄 Загружаем ещё события...');
+        loadMoreEvents();
+      }
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    const throttledHandleScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 100);
+    };
+
+    window.addEventListener('scroll', throttledHandleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', throttledHandleScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [loadingMore, displayedCount, allFilteredEvents.length]);
   
   // Группировка событий по group_name и дате
   const { groupedEvents, standaloneEvents } = React.useMemo(() => {
@@ -288,19 +380,69 @@ const EventsPage: React.FC<EventsPageProps> = () => {
         )}
 
         {!loading && !error && (filteredEvents.length > 0 || Object.keys(groupedEvents).length > 0) && (
-          <div className="space-y-3">
-            {/* Группы событий */}
-            {Object.entries(groupedEvents).map(([key, evts]) => (
-              <GroupedEventCard key={key} events={evts} groupKey={key} />
-            ))}
+          <>
+            <div className="space-y-3">
+              {/* Группы событий */}
+              {Object.entries(groupedEvents).map(([key, evts]) => (
+                <GroupedEventCard key={key} events={evts} groupKey={key} />
+              ))}
+              
+              {/* Отдельные события */}
+              {standaloneEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
             
-            {/* Отдельные события */}
-            {standaloneEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+            {/* Индикатор загрузки при infinite scroll */}
+            {loadingMore && (
+              <div className="mt-4 text-center py-4">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                <p className="mt-2 text-sm text-[var(--color-text)]-secondary">Загрузка событий...</p>
+              </div>
+            )}
+            
+            {/* Индикатор прогресса */}
+            {!loadingMore && displayedCount < allFilteredEvents.length && (
+              <div className="mt-4 text-center py-4">
+                <p className="text-sm text-[var(--color-text)]-secondary">
+                  📊 Показано {displayedCount} из {allFilteredEvents.length} событий
+                </p>
+                <p className="text-xs text-primary mt-1">
+                  Прокрутите вниз для загрузки ещё
+                </p>
+              </div>
+            )}
+            
+            {/* Индикатор окончания */}
+            {displayedCount >= allFilteredEvents.length && allFilteredEvents.length > 0 && (
+              <div className="mt-4 text-center py-4">
+                <p className="text-sm text-[var(--color-text)]-secondary">
+                  ✅ Все события загружены ({allFilteredEvents.length})
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={scrollToTop}
+          className="fixed bottom-20 right-4 z-40 
+                     bg-primary hover:bg-primary/90 
+                     text-white 
+                     rounded-full p-3 
+                     shadow-lg hover:shadow-xl 
+                     transition-all duration-300"
+          aria-label="Прокрутить вверх"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </motion.button>
+      )}
     </div>
   );
 };
@@ -313,7 +455,17 @@ const GroupedEventCard: React.FC<{ events: Event[]; groupKey: string }> = ({ eve
   
   const [groupName, dateStr] = groupKey.split('|');
   const firstEvent = events[0];
-  const date = new Date(dateStr);
+  
+  // Защита от Invalid Date
+  let date: Date;
+  try {
+    date = dateStr ? new Date(dateStr) : new Date(firstEvent.starts_at);
+    if (isNaN(date.getTime())) {
+      date = new Date(firstEvent.starts_at);
+    }
+  } catch {
+    date = new Date(firstEvent.starts_at);
+  }
   
   const getCategoryIcon = () => {
     const icons: Record<string, string> = {
@@ -327,14 +479,18 @@ const GroupedEventCard: React.FC<{ events: Event[]; groupKey: string }> = ({ eve
   };
   
   const formatGroupDate = () => {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === now.toDateString()) return 'Today';
-    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-    
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    try {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      if (date.toDateString() === now.toDateString()) return 'Today';
+      if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+      
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch {
+      return 'Unknown';
+    }
   };
   
   return (
@@ -413,30 +569,38 @@ const EventCard: React.FC<{ event: Event }> = ({ event }) => {
   const [expanded, setExpanded] = useState(false);
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'Unknown date';
+      }
+      
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
 
-    const isToday = date.toDateString() === now.toDateString();
-    const isTomorrow = date.toDateString() === tomorrow.toDateString();
+      const isToday = date.toDateString() === now.toDateString();
+      const isTomorrow = date.toDateString() === tomorrow.toDateString();
 
-    const time = date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false 
-    });
+      const time = date.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
 
-    if (isToday) return `Today at ${time}`;
-    if (isTomorrow) return `Tomorrow at ${time}`;
-    
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
+      if (isToday) return `Today at ${time}`;
+      if (isTomorrow) return `Tomorrow at ${time}`;
+      
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    } catch {
+      return 'Unknown date';
+    }
   };
 
   const getCategoryIcon = () => {

@@ -663,7 +663,11 @@ class DatabaseService:
             User data dict or None if not found
         """
         try:
-            query = self.sync_client.table("users").select("*").eq("telegram_id", telegram_id)
+            query = (
+                self.sync_client.table("users")
+                .select("id, telegram_id, username, categories, sources, notification_enabled, updated_at")
+                .eq("telegram_id", telegram_id)
+            )
             result = self.safe_execute(query)
 
             if result.data and len(result.data) > 0:
@@ -745,7 +749,14 @@ class DatabaseService:
             List of digest data
         """
         try:
-            query = self.sync_client.table("digests").select("*").eq("user_id", user_id)
+            query = (
+                self.sync_client.table("digests")
+                .select(
+                    "id, user_id, title, content, category, style, tone, length, audience, "
+                    "confidence, feedback_score, created_at, deleted_at, archived"
+                )
+                .eq("user_id", user_id)
+            )
 
             # Фильтрация по статусу
             if include_deleted and include_archived:

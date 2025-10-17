@@ -308,12 +308,7 @@ def get_upcoming_events():
         # Get events service
         events_service = get_events_service()
 
-        # Fetch upcoming events (synchronous)
-        events = events_service.get_upcoming_events_sync(
-            days_ahead=days, category=category, min_importance=min_importance
-        )
-
-        # Фильтрация по предпочтениям пользователя
+        # Получаем user_id для фильтрации по предпочтениям
         user_id = None
         if filter_by_subscriptions:
             from flask import g
@@ -322,30 +317,68 @@ def get_upcoming_events():
             if hasattr(g, "current_user") and g.current_user:
                 user_id = g.current_user["user_id"]
 
+        # ОПТИМИЗАЦИЯ: загружаем события целенаправленно по категориям подписки
         if filter_by_subscriptions and user_id:
             from database.db_models import get_active_categories
 
             active_cats = get_active_categories(user_id)
             full_categories = active_cats.get("full_categories", [])
-            subcategories = active_cats.get("subcategories", {})
+            subcategories_filter = active_cats.get("subcategories", {})
 
-            # Если есть активные предпочтения, фильтруем
-            if full_categories or subcategories:
-                filtered_events = []
-                for event in events:
-                    event_category = event.category
-                    event_subcategory = event.subcategory
+            logger.info(f"📊 Фильтрация событий по подпискам пользователя {user_id}")
+            logger.info(f"📊 Активные категории: full={full_categories}, subcategories={subcategories_filter}")
 
-                    # Проверяем: либо вся категория включена, либо конкретная подкатегория
-                    if event_category in full_categories:
-                        filtered_events.append(event)
-                    elif event_category in subcategories and event_subcategory in subcategories[event_category]:
-                        filtered_events.append(event)
+            events = []
 
-                events = filtered_events
-                logger.info(
-                    f"Фильтрация событий по предпочтениям пользователя {user_id}: " f"{len(filtered_events)} событий"
+            # Если есть полные категории - загружаем их
+            if full_categories:
+                logger.info(f"📊 Загружаем события для полных категорий: {full_categories}")
+                for cat in full_categories:
+                    cat_events = events_service.get_upcoming_events_sync(
+                        days_ahead=days, category=cat, min_importance=min_importance
+                    )
+                    events.extend(cat_events)
+                    logger.info(f"📊 Категория {cat}: {len(cat_events)} событий")
+
+            # Если есть подкатегории - загружаем и фильтруем
+            if subcategories_filter:
+                logger.info(f"📊 Загружаем события для подкатегорий: {subcategories_filter}")
+                for cat, subcats in subcategories_filter.items():
+                    # Загружаем все события категории
+                    cat_events = events_service.get_upcoming_events_sync(
+                        days_ahead=days, category=cat, min_importance=min_importance
+                    )
+                    # Фильтруем по нужным подкатегориям
+                    filtered_cat_events = [e for e in cat_events if e.subcategory in subcats]
+                    events.extend(filtered_cat_events)
+                    logger.info(
+                        f"📊 Категория {cat}: загружено {len(cat_events)}, "
+                        f"отфильтровано {len(filtered_cat_events)} по подкатегориям {subcats}"
+                    )
+
+            # Убираем дубликаты (событие могло попасть и через полную категорию, и через подкатегорию)
+            seen_ids = set()
+            unique_events = []
+            for event in events:
+                if event.id not in seen_ids:
+                    seen_ids.add(event.id)
+                    unique_events.append(event)
+            events = unique_events
+
+            logger.info(f"📊 Всего уникальных событий по подпискам: {len(events)}")
+
+            # ВАЖНО: Если подписок нет - показываем все события
+            if not events and not (full_categories or subcategories_filter):
+                logger.info("⚠️ Нет подписок - показываем все события")
+                events = events_service.get_upcoming_events_sync(
+                    days_ahead=days, category=category, min_importance=min_importance
                 )
+
+        else:
+            # Без фильтрации или если категория уже указана
+            events = events_service.get_upcoming_events_sync(
+                days_ahead=days, category=category, min_importance=min_importance
+            )
 
         # Convert to JSON format
         events_data = []
