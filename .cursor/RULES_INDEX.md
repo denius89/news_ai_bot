@@ -155,6 +155,80 @@
 
 ---
 
+### 90-99: Production Operations
+
+#### `90-logging-monitoring.mdc` ⭐ HIGH
+**Priority:** HIGH  
+**Impact:** Production debugging & monitoring
+
+**Key Rules:**
+- Structured JSON logging with request_id
+- Log levels: INFO (normal), WARNING (issues), ERROR (failures)
+- Log AI metrics: model, tokens, latency
+- Never log API keys or PII
+- Monitor job execution and performance
+
+**When AI will use:**
+- Adding logging statements
+- Debugging production issues
+- Tracking AI performance
+
+---
+
+#### `91-error-handling.mdc` ⭐ HIGH
+**Priority:** HIGH  
+**Impact:** Production stability
+
+**Key Rules:**
+- Handle OpenAI errors with retry logic (3 attempts, exponential backoff)
+- User-friendly messages vs internal logging
+- Graceful degradation (fallback to cached/simple logic)
+- Never expose internal errors to users
+- Telegram bot error handling
+
+**When AI will use:**
+- Adding error handling
+- Fixing production bugs
+- Implementing API integrations
+
+---
+
+#### `92-background-jobs.mdc`
+**Priority:** MEDIUM  
+**Impact:** Data freshness & ML accuracy
+
+**Key Rules:**
+- Background jobs in `tools/` directory
+- Log start/end times, records processed
+- Handle failures gracefully (don't block other jobs)
+- Resource management: memory/disk checks
+- Batch processing for large datasets (25k+ records)
+
+**When AI will use:**
+- Creating new background tasks
+- Optimizing cron jobs
+- Debugging failed jobs
+
+---
+
+#### `93-performance.mdc`
+**Priority:** MEDIUM  
+**Impact:** Cost & speed
+
+**Key Rules:**
+- Use local ML predictor (60-70% token savings)
+- Database indexes on published_at, importance, credibility
+- Batch processing: chunks of 100-1000
+- Cache AI responses with `ai_modules/cache.py`
+- Quality gates: skip AI if importance/credibility < 0.6/0.7
+
+**When AI will use:**
+- Performance optimization
+- Reducing API costs
+- Fixing slow queries
+
+---
+
 ## 🎯 How AI Uses These Rules
 
 ### Automatic Triggers:
@@ -167,6 +241,10 @@
 | "Install package" | 60-dependencies | Check security, pin version |
 | "Commit changes" | 70-commits | Format as Conventional Commit |
 | "Feature is done" | 80-testing | Run tests before confirming |
+| "Add logging" | 90-logging | Use structured JSON format |
+| "Fix production bug" | 91-error-handling | Add retry logic, graceful degradation |
+| "Create background job" | 92-background-jobs | Use template, add monitoring |
+| "Optimize performance" | 93-performance | Check ML predictor, caching, indexes |
 
 ---
 
@@ -191,6 +269,12 @@
 - Commits: `70-git-commits.mdc`
 - Dependencies: `60-dependencies-management.mdc`
 
+**Production:**
+- Logging: `90-logging-monitoring.mdc`
+- Error handling: `91-error-handling.mdc`
+- Background jobs: `92-background-jobs.mdc`
+- Performance: `93-performance.mdc`
+
 ---
 
 ## ✅ Verification Checklist
@@ -203,6 +287,10 @@ After restart, AI should:
 - [ ] Pin versions when adding dependencies
 - [ ] Use Conventional Commits format
 - [ ] Run tests before marking complete
+- [ ] Use structured JSON logging
+- [ ] Add retry logic for API errors
+- [ ] Log background job metrics
+- [ ] Check for performance optimizations (ML predictor, caching)
 
 ---
 
@@ -233,15 +321,15 @@ After restart, AI should:
 
 ## 📊 Statistics
 
-- **Total rules:** 8 files
-- **Total lines:** ~1,200
-- **Critical rules:** 3 (env, prompts, migrations)
-- **Coverage areas:** 6 (security, AI, DB, deps, git, testing)
+- **Total rules:** 12 files
+- **Total lines:** ~2,200
+- **Critical rules:** 5 (env, prompts, migrations, logging, errors)
+- **Coverage areas:** 10 (security, AI, DB, deps, git, testing, logging, errors, background, performance)
 
 ---
 
-**Last Updated:** 2025-10-16  
-**Version:** 1.0  
+**Last Updated:** 2025-10-17  
+**Version:** 1.1  
 **Status:** Active
 
 

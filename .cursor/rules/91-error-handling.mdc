@@ -1,0 +1,407 @@
+---
+title: Error Handling
+tags: [errors, exceptions, production]
+priority: HIGH
+---
+
+# 🛡️ Error Handling Rules
+
+## 🎯 Error Handling Philosophy
+
+**Principles:**
+1. **Never expose internal errors to users**
+2. **Always log full error details internally**
+3. **Provide graceful degradation**
+4. **Retry transient errors**
+5. **User-friendly error messages**
+
+---
+
+## 🔴 OpenAI API Error Handling
+
+### Common Errors:
+
+#### 1. Rate Limit Error (429):
+```python
+import time
+from openai import RateLimitError
+
+def call_openai_with_retry(prompt, max_retries=3):
+    """Call OpenAI with exponential backoff retry."""
+    
+    for attempt in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            return response
+            
+        except RateLimitError as e:
+            wait_time = (2 ** attempt) + random.uniform(0, 1)
+            logger.warning(json.dumps({
+                "event": "openai_rate_limit",
+                "attempt": attempt + 1,
+                "wait_seconds": wait_time,
+                "error": str(e)
+            }))
+            
+            if attempt < max_retries - 1:
+                time.sleep(wait_time)
+            else:
+                logger.error("OpenAI rate limit exceeded after retries")
+                raise
+```
+
+#### 2. Invalid API Key (401):
+```python
+from openai import AuthenticationError
+
+try:
+    response = client.chat.completions.create(...)
+except AuthenticationError as e:
+    logger.error(json.dumps({
+        "event": "openai_auth_error",
+        "error": "Invalid API key",
+        "action": "Check OPENAI_API_KEY in .env"
+    }))
+    # NEVER retry auth errors
+    raise
+```
+
+#### 3. Timeout Error:
+```python
+from openai import APITimeoutError
+
+try:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[...],
+        timeout=10  # 10 seconds
+    )
+except APITimeoutError as e:
+    logger.warning(json.dumps({
+        "event": "openai_timeout",
+        "timeout_sec": 10,
+        "retry": True
+    }))
+    # Retry with longer timeout or use cached result
+```
+
+#### 4. Invalid Request (400):
+```python
+from openai import BadRequestError
+
+try:
+    response = client.chat.completions.create(...)
+except BadRequestError as e:
+    logger.error(json.dumps({
+        "event": "openai_bad_request",
+        "error": str(e),
+        "prompt_length": len(prompt),
+        "model": "gpt-4o-mini"
+    }))
+    # Don't retry - fix the request
+    raise
+```
+
+---
+
+## 🔄 Retry Logic
+
+### Exponential Backoff Pattern:
+
+```python
+import time
+import random
+from typing import Callable, Any
+
+def retry_with_backoff(
+    func: Callable,
+    max_retries: int = 3,
+    initial_wait: float = 1.0,
+    max_wait: float = 60.0,
+    exponential_base: float = 2.0
+) -> Any:
+    """
+    Retry function with exponential backoff.
+    
+    Args:
+        func: Function to retry
+        max_retries: Maximum number of retry attempts
+        initial_wait: Initial wait time in seconds
+        max_wait: Maximum wait time in seconds
+        exponential_base: Base for exponential backoff
+    """
+    
+    for attempt in range(max_retries):
+        try:
+            return func()
+            
+        except (RateLimitError, APITimeoutError, ConnectionError) as e:
+            if attempt >= max_retries - 1:
+                logger.error(f"Failed after {max_retries} attempts: {e}")
+                raise
+            
+            # Calculate wait time with jitter
+            wait_time = min(
+                initial_wait * (exponential_base ** attempt) + random.uniform(0, 1),
+                max_wait
+            )
+            
+            logger.warning(json.dumps({
+                "event": "retry_attempt",
+                "attempt": attempt + 1,
+                "max_retries": max_retries,
+                "wait_seconds": wait_time,
+                "error_type": type(e).__name__
+            }))
+            
+            time.sleep(wait_time)
+```
+
+### When to Retry:
+- ✅ Rate limits (429)
+- ✅ Timeouts
+- ✅ Connection errors
+- ✅ Server errors (5xx)
+
+### When NOT to Retry:
+- ❌ Authentication errors (401)
+- ❌ Bad requests (400)
+- ❌ Not found (404)
+- ❌ Permission denied (403)
+
+---
+
+## 👥 User-Facing vs Internal Errors
+
+### User-Facing Messages:
+
+```python
+# Internal error
+logger.error(json.dumps({
+    "event": "database_error",
+    "error": str(e),
+    "traceback": traceback.format_exc(),
+    "query": query
+}))
+
+# User message
+return {
+    "success": False,
+    "error": "Не удалось загрузить новости. Попробуйте позже.",
+    "error_code": "DB_ERROR"
+}
+```
+
+### Error Message Guidelines:
+
+| Internal Error | User Message |
+|----------------|--------------|
+| `DatabaseError: Connection timeout` | "Сервис временно недоступен" |
+| `OpenAI RateLimitError` | "Система перегружена, подождите минуту" |
+| `KeyError: 'importance'` | "Ошибка обработки новости" |
+| `ValidationError: Invalid date` | "Некорректные данные" |
+
+---
+
+## 🔽 Graceful Degradation
+
+### If AI Fails - Use Fallbacks:
+
+```python
+def score_importance(news: dict) -> float:
+    """Score news importance with fallback."""
+    
+    try:
+        # Try local ML predictor first (fast, cheap)
+        if local_predictor.is_loaded():
+            return local_predictor.predict_importance(news)
+        
+        # Fallback to OpenAI API
+        return openai_score_importance(news)
+        
+    except Exception as e:
+        logger.error(json.dumps({
+            "event": "importance_scoring_failed",
+            "news_id": news.get('id'),
+            "error": str(e)
+        }))
+        
+        # Final fallback: simple heuristics
+        return calculate_simple_importance(news)
+
+def calculate_simple_importance(news: dict) -> float:
+    """Simple rule-based importance (fallback)."""
+    score = 0.5  # baseline
+    
+    # High-priority keywords
+    if any(kw in news['title'].lower() for kw in ['фрс', 'биткоин', 'crash', 'банкротство']):
+        score += 0.2
+    
+    # Reputable source
+    if news['source'] in ['Bloomberg', 'Reuters', 'WSJ']:
+        score += 0.1
+    
+    return min(score, 1.0)
+```
+
+---
+
+## 📱 Telegram Bot Error Messages
+
+### User-Friendly Telegram Responses:
+
+```python
+async def handle_telegram_error(update, context, error):
+    """Handle Telegram bot errors."""
+    
+    logger.error(json.dumps({
+        "event": "telegram_error",
+        "user_id": update.effective_user.id,
+        "error": str(error),
+        "update": update.to_dict()
+    }))
+    
+    # User-friendly messages
+    if isinstance(error, NetworkError):
+        await update.message.reply_text(
+            "⚠️ Проблема с соединением. Попробуйте через минуту."
+        )
+    elif isinstance(error, BadRequest):
+        await update.message.reply_text(
+            "❌ Некорректный запрос. Попробуйте другую команду."
+        )
+    else:
+        await update.message.reply_text(
+            "⚠️ Произошла ошибка. Мы уже работаем над исправлением."
+        )
+```
+
+---
+
+## 🗄️ Database Error Handling
+
+### Supabase Connection Errors:
+
+```python
+from supabase import Client
+import httpx
+
+def fetch_news_safe(supabase: Client, limit: int = 100):
+    """Fetch news with error handling."""
+    
+    try:
+        response = supabase.table('news').select('*').limit(limit).execute()
+        return response.data
+        
+    except httpx.ConnectTimeout:
+        logger.error(json.dumps({
+            "event": "supabase_timeout",
+            "action": "fetch_news",
+            "limit": limit
+        }))
+        # Return cached data or empty list
+        return get_cached_news() or []
+        
+    except Exception as e:
+        logger.error(json.dumps({
+            "event": "supabase_error",
+            "error": str(e),
+            "error_type": type(e).__name__
+        }))
+        return []
+```
+
+---
+
+## 🎯 Error Categories
+
+### 1. Transient Errors (Retry):
+- Network timeouts
+- Rate limits
+- Service unavailable (503)
+- Connection reset
+
+### 2. Permanent Errors (Don't Retry):
+- Authentication failures
+- Invalid input (400)
+- Not found (404)
+- Validation errors
+
+### 3. Critical Errors (Alert):
+- Database unreachable
+- All AI requests failing
+- Service cannot start
+- Data corruption
+
+---
+
+## 📊 Error Monitoring
+
+### Track Error Rates:
+
+```python
+# Log errors with context
+logger.error(json.dumps({
+    "event": "error",
+    "error_type": type(e).__name__,
+    "error_msg": str(e),
+    "module": __name__,
+    "function": func.__name__,
+    "retryable": is_retryable(e),
+    "timestamp": datetime.utcnow().isoformat()
+}))
+
+# Alert if error rate > 5% in last hour
+if error_rate > 0.05:
+    send_alert("High error rate detected")
+```
+
+---
+
+## 🎯 When AI Uses These Rules
+
+### Adding Error Handling:
+```
+Always wrap external API calls:
+
+try:
+    result = external_api_call()
+except SpecificError as e:
+    logger.error(...)
+    # Fallback or re-raise
+```
+
+### Fixing Production Bugs:
+```
+1. Check logs for error details
+2. Identify error category (transient/permanent/critical)
+3. Add appropriate error handling
+4. Add fallback if possible
+5. Update user-facing message
+```
+
+### New API Integration:
+```
+1. Identify possible errors
+2. Add retry logic for transient errors
+3. Add graceful degradation
+4. Log all errors with context
+5. Test error scenarios
+```
+
+---
+
+## 📖 References
+
+- OpenAI errors: https://platform.openai.com/docs/guides/error-codes
+- Retry library: `tenacity` (if needed)
+- Logging: `90-logging-monitoring.mdc`
+
+---
+
+**Priority:** HIGH  
+**Impact:** Production stability  
+**Version:** 1.0

@@ -44,6 +44,8 @@ env-save "describe what you're changing"
 - Check linter before suggesting completion
 - Use project scripts in tools/
 - Follow existing patterns
+- Use structured JSON logging with request_id
+- Add retry logic for external API calls (3 attempts, exponential backoff)
 
 ## 📚 Documentation
 

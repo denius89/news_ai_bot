@@ -1,9 +1,6 @@
 ---
-title: .env Backup & Security Rules
-tags: [security, critical, env-management]
-priority: CRITICAL
+alwaysApply: true
 ---
-
 # 🔐 .env File Management - CRITICAL SECURITY RULE
 
 ## ⚠️ Context: Security Incident

@@ -1,9 +1,6 @@
 ---
-title: Testing Requirements
-tags: [testing, quality]
-priority: MEDIUM
+alwaysApply: true
 ---
-
 # 🧪 Testing Requirements
 
 ## 🎯 Test Before Suggesting "Done"

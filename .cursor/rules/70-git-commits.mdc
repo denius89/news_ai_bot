@@ -1,9 +1,6 @@
 ---
-title: Git Commit Standards
-tags: [git, commits]
-priority: LOW
+alwaysApply: true
 ---
-
 # 📝 Git Commit Standards
 
 ## 🎯 Conventional Commits Format

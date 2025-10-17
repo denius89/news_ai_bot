@@ -1,0 +1,453 @@
+---
+title: Performance & Optimization
+tags: [performance, optimization, cost]
+priority: MEDIUM
+---
+
+# ⚡ Performance & Optimization Rules
+
+## 🎯 Performance Goals
+
+**PulseAI Performance Targets:**
+- API response time: < 1s (P95)
+- AI request latency: < 5s (P95)
+- News processing: 16,000+ news/day
+- Token savings: 60-70% via local ML predictor
+- Database queries: < 500ms
+
+---
+
+## 🤖 AI Optimization
+
+### 1. Local ML Predictor (Primary Strategy)
+
+**Location:** `ai_modules/local_predictor.py`
+
+**Strategy:** Use local ML models for 60-70% of requests, fallback to OpenAI API.
+
+```python
+from ai_modules.local_predictor import LocalPredictor
+
+predictor = LocalPredictor()
+
+def score_news_optimized(news: dict) -> dict:
+    """Score news with local predictor first."""
+    
+    # Try local ML model first (fast, free)
+    if predictor.is_loaded():
+        try:
+            importance = predictor.predict_importance(news)
+            credibility = predictor.predict_credibility(news)
+            
+            # Use threshold to decide if OpenAI needed
+            if importance < 0.5 or credibility < 0.6:
+                # Low scores - trust ML, skip OpenAI
+                return {
+                    "importance": importance,
+                    "credibility": credibility,
+                    "source": "local_ml"
+                }
+            
+            # Borderline - use OpenAI for accuracy
+            return score_with_openai(news)
+            
+        except Exception as e:
+            logger.warning(f"Local predictor failed: {e}")
+            return score_with_openai(news)
+    
+    # Fallback to OpenAI
+    return score_with_openai(news)
+```
+
+**Config:** `config/data/ai_optimization.yaml`
+```yaml
+local_predictor_enabled: true
+fallback_to_api: true
+confidence_threshold: 0.7
+```
+
+**Token Savings:**
+- Before: 100% requests to OpenAI (~$10-20/day)
+- After: 30-40% requests to OpenAI (~$3-6/day)
+- Savings: **60-70%** 🎉
+
+---
+
+### 2. Early Filtering (Prefilter)
+
+**Location:** `ai_modules/prefilter.py`
+
+**Strategy:** Filter obvious low-quality news before AI scoring.
+
+```python
+from ai_modules.prefilter import prefilter_news
+
+def process_news_batch(news_list: list) -> list:
+    """Process news with prefiltering."""
+    
+    # Filter out obvious spam/low-quality
+    filtered = prefilter_news(news_list)
+    
+    logger.info(json.dumps({
+        "event": "prefilter",
+        "original_count": len(news_list),
+        "filtered_count": len(filtered),
+        "removed": len(news_list) - len(filtered),
+        "savings_percent": (1 - len(filtered)/len(news_list)) * 100
+    }))
+    
+    # Only score high-quality candidates
+    scored = [score_news_optimized(news) for news in filtered]
+    
+    return scored
+```
+
+**Prefilter Rules:**
+- Title < 10 chars → skip
+- No content → skip
+- Blacklisted domains → skip
+- Duplicate (by URL hash) → skip
+
+---
+
+### 3. Quality Gates (Skip AI for Low Scores)
+
+**Strategy:** If local ML predicts low score, don't call OpenAI.
+
+```python
+def should_use_openai(local_importance: float, local_credibility: float) -> bool:
+    """Decide if OpenAI call needed."""
+    
+    # Thresholds from config
+    IMPORTANCE_THRESHOLD = 0.6
+    CREDIBILITY_THRESHOLD = 0.7
+    
+    # If both below threshold - skip OpenAI
+    if local_importance < IMPORTANCE_THRESHOLD and local_credibility < CREDIBILITY_THRESHOLD:
+        logger.info(json.dumps({
+            "event": "skip_openai",
+            "reason": "low_local_scores",
+            "importance": local_importance,
+            "credibility": local_credibility
+        }))
+        return False
+    
+    # Borderline or high scores - use OpenAI for accuracy
+    return True
+```
+
+---
+
+## 🗄️ Database Optimization
+
+### 1. Indexes
+
+**Critical Indexes:**
+```sql
+-- News published_at (for sorting latest)
+CREATE INDEX idx_news_published_at ON news (published_at DESC);
+
+-- Importance + credibility (for filtering)
+CREATE INDEX idx_news_quality ON news (importance DESC, credibility DESC);
+
+-- Source (for filtering by source)
+CREATE INDEX idx_news_source ON news (source);
+
+-- Full-text search
+CREATE INDEX idx_news_search ON news USING gin(to_tsvector('english', title || ' ' || content));
+```
+
+**Check Index Usage:**
+```sql
+EXPLAIN ANALYZE 
+SELECT * FROM news 
+WHERE importance >= 0.6 
+  AND credibility >= 0.7 
+ORDER BY published_at DESC 
+LIMIT 100;
+```
+
+---
+
+### 2. Batch Processing
+
+**Process in Chunks:**
+```python
+BATCH_SIZE = 100
+
+def process_large_dataset(all_records: list):
+    """Process large dataset in batches."""
+    
+    total = len(all_records)
+    
+    for i in range(0, total, BATCH_SIZE):
+        batch = all_records[i:i + BATCH_SIZE]
+        
+        logger.info(json.dumps({
+            "event": "batch_process",
+            "batch_num": i // BATCH_SIZE + 1,
+            "batch_size": len(batch),
+            "progress": f"{i}/{total}"
+        }))
+        
+        process_batch(batch)
+        
+        # Avoid overwhelming database
+        time.sleep(0.5)
+```
+
+---
+
+### 3. Pagination (Supabase 1k Limit)
+
+**Handle Supabase Pagination:**
+```python
+def fetch_all_news(limit=None):
+    """Fetch all news with pagination."""
+    
+    all_news = []
+    page = 0
+    page_size = 1000  # Supabase limit
+    
+    while True:
+        offset = page * page_size
+        
+        response = supabase.table('news')\
+            .select('*')\
+            .order('published_at', desc=True)\
+            .range(offset, offset + page_size - 1)\
+            .execute()
+        
+        if not response.data:
+            break
+        
+        all_news.extend(response.data)
+        page += 1
+        
+        logger.info(json.dumps({
+            "event": "fetch_page",
+            "page": page,
+            "fetched": len(response.data),
+            "total": len(all_news)
+        }))
+        
+        # Break if limit reached
+        if limit and len(all_news) >= limit:
+            break
+    
+    return all_news[:limit] if limit else all_news
+```
+
+---
+
+## 💾 Caching
+
+### Location: `ai_modules/cache.py`
+
+**Cache AI Responses:**
+```python
+from ai_modules.cache import Cache
+
+cache = Cache(ttl=3600)  # 1 hour
+
+def score_with_cache(news: dict) -> dict:
+    """Score news with caching."""
+    
+    # Create cache key from news content
+    cache_key = f"importance:{hash(news['title'] + news['url'])}"
+    
+    # Check cache first
+    cached = cache.get(cache_key)
+    if cached:
+        logger.info(json.dumps({
+            "event": "cache_hit",
+            "key": cache_key
+        }))
+        return cached
+    
+    # Cache miss - call AI
+    result = score_with_openai(news)
+    
+    # Store in cache
+    cache.set(cache_key, result)
+    
+    return result
+```
+
+**What to Cache:**
+- ✅ AI importance scores (by URL)
+- ✅ AI credibility scores
+- ✅ News summaries
+- ✅ Digest data (5-10 min TTL)
+
+**What NOT to Cache:**
+- ❌ Real-time data
+- ❌ User-specific data
+- ❌ Frequently changing data
+
+---
+
+## 🚦 Rate Limiting
+
+### OpenAI Rate Limits:
+
+**Free Tier:**
+- 3 requests/minute
+- 200 requests/day
+
+**Paid Tier:**
+- 3,500 requests/minute
+- 10,000 requests/day
+
+**Implementation:**
+```python
+import time
+from collections import deque
+
+class RateLimiter:
+    def __init__(self, max_requests: int, time_window: int):
+        self.max_requests = max_requests
+        self.time_window = time_window
+        self.requests = deque()
+    
+    def wait_if_needed(self):
+        """Wait if rate limit reached."""
+        now = time.time()
+        
+        # Remove old requests outside time window
+        while self.requests and self.requests[0] < now - self.time_window:
+            self.requests.popleft()
+        
+        # Check if limit reached
+        if len(self.requests) >= self.max_requests:
+            wait_time = self.time_window - (now - self.requests[0])
+            
+            logger.warning(json.dumps({
+                "event": "rate_limit_wait",
+                "wait_seconds": wait_time
+            }))
+            
+            time.sleep(wait_time)
+        
+        # Record this request
+        self.requests.append(now)
+
+# Usage
+rate_limiter = RateLimiter(max_requests=3000, time_window=60)
+
+def call_openai():
+    rate_limiter.wait_if_needed()
+    return client.chat.completions.create(...)
+```
+
+---
+
+## 📊 Performance Monitoring
+
+### Track Slow Operations:
+
+```python
+import time
+from functools import wraps
+
+def track_performance(threshold_ms=1000):
+    """Decorator to track function performance."""
+    
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            start = time.time()
+            result = func(*args, **kwargs)
+            duration_ms = (time.time() - start) * 1000
+            
+            if duration_ms > threshold_ms:
+                logger.warning(json.dumps({
+                    "event": "slow_operation",
+                    "function": func.__name__,
+                    "duration_ms": duration_ms,
+                    "threshold_ms": threshold_ms
+                }))
+            
+            return result
+        return wrapper
+    return decorator
+
+# Usage
+@track_performance(threshold_ms=5000)
+def fetch_and_process_news():
+    # ... expensive operation
+    pass
+```
+
+---
+
+## 🎯 Performance Checklist
+
+Before deploying code:
+
+### AI Optimization:
+- [ ] Use local ML predictor when possible
+- [ ] Implement prefiltering
+- [ ] Set quality gate thresholds
+- [ ] Add caching for repeated queries
+- [ ] Respect rate limits
+
+### Database:
+- [ ] Add indexes for frequent queries
+- [ ] Use batch processing (100-1000 records)
+- [ ] Implement pagination for large datasets
+- [ ] Optimize JOIN queries
+- [ ] Use SELECT only needed columns
+
+### General:
+- [ ] Profile slow operations (>1s)
+- [ ] Add performance logging
+- [ ] Test with production data size
+- [ ] Monitor memory usage
+- [ ] Check for N+1 queries
+
+---
+
+## 🎯 When AI Uses These Rules
+
+### Performance Optimization:
+```
+1. Check current bottlenecks (logs, profiling)
+2. Apply relevant optimization from this guide
+3. Measure improvement
+4. Log performance metrics
+```
+
+### Reducing API Costs:
+```
+1. Enable local ML predictor
+2. Add prefiltering
+3. Implement quality gates
+4. Add caching
+5. Monitor token usage
+```
+
+### Fixing Slow Queries:
+```
+1. Use EXPLAIN ANALYZE
+2. Add missing indexes
+3. Implement batch processing
+4. Add pagination
+5. Optimize SELECT queries
+```
+
+---
+
+## 📖 References
+
+- Local predictor: `ai_modules/local_predictor.py`
+- Cache: `ai_modules/cache.py`
+- Prefilter: `ai_modules/prefilter.py`
+- Config: `config/data/ai_optimization.yaml`
+- Models: `models/` directory
+
+---
+
+**Priority:** MEDIUM  
+**Impact:** Cost & speed  
+**Version:** 1.0

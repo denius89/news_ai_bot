@@ -1,0 +1,462 @@
+---
+title: Background Jobs
+tags: [background, async, cron]
+priority: MEDIUM
+---
+
+# ⚙️ Background Jobs Rules
+
+## 📍 Background Jobs Location
+
+**All background jobs in:** `tools/` directory
+
+### Job Structure:
+```
+tools/
+├── news/
+│   ├── fetch_and_train.py    # Main news fetching + ML training
+│   ├── README.md
+│   └── ...
+├── digests/
+│   └── generate_digest.py
+└── maintenance/
+    └── cleanup_old_data.py
+```
+
+### Scripts:
+```
+scripts/
+├── auto_fetch_and_train.sh   # Cron job wrapper
+└── ...
+```
+
+---
+
+## 🎯 Background Job Pattern
+
+### Template for New Job:
+
+```python
+#!/usr/bin/env python3
+"""
+Background Job: [Job Name]
+Purpose: [What it does]
+Schedule: [How often]
+"""
+
+import sys
+import os
+import logging
+import json
+from datetime import datetime
+from pathlib import Path
+
+# Add project to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from config.core.settings import SUPABASE_URL
+from database.service import DatabaseService
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('logs/background_jobs.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def main():
+    """Main job function."""
+    job_name = "job_name"
+    start_time = datetime.utcnow()
+    
+    logger.info(json.dumps({
+        "event": "job_start",
+        "job": job_name,
+        "start_time": start_time.isoformat()
+    }))
+    
+    try:
+        # Job logic here
+        records_processed = process_data()
+        
+        end_time = datetime.utcnow()
+        duration = (end_time - start_time).total_seconds()
+        
+        logger.info(json.dumps({
+            "event": "job_complete",
+            "job": job_name,
+            "duration_sec": duration,
+            "records_processed": records_processed,
+            "success": True
+        }))
+        
+        return 0
+        
+    except Exception as e:
+        logger.error(json.dumps({
+            "event": "job_failed",
+            "job": job_name,
+            "error": str(e),
+            "duration_sec": (datetime.utcnow() - start_time).total_seconds()
+        }))
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+---
+
+## 📰 News Fetching Job
+
+### Location: `tools/news/fetch_and_train.py`
+
+**What it does:**
+1. Fetches news from 255 RSS sources
+2. Scores importance/credibility
+3. Saves to Supabase
+4. Trains ML models
+
+**Schedule:** Every 2 hours (via cron)
+
+**Best Practices:**
+
+```python
+# Process in batches
+BATCH_SIZE = 100
+
+for i in range(0, len(all_news), BATCH_SIZE):
+    batch = all_news[i:i + BATCH_SIZE]
+    
+    logger.info(json.dumps({
+        "event": "processing_batch",
+        "batch_num": i // BATCH_SIZE + 1,
+        "batch_size": len(batch)
+    }))
+    
+    process_batch(batch)
+    
+    # Avoid overwhelming API
+    time.sleep(1)
+
+# Log summary
+logger.info(json.dumps({
+    "event": "fetch_complete",
+    "total_fetched": len(all_news),
+    "saved": saved_count,
+    "duplicates": duplicate_count,
+    "errors": error_count
+}))
+```
+
+---
+
+## 🤖 ML Model Training
+
+### Location: `tools/news/fetch_and_train.py`
+
+**Training Large Datasets:**
+
+```python
+def train_models_safe(max_records=25000):
+    """Train ML models with memory management."""
+    
+    logger.info(json.dumps({
+        "event": "training_start",
+        "max_records": max_records
+    }))
+    
+    try:
+        # Fetch data in chunks to avoid memory issues
+        data = fetch_training_data(limit=max_records)
+        
+        logger.info(json.dumps({
+            "event": "data_fetched",
+            "records": len(data),
+            "memory_mb": get_memory_usage()
+        }))
+        
+        # Train importance model
+        importance_model = train_importance_model(data)
+        
+        # Train credibility model
+        credibility_model = train_credibility_model(data)
+        
+        # Save models
+        save_models(importance_model, credibility_model)
+        
+        logger.info(json.dumps({
+            "event": "training_complete",
+            "importance_f1": importance_model.f1_score,
+            "credibility_f1": credibility_model.f1_score,
+            "memory_mb": get_memory_usage()
+        }))
+        
+    except MemoryError:
+        logger.error(json.dumps({
+            "event": "training_memory_error",
+            "records": max_records,
+            "action": "Reduce max_records"
+        }))
+        # Retry with fewer records
+        train_models_safe(max_records // 2)
+```
+
+---
+
+## 📅 Cron Job Pattern
+
+### Script: `scripts/auto_fetch_and_train.sh`
+
+```bash
+#!/bin/bash
+# Cron job wrapper for news fetching
+
+set -e
+
+PROJECT_DIR="/Users/denisfedko/news_ai_bot"
+LOG_DIR="$PROJECT_DIR/logs"
+
+cd "$PROJECT_DIR"
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Load environment
+export $(cat .env | grep -v '^#' | xargs)
+
+# Run job with logging
+python3 tools/news/fetch_and_train.py >> "$LOG_DIR/cron_fetch.log" 2>&1
+
+# Log completion
+echo "$(date): Fetch and train completed" >> "$LOG_DIR/cron_fetch.log"
+```
+
+### Crontab Entry:
+
+```cron
+# Fetch news every 2 hours
+0 */2 * * * /Users/denisfedko/news_ai_bot/scripts/auto_fetch_and_train.sh
+
+# Train ML models daily at 3 AM
+0 3 * * * /Users/denisfedko/news_ai_bot/scripts/train_models.sh
+
+# Cleanup old data weekly
+0 0 * * 0 /Users/denisfedko/news_ai_bot/scripts/cleanup_old_data.sh
+```
+
+---
+
+## 🔧 Job Monitoring
+
+### Log Job Metrics:
+
+```python
+# At start of job
+job_metrics = {
+    "job": "fetch_news",
+    "start_time": datetime.utcnow().isoformat(),
+    "hostname": socket.gethostname(),
+    "pid": os.getpid()
+}
+
+logger.info(json.dumps({"event": "job_start", **job_metrics}))
+
+# During job
+logger.info(json.dumps({
+    "event": "job_progress",
+    "job": "fetch_news",
+    "progress": f"{processed}/{total}",
+    "percent": (processed / total) * 100
+}))
+
+# At end
+job_metrics.update({
+    "end_time": datetime.utcnow().isoformat(),
+    "duration_sec": duration,
+    "records_processed": processed,
+    "success": True
+})
+
+logger.info(json.dumps({"event": "job_complete", **job_metrics}))
+```
+
+---
+
+## ⚠️ Handling Job Failures
+
+### Don't Block Other Jobs:
+
+```python
+def run_multiple_jobs():
+    """Run multiple jobs independently."""
+    
+    jobs = [
+        ("fetch_news", fetch_news),
+        ("generate_digests", generate_digests),
+        ("train_models", train_models)
+    ]
+    
+    results = []
+    
+    for job_name, job_func in jobs:
+        try:
+            logger.info(f"Starting job: {job_name}")
+            result = job_func()
+            results.append((job_name, "success", result))
+            
+        except Exception as e:
+            logger.error(json.dumps({
+                "event": "job_error",
+                "job": job_name,
+                "error": str(e)
+            }))
+            results.append((job_name, "failed", None))
+            # Continue with next job
+    
+    # Log summary
+    success_count = sum(1 for _, status, _ in results if status == "success")
+    logger.info(json.dumps({
+        "event": "jobs_summary",
+        "total": len(jobs),
+        "success": success_count,
+        "failed": len(jobs) - success_count
+    }))
+    
+    return results
+```
+
+---
+
+## 💾 Resource Management
+
+### Memory Limits:
+
+```python
+import psutil
+
+def check_memory_usage():
+    """Check if enough memory available."""
+    
+    memory = psutil.virtual_memory()
+    
+    logger.info(json.dumps({
+        "event": "memory_check",
+        "available_gb": memory.available / (1024**3),
+        "percent_used": memory.percent
+    }))
+    
+    # Warn if memory usage > 80%
+    if memory.percent > 80:
+        logger.warning(json.dumps({
+            "event": "high_memory_usage",
+            "percent": memory.percent,
+            "action": "Consider reducing batch size"
+        }))
+        return False
+    
+    return True
+
+# Before intensive operation
+if not check_memory_usage():
+    logger.warning("Low memory, reducing batch size")
+    batch_size = batch_size // 2
+```
+
+### Disk Space:
+
+```python
+def check_disk_space(path="/"):
+    """Check available disk space."""
+    
+    disk = psutil.disk_usage(path)
+    
+    if disk.percent > 90:
+        logger.error(json.dumps({
+            "event": "low_disk_space",
+            "percent_used": disk.percent,
+            "free_gb": disk.free / (1024**3)
+        }))
+        return False
+    
+    return True
+```
+
+---
+
+## 🚫 NEVER in Background Jobs
+
+1. **Don't use interactive input** - Jobs must run unattended
+2. **Don't rely on current directory** - Use absolute paths
+3. **Don't hardcode paths** - Use config or environment variables
+4. **Don't ignore errors silently** - Always log failures
+5. **Don't run indefinitely** - Set timeouts
+6. **Don't modify .env** - Read-only access
+
+---
+
+## ✅ Background Job Checklist
+
+Before deploying new background job:
+
+- [ ] Logging: start, progress, end, errors
+- [ ] Error handling: try/except with logging
+- [ ] Timeout: max execution time
+- [ ] Resource checks: memory, disk space
+- [ ] Batch processing: for large datasets
+- [ ] Idempotent: safe to run multiple times
+- [ ] Monitoring: metrics logged
+- [ ] Documentation: what, when, why
+- [ ] Tested: with sample data
+- [ ] Cron entry: added to crontab
+
+---
+
+## 🎯 When AI Uses These Rules
+
+### Creating New Background Task:
+```
+1. Use template from this guide
+2. Add to tools/ directory
+3. Add logging (start/end/errors)
+4. Handle failures gracefully
+5. Create cron wrapper script
+6. Document in tools/README.md
+```
+
+### Optimizing Existing Job:
+```
+1. Check logs for bottlenecks
+2. Add batch processing if needed
+3. Add memory/disk checks
+4. Optimize database queries
+5. Add progress logging
+```
+
+### Debugging Failed Job:
+```
+1. Check logs/background_jobs.log
+2. Look for error messages
+3. Check resource usage (memory/disk)
+4. Verify .env variables loaded
+5. Test job manually
+```
+
+---
+
+## 📖 References
+
+- News fetching: `tools/news/fetch_and_train.py`
+- Cron scripts: `scripts/auto_fetch_and_train.sh`
+- Config: `config/data/ai_optimization.yaml`
+- Logging: `90-logging-monitoring.mdc`
+
+---
+
+**Priority:** MEDIUM  
+**Impact:** Data freshness & ML accuracy  
+**Version:** 1.0

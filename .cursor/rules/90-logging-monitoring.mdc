@@ -1,0 +1,281 @@
+---
+title: Logging & Monitoring
+tags: [logging, monitoring, production]
+priority: HIGH
+---
+
+# 📊 Logging & Monitoring Rules
+
+## 🎯 Structured Logging
+
+**PulseAI uses JSON logging** for structured log analysis.
+
+### Log Format:
+
+```python
+import logging
+import json
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+# Structured log entry
+log_entry = {
+    "timestamp": datetime.utcnow().isoformat(),
+    "level": "INFO",
+    "request_id": request_id,  # For tracing
+    "event": "ai_request",
+    "module": "digests.ai_service",
+    "data": {
+        "model": "gpt-4o-mini",
+        "tokens": 450,
+        "latency_ms": 1200,
+        "success": True
+    }
+}
+
+logger.info(json.dumps(log_entry))
+```
+
+---
+
+## 📋 Log Levels
+
+### INFO - Normal Operations:
+- News fetched: count, sources
+- Digest generated: news count, time
+- AI request: model, tokens, latency
+- Background job: start/end, records processed
+- User action: digest viewed, filter applied
+
+### WARNING - Potential Issues:
+- AI response slow (>5s)
+- Low quality score (importance < 0.6)
+- API rate limit approaching
+- ML model not loaded (fallback to API)
+- Database query slow (>1s)
+
+### ERROR - Failures:
+- OpenAI API error
+- Database connection failed
+- Background job crashed
+- Invalid data format
+- Authentication failed
+
+### CRITICAL - System Down:
+- Service cannot start
+- Database unreachable
+- All AI requests failing
+
+---
+
+## 🎯 What to Log
+
+### AI API Calls:
+```python
+logger.info(json.dumps({
+    "event": "openai_request",
+    "model": "gpt-4o-mini",
+    "prompt_type": "importance_scoring",
+    "tokens_used": 450,
+    "latency_ms": 1200,
+    "success": True,
+    "news_id": news_id
+}))
+```
+
+### Background Jobs:
+```python
+logger.info(json.dumps({
+    "event": "background_job",
+    "job_name": "fetch_and_train",
+    "start_time": start_time,
+    "end_time": end_time,
+    "duration_sec": duration,
+    "records_processed": 4500,
+    "success": True
+}))
+```
+
+### User Actions:
+```python
+logger.info(json.dumps({
+    "event": "user_action",
+    "user_id": user_id,
+    "action": "view_digest",
+    "digest_id": digest_id,
+    "timestamp": datetime.utcnow().isoformat()
+}))
+```
+
+### Performance Metrics:
+```python
+logger.info(json.dumps({
+    "event": "performance",
+    "endpoint": "/api/digest/latest",
+    "method": "GET",
+    "duration_ms": 850,
+    "status_code": 200,
+    "request_id": request_id
+}))
+```
+
+---
+
+## 🚫 What NOT to Log
+
+### NEVER Log:
+1. **API Keys** - `OPENAI_API_KEY`, `TELEGRAM_BOT_TOKEN`
+2. **Full tokens** - Only log masked versions
+3. **PII** - User emails, phone numbers
+4. **Full request bodies** - Only relevant fields
+5. **Passwords** - Even hashed ones
+6. **Database credentials**
+7. **Full error tracebacks in production** - Log to separate error file
+
+### Example - Bad:
+```python
+# ❌ BAD - Exposes API key
+logger.info(f"API Key: {os.getenv('OPENAI_API_KEY')}")
+
+# ❌ BAD - Exposes PII
+logger.info(f"User email: {user.email}")
+```
+
+### Example - Good:
+```python
+# ✅ GOOD - Masked key
+api_key = os.getenv('OPENAI_API_KEY')
+logger.info(f"API Key: {api_key[:10]}***")
+
+# ✅ GOOD - User ID only
+logger.info(f"User ID: {user.id}")
+```
+
+---
+
+## 📂 Log Locations
+
+### Application Logs:
+- **Main app:** `logs/app.log`
+- **Reactor:** `logs/reactor.log`
+- **Background jobs:** stdout redirected to `logs/`
+
+### Log Rotation:
+- Daily rotation
+- Keep last 30 days
+- Compress old logs
+
+---
+
+## 🔍 Request ID Tracking
+
+Use request_id for tracing requests across services:
+
+```python
+import uuid
+
+def process_request():
+    request_id = str(uuid.uuid4())
+    
+    logger.info(json.dumps({
+        "request_id": request_id,
+        "event": "request_start",
+        "endpoint": "/api/digest"
+    }))
+    
+    # Pass request_id to all functions
+    result = fetch_news(request_id=request_id)
+    
+    logger.info(json.dumps({
+        "request_id": request_id,
+        "event": "request_end",
+        "duration_ms": duration
+    }))
+```
+
+---
+
+## 📊 Monitoring AI Performance
+
+### Track These Metrics:
+
+1. **Token Usage:**
+   - Total tokens per day
+   - Cost estimation
+   - Savings from local predictor
+
+2. **Latency:**
+   - Average AI request time
+   - P50, P95, P99 percentiles
+   - Slow requests (>5s)
+
+3. **Success Rate:**
+   - Successful AI requests / Total
+   - Error types distribution
+   - Retry success rate
+
+4. **Quality Metrics:**
+   - Average importance score
+   - Average credibility score
+   - News filtered out percentage
+
+### Example Monitoring:
+```python
+# Log AI metrics every 100 requests
+if request_count % 100 == 0:
+    logger.info(json.dumps({
+        "event": "ai_metrics_summary",
+        "requests_count": 100,
+        "avg_latency_ms": avg_latency,
+        "total_tokens": total_tokens,
+        "success_rate": success_rate,
+        "avg_importance": avg_importance,
+        "period_minutes": 10
+    }))
+```
+
+---
+
+## 🎯 When AI Uses These Rules
+
+### Adding Logging:
+```
+When adding new feature, include structured logging:
+
+logger.info(json.dumps({
+    "event": "feature_name",
+    "request_id": request_id,
+    "key_data": value,
+    "success": True
+}))
+```
+
+### Debugging Production:
+```
+Check logs/app.log for structured entries:
+grep "error" logs/app.log | jq .
+
+Filter by request_id:
+grep "request_id_value" logs/app.log | jq .
+```
+
+### Performance Analysis:
+```
+Track slow operations:
+grep "latency_ms" logs/app.log | jq 'select(.latency_ms > 5000)'
+```
+
+---
+
+## 📖 References
+
+- Logging config: `config/core/settings.py`
+- Log files: `logs/`
+- JSON parsing: Use `jq` for analysis
+
+---
+
+**Priority:** HIGH  
+**Impact:** Production debugging & monitoring  
+**Version:** 1.0
