@@ -1,5 +1,6 @@
 import os
 import pytest
+from unittest.mock import Mock, patch
 
 from digests.ai_summary import (
     generate_summary_why_important_json,
@@ -97,7 +98,7 @@ def test_generate_summary_why_important_json_structure():
     }
 
     # Мокаем вызов OpenAI, чтобы тест работал без API ключа
-    with pytest.Mock() as mock_openai:
+    with patch("digests.ai_summary.openai_client") as mock_openai:
         mock_openai.return_value = {
             "choices": [
                 {
@@ -113,7 +114,7 @@ def test_generate_summary_why_important_json_structure():
         }
 
         # Используем patch для мокирования
-        with pytest.patch("digests.ai_summary.openai_client") as mock_client:
+        with patch("digests.ai_summary.openai_client") as mock_client:
             mock_client.chat.completions.create.return_value = mock_openai.return_value
 
             result = generate_summary_why_important_json(item, max_tokens=120)
@@ -134,7 +135,7 @@ def test_generate_summary_why_important_fallback():
     }
 
     # Мокаем ошибку OpenAI для тестирования fallback
-    with pytest.patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.openai_client") as mock_client:
         mock_client.chat.completions.create.side_effect = Exception("API Error")
 
         result = generate_summary_why_important(item, max_tokens=120)
@@ -155,7 +156,7 @@ def test_generate_summary_why_important_json_with_keys():
     expected_keys = {"title", "why_important"}
 
     # Мокаем успешный ответ OpenAI
-    with pytest.patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.openai_client") as mock_client:
         mock_response = {
             "choices": [
                 {
@@ -195,7 +196,7 @@ def test_generate_batch_summary_structure():
     ]
 
     # Мокаем успешный ответ
-    with pytest.patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.openai_client") as mock_client:
         mock_response = {
             "choices": [
                 {
@@ -222,7 +223,7 @@ def test_generate_summary_with_empty_data():
     """Unit test: обработка пустых данных"""
     empty_data = []
 
-    with pytest.patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.openai_client") as mock_client:
         mock_client.chat.completions.create.side_effect = Exception("Empty data error")
 
         # Должен вернуть fallback даже для пустых данных
