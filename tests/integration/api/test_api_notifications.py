@@ -19,7 +19,7 @@ def client():
 @pytest.fixture
 def mock_auth():
     """Mock authentication for tests."""
-    with patch("utils.auth.telegram_auth.verify_telegram_auth") as mock_auth:
+    with patch("src.webapp.verify_telegram_auth") as mock_auth:
         mock_auth.return_value = {"user_id": 123456789, "authenticated": True}
         yield mock_auth
 
