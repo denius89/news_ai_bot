@@ -62,11 +62,20 @@ def build_style_keyboard(category: str, period: str) -> types.InlineKeyboardMark
 
 async def show_digest_ai_menu(target: types.Message | types.CallbackQuery):
     kb = build_category_keyboard()
-    text = "📌 Выберите категорию для AI-дайджеста:"
+    text = (
+        "🤖 <b>AI-дайджест</b>\n\n"
+        "Персональный дайджест, созданный специально для вас!\n\n"
+        "✨ <b>Что внутри:</b>\n"
+        "• Анализ 255 источников новостей\n"
+        "• ML-фильтрация по важности и достоверности\n"
+        "• 4 профессиональных стиля на выбор\n"
+        "• Адаптация под ваши интересы\n\n"
+        "📌 <b>Выберите категорию:</b>"
+    )
     if isinstance(target, types.Message):
-        await target.answer(text, reply_markup=kb)
+        await target.answer(text, parse_mode="HTML", reply_markup=kb)
     else:
-        await target.message.edit_text(text, reply_markup=kb)
+        await target.message.edit_text(text, parse_mode="HTML", reply_markup=kb)
         await target.answer()
 
 
@@ -90,7 +99,16 @@ async def cb_digest_ai_menu_back(query: types.CallbackQuery):
 async def cb_digest_ai_category(query: types.CallbackQuery):
     raw_category = query.data.split(":", 1)[1]
     kb = build_period_keyboard(raw_category)
-    await query.message.edit_text("📌 Категория выбрана. Теперь укажите период:", reply_markup=kb)
+
+    category_display = "Все категории" if raw_category == "all" else raw_category.title()
+    text = (
+        f"📚 <b>AI-дайджест: {category_display}</b>\n\n"
+        "⏱️ <b>Выберите период:</b>\n"
+        "• <i>Сегодня</i> — новости за последние 24 часа\n"
+        "• <i>За неделю</i> — главное за 7 дней\n"
+        "• <i>За месяц</i> — ключевые события месяца"
+    )
+    await query.message.edit_text(text, parse_mode="HTML", reply_markup=kb)
     await query.answer()
 
 
@@ -261,8 +279,25 @@ async def cb_digest_ai_period(query: types.CallbackQuery):
 
             # Показываем выбор стиля
             kb = build_style_keyboard(category, period)
+
+            category_display = "Все категории" if category == "all" else category.title()
+            period_display = PERIODS.get(period, period)
+
+            text = (
+                f"📚 <b>AI-дайджест: {category_display}</b>\n"
+                f"⏱️ Период: <i>{period_display}</i>\n\n"
+                "✍️ <b>Выберите стиль подачи:</b>\n\n"
+                "📰 <b>Newsroom</b> — как Reuters/Bloomberg\n"
+                "   Факты, цифры, без эмоций. Для быстрого чтения.\n\n"
+                "🔍 <b>Analytical</b> — глубокий анализ\n"
+                "   Причинно-следственные связи, контекст, инсайты.\n\n"
+                "📖 <b>Magazine</b> — storytelling\n"
+                "   Захватывающая подача, метафоры, вовлечение.\n\n"
+                "💬 <b>Casual</b> — разговорный стиль\n"
+                "   Простым языком, как разговор с другом."
+            )
             await query.message.edit_text(
-                f"📚 <b>AI-дайджест: {category.title()}</b>\n\n" f"Период: {period}\n" "Выберите стиль дайджеста:",
+                text,
                 parse_mode="HTML",
                 reply_markup=kb,
             )
