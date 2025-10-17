@@ -59,37 +59,34 @@ class TestEventsFlow:
             mock_parser = Mock()
             mock_parser.providers = {"test_provider": mock_provider}
             # Use AsyncMock for async method
-            mock_parser.fetch_events = AsyncMock(
-                return_value=[
-                    Mock(
-                        title="High Importance Event",
-                        category="crypto",
-                        subcategory="crypto",
-                        starts_at=datetime.now(timezone.utc) + timedelta(days=1),
-                        importance=0.8,
-                        importance_score=0.8,
-                        description="Important crypto event",
-                        source="test_provider",
-                        __dict__={"importance_score": 0.8},
-                    ),
-                    Mock(
-                        title="Low Importance Event",
-                        category="crypto",
-                        subcategory="general",
-                        starts_at=datetime.now(timezone.utc) + timedelta(days=1),
-                        importance=0.4,
-                        importance_score=0.4,
-                        description="Less important event",
-                        source="test_provider",
-                        __dict__={"importance_score": 0.4},
-                    ),
-                ]
-            )
+            high_importance_event = Mock()
+            high_importance_event.title = "High Importance Event"
+            high_importance_event.category = "crypto"
+            high_importance_event.subcategory = "crypto"
+            high_importance_event.starts_at = datetime.now(timezone.utc) + timedelta(days=1)
+            high_importance_event.importance = 0.8
+            high_importance_event.importance_score = 0.8
+            high_importance_event.description = "Important crypto event"
+            high_importance_event.source = "test_provider"
+
+            low_importance_event = Mock()
+            low_importance_event.title = "Low Importance Event"
+            low_importance_event.category = "crypto"
+            low_importance_event.subcategory = "general"
+            low_importance_event.starts_at = datetime.now(timezone.utc) + timedelta(days=1)
+            low_importance_event.importance = 0.4
+            low_importance_event.importance_score = 0.4
+            low_importance_event.description = "Less important event"
+            low_importance_event.source = "test_provider"
+
+            mock_parser.fetch_events = AsyncMock(return_value=[high_importance_event, low_importance_event])
             mock_get_parser.return_value = mock_parser
 
             # Mock ML evaluator to avoid loading model
-            with patch("tools.events.fetch_events.evaluator_v2") as mock_evaluator:
-                mock_evaluator.evaluate_importance = Mock(side_effect=lambda x: x.get("importance", 0.5))
+            with patch("ai_modules.importance_v2.evaluator_v2") as mock_evaluator:
+                mock_evaluator.evaluate_importance = Mock(
+                    side_effect=lambda x: x.get("importance", 0.8) if "High" in x.get("title", "") else 0.4
+                )
 
                 # Mock events service
                 with patch("database.events_service.EventsService") as mock_service_class:
@@ -124,20 +121,16 @@ class TestEventsFlow:
             mock_parser.fetch_events = AsyncMock(return_value=[])
             mock_get_parser.return_value = mock_parser
 
-            # Mock ML evaluator
-            with patch("tools.events.fetch_events.evaluator_v2") as mock_evaluator:
-                mock_evaluator.evaluate_importance = Mock(return_value=0.5)
+            # Import and test the function
+            from tools.events.fetch_events import fetch_and_store_events
 
-                # Import and test the function
-                from tools.events.fetch_events import fetch_and_store_events
+            result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=True)
 
-                result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=True)
-
-                # Verify results
-                assert result["success"] is True
-                assert result["events_fetched"] == 0
-                assert result["events_stored"] == 0
-                assert result["dry_run"] is True
+            # Verify results
+            assert result["success"] is True
+            assert result["events_fetched"] == 0
+            assert result["events_stored"] == 0
+            assert result["dry_run"] is True
 
     @pytest.mark.asyncio
     async def test_update_event_results_flow(self):
