@@ -10,6 +10,15 @@
 ## [Unreleased]
 
 ### Добавлено
+- **Автоматическое восстановление .env** (17 октября 2025)
+  - Добавлена система автовосстановления .env из Git Stash
+  - Интегрировано во все скрипты запуска (start_services.sh, start_bot.sh, START_ADMIN.sh)
+  - Создана документация AUTO_ENV_RESTORE.md
+  - Защита от случайного удаления конфигурации
+  - Не требует ручного вмешательства при запуске
+- **Обновление Cursor AI Rules** (17 октября 2025)
+  - Исправлен frontmatter для правильной работы alwaysApply: true
+  - Обновлены 6 правил: database, dependencies, logging, errors, background jobs, performance
 - **Масштабное расширение RSS-источников** (16 октября 2025)
   - **+72 топовых источника** из FeedSpot (топ-100 по каждой категории)
   - Итого: **255 источников в 70 субкатегориях** (было ~183)
@@ -45,6 +54,16 @@
 - Система кеширования API endpoints
 
 ### Исправлено
+- **Flake8 code quality** (17 октября 2025)
+  - Исправлены 9 критичных flake8 ошибок
+  - database/service.py: 2x bare except → Exception with logging
+  - demo_digest_operations.py: E402 import order + 3x f-string без placeholders
+  - routes/admin_routes.py: 1x f-string + 2x bare except
+  - Pre-push hooks теперь проходят успешно
+- **Обновлены TODO комментарии** (17 октября 2025)
+  - Все TODO привязаны к конкретным этапам MVP Launch плана
+  - Добавлены ссылки на Week 2 (Subscriptions) и Week 3 (Performance)
+  - 7 TODO обновлены с четким планом реализации
 - **Критический баг в self_tuning_trainer.py** - StandardScaler не сохранялся
   - ML-модели обучались, но scaler отсутствовал при загрузке
   - Локальный предиктор выдавал ошибку "StandardScaler not fitted"
