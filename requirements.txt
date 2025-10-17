@@ -60,6 +60,7 @@ websockets>=15.0.1
 Flask>=3.0.0,<4.0
 Werkzeug>=3.0.0,<4.0
 Flask-Caching>=2.3.0  # Advanced caching for Flask
+Flask-CORS>=4.0.0     # Cross-Origin Resource Sharing
 
 # PULSE-WS: FastAPI dependencies removed - using Flask only
 
