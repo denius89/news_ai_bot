@@ -20,7 +20,7 @@ def client():
 def mock_auth():
     """Mock authentication for tests."""
     with patch("src.webapp.verify_telegram_auth") as mock_auth:
-        mock_auth.return_value = {"user_id": 123456789, "authenticated": True}
+        mock_auth.return_value = {"success": True, "user_id": 123456789, "message": "Authenticated"}
         yield mock_auth
 
 
