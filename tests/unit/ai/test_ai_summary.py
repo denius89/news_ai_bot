@@ -98,32 +98,26 @@ def test_generate_summary_why_important_json_structure():
     }
 
     # Мокаем вызов OpenAI, чтобы тест работал без API ключа
-    with patch("digests.ai_summary.openai_client") as mock_openai:
-        mock_openai.return_value = {
-            "choices": [
-                {
-                    "message": {
-                        "content": (
-                            '{"title": "Тестовая новость", '
-                            '"why_important": ["Важно для тестирования", '
-                            '"Проверяет структуру"]}'
-                        )
-                    }
-                }
-            ]
-        }
+    with patch("digests.ai_summary.get_client") as mock_get_client:
+        mock_client = Mock()
+        mock_response = Mock()
+        mock_response.choices = [
+            Mock(
+                message=Mock(
+                    content='{"title": "Тестовая новость", "why_important": ["Важно для тестирования", "Проверяет структуру"]}'
+                )
+            )
+        ]
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_get_client.return_value = mock_client
 
-        # Используем patch для мокирования
-        with patch("digests.ai_summary.openai_client") as mock_client:
-            mock_client.chat.completions.create.return_value = mock_openai.return_value
+        result = generate_summary_why_important_json(item, max_tokens=120)
 
-            result = generate_summary_why_important_json(item, max_tokens=120)
-
-            assert isinstance(result, dict)
-            assert "title" in result
-            assert "why_important" in result
-            assert isinstance(result["why_important"], list)
-            assert len(result["why_important"]) > 0
+        assert isinstance(result, dict)
+        assert "title" in result
+        assert "why_important" in result
+        assert isinstance(result["why_important"], list)
+        assert len(result["why_important"]) > 0
 
 
 def test_generate_summary_why_important_fallback():
@@ -135,8 +129,10 @@ def test_generate_summary_why_important_fallback():
     }
 
     # Мокаем ошибку OpenAI для тестирования fallback
-    with patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.get_client") as mock_get_client:
+        mock_client = Mock()
         mock_client.chat.completions.create.side_effect = Exception("API Error")
+        mock_get_client.return_value = mock_client
 
         result = generate_summary_why_important(item, max_tokens=120)
 
@@ -156,20 +152,18 @@ def test_generate_summary_why_important_json_with_keys():
     expected_keys = {"title", "why_important"}
 
     # Мокаем успешный ответ OpenAI
-    with patch("digests.ai_summary.openai_client") as mock_client:
-        mock_response = {
-            "choices": [
-                {
-                    "message": {
-                        "content": (
-                            '{"title": "Bitcoin Price Surge", '
-                            '"why_important": ["Market impact", "Investment implications"]}'
-                        )
-                    }
-                }
-            ]
-        }
+    with patch("digests.ai_summary.get_client") as mock_get_client:
+        mock_client = Mock()
+        mock_response = Mock()
+        mock_response.choices = [
+            Mock(
+                message=Mock(
+                    content='{"title": "Bitcoin Price Surge", "why_important": ["Market impact", "Investment implications"]}'
+                )
+            )
+        ]
         mock_client.chat.completions.create.return_value = mock_response
+        mock_get_client.return_value = mock_client
 
         result = generate_summary_why_important_json(item, max_tokens=120)
 
@@ -196,20 +190,18 @@ def test_generate_batch_summary_structure():
     ]
 
     # Мокаем успешный ответ
-    with patch("digests.ai_summary.openai_client") as mock_client:
-        mock_response = {
-            "choices": [
-                {
-                    "message": {
-                        "content": (
-                            "📰 Дайджест новостей:\n\n1. News 1\n2. News 2\n\n"
-                            "<b>Почему это важно:</b>\n1. Важно для рынка\n2. Влияет на инвестиции"
-                        )
-                    }
-                }
-            ]
-        }
+    with patch("digests.ai_summary.get_client") as mock_get_client:
+        mock_client = Mock()
+        mock_response = Mock()
+        mock_response.choices = [
+            Mock(
+                message=Mock(
+                    content="📰 Дайджест новостей:\n\n1. News 1\n2. News 2\n\n<b>Почему это важно:</b>\n1. Важно для рынка\n2. Влияет на инвестиции"
+                )
+            )
+        ]
         mock_client.chat.completions.create.return_value = mock_response
+        mock_get_client.return_value = mock_client
 
         result = generate_batch_summary(data, max_tokens=300, style="analytical")
 
@@ -223,8 +215,10 @@ def test_generate_summary_with_empty_data():
     """Unit test: обработка пустых данных"""
     empty_data = []
 
-    with patch("digests.ai_summary.openai_client") as mock_client:
+    with patch("digests.ai_summary.get_client") as mock_get_client:
+        mock_client = Mock()
         mock_client.chat.completions.create.side_effect = Exception("Empty data error")
+        mock_get_client.return_value = mock_client
 
         # Должен вернуть fallback даже для пустых данных
         result = generate_batch_summary(empty_data, max_tokens=100)
