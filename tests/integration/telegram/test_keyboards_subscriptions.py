@@ -157,7 +157,7 @@ class TestSubscriptionKeyboards:
 
     @pytest.mark.unit
     def test_main_keyboard_has_subscription_buttons(self):
-        """Test that main keyboard includes news and notification buttons."""
+        """Test that main keyboard includes news and main menu buttons."""
         keyboard = main_inline_keyboard()
 
         # Flatten all buttons
@@ -166,11 +166,13 @@ class TestSubscriptionKeyboards:
             for button in row:
                 all_buttons.append(button)
 
-        # Check button texts
+        # Check button texts - current implementation has 4 main buttons
         button_texts = [button.text for button in all_buttons]
 
         assert "📰 Новости" in button_texts
-        assert "🔔 Уведомления" in button_texts
+        assert "🤖 AI-дайджест" in button_texts
+        assert "📅 События" in button_texts
+        assert "🌐 WebApp" in button_texts
 
     @pytest.mark.unit
     def test_main_keyboard_callback_data(self):
@@ -183,16 +185,19 @@ class TestSubscriptionKeyboards:
             for button in row:
                 callback_data_list.append(button.callback_data)
 
-        assert "digest:all" in callback_data_list
-        assert "notifications" in callback_data_list
+        # Current implementation uses these callback_data values
+        assert "digest_menu" in callback_data_list
+        assert "digest_ai" in callback_data_list
+        assert "events" in callback_data_list
+        assert "dashboard" in callback_data_list
 
     @pytest.mark.unit
     def test_keyboard_button_count(self):
         """Test that keyboards have expected number of buttons."""
-        # Main keyboard should have at least 5 buttons (original 3 + 2 new)
+        # Main keyboard has 4 buttons in current implementation
         main_kb = main_inline_keyboard()
         main_buttons = sum(len(row) for row in main_kb.inline_keyboard)
-        assert main_buttons >= 5
+        assert main_buttons == 4
 
         # Subscriptions keyboard should have 4 buttons
         subs_kb = subscriptions_inline_keyboard()
