@@ -6,9 +6,10 @@
 import sys
 import os
 
+# Path setup must be before imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from database.db_models import (
+from database.db_models import (  # noqa: E402
     supabase,
     archive_digest,
     unarchive_digest,
@@ -30,7 +31,7 @@ def show_digest_state(digest_id: str, label: str = ""):
         print(f"   archived: {d['archived']}")
         print(f"   deleted_at: {d['deleted_at']}")
     else:
-        print(f"   ❌ Дайджест не найден")
+        print("   ❌ Дайджест не найден")
 
 
 def demo_operations():
@@ -249,7 +250,7 @@ def demo_filters():
     archived_ids = set(d["id"] for d in archived)
     deleted_ids = set(d["id"] for d in deleted)
 
-    print(f"\n📊 Статистика:")
+    print("\n📊 Статистика:")
     print(f"   Активные: {len(active_ids)}")
     print(f"   Архивированные: {len(archived_ids)}")
     print(f"   Удаленные: {len(deleted_ids)}")
@@ -260,7 +261,7 @@ def demo_filters():
     active_deleted = active_ids & deleted_ids
     archived_deleted = archived_ids & deleted_ids
 
-    print(f"\n🔍 Пересечения:")
+    print("\n🔍 Пересечения:")
     print(
         f"   Активные ∩ Архивированные: {len(active_archived)} {'✅ OK' if len(active_archived) == 0 else '❌ ПРОБЛЕМА!'}"
     )

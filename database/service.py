@@ -163,8 +163,8 @@ class DatabaseService:
                         try:
                             sync_client = self._create_sync_client()
                             DatabaseService._sync_pool.put(sync_client)
-                        except:
-                            pass
+                        except Exception as e:
+                            logger.warning(f"Failed to create sync client for pool: {e}")
                     DatabaseService._pool_initialized = True
 
     def _get_from_pool(self) -> Optional[Client]:
@@ -178,7 +178,7 @@ class DatabaseService:
         """Вернуть клиент в pool"""
         try:
             DatabaseService._sync_pool.put_nowait(client)
-        except:
+        except Exception:
             pass  # Pool full, ignore
 
     def _init_sync_client(self):

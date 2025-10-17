@@ -860,7 +860,7 @@ def get_events_metrics():
         days = int(request.args.get("days", 7))
         upcoming_days = int(request.args.get("upcoming_days", 7))
 
-        logger.info(f"Getting events metrics...")
+        logger.info("Getting events metrics...")
         db = get_sync_service()
 
         now = datetime.now()
@@ -1306,8 +1306,8 @@ def get_system_health():
                             }
                     except (psutil.NoSuchProcess, psutil.AccessDenied):
                         continue
-            except:
-                pass
+            except Exception as e:
+                logger.warning(f"Error checking process by command: {e}")
             return {"status": "stopped", "pid": None, "uptime_seconds": 0}
 
         flask_status = check_process_by_command("src/webapp.py")
@@ -1321,8 +1321,8 @@ def get_system_health():
                     lines = f.readlines()[-10:]
                     if any("https://" in line for line in lines):
                         cloudflare_status = {"status": "running"}
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"Error reading cloudflare log: {e}")
 
         # 2. Resource Monitoring
         cpu_percent = psutil.cpu_percent(interval=0.1)
