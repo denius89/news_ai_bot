@@ -42,7 +42,8 @@ Notes:
     - Использует legacy db_models (нужна миграция на service.py)
     - Поддерживает фильтрацию по категориям
     - Интегрирован с unified_digest_service
-    - TODO: Добавить pagination для больших списков
+    - TODO (Week 2): Добавить pagination для больших списков
+    Запланировано после Subscriptions Integration
 
 Author: PulseAI Team
 Last Updated: October 2025

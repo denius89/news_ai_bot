@@ -78,7 +78,7 @@ Notes:
     - Поддерживает async context manager
     - Автоматически загружает конфигурацию источников
     - Логирует детальную информацию о процессе
-    - TODO: Добавить metrics и monitoring
+    - TODO (Future): Добавить metrics и monitoring (запланировано на Week 3)
 
 Author: PulseAI Team
 Last Updated: October 2025

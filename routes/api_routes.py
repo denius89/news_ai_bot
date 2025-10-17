@@ -7,7 +7,8 @@ Description:
     Flask Blueprint для основных API endpoints веб-приложения.
     Обрабатывает subscriptions, user management, categories, и webhooks.
 
-    ⚠️ TODO: Добавить authentication, rate limiting, input validation
+    ⚠️ TODO (Week 3): Добавить authentication, rate limiting, input validation
+    Запланировано в плане MVP Launch - Неделя 3: Performance & Infrastructure
 
 Key Endpoints:
     GET  /api/categories - Список доступных категорий новостей
@@ -48,7 +49,7 @@ Notes:
     - Categories централизованы в digests/configs.py
     - Использует legacy db_models (нужна миграция на service.py)
     - Unicode name conversion для Telegram имен
-    - TODO: Добавить proper error handling
+    - TODO (Week 2): Добавить proper error handling для всех endpoints
 
 Author: PulseAI Team
 Last Updated: October 2025
@@ -655,7 +656,8 @@ def get_notification_settings():
     """
     GET /api/notification-settings?user_id=<id>
     Returns user's notification settings for all categories.
-    TODO: Implement get_notification_settings function in db_models
+    TODO (Week 2): Implement get_notification_settings function in db_models
+    Запланировано в Subscriptions Integration
     """
     return jsonify({"status": "error", "message": "Not implemented yet"}), 501
 
@@ -665,7 +667,8 @@ def update_notification_settings():
     """
     POST /api/notification-settings/update
     Updates user's notification settings.
-    TODO: Implement upsert_notification_setting function in db_models
+    TODO (Week 2): Implement upsert_notification_setting function in db_models
+    Запланировано в Subscriptions Integration
     """
     return jsonify({"status": "error", "message": "Not implemented yet"}), 501
 

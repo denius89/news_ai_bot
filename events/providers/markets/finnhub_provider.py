@@ -232,7 +232,7 @@ class FinnhubProvider(BaseEventProvider):
             # Finnhub API поддерживает splits через stock/split
             # Для простоты используем популярные акции или skip если API не поддерживает
             # В реальности нужен отдельный endpoint или список символов
-            return []  # TODO: реализовать когда будет доступен endpoint
+            return []  # TODO (Future): реализовать когда будет доступен Finnhub endpoint
 
         except Exception as e:
             logger.debug(f"Error fetching splits calendar: {e}")
