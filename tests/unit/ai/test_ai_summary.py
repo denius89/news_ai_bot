@@ -8,6 +8,7 @@ from digests.ai_summary import (
     generate_batch_summary,
     generate_summary_journalistic_v2,
 )
+from models.news import NewsItem
 
 # ✅ все тесты в этом файле — интеграционные
 pytestmark = pytest.mark.integration
@@ -91,11 +92,9 @@ def test_generate_batch_summary_smoke():
 
 def test_generate_summary_why_important_json_structure():
     """Unit test: проверка структуры JSON ответа"""
-    item = {
-        "title": "Тестовая новость",
-        "content": "Тестовое содержание новости",
-        "source": "test",
-    }
+    item = NewsItem(
+        title="Тестовая новость", content="Тестовое содержание новости", source="test", link="https://test.com"
+    )
 
     # Мокаем вызов OpenAI, чтобы тест работал без API ключа
     with patch("digests.ai_summary.get_client") as mock_get_client:
@@ -122,11 +121,7 @@ def test_generate_summary_why_important_json_structure():
 
 def test_generate_summary_why_important_fallback():
     """Unit test: проверка fallback блока 'Почему это важно'"""
-    item = {
-        "title": "Тестовая новость",
-        "content": "Тестовое содержание",
-        "source": "test",
-    }
+    item = NewsItem(title="Тестовая новость", content="Тестовое содержание", source="test", link="https://test.com")
 
     # Мокаем ошибку OpenAI для тестирования fallback
     with patch("digests.ai_summary.get_client") as mock_get_client:
@@ -143,11 +138,12 @@ def test_generate_summary_why_important_fallback():
 
 def test_generate_summary_why_important_json_with_keys():
     """Unit test: проверка что JSON содержит правильные ключи"""
-    item = {
-        "title": "Bitcoin Price Surge",
-        "content": "Bitcoin reached new all-time high",
-        "source": "crypto",
-    }
+    item = NewsItem(
+        title="Bitcoin Price Surge",
+        content="Bitcoin reached new all-time high",
+        source="crypto",
+        link="https://crypto.com",
+    )
 
     expected_keys = {"title", "why_important"}
 
@@ -177,16 +173,8 @@ def test_generate_summary_why_important_json_with_keys():
 def test_generate_batch_summary_structure():
     """Unit test: проверка структуры batch summary"""
     data = [
-        {
-            "title": "News 1",
-            "content": "Content 1",
-            "source": "test",
-        },
-        {
-            "title": "News 2",
-            "content": "Content 2",
-            "source": "test",
-        },
+        NewsItem(title="News 1", content="Content 1", source="test", link="https://test.com/1"),
+        NewsItem(title="News 2", content="Content 2", source="test", link="https://test.com/2"),
     ]
 
     # Мокаем успешный ответ
@@ -308,14 +296,15 @@ def test_validate_sources_low_importance():
     """Test that low importance sources are skipped"""
 
     news_items = [
-        {
-            "title": "Low importance news",
-            "content": "This news has low importance",
-            "importance": 0.3,  # Below threshold
-            "credibility": 0.9,
-            "source": "Test",
-            "published_at": "2024-01-15T10:00:00Z",
-        }
+        NewsItem(
+            title="Low importance news",
+            content="This news has low importance",
+            importance=0.3,  # Below threshold
+            credibility=0.9,
+            source="Test",
+            published_at="2024-01-15T10:00:00Z",
+            link="https://test.com",
+        )
     ]
 
     result = generate_summary_journalistic_v2(
