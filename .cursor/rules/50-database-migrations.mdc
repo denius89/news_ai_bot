@@ -1,9 +1,6 @@
 ---
-title: Database Migrations Safety
-tags: [database, migrations, critical]
-priority: HIGH
+alwaysApply: true
 ---
-
 # 🗄️ Database Migrations Safety Rules
 
 ## ⚠️ CRITICAL: Data Loss Prevention

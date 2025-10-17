@@ -1,9 +1,6 @@
 ---
-title: Performance & Optimization
-tags: [performance, optimization, cost]
-priority: MEDIUM
+alwaysApply: true
 ---
-
 # ⚡ Performance & Optimization Rules
 
 ## 🎯 Performance Goals

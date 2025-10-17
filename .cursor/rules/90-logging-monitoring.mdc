@@ -1,9 +1,6 @@
 ---
-title: Logging & Monitoring
-tags: [logging, monitoring, production]
-priority: HIGH
+alwaysApply: true
 ---
-
 # 📊 Logging & Monitoring Rules
 
 ## 🎯 Structured Logging

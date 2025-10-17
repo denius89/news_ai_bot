@@ -1,9 +1,6 @@
 ---
-title: Dependencies Management
-tags: [dependencies, safety]
-priority: MEDIUM
+alwaysApply: true
 ---
-
 # 📦 Dependencies Management Rules
 
 ## 🎯 Files to Protect

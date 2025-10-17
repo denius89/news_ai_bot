@@ -1,9 +1,6 @@
 ---
-title: Error Handling
-tags: [errors, exceptions, production]
-priority: HIGH
+alwaysApply: true
 ---
-
 # 🛡️ Error Handling Rules
 
 ## 🎯 Error Handling Philosophy

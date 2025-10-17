@@ -1,9 +1,6 @@
 ---
-title: Background Jobs
-tags: [background, async, cron]
-priority: MEDIUM
+alwaysApply: true
 ---
-
 # ⚙️ Background Jobs Rules
 
 ## 📍 Background Jobs Location
