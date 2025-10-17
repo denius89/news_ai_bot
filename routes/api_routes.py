@@ -396,7 +396,7 @@ def update_subscription():
         if enabled:
             # For demo users, create user with a fake telegram_id
             demo_telegram_id = 999999999
-            created_user_id = run_async(subscription_service.get_or_create_user(demo_telegram_id, "demo-user", "en"))
+            created_user_id = run_async(subscription_service.get_or_create_user(demo_telegram_id, "demo-user"))
 
             # Add subscription using the created user_id
             success = run_async(subscription_service.add(created_user_id, category))

@@ -88,28 +88,35 @@ class TestEventsFlow:
                     side_effect=lambda x: x.get("importance", 0.8) if "High" in x.get("title", "") else 0.4
                 )
 
-                # Mock events service
-                with patch("database.events_service.EventsService") as mock_service_class:
+                # Mock events service - patch get_events_service
+                with patch("tools.events.fetch_events.get_events_service") as mock_get_service:
                     mock_service = Mock()
-                    mock_service.insert_events = Mock(return_value=1)  # Only high importance event stored
-                    mock_service_class.return_value = mock_service
+                    # Use AsyncMock for async method
+                    mock_service.insert_events = AsyncMock(return_value=1)  # Only high importance event stored
+                    mock_get_service.return_value = mock_service
 
-                    # Import and test the function
-                    from tools.events.fetch_events import fetch_and_store_events
+                    # Mock metrics to avoid metrics tracking
+                    with patch("tools.events.fetch_events.get_metrics") as mock_get_metrics:
+                        mock_metrics = Mock()
+                        mock_metrics.increment_events_processed_total = Mock()
+                        mock_get_metrics.return_value = mock_metrics
 
-                    result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=False)
+                        # Import and test the function
+                        from tools.events.fetch_events import fetch_and_store_events
 
-                    # Verify results
-                    assert result["success"] is True
-                    assert result["events_fetched"] == 1  # Only high importance event
-                    assert result["events_stored"] == 1
-                    assert result["dry_run"] is False
+                        result = await fetch_and_store_events(days_ahead=7, categories=["crypto"], dry_run=False)
 
-                    # Verify AI filtering worked (importance >= 0.6)
-                    mock_service.insert_events.assert_called_once()
-                    stored_events = mock_service.insert_events.call_args[0][0]
-                    assert len(stored_events) == 1
-                    assert stored_events[0]["title"] == "High Importance Event"
+                        # Verify results
+                        assert result["success"] is True
+                        assert result["events_fetched"] == 1  # Only high importance event
+                        assert result["events_stored"] == 1
+                        assert result["dry_run"] is False
+
+                        # Verify AI filtering worked (importance >= 0.6)
+                        mock_service.insert_events.assert_called_once()
+                        stored_events = mock_service.insert_events.call_args[0][0]
+                        assert len(stored_events) == 1
+                        assert stored_events[0]["title"] == "High Importance Event"
 
     @pytest.mark.asyncio
     async def test_fetch_events_dry_run(self):
