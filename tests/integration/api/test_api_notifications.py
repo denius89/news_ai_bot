@@ -3,7 +3,7 @@ Unit tests for Notifications API endpoints.
 """
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from src.webapp import app
 
@@ -16,10 +16,18 @@ def client():
         yield client
 
 
+@pytest.fixture
+def mock_auth():
+    """Mock authentication for tests."""
+    with patch("utils.auth.telegram_auth.authenticate_telegram_user") as mock_auth:
+        mock_auth.return_value = {"user_id": 123456789, "authenticated": True}
+        yield mock_auth
+
+
 class TestNotificationsAPI:
     """Test notifications API endpoints."""
 
-    def test_get_notifications_missing_user_id(self, client):
+    def test_get_notifications_missing_user_id(self, client, mock_auth):
         """Test GET /api/notifications without user_id parameter."""
         response = client.get("/api/notifications")
         assert response.status_code == 400
@@ -28,7 +36,7 @@ class TestNotificationsAPI:
         assert "user_id parameter is required" in data["message"]
 
     @patch("routes.api_routes.list_notifications")
-    def test_get_notifications_success(self, mock_get_notifications, client):
+    def test_get_notifications_success(self, mock_get_notifications, client, mock_auth):
         """Test successful GET /api/notifications."""
         # Mock database response
         mock_get_notifications.return_value = [
@@ -59,7 +67,7 @@ class TestNotificationsAPI:
         assert data["data"]["unread_count"] == 1
 
     @patch("routes.api_routes.list_notifications")
-    def test_get_notifications_empty(self, mock_get_notifications, client):
+    def test_get_notifications_empty(self, mock_get_notifications, client, mock_auth):
         """Test GET /api/notifications with no notifications."""
         mock_get_notifications.return_value = []
 
@@ -72,7 +80,7 @@ class TestNotificationsAPI:
         assert data["data"]["unread_count"] == 0
 
     @patch("routes.api_routes.list_notifications")
-    def test_get_notifications_error(self, mock_get_notifications, client):
+    def test_get_notifications_error(self, mock_get_notifications, client, mock_auth):
         """Test GET /api/notifications with database error."""
         mock_get_notifications.side_effect = Exception("Database error")
 
@@ -83,7 +91,7 @@ class TestNotificationsAPI:
         assert data["status"] == "success"
         assert data["data"]["notifications"] == []
 
-    def test_mark_notification_read_not_implemented(self, client):
+    def test_mark_notification_read_not_implemented(self, client, mock_auth):
         """Test marking notification as read (not implemented yet)."""
         response = client.post(
             "/api/notifications/mark-read",
@@ -94,7 +102,7 @@ class TestNotificationsAPI:
         assert data["status"] == "error"
         assert "Use /api/user_notifications/mark_read instead" in data["message"]
 
-    def test_get_notification_settings_not_implemented(self, client):
+    def test_get_notification_settings_not_implemented(self, client, mock_auth):
         """Test getting notification settings (not implemented yet)."""
         response = client.get("/api/notification-settings?user_id=test-user-123")
         assert response.status_code == 501
@@ -102,7 +110,7 @@ class TestNotificationsAPI:
         assert data["status"] == "error"
         assert "Not implemented yet" in data["message"]
 
-    def test_update_notification_settings_not_implemented(self, client):
+    def test_update_notification_settings_not_implemented(self, client, mock_auth):
         """Test updating notification settings (not implemented yet)."""
         response = client.post(
             "/api/notification-settings/update",

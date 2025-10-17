@@ -29,6 +29,97 @@ class SubscriptionService:
         else:
             self.db_service = get_sync_service()
 
+    async def list(self, user_id: int) -> List[str]:
+        """
+        List user's subscribed categories.
+
+        Args:
+            user_id: Telegram user ID
+
+        Returns:
+            List of category names
+        """
+        subscriptions = await self.get_user_subscriptions(user_id)
+        return subscriptions.get("categories", [])
+
+    async def add(self, user_id: int, category: str) -> bool:
+        """
+        Add subscription to category.
+
+        Args:
+            user_id: Telegram user ID
+            category: Category name
+
+        Returns:
+            True if successful
+        """
+        return await self.subscribe_to_category(user_id, category)
+
+    async def remove(self, user_id: int, category: str) -> bool:
+        """
+        Remove subscription from category.
+
+        Args:
+            user_id: Telegram user ID
+            category: Category name
+
+        Returns:
+            True if successful
+        """
+        return await self.unsubscribe_from_category(user_id, category)
+
+    async def get_or_create_user(self, telegram_id: int, username: Optional[str] = None) -> Dict:
+        """
+        Get or create user in database.
+
+        Args:
+            telegram_id: Telegram user ID
+            username: Optional username
+
+        Returns:
+            User data dictionary
+        """
+        try:
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                result = await self.db_service.async_safe_execute(
+                    client.table("users").select("*").eq("telegram_id", telegram_id).single()
+                )
+            else:
+                result = self.db_service.safe_execute(
+                    self.db_service.sync_client.table("users").select("*").eq("telegram_id", telegram_id).single()
+                )
+
+            if result and result.data:
+                return result.data
+
+            # Create new user
+            user_data = {
+                "telegram_id": telegram_id,
+                "username": username,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+
+            if self.async_mode:
+                client = await self.db_service._get_async_client()
+                result = await self.db_service.async_safe_execute(
+                    client.table("users").insert(user_data).select().single()
+                )
+            else:
+                result = self.db_service.safe_execute(
+                    self.db_service.sync_client.table("users").insert(user_data).select().single()
+                )
+
+            if result and result.data:
+                return result.data
+            else:
+                logger.error(f"Failed to create user {telegram_id}")
+                return {"telegram_id": telegram_id, "username": username}
+
+        except Exception as e:
+            logger.error(f"Error in get_or_create_user: {e}")
+            return {"telegram_id": telegram_id, "username": username}
+
     async def get_user_subscriptions(self, user_id: int) -> Dict[str, List[str]]:
         """
         Get user's subscriptions to categories and subcategories.
