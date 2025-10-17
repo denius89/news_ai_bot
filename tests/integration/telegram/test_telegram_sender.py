@@ -34,7 +34,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_message_success(self):
         """Test successful message sending."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot_class.return_value = mock_bot
@@ -54,7 +54,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_message_too_long(self):
         """Test message sending with text too long."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot_class.return_value = mock_bot
@@ -74,7 +74,7 @@ class TestTelegramSender:
         """Test handling of TelegramForbiddenError (user blocked bot)."""
         from aiogram.exceptions import TelegramForbiddenError
 
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock(side_effect=TelegramForbiddenError("Forbidden", "Forbidden"))
             mock_bot_class.return_value = mock_bot
@@ -89,7 +89,7 @@ class TestTelegramSender:
         """Test handling of TelegramBadRequest."""
         from aiogram.exceptions import TelegramBadRequest
 
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock(side_effect=TelegramBadRequest("Bad Request", "Bad Request"))
             mock_bot_class.return_value = mock_bot
@@ -104,7 +104,7 @@ class TestTelegramSender:
         """Test handling of TelegramRetryAfter with retry."""
         from aiogram.exceptions import TelegramRetryAfter
 
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
 
             # First call raises RetryAfter, second succeeds
@@ -130,7 +130,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_message_general_exception(self):
         """Test handling of general exceptions."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock(side_effect=Exception("General error"))
             mock_bot_class.return_value = mock_bot
@@ -143,7 +143,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_digest(self):
         """Test send_digest method."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot_class.return_value = mock_bot
@@ -159,7 +159,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_error_message(self):
         """Test send_error_message method."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot_class.return_value = mock_bot
@@ -179,7 +179,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_send_help_message(self):
         """Test send_help_message method."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot_class.return_value = mock_bot
@@ -199,7 +199,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_close(self):
         """Test close method."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.session = AsyncMock()
             mock_bot.session.close = AsyncMock()
@@ -213,7 +213,7 @@ class TestTelegramSender:
     @pytest.mark.asyncio
     async def test_context_manager(self):
         """Test async context manager."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.session = AsyncMock()
             mock_bot.session.close = AsyncMock()
@@ -234,7 +234,7 @@ class TestGlobalFunctions:
     @patch.dict("os.environ", {"TELEGRAM_BOT_TOKEN": "test-token"})
     async def test_send_message_global(self):
         """Test global send_message function."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot.session = AsyncMock()
@@ -251,7 +251,7 @@ class TestGlobalFunctions:
     @patch.dict("os.environ", {"TELEGRAM_BOT_TOKEN": "test-token"})
     async def test_send_digest_global(self):
         """Test global send_digest function."""
-        with patch("utils.telegram_sender.Bot") as mock_bot_class:
+        with patch("utils.network.telegram_sender.Bot") as mock_bot_class:
             mock_bot = AsyncMock()
             mock_bot.send_message = AsyncMock()
             mock_bot.session = AsyncMock()
