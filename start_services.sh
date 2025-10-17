@@ -91,6 +91,34 @@ log_info "Лог файл: $LOG_FILE"
 log_info "Health check: $([ "$SKIP_HEALTH_CHECK" = true ] && echo "отключён" || echo "включён")"
 echo ""
 
+# Автоматическое восстановление .env файла
+if [ ! -f ".env" ]; then
+    log_warning "⚠️ Файл .env отсутствует"
+    
+    # Проверяем наличие бэкапов в git stash
+    if git stash list | grep -q "env-backup\|production config\|initial backup" 2>/dev/null; then
+        log_info "📦 Восстанавливаю .env из последнего бэкапа..."
+        
+        # Восстанавливаем без удаления из стеша
+        if git checkout stash@{0} -- .env >> "$LOG_FILE" 2>&1; then
+            # Убираем из staged area
+            git restore --staged .env 2>> "$LOG_FILE" || true
+            log_success "✅ Файл .env восстановлен из бэкапа"
+        else
+            log_error "❌ Не удалось восстановить .env"
+            log_error "💡 Запустите вручную: env-restore"
+            exit 1
+        fi
+    else
+        log_error "❌ Бэкапы .env не найдены в git stash"
+        log_error "💡 Создайте .env из .env.example и настройте переменные"
+        exit 1
+    fi
+else
+    log_success "✅ Файл .env обнаружен"
+fi
+echo ""
+
 # Проверяем здоровье проекта (если не отключено)
 if [ "$SKIP_HEALTH_CHECK" = false ]; then
     log_info "🔍 Проверка здоровья проекта..."
