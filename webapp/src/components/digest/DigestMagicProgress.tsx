@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Sparkles, Bot, Briefcase, Brain, Laugh, Newspaper, BookOpen, MessageCircle } from "lucide-react";
+import { Sparkles, Bot, Briefcase, Brain, Laugh, Newspaper, BookOpen, MessageCircle, FileText, Cpu } from "lucide-react";
 
 const personalities = {
   analytical: {
@@ -66,11 +66,33 @@ const personalities = {
       "Делаю дайджест для чтения в метро 🚇",
       "Формирую удобную сводку для Telegram..."
     ]
+  },
+  
+  explanatory: {
+    color: "from-indigo-400 via-blue-300 to-purple-400",
+    icon: <FileText className="w-10 h-10 text-indigo-400" />,
+    phrases: [
+      "Объясняю сложные термины простыми словами...",
+      "Добавляю контекст и историю вопроса...",
+      "Разбираю причины и следствия событий...",
+      "Делаю новости понятными для всех..."
+    ]
+  },
+  
+  technical: {
+    color: "from-emerald-400 via-green-300 to-teal-400",
+    icon: <Cpu className="w-10 h-10 text-emerald-400" />,
+    phrases: [
+      "Анализирую технические детали и спецификации...",
+      "Изучаю архитектуру и алгоритмы...",
+      "Сравниваю производительность и benchmark'и...",
+      "Формирую дайджест для разработчиков..."
+    ]
   }
 };
 
 interface DigestMagicProgressProps {
-  style?: 'analytical' | 'business' | 'meme' | 'newsroom' | 'magazine' | 'casual';
+  style?: 'analytical' | 'business' | 'meme' | 'newsroom' | 'magazine' | 'casual' | 'explanatory' | 'technical';
   tone?: 'neutral' | 'insightful' | 'critical' | 'optimistic';
   length?: 'short' | 'medium' | 'long';
   onComplete?: () => void;
@@ -78,15 +100,20 @@ interface DigestMagicProgressProps {
 
 export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({ 
   style = "analytical", 
-  tone = "neutral",
-  length = "medium",
-  onComplete 
+  tone = "neutral"
+  // length и onComplete больше не используются - полагаемся на реальное завершение
 }) => {
-  const persona = personalities[style] || personalities.analytical;
+  // Защита от неожиданных значений style
+  const safeStyle = style && personalities[style as keyof typeof personalities] ? style : "analytical";
+  const persona = personalities[safeStyle] || personalities.analytical;
   
   // Адаптация фраз по тону
   const getPhrases = (style: string, tone?: string) => {
-    const basePersona = personalities[style as keyof typeof personalities];
+    const basePersona = personalities[style as keyof typeof personalities] || personalities.analytical;
+    
+    if (!basePersona || !basePersona.phrases) {
+      return ["Генерирую дайджест..."];
+    }
     
     if (tone === 'critical') {
       return [
@@ -107,41 +134,27 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
     return basePersona.phrases;
   };
   
-  const adaptedPhrases = getPhrases(style, tone);
-  const [phrase, setPhrase] = useState(adaptedPhrases[0]);
+  const adaptedPhrases = getPhrases(safeStyle, tone);
+  const [phrase, setPhrase] = useState(adaptedPhrases[0] || "Генерирую дайджест...");
 
   useEffect(() => {
+    if (adaptedPhrases.length === 0) {
+      return;
+    }
+    
     const interval = setInterval(() => {
       setPhrase((prev: string) => {
         const currentIndex = adaptedPhrases.indexOf(prev);
         const nextIndex = (currentIndex + 1) % adaptedPhrases.length;
-        return adaptedPhrases[nextIndex];
+        return adaptedPhrases[nextIndex] || adaptedPhrases[0] || "Генерирую дайджест...";
       });
     }, 3000);
     
     return () => clearInterval(interval);
   }, [adaptedPhrases]);
 
-  // Динамическое время генерации
-  const getGenerationTime = (length?: string) => {
-    switch (length) {
-      case 'short': return 10000; // 10 секунд
-      case 'medium': return 15000; // 15 секунд
-      case 'long': return 20000; // 20 секунд
-      default: return 15000;
-    }
-  };
-
-  // Auto-complete after some time (optional)
-  useEffect(() => {
-    if (onComplete) {
-      const timer = setTimeout(() => {
-        onComplete();
-      }, getGenerationTime(length));
-      
-      return () => clearTimeout(timer);
-    }
-  }, [onComplete, length]);
+  // Убрали автотаймер и getGenerationTime - полагаемся только на реальное завершение генерации
+  // Автотаймер может скрыть экран раньше времени, если генерация затягивается
 
   return (
     <motion.div 
@@ -172,7 +185,7 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
         transition={{ duration: 0.6 }}
         className="text-2xl font-semibold text-white mb-3 drop-shadow-lg"
       >
-        AI думает в стиле "{style}"...
+        AI думает в стиле "{safeStyle}"...
       </motion.h2>
 
       {/* Dynamic Phrases */}

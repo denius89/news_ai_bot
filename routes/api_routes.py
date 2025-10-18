@@ -850,6 +850,7 @@ def get_digest_categories():
     """Get available digest categories."""
     try:
         from services.categories import get_categories
+        from digests.prompts_v2 import CATEGORY_CARDS
 
         # Get real categories from sources.yaml
         real_categories = get_categories()
@@ -868,11 +869,22 @@ def get_digest_categories():
         for cat in real_categories:
             categories_dict[cat] = category_display.get(cat, cat.title())
 
+        # Build subcategories dict
+        subcategories_dict = {}
+        for category_key in CATEGORY_CARDS:
+            if "subcategories" in CATEGORY_CARDS[category_key]:
+                subcategories = {}
+                for sub_key, sub_config in CATEGORY_CARDS[category_key]["subcategories"].items():
+                    # Use focus as display name
+                    subcategories[sub_key] = sub_config["focus"]
+                subcategories_dict[category_key] = subcategories
+
         return jsonify(
             {
                 "status": "success",
                 "data": {
                     "categories": categories_dict,
+                    "subcategories": subcategories_dict,
                     "periods": {"today": "Сегодня", "7d": "Последние 7 дней", "30d": "Последние 30 дней"},
                 },
             }
@@ -890,6 +902,7 @@ def generate_digest():
 
     data = request.get_json()
     category = data.get("category", "all")
+    subcategory = data.get("subcategory", None)  # Новый параметр субкатегории
     style = data.get("style", "analytical")
     period = data.get("period", "today")
     limit = data.get("limit", 10)
@@ -900,18 +913,32 @@ def generate_digest():
     # ЛОГИРОВАНИЕ ДЛЯ ОТЛАДКИ
     logger.info("🔍 DIGEST GENERATION REQUEST:")
     logger.info(f"  - category: {category}")
+    logger.info(f"  - subcategory: {subcategory}")
     logger.info(f"  - style: {style}")
     logger.info(f"  - period: {period}")
     logger.info(f"  - limit: {limit}")
     logger.info(f"  - length: {length}")
     logger.info(f"  - user_id: {user_id}")
     logger.info(f"  - save_digest: {save_digest}")
-    logger.info(f"  - Full data: {data}")
 
     # НОВЫЕ ПАРАМЕТРЫ ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
     min_importance = data.get("min_importance", None)  # Минимальная важность новостей
     enable_smart_filtering = data.get("enable_smart_filtering", True)  # Включить умную фильтрацию
     use_user_preferences = data.get("use_user_preferences", True)  # Использовать предпочтения пользователя
+
+    # НОВЫЕ ПАРАМЕТРЫ ДЛЯ РАСШИРЕННЫХ ВОЗМОЖНОСТЕЙ AI
+    # Сбалансированные дефолты: включены функции качества, но оптимизированы
+    use_multistage = data.get("use_multistage", False)  # Multi-stage генерация (медленная, отключена для UI)
+    use_rag = data.get("use_rag", True)  # RAG система с примерами (включена для качества)
+    use_personalization = data.get("use_personalization", True)  # Персонализация (включена для качества)
+    audience = data.get("audience", "general")  # Тип аудитории
+
+    # ЛОГИРОВАНИЕ НОВЫХ ПАРАМЕТРОВ
+    logger.info("🚀 НОВЫЕ AI ВОЗМОЖНОСТИ:")
+    logger.info(f"  - use_multistage: {use_multistage}")
+    logger.info(f"  - use_rag: {use_rag}")
+    logger.info(f"  - use_personalization: {use_personalization}")
+    logger.info(f"  - audience: {audience}")
 
     try:
         from services.unified_digest_service import get_async_digest_service
@@ -944,6 +971,7 @@ def generate_digest():
 
         logger.info(f"📋 Генерация дайджеста для категории из UI: {category}")
         logger.info(f"📋 categories_list: {categories_list}")
+        logger.info(f"📋 min_importance исходный: {min_importance}")
 
         # УМНАЯ ФИЛЬТРАЦИЯ: Определяем параметры фильтрации
         if enable_smart_filtering:
@@ -954,19 +982,29 @@ def generate_digest():
                 logger.debug(f"Применен умный фильтр по времени: min_importance={final_min_importance}")
             except Exception as e:
                 logger.warning(f"Не удалось получить умный фильтр: {e}")
+        
+        logger.info(f"📋 final_min_importance: {final_min_importance}")
         digest_service = get_async_digest_service()
 
         # ИЗМЕРЯЕМ ВРЕМЯ ГЕНЕРАЦИИ ДЛЯ АНАЛИТИКИ
         start_time = time.time()
 
-        # Use async method to generate AI digest with smart filtering
+        # Use async method to generate AI digest with smart filtering and new capabilities
         digest_text = run_async(
             digest_service.async_build_ai_digest(
                 limit=limit,
                 categories=categories_list,
+                subcategory=subcategory,  # Передаем параметр субкатегории
+                period=period,  # ВАЖНО: передаем параметр периода!
                 style=style,
                 length=length,  # Передаем параметр длины текста
                 min_importance=final_min_importance,  # Передаем параметр фильтрации
+                # Новые параметры для расширенных возможностей
+                use_multistage=use_multistage,
+                use_rag=use_rag,
+                use_personalization=use_personalization,
+                user_id=user_id,
+                audience=audience,
             )
         )
 
@@ -986,30 +1024,64 @@ def generate_digest():
         digest_id = None
         if user_id and save_digest:
             try:
+                logger.info(f"🔍 Attempting to save digest for user_id={user_id}, save_digest={save_digest}")
                 # user_id уже является UUID строкой, не нужно искать пользователя
                 db_service = get_sync_service()
-                digest_id = db_service.save_digest(
-                    {
-                        "user_id": str(user_id),
-                        "summary": digest_text,  # Для обратной совместимости
-                        "content": digest_text,  # Основное поле для WebApp
-                        "category": category,
-                        "style": style,
-                        "period": period,
-                        "limit_count": limit,
-                        "metadata": {
-                            "generation_time_ms": generation_time_ms,
-                            "news_count": digest_text.count("\n") if digest_text else 0,
-                            "min_importance": final_min_importance,
-                            "smart_filtering": enable_smart_filtering,
-                            "user_preferences_used": use_user_preferences,
-                        },
-                    }
-                )
-                logger.info(f"Дайджест сохранен для пользователя {user_id}: {digest_id}")
+                
+                # Проверяем существование пользователя в базе данных
+                from supabase import create_client
+                from config.core.settings import SUPABASE_URL, SUPABASE_KEY
+                supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+                
+                try:
+                    user_check = supabase_client.table("users").select("id").eq("id", user_id).execute()
+                    if not user_check.data:
+                        logger.error(f"❌ User {user_id} not found in database, cannot save digest")
+                        raise ValueError(f"User {user_id} not found")
+                    else:
+                        logger.info(f"✅ User {user_id} exists in database")
+                except Exception as user_check_error:
+                    logger.error(f"❌ Error checking user existence: {user_check_error}")
+                    # Не прерываем выполнение, попробуем сохранить
+                
+                digest_data = {
+                    "user_id": str(user_id),
+                    "summary": digest_text,  # Для обратной совместимости
+                    "content": digest_text,  # Основное поле для WebApp
+                    "category": category,
+                    "style": style,
+                    "period": period,
+                    "limit_count": limit,
+                    "metadata": {
+                        "generation_time_ms": generation_time_ms,
+                        "news_count": digest_text.count("\n") if digest_text else 0,
+                        "min_importance": final_min_importance,
+                        "smart_filtering": enable_smart_filtering,
+                        "user_preferences_used": use_user_preferences,
+                        # Новые возможности AI
+                        "use_multistage": use_multistage,
+                        "use_rag": use_rag,
+                        "use_personalization": use_personalization,
+                        "audience": audience,
+                    },
+                }
+                
+                logger.info(f"🔍 Saving digest data: {len(str(digest_data))} chars, category={category}, style={style}")
+                digest_id = db_service.save_digest(digest_data)
+                logger.info(f"🔍 Save result: digest_id={digest_id}")
+                
+                if digest_id:
+                    logger.info(f"✅ Дайджест сохранен для пользователя {user_id}: {digest_id}")
+                else:
+                    logger.error(f"❌ save_digest вернул None для пользователя {user_id}")
+                    
             except Exception as save_error:
-                logger.warning(f"Не удалось сохранить дайджест: {save_error}")
+                logger.error(f"❌ Exception при сохранении дайджеста: {save_error}")
+                import traceback
+                logger.error(f"❌ Traceback: {traceback.format_exc()}")
                 # Продолжаем выполнение даже если сохранение не удалось
+        else:
+            logger.info(f"🔍 Skipping save: user_id={user_id}, save_digest={save_digest}")
 
         # ПРИМЕЧАНИЕ: Предпочтения категорий теперь сохраняются отдельно через /api/user/category-preferences
         # Здесь мы не сохраняем предпочтения, чтобы не перезаписывать настройки пользователя

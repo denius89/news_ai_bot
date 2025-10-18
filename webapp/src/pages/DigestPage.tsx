@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { MobileHeader } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
-import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown, ArrowUp } from 'lucide-react';
+import { DigestMagicProgress } from '../components/digest/DigestMagicProgress';
+import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown, ArrowUp, FileText, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
@@ -43,6 +44,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [categories, setCategories] = useState<Record<string, string>>({});
+  const [styles, setStyles] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<'active' | 'archived' | 'deleted'>('active');
   const [deletedDigests, setDeletedDigests] = useState<DigestItem[]>([]);
   const [archivedDigests, setArchivedDigests] = useState<DigestItem[]>([]);
@@ -50,6 +52,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   const [selectedDigest, setSelectedDigest] = useState<DigestItem | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, 'up' | 'down'>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isGeneratingDigest, setIsGeneratingDigest] = useState(false);
+  const [generatingStyle, setGeneratingStyle] = useState<'analytical' | 'business' | 'meme' | 'newsroom' | 'magazine' | 'casual' | 'explanatory' | 'technical'>('analytical');
   
   // 🚀 Гибридный подход: useTelegramUser для UI, useAuth для API
   const { userData } = useTelegramUser();
@@ -95,7 +99,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
     }
   };
 
-  // Load categories from API
+  // Load categories and styles from API
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -116,8 +120,37 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         });
       }
     };
+
+    const loadStyles = async () => {
+      try {
+        const response = await fetch('/api/digests/styles');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data?.styles) {
+            setStyles({ ...data.data.styles });
+            return;
+          }
+        }
+        console.warn('API response not successful, using defaults');
+      } catch (error) {
+        console.warn('Failed to load styles, using defaults:', error);
+      }
+      
+      // Fallback styles
+      setStyles({
+        newsroom: "Newsroom",
+        analytical: "Аналитический",
+        magazine: "Magazine", 
+        casual: "Простой",
+        business: "Бизнес",
+        explanatory: "Объясняющий",
+        technical: "Технический",
+        meme: "Мемный"
+      });
+    };
     
     loadCategories();
+    loadStyles();
   }, []);
 
   // Load digest history from API
@@ -129,22 +162,25 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         return;
       }
       
+      console.log('🔄 Loading digest history for user:', userId);
+      
       // Заголовки для аутентификации уже установлены в AuthContext
       
       // Загружаем активные дайджесты (не удаленные и не архивированные)
-      const activeResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=false`, {
+      const activeResponse = await fetch(`/api/digests/history?limit=10&include_deleted=false&include_archived=false`, {
         headers: authHeaders
       });
       const activeData = await activeResponse.json();
+      console.log('📋 Active digests response:', activeData);
       
       // Загружаем архивированные дайджесты
-      const archivedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=false&include_archived=true`, {
+      const archivedResponse = await fetch(`/api/digests/history?limit=10&include_deleted=false&include_archived=true`, {
         headers: authHeaders
       });
       const archivedData = await archivedResponse.json();
       
       // Загружаем удаленные дайджесты
-      const deletedResponse = await fetch(`/api/digests/history?user_id=${userId}&limit=10&include_deleted=true&include_archived=false`, {
+      const deletedResponse = await fetch(`/api/digests/history?limit=10&include_deleted=true&include_archived=false`, {
         headers: authHeaders
       });
       const deletedData = await deletedResponse.json();
@@ -386,12 +422,19 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   };
 
   // Generate digest function
-  const generateDigest = async (category: string, style: string, period: string): Promise<string> => {
+  const generateDigest = async (category: string, style: string, period: string, length: string, subcategory?: string | null): Promise<string> => {
     try {
+      // Устанавливаем состояние загрузки
+      console.log('🔄 Starting digest generation, setting isLoading=true');
+      setIsGeneratingDigest(true);
+      setGeneratingStyle(style as 'analytical' | 'business' | 'meme' | 'newsroom' | 'magazine' | 'casual' | 'explanatory' | 'technical');
+      
       // 🚀 Используем автоматически полученный user_id из Telegram WebApp
       if (!userId) {
         throw new Error('User ID not available. Please ensure you are logged in.');
       }
+      
+      console.log('🔍 Generating digest with userId:', userId);
       
       // Генерация дайджеста
       
@@ -403,16 +446,38 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         },
         body: JSON.stringify({
           category,
+          subcategory,
           style,
           period,
+          length,
           limit: 10,
           user_id: userId,
           save: true,
-          use_user_preferences: true  // Использовать предпочтения пользователя для фильтрации
+          use_user_preferences: true,  // Использовать предпочтения пользователя для фильтрации
+          // Новые AI возможности
+          use_multistage: false,  // Multi-stage генерация (пока отключено для UI по умолчанию)
+          use_rag: true,  // RAG система с примерами (включено)
+          use_personalization: true,  // Персонализация (включена)
+          audience: "general"  // Тип аудитории
         })
       });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // Если не удалось парсить JSON, используем заголовок
+        }
+        
+        throw new Error(errorMessage);
+      }
+      
       const data = await response.json();
+      console.log('🔍 API Response:', data);
       
       if (data.status === 'success') {
         
@@ -420,8 +485,25 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         showNotification('success', 'Дайджест успешно создан');
         
         // Перезагружаем историю для обновления списка (без дублирования)
+        console.log('🔍 Checking if digest was saved:', {
+          saved: data.data.saved,
+          digest_id: data.data.digest_id,
+          user_id: userId
+        });
+        
         if (data.data.saved) {
+          console.log('📄 Digest saved, reloading history...');
           // Убеждаемся, что модалка просмотра закрыта перед обновлением списка
+          setSelectedDigest(null);
+          // Убираем задержку для более быстрого обновления UI
+          setTimeout(() => loadDigestHistory(), 500);
+        } else {
+          console.log('⚠️ Digest not saved, but trying to reload history anyway', {
+            reason: 'data.data.saved is false',
+            digest_id: data.data.digest_id
+          });
+          // Попробуем перезагрузить историю даже если saved=false
+          // Возможно, дайджест сохранился, но флаг не установился корректно
           setSelectedDigest(null);
           setTimeout(() => loadDigestHistory(), 1000);
         }
@@ -436,6 +518,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       console.error('Error generating digest:', error);
       showNotification('error', `Ошибка генерации: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
       throw error;
+    } finally {
+      // Сбрасываем состояние загрузки
+      console.log('✅ Digest generation completed, setting isLoading=false');
+      setIsGeneratingDigest(false);
     }
   };
 
@@ -687,7 +773,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         {categories[digest.category] || digest.category}
                       </span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-                        {digest.style}
+                        {styles[digest.style] || digest.metadata?.style_name || digest.style}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(digest.createdAt).toLocaleDateString('ru-RU')}
@@ -816,6 +902,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         onGenerate={generateDigest}
       />
 
+      {/* Magic Progress Overlay - показывается даже после закрытия модалки */}
+      {isGeneratingDigest && (
+        <DigestMagicProgress 
+          style={generatingStyle}
+        />
+      )}
+
       {/* Digest Detail Modal */}
       {selectedDigest && (
         <motion.div
@@ -865,11 +958,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                       meme: <Bot className="w-3 h-3 mr-1" />,
                       newsroom: <Newspaper className="w-3 h-3 mr-1" />,
                       magazine: <BookOpen className="w-3 h-3 mr-1" />,
-                      casual: <MessageCircle className="w-3 h-3 mr-1" />
+                      casual: <MessageCircle className="w-3 h-3 mr-1" />,
+                      explanatory: <FileText className="w-3 h-3 mr-1" />,
+                      technical: <Settings className="w-3 h-3 mr-1" />
                     };
                     return styleIcons[selectedDigest.style as keyof typeof styleIcons] || <Bot className="w-3 h-3 mr-1" />;
                   })()}
-                  {selectedDigest.metadata?.style_name || selectedDigest.style}
+                  {styles[selectedDigest.style] || selectedDigest.metadata?.style_name || selectedDigest.style}
                 </span>
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
                   <CalendarDays className="w-3 h-3 mr-1" />

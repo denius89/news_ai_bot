@@ -146,11 +146,18 @@ class UnifiedDigestService:
         self,
         categories: Optional[List[str]] = None,
         category: Optional[str] = None,  # Backward compatibility
+        subcategory: Optional[str] = None,  # Новый параметр субкатегории
         period: str = "daily",
         style: str = "analytical",
         length: str = "medium",  # НОВЫЙ ПАРАМЕТР ДЛИНЫ ТЕКСТА
         limit: int = 20,
         min_importance: Optional[float] = None,  # НОВЫЙ ПАРАМЕТР ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
+        # Новые параметры для расширенных возможностей
+        use_multistage: bool = False,
+        use_rag: bool = True,
+        use_personalization: bool = True,
+        user_id: Optional[str] = None,
+        audience: str = "general",
     ) -> str:
         """
         Build AI digest (async version).
@@ -158,11 +165,17 @@ class UnifiedDigestService:
         Args:
             categories: List of categories to filter
             category: Single category for backward compatibility
+            subcategory: Specific subcategory (e.g., "bitcoin", "stocks")
             period: Time period for digest
             style: AI generation style
             length: Text length (short, medium, long)
             limit: Maximum number of news items
             min_importance: Minimum importance threshold for news filtering
+            use_multistage: Enable multi-stage generation with Chain-of-Thought
+            use_rag: Enable RAG system with high-quality examples
+            use_personalization: Enable personalization based on user profile
+            user_id: User ID for personalization
+            audience: Target audience type (general, pro)
 
         Returns:
             AI-generated digest text
@@ -172,22 +185,61 @@ class UnifiedDigestService:
             if categories is None and category is not None:
                 categories = [category]
 
+            # Convert period to days_back for database filtering
+            days_back = None
+            if period == "7d":
+                days_back = 7
+            elif period == "30d":
+                days_back = 30
+            elif period == "today":
+                days_back = 1
+            # "daily" and other values default to None (no date filtering)
+
+            logger.info(f"🔍 Period '{period}' converted to days_back={days_back} for category={categories}")
+            logger.info(f"🔍 Filtering parameters: categories={categories}, limit={limit}, min_importance={min_importance}")
+
             # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ С ФИЛЬТРАЦИЕЙ ПО ВАЖНОСТИ
             if min_importance is not None:
+                logger.info(f"🔍 Using importance filter: min_importance={min_importance}")
                 news_items = await self.db_service.async_get_latest_news_with_importance(
-                    categories=categories, limit=limit, min_importance=min_importance
+                    categories=categories, limit=limit, min_importance=min_importance, days_back=days_back
                 )
             else:
-                # Fallback на старую функцию
-                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit)
+                logger.info("🔍 Using standard filter (no min_importance)")
+                # Use updated function with date filtering
+                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit, days_back=days_back)
+
+            logger.info(f"📰 Retrieved {len(news_items)} news items for period={period}, days_back={days_back}, categories={categories}")
+
+            # Fallback: если не найдено новостей с фильтром по важности, попробуем без него
+            if not news_items and min_importance is not None and categories:
+                logger.warning(f"⚠️ No news with importance filter, trying without importance filter for categories={categories}")
+                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit, days_back=days_back)
+                logger.info(f"📰 Fallback retrieved {len(news_items)} news items without importance filter")
+            # Логируем первые несколько новостей для отладки
+            if news_items:
+                logger.info(f"📰 First few news items: {[{'title': item.get('title', '')[:50], 'category': item.get('category'), 'importance': item.get('importance')} for item in news_items[:3]]}")
+            else:
+                logger.warning(f"⚠️ No news items found for categories={categories}, period={period}")
 
             if not news_items:
                 cat_display = categories[0] if categories else category or "all"
                 return f"📰 <b>AI-дайджест</b> ({cat_display.title()})\n\nСегодня новостей нет."
 
-            # Use AI service for generation
+            # Use AI service for generation with new capabilities
             cat_display = categories[0] if categories else category or "all"
-            ai_service = DigestAIService()
+
+            # Create configuration with new parameters
+            from digests.ai_service import DigestConfig
+            config = DigestConfig(
+                use_multistage=use_multistage,
+                use_rag=use_rag,
+                use_personalization=use_personalization,
+                user_id=user_id,
+                audience=audience,
+                max_items=limit
+            )
+            ai_service = DigestAIService(config=config)
 
             # Convert dicts to NewsItem objects
             from models.news import NewsItem
@@ -211,7 +263,7 @@ class UnifiedDigestService:
                     news_objects.append(item)
 
             ai_digest = await ai_service.build_digest(
-                news_items=news_objects, style=style, category=cat_display, length=length
+                news_items=news_objects, style=style, category=cat_display, length=length, subcategory=subcategory
             )
 
             return clean_for_telegram(ai_digest)

@@ -12,6 +12,14 @@ from typing import Dict, List, Tuple, Any, Optional  # noqa: F401
 
 logger = logging.getLogger("prompts_v2")
 
+# Import personas for automatic selection
+try:
+    from ai_modules.personas import PersonaSelector, select_persona_for_context
+    PERSONAS_AVAILABLE = True
+except ImportError:
+    PERSONAS_AVAILABLE = False
+    logger.warning("Personas module not available, using default persona selection")
+
 # ============================================================================
 # STYLE PROFILES (4 стиля)
 # ============================================================================
@@ -69,6 +77,58 @@ STYLE_CARDS = {
         "expert_persona": "Опытный блогер с миллионной аудиторией",
         "writing_style": "объясняет сложное простыми словами, как другу за чашкой кофе",
     },
+    "business": {
+        "name": "Бизнес",
+        "description": "Корпоративный стиль — структурированно, профессионально, с фокусом на влияние",
+        "characteristics": [
+            "Структурированные абзацы",
+            "Фокус на рыночном влиянии",
+            "Конкретные цифры и данные",
+            "Профессиональная терминология",
+            "Executive summary подход",
+        ],
+        "expert_persona": "Управляющий директор McKinsey",
+        "writing_style": "анализирует ситуацию как бизнес-консультант, фокусируется на стратегических последствиях",
+    },
+    "explanatory": {
+        "name": "Объясняющий",
+        "description": "Образовательный стиль — четко, пошагово, с контекстом",
+        "characteristics": [
+            "Пошаговые объяснения",
+            "Расшифровка терминов",
+            "Исторический контекст",
+            "Причинно-следственные связи",
+            "Доступный язык",
+        ],
+        "expert_persona": "Профессор Стэнфорда",
+        "writing_style": "преподает сложные концепции простыми словами, всегда объясняет контекст",
+    },
+    "technical": {
+        "name": "Технический",
+        "description": "Экспертный стиль — глубокое погружение, техническая точность",
+        "characteristics": [
+            "Техническая терминология",
+            "Детальный анализ",
+            "Экспертные инсайты",
+            "Ссылки на источники",
+            "Профессиональная глубина",
+        ],
+        "expert_persona": "Ведущий инженер Google",
+        "writing_style": "пишет как технический эксперт, использует профессиональную терминологию и глубокий анализ",
+    },
+    "meme": {
+        "name": "Мемный",
+        "description": "Юмор и ирония — engaging, relatable, с элементами сатиры",
+        "characteristics": [
+            "Юмористические сравнения",
+            "Ироничные комментарии",
+            "Мемные отсылки",
+            "Легкий тон",
+            "Relatable контент",
+        ],
+        "expert_persona": "Популярный финансовый мемер с Twitter",
+        "writing_style": "пишет с юмором и иронией, использует мемы и современные отсылки для объяснения финансовых событий",
+    },
 }
 
 # ============================================================================
@@ -78,39 +138,128 @@ STYLE_CARDS = {
 CATEGORY_CARDS = {
     "crypto": {
         "name": "Криптовалюты",
-        "expert": "Виталик Бутерин, сооснователь Ethereum",
-        "focus": "блокчейн, DeFi, NFT, регуляция, майнинг, технологические инновации",
-        "impact": "влияние на крипторынок, инвесторов, регуляторную среду",
-        "keywords": ["блокчейн", "DeFi", "NFT", "майнинг", "регуляция", "токены", "смарт-контракты"],
+        "expert": "Виталик Бутерин",
+        "subcategories": {
+            "bitcoin": {
+                "focus": "BTC, майнинг, халвинг, институциональное принятие",
+                "keywords": ["bitcoin", "btc", "халвинг", "майнинг", "etf"]
+            },
+            "ethereum": {
+                "focus": "ETH, смарт-контракты, обновления сети, DeFi",
+                "keywords": ["ethereum", "eth", "eip", "merge", "staking"]
+            },
+            "defi": {
+                "focus": "Децентрализованные финансы, протоколы, TVL",
+                "keywords": ["defi", "tvl", "yield", "lending", "dex"]
+            },
+            "nft": {
+                "focus": "NFT, метавселенные, коллекции",
+                "keywords": ["nft", "opensea", "метавселенная", "коллекция"]
+            },
+            "regulation": {
+                "focus": "Регуляция, законодательство, SEC, MiCA",
+                "keywords": ["sec", "регуляция", "mica", "закон", "запрет"]
+            }
+        },
+        "focus": "блокчейн, DeFi, NFT, регуляция",
+        "keywords": ["блокчейн", "DeFi", "NFT", "регуляция"]
     },
     "markets": {
         "name": "Финансовые рынки",
-        "expert": "Уоррен Баффет, легендарный инвестор",
-        "focus": "фондовые рынки, валюты, сырьевые товары, экономические индикаторы",
-        "impact": "влияние на инвесторов, экономику, корпорации и глобальные рынки",
-        "keywords": ["акции", "облигации", "валюта", "нефть", "золото", "инфляция", "процентные ставки"],
+        "expert": "Уоррен Баффет",
+        "subcategories": {
+            "stocks": {
+                "focus": "Акции, индексы, корпоративные новости",
+                "keywords": ["акции", "s&p500", "nasdaq", "дивиденды"]
+            },
+            "forex": {
+                "focus": "Валютные пары, ЦБ, процентные ставки",
+                "keywords": ["forex", "доллар", "евро", "фрс", "ставка"]
+            },
+            "commodities": {
+                "focus": "Нефть, золото, сырьевые товары",
+                "keywords": ["нефть", "золото", "газ", "металлы"]
+            },
+            "bonds": {
+                "focus": "Облигации, доходность, долговой рынок",
+                "keywords": ["облигации", "доходность", "трежерис"]
+            }
+        },
+        "focus": "фондовые рынки, валюты, сырьевые товары",
+        "keywords": ["акции", "валюта", "нефть", "золото"]
     },
     "tech": {
         "name": "Технологии",
-        "expert": "Илон Маск, основатель SpaceX и Tesla",
-        "focus": "искусственный интеллект, стартапы, гаджеты, инновации, кибербезопасность",
-        "impact": "влияние на технологии, пользователей, бизнес и общество",
-        "keywords": ["ИИ", "стартапы", "гаджеты", "инновации", "кибербезопасность", "автономные системы"],
+        "expert": "Илон Маск",
+        "subcategories": {
+            "ai": {
+                "focus": "ИИ, LLM, машинное обучение",
+                "keywords": ["ai", "gpt", "llm", "машинное обучение"]
+            },
+            "startups": {
+                "focus": "Стартапы, венчур, IPO, M&A",
+                "keywords": ["стартап", "венчур", "ipo", "сделка"]
+            },
+            "cybersecurity": {
+                "focus": "Кибербезопасность, уязвимости, атаки",
+                "keywords": ["взлом", "уязвимость", "кибератака", "cve"]
+            },
+            "gadgets": {
+                "focus": "Гаджеты, релизы, обзоры",
+                "keywords": ["iphone", "samsung", "релиз", "анонс"]
+            }
+        },
+        "focus": "ИИ, стартапы, кибербезопасность, гаджеты",
+        "keywords": ["ИИ", "стартапы", "кибербезопасность"]
     },
     "sports": {
         "name": "Спорт",
-        "expert": "Василий Уткин, известный спортивный комментатор",
-        "focus": "результаты матчей, трансферы, достижения спортсменов, турнирная ситуация",
-        "impact": "влияние на команды, лиги, спортсменов и фанатов",
-        "keywords": ["матчи", "трансферы", "достижения", "турниры", "команды", "спортсмены"],
+        "expert": "Василий Уткин",
+        "subcategories": {
+            "football": {
+                "focus": "Футбол, матчи, трансферы, турниры",
+                "keywords": ["футбол", "матч", "трансфер", "лига"]
+            },
+            "basketball": {
+                "focus": "Баскетбол, NBA, Евролига",
+                "keywords": ["баскетбол", "nba", "евролига"]
+            },
+            "esports": {
+                "focus": "Киберспорт, турниры, команды",
+                "keywords": ["esports", "dota", "csgo", "турнир"]
+            },
+            "other": {
+                "focus": "Другие виды спорта",
+                "keywords": ["хоккей", "теннис", "формула"]
+            }
+        },
+        "focus": "результаты, трансферы, турниры",
+        "keywords": ["матчи", "трансферы", "турниры"]
     },
     "world": {
         "name": "Мир",
-        "expert": "Дмитрий Киселев, директор МИА 'Россия сегодня'",
-        "focus": "геополитика, международные отношения, конфликты, дипломатия",
-        "impact": "влияние на глобальную стабильность, экономику и международные отношения",
-        "keywords": ["геополитика", "дипломатия", "конфликты", "санкции", "международные отношения"],
-    },
+        "expert": "Дмитрий Киселев",
+        "subcategories": {
+            "geopolitics": {
+                "focus": "Геополитика, международные отношения",
+                "keywords": ["геополитика", "санкции", "саммит"]
+            },
+            "conflicts": {
+                "focus": "Конфликты, военные действия",
+                "keywords": ["конфликт", "война", "перемирие"]
+            },
+            "diplomacy": {
+                "focus": "Дипломатия, переговоры, соглашения",
+                "keywords": ["дипломатия", "переговоры", "соглашение"]
+            },
+            "elections": {
+                "focus": "Выборы, политика, референдумы",
+                "keywords": ["выборы", "референдум", "голосование"]
+            }
+        },
+        "focus": "геополитика, конфликты, дипломатия",
+        "keywords": ["геополитика", "конфликты", "дипломатия"]
+    }
 }
 
 # ============================================================================
@@ -147,20 +296,20 @@ TONE_CARDS = {
 LENGTH_SPECS = {
     "short": {
         "name": "Короткий",
-        "max_words": 100,
-        "paragraphs": "1-2",
+        "max_words": 300,
+        "paragraphs": "2-3",
         "description": "Краткая сводка для быстрого чтения",
     },
     "medium": {
         "name": "Средний",
-        "max_words": 250,
-        "paragraphs": "2-3",
+        "max_words": 600,
+        "paragraphs": "3-4",
         "description": "Сбалансированный дайджест с контекстом",
     },
     "long": {
         "name": "Длинный",
-        "max_words": 500,
-        "paragraphs": "3-5",
+        "max_words": 1000,
+        "paragraphs": "4-6",
         "description": "Подробный анализ с глубоким контекстом",
     },
 }
@@ -249,20 +398,47 @@ FEW_SHOT_EXAMPLES = [
 
 SYSTEM_PROMPT_TEMPLATE = """Ты — {expert_persona}. {writing_style}
 
-ТВОЯ ЗАДАЧА: Создать реалистичный журналистский дайджест в стиле {style_name}.
+ТВОЯ СПЕЦИАЛИЗАЦИЯ: {category_name}
 
+ЗАДАЧА: Создать увлекательный дайджест как для ведущего издания.
+
+СТИЛЬ НАПИСАНИЯ:
+✓ Связное повествование — каждый абзац плавно переходит в следующий
+✓ Показывай СВЯЗИ между событиями ("На фоне этого...", "Параллельно...", "В то же время...")
+✓ Используй метафоры и аналогии для объяснения сложного
+✓ Добавляй контекст и предысторию к каждому событию
+✓ Анализируй причинно-следственные связи
+✓ Создавай нарратив — история развития событий
+
+СТРУКТУРА:
+1. Захватывающее вступление (2-3 предложения о главном тренде)
+2. Основная часть: развитие тем с деталями и анализом
+3. Контекст: как это связано с предыдущими событиями и предстоящими
+4. Выводы: что это значит и что ждать дальше
+
+ТЕХНИКИ STORYTELLING:
+- Начинай с самого интересного факта
+- Используй конкретные цифры и детали
+- Цитируй источники естественно
+- Создавай интригу ("Это не первый раз когда...")
+- Завершай прогнозом или вопросом
+- Используй временные маркеры ("Вчера", "На этой неделе", "Одновременно")
+
+КАЧЕСТВО ТЕКСТА:
+- Избегай повторений и тавтологий
+- Каждое предложение добавляет новую информацию
+- Используй активный залог где возможно
+- Проверяй логическую последовательность
+- Убедись, что каждый абзац имеет четкую цель
+
+Параметры:
 СТИЛЬ: {style_description}
 ХАРАКТЕРИСТИКИ: {characteristics}
 ТОН: {tone_description}
 ДЛИНА: {length_description} ({max_words} слов максимум)
 АУДИТОРИЯ: {audience_description}
 
-КРИТИЧЕСКИ ВАЖНО:
-- НЕ создавай новые факты, числа, даты — используй ТОЛЬКО данные из источников
-- НЕ добавляй информацию, которой нет в предоставленных новостях
-- НЕ используй клише типа "время покажет" или "эксперты считают"
-- НЕ добавляй эмоциональные оценки без обоснования
-- Строго следуй стилю {style_name} и тону {tone_name}
+Пиши так, чтобы читатель не мог оторваться до конца.
 
 ФОРМАТ ОТВЕТА: Строго JSON без дополнительного текста."""
 
@@ -369,6 +545,7 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         expert_persona=style_config["expert_persona"],
         writing_style=style_config["writing_style"],
+        category_name=category_config["name"],
         style_name=style_config["name"],
         style_description=style_config["description"],
         characteristics=", ".join(style_config["characteristics"]),
@@ -384,7 +561,7 @@ def build_prompt(input_payload: Dict[str, Any]) -> Tuple[str, str]:
         category_name=category_config["name"],
         expert=category_config["expert"],
         focus=category_config["focus"],
-        impact=category_config["impact"],
+        impact=category_config.get("impact", category_config["focus"]),  # Используем focus если impact нет
         keywords=", ".join(category_config["keywords"]),
         news_text=input_payload["news_text"],
         min_importance=input_payload.get("min_importance", 0.6),
@@ -555,3 +732,142 @@ def calculate_confidence_score(output: Dict[str, Any], sources_count: int) -> fl
         score += 0.05
 
     return min(score, 1.0)
+
+
+def get_subcategory_config(category: str, subcategory: str) -> Dict[str, Any]:
+    """Get configuration for a specific subcategory."""
+    if category not in CATEGORY_CARDS:
+        raise ValueError(f"Unknown category: {category}")
+
+    category_config = CATEGORY_CARDS[category]
+    if "subcategories" not in category_config:
+        raise ValueError(f"Category {category} has no subcategories")
+
+    if subcategory not in category_config["subcategories"]:
+        raise ValueError(f"Unknown subcategory {subcategory} for category {category}")
+
+    return category_config["subcategories"][subcategory]
+
+
+def get_available_subcategories(category: str) -> List[str]:
+    """Get list of available subcategories for a category."""
+    if category not in CATEGORY_CARDS:
+        raise ValueError(f"Unknown category: {category}")
+
+    category_config = CATEGORY_CARDS[category]
+    if "subcategories" not in category_config:
+        return []
+
+    return list(category_config["subcategories"].keys())
+
+
+def build_prompt_with_subcategory(
+    input_payload: Dict[str, Any],
+    subcategory: str = None
+) -> Tuple[str, str]:
+    """
+    Build system and user prompts with subcategory support.
+
+    Args:
+        input_payload: Dictionary with keys (same as build_prompt)
+        subcategory: Optional subcategory string (e.g., "bitcoin", "stocks")
+
+    Returns:
+        Tuple of (system_prompt, user_prompt)
+    """
+    # First get base prompts
+    system_prompt, user_prompt = build_prompt(input_payload)
+
+    category = input_payload["category"]
+
+    # If subcategory is specified and exists, enhance prompts
+    if subcategory:
+        try:
+            subcategory_config = get_subcategory_config(category, subcategory)
+
+            # Enhance system prompt with subcategory info
+            subcategory_info = f"\n\nСПЕЦИАЛИЗАЦИЯ: {category} → {subcategory_config['focus']}\nКЛЮЧЕВЫЕ СЛОВА ПОДКАТЕГОРИИ: {', '.join(subcategory_config['keywords'])}"
+            system_prompt += subcategory_info
+
+            # Enhance user prompt with subcategory context
+            subcategory_context = f"\n\nПОДКАТЕГОРИЯ: {subcategory}\nФОКУС ПОДКАТЕГОРИИ: {subcategory_config['focus']}\nКЛЮЧЕВЫЕ СЛОВА: {', '.join(subcategory_config['keywords'])}"
+            user_prompt += subcategory_context
+
+        except ValueError:
+            logger.warning(f"Invalid subcategory {subcategory} for category {category}, using base configuration")
+
+    return system_prompt, user_prompt
+
+
+def build_prompt_with_persona(
+    input_payload: Dict[str, Any],
+    persona_id: Optional[str] = None,
+    subcategory: Optional[str] = None,
+    urgency: float = 0.5,
+    complexity: float = 0.5,
+    news_count: int = 5,
+    avg_importance: float = 0.5
+) -> Tuple[str, str]:
+    """
+    Build system and user prompts with automatic persona selection.
+    
+    Args:
+        input_payload: Dictionary with keys (same as build_prompt)
+        persona_id: Optional persona ID to use (if None, auto-selects)
+        subcategory: Optional subcategory string
+        urgency: Urgency level (0.0-1.0)
+        complexity: Complexity level (0.0-1.0)
+        news_count: Number of news items
+        avg_importance: Average importance of news items
+        
+    Returns:
+        Tuple of (system_prompt, user_prompt, selected_persona_id)
+    """
+    category = input_payload["category"]
+    
+    # Auto-select persona if not provided and personas are available
+    if not persona_id and PERSONAS_AVAILABLE:
+        try:
+            persona_id, persona_config = select_persona_for_context(
+                category=category,
+                subcategory=subcategory,
+                urgency=urgency,
+                complexity=complexity,
+                news_count=news_count,
+                avg_importance=avg_importance
+            )
+            
+            # Override style_profile in input_payload with persona style
+            if persona_config.get("style") in STYLE_CARDS:
+                input_payload["style_profile"] = persona_config["style"]
+                logger.info(f"Auto-selected persona: {persona_id} with style {persona_config['style']}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to auto-select persona: {e}, using default style")
+    
+    # Get base prompts (with or without subcategory)
+    if subcategory:
+        system_prompt, user_prompt = build_prompt_with_subcategory(input_payload, subcategory)
+    else:
+        system_prompt, user_prompt = build_prompt(input_payload)
+    
+    # Enhance with persona context if available
+    if persona_id and PERSONAS_AVAILABLE:
+        try:
+            selector = PersonaSelector()
+            persona_context = selector.get_persona_prompt_context(persona_id)
+            
+            # Add persona context to system prompt
+            system_prompt += f"\n\n{persona_context}"
+            
+            # Update input_payload meta to include persona info
+            if "meta" not in input_payload:
+                input_payload["meta"] = {}
+            input_payload["meta"]["selected_persona"] = persona_id
+            
+            logger.info(f"Enhanced prompts with persona: {persona_id}")
+            
+        except Exception as e:
+            logger.warning(f"Failed to enhance prompts with persona {persona_id}: {e}")
+    
+    return system_prompt, user_prompt

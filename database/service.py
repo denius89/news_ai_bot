@@ -385,6 +385,7 @@ class DatabaseService:
         source: Optional[str] = None,
         categories: Optional[List[str]] = None,
         limit: int = 10,
+        days_back: Optional[int] = None,
     ) -> List[Dict]:
         """
         Get latest news (async version).
@@ -393,6 +394,7 @@ class DatabaseService:
             source: Filter by source name
             categories: Filter by categories
             limit: Maximum number of news items
+            days_back: Number of days back to filter (e.g., 7 for last 7 days)
 
         Returns:
             List of news dictionaries
@@ -403,7 +405,7 @@ class DatabaseService:
             logger.error("❌ Failed to get async client: %s", e)
             return []
 
-        logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+        logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s, days_back=%s", source, categories, limit, days_back)
 
         query = (
             client.table("news")
@@ -419,10 +421,21 @@ class DatabaseService:
 
         if categories:
             query = query.in_("category", categories)
+            logger.debug(f"Added category filter: {categories}")
+
+        # Add date filtering if days_back is specified
+        if days_back:
+            from datetime import datetime, timezone, timedelta
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
+            cutoff_iso = cutoff_date.isoformat()
+            query = query.gte("published_at", cutoff_iso)
+            logger.debug(f"Filtering news from last {days_back} days (since {cutoff_iso})")
 
         try:
+            logger.debug(f"Executing query: categories={categories}, limit={limit}, days_back={days_back}")
             result = await self.async_safe_execute(query)
             news_items = result.data or []
+            logger.debug(f"Query returned {len(news_items)} items")
 
             # Add formatted dates for backward compatibility
             for item in news_items:
@@ -443,6 +456,7 @@ class DatabaseService:
         categories: Optional[List[str]] = None,
         limit: int = 10,
         min_importance: Optional[float] = None,
+        days_back: Optional[int] = None,
     ) -> List[Dict]:
         """
         Get latest news with importance filtering (async version).
@@ -452,6 +466,7 @@ class DatabaseService:
             categories: Filter by categories
             limit: Maximum number of news items
             min_importance: Minimum importance threshold
+            days_back: Number of days back to filter (e.g., 7 for last 7 days)
 
         Returns:
             List of news dictionaries sorted by importance
@@ -463,11 +478,12 @@ class DatabaseService:
             return []
 
         logger.debug(
-            "async_get_latest_news_with_importance: source=%s, categories=%s, limit=%s, min_importance=%s",
+            "async_get_latest_news_with_importance: source=%s, categories=%s, limit=%s, min_importance=%s, days_back=%s",
             source,
             categories,
             limit,
             min_importance,
+            days_back,
         )
 
         query = (
@@ -484,13 +500,25 @@ class DatabaseService:
 
         if categories:
             query = query.in_("category", categories)
+            logger.debug(f"Added category filter to importance query: {categories}")
 
         if min_importance is not None:
             query = query.gte("importance", min_importance)
+            logger.debug(f"Added importance filter: >= {min_importance}")
+
+        # Add date filtering if days_back is specified
+        if days_back:
+            from datetime import datetime, timezone, timedelta
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
+            cutoff_iso = cutoff_date.isoformat()
+            query = query.gte("published_at", cutoff_iso)
+            logger.debug(f"Filtering news with importance from last {days_back} days (since {cutoff_iso})")
 
         try:
+            logger.debug(f"Executing importance query: categories={categories}, limit={limit}, min_importance={min_importance}, days_back={days_back}")
             result = await self.async_safe_execute(query)
             news_items = result.data or []
+            logger.debug(f"Importance query returned {len(news_items)} items")
 
             # Add formatted dates for backward compatibility
             for item in news_items:
@@ -508,7 +536,7 @@ class DatabaseService:
         except Exception as e:
             logger.error("❌ Error async retrieving news with importance: %s", e)
             # Fallback на обычную функцию
-            return await self.async_get_latest_news(source, categories, limit)
+            return await self.async_get_latest_news(source, categories, limit, days_back)
 
     async def async_upsert_news(self, items: List[Dict]) -> int:
         """
@@ -716,15 +744,24 @@ class DatabaseService:
             Digest ID or None if failed
         """
         try:
+            logger.debug(f"🔍 save_digest called with data keys: {digest_data.keys()}")
             query = self.sync_client.table("digests").insert(digest_data)
+            logger.debug("🔍 Executing insert query for digest")
             result = self.safe_execute(query)
 
+            logger.debug(f"🔍 Insert result: data={result.data is not None}, count={len(result.data) if result.data else 0}")
             if result.data and len(result.data) > 0:
-                return result.data[0]["id"]
-            return None
+                digest_id = result.data[0]["id"]
+                logger.info(f"✅ Digest saved successfully with ID: {digest_id}")
+                return digest_id
+            else:
+                logger.error("❌ save_digest: result.data is empty or None")
+                return None
 
         except Exception as e:
             logger.error("❌ Error saving digest: %s", e)
+            import traceback
+            logger.error("❌ Traceback: %s", traceback.format_exc())
             return None
 
     def get_user_digests(
@@ -827,10 +864,11 @@ async def async_get_latest_news(
     source: Optional[str] = None,
     categories: Optional[List[str]] = None,
     limit: int = 10,
+    days_back: Optional[int] = None,
 ) -> List[Dict]:
     """Backward compatibility function for async_get_latest_news."""
     service = get_async_service()
-    return await service.async_get_latest_news(source, categories, limit)
+    return await service.async_get_latest_news(source, categories, limit, days_back)
 
 
 async def async_upsert_news(items: List[Dict]) -> int:
