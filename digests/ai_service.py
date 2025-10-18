@@ -19,24 +19,28 @@ from digests.prompts import get_prompt_for_category, PROMPTS as LEGACY_PROMPTS
 
 try:
     from digests.prompts_v2 import build_prompt, STYLE_CARDS, CATEGORY_CARDS
+
     PROMPTS_V2_AVAILABLE = True
 except ImportError:
     PROMPTS_V2_AVAILABLE = False
 
 try:
     from digests.multistage_generator import generate_multistage_digest
+
     MULTISTAGE_AVAILABLE = True
 except ImportError:
     MULTISTAGE_AVAILABLE = False
 
 try:
     from digests.rag_system import get_rag_context
+
     RAG_SYSTEM_AVAILABLE = True
 except ImportError:
     RAG_SYSTEM_AVAILABLE = False
 
 try:
     from digests.personalization import PersonalizedDigestGenerator
+
     PERSONALIZATION_AVAILABLE = True
 except ImportError:
     PERSONALIZATION_AVAILABLE = False
@@ -45,6 +49,7 @@ try:
     from ai_modules.personas import select_persona_for_context
     from ai_modules.news_graph import StoryContextManager
     from ai_modules.feedback_loop import FeedbackAnalyzer
+
     SUPER_JOURNALIST_V3_AVAILABLE = True
 except ImportError:
     SUPER_JOURNALIST_V3_AVAILABLE = False
@@ -65,7 +70,7 @@ class DigestConfig:
     use_events: bool = True  # Enable events fetching from database
     user_id: Optional[str] = None  # User ID for personalization
     audience: str = "general"  # Target audience type
-    
+
     # Super Journalist v3 features
     use_personas: bool = False  # Enable automatic persona selection
     use_story_memory: bool = False  # Enable historical context from news graph
@@ -105,7 +110,12 @@ class DigestAIService:
             return 1000  # default
 
     async def build_digest(
-        self, news_items: List[NewsItem], style: str = "analytical", category: str = "all", length: str = "medium", subcategory: Optional[str] = None
+        self,
+        news_items: List[NewsItem],
+        style: str = "analytical",
+        category: str = "all",
+        length: str = "medium",
+        subcategory: Optional[str] = None,
     ) -> str:
         """
         Build AI-powered digest from news items.
@@ -133,7 +143,12 @@ class DigestAIService:
             return self._build_fallback_digest(limited_news)
 
     async def _llm_summarize(
-        self, news_items: List[NewsItem], style: str, category: str = "world", length: str = "medium", subcategory: Optional[str] = None
+        self,
+        news_items: List[NewsItem],
+        style: str,
+        category: str = "world",
+        length: str = "medium",
+        subcategory: Optional[str] = None,
     ) -> str:
         """
         Generate AI-powered summary using OpenAI.
@@ -166,7 +181,8 @@ class DigestAIService:
         subcategory = None
         if news_data:
             from collections import Counter
-            subcats = [item.get('subcategory') for item in news_data if item.get('subcategory')]
+
+            subcats = [item.get("subcategory") for item in news_data if item.get("subcategory")]
             if subcats:
                 subcategory = Counter(subcats).most_common(1)[0][0]
 
@@ -184,11 +200,13 @@ class DigestAIService:
                     style=style,
                     events=events,
                     use_reasoning=True,
-                    use_rag=self.config.use_rag
+                    use_rag=self.config.use_rag,
                 )
 
-                logger.info(f"Multi-stage generation completed: {result['stats']['word_count']} words, {result['stats']['generation_time_sec']:.2f}s")
-                return result['text']
+                logger.info(
+                    f"Multi-stage generation completed: {result['stats']['word_count']} words, {result['stats']['generation_time_sec']:.2f}s"
+                )
+                return result["text"]
 
             except Exception as e:
                 logger.warning(f"Multi-stage generation failed, falling back to standard: {e}")
@@ -205,10 +223,10 @@ class DigestAIService:
 
         # Call OpenAI API with timeout
         import asyncio
+
         try:
             response = await asyncio.wait_for(
-                ask_async(prompt=prompt, style=style, max_tokens=max_tokens),
-                timeout=timeout_seconds
+                ask_async(prompt=prompt, style=style, max_tokens=max_tokens), timeout=timeout_seconds
             )
         except asyncio.TimeoutError:
             logger.error(f"OpenAI API timeout after {timeout_seconds} seconds for length={length}")
@@ -255,10 +273,7 @@ class DigestAIService:
         return response
 
     async def _fetch_relevant_events(
-        self,
-        news_items: List[NewsItem],
-        category: str,
-        subcategory: Optional[str] = None
+        self, news_items: List[NewsItem], category: str, subcategory: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """Получить релевантные события из БД."""
         try:
@@ -275,6 +290,7 @@ class DigestAIService:
             # Определяем период
             from datetime import timezone
             import time
+
             now = datetime.now(timezone.utc)
             start = now - timedelta(hours=12)
             end = now + timedelta(days=2)
@@ -282,16 +298,11 @@ class DigestAIService:
             # ✅ ЧИТАЕМ ИЗ БД (быстро!)
             start_time = time.time()
             all_events = await events_service.get_events_by_date_range(
-                from_date=start,
-                to_date=end,
-                category=category  # Фильтруем сразу
+                from_date=start, to_date=end, category=category  # Фильтруем сразу
             )
             elapsed = time.time() - start_time
 
-            logger.info(
-                f"⏱️ Events from DB: {len(all_events)} events "
-                f"in {elapsed*1000:.0f}ms for {category}"
-            )
+            logger.info(f"⏱️ Events from DB: {len(all_events)} events " f"in {elapsed*1000:.0f}ms for {category}")
 
             if not all_events:
                 logger.info("No events found in database for period")
@@ -299,10 +310,7 @@ class DigestAIService:
 
             # Фильтр по подкатегории
             if subcategory:
-                all_events = [
-                    e for e in all_events
-                    if e.subcategory == subcategory
-                ]
+                all_events = [e for e in all_events if e.subcategory == subcategory]
                 logger.info(f"After subcategory filter: {len(all_events)}")
 
             # Фильтр по важности
@@ -314,16 +322,18 @@ class DigestAIService:
             # Формируем результат
             result = []
             for e in relevant[:4]:
-                result.append({
-                    "title": e.title,
-                    "date": e.starts_at.strftime('%d.%m.%Y'),
-                    "description": e.description or "",
-                    "importance": e.importance,
-                    "subcategory": e.subcategory
-                })
+                result.append(
+                    {
+                        "title": e.title,
+                        "date": e.starts_at.strftime("%d.%m.%Y"),
+                        "description": e.description or "",
+                        "importance": e.importance,
+                        "subcategory": e.subcategory,
+                    }
+                )
 
             return result
-            
+
         except Exception as e:
             logger.warning(f"Failed to fetch events: {e}")
             return []  # Graceful degradation
@@ -336,7 +346,7 @@ class DigestAIService:
         category: str = "world",
         length: str = "medium",
         subcategory: Optional[str] = None,
-        news_items: Optional[List[NewsItem]] = None
+        news_items: Optional[List[NewsItem]] = None,
     ) -> str:
         """Create AI prompt based on news data, style, category, events, and RAG examples."""
 
@@ -364,7 +374,7 @@ class DigestAIService:
                     subcategory=subcategory,
                     style=style,
                     news_items=news_items,
-                    max_samples=3  # Возвращаем к 3 для качества, но с кэшированием это быстро
+                    max_samples=3,  # Возвращаем к 3 для качества, но с кэшированием это быстро
                 )
                 if rag_context:
                     # Разумное ограничение RAG контекста для баланса скорости/качества
@@ -417,31 +427,37 @@ class DigestAIService:
             logger.warning(f"Invalid personalized_style '{personalized_style}', falling back to '{style}'")
             logger.warning(f"Available styles: {list(STYLE_CARDS.keys())}")
             personalized_style = style
-            
+
         # Дополнительная проверка: если и оригинальный стиль не найден, используем analytical
         if personalized_style not in STYLE_CARDS:
             logger.warning(f"Original style '{style}' also not found in STYLE_CARDS, using 'analytical' as fallback")
             personalized_style = "analytical"
-        
-        logger.info(f"Style check: original='{style}', personalized='{personalized_style}', valid={personalized_style in STYLE_CARDS}")
-        
+
+        logger.info(
+            f"Style check: original='{style}', personalized='{personalized_style}', valid={personalized_style in STYLE_CARDS}"
+        )
+
         # Добавляем исторический контекст если включена функция story memory
         story_context = ""
-        if (self.config.use_story_memory and SUPER_JOURNALIST_V3_AVAILABLE and news_items):
+        if self.config.use_story_memory and SUPER_JOURNALIST_V3_AVAILABLE and news_items:
             try:
                 from database.db_models import supabase
+
                 if supabase:
                     context_manager = StoryContextManager(supabase)
                     story_context = context_manager.get_historical_context_for_digest(
-                        news_items=[{
-                            "id": item.get("id"),
-                            "title": item.get("title", ""),
-                            "content": item.get("content", ""),
-                            "importance": item.get("importance", 0.5),
-                            "category": category
-                        } for item in news_items],
+                        news_items=[
+                            {
+                                "id": item.get("id"),
+                                "title": item.get("title", ""),
+                                "content": item.get("content", ""),
+                                "importance": item.get("importance", 0.5),
+                                "category": category,
+                            }
+                            for item in news_items
+                        ],
                         category=category,
-                        lookback_days=30
+                        lookback_days=30,
                     )
                     if story_context:
                         news_text = story_context + "\n\n" + news_text
@@ -455,12 +471,18 @@ class DigestAIService:
 
             # Добавляем события к news_text если есть
             if events:
-                events_text = "\n\n📅 ПРЕДСТОЯЩИЕ СОБЫТИЯ:\n" + "\n".join([
-                    f"• {e['title']} ({e['date']}) — важность: {e['importance']:.1f}"
-                    f"\n  Подкатегория: {e['subcategory']}"
-                    f"\n  {e['description']}" if e['description'] else ""
-                    for e in events
-                ])
+                events_text = "\n\n📅 ПРЕДСТОЯЩИЕ СОБЫТИЯ:\n" + "\n".join(
+                    [
+                        (
+                            f"• {e['title']} ({e['date']}) — важность: {e['importance']:.1f}"
+                            f"\n  Подкатегория: {e['subcategory']}"
+                            f"\n  {e['description']}"
+                            if e["description"]
+                            else ""
+                        )
+                        for e in events
+                    ]
+                )
                 news_text += events_text + "\n\nЕсли события связаны с новостями, упомяни это естественно.\n"
 
             # Добавляем персонализацию к контексту новостей
@@ -483,7 +505,7 @@ class DigestAIService:
             urgency = 0.5  # Default
             complexity = 0.5  # Default
             if news_data:
-                avg_importance = sum(item.get('importance', 0.5) for item in news_data) / len(news_data)
+                avg_importance = sum(item.get("importance", 0.5) for item in news_data) / len(news_data)
                 urgency = min(avg_importance, 1.0)  # Use importance as urgency proxy
                 complexity = 0.8 if len(news_data) > 5 else 0.4  # More news = more complex
 
@@ -491,6 +513,7 @@ class DigestAIService:
                 # Используем новую функцию с поддержкой персон и подкатегорий
                 if self.config.use_personas and SUPER_JOURNALIST_V3_AVAILABLE:
                     from digests.prompts_v2 import build_prompt_with_persona
+
                     system_prompt, user_prompt = build_prompt_with_persona(
                         input_payload,
                         persona_id=None,  # Auto-select
@@ -498,20 +521,21 @@ class DigestAIService:
                         urgency=urgency,
                         complexity=complexity,
                         news_count=len(news_data),
-                        avg_importance=avg_importance if news_data else 0.5
+                        avg_importance=avg_importance if news_data else 0.5,
                     )
                 else:
                     # Используем функцию с поддержкой подкатегорий без персон
                     from digests.prompts_v2 import build_prompt_with_subcategory
+
                     system_prompt, user_prompt = build_prompt_with_subcategory(input_payload, subcategory)
-                
+
                 final_prompt = f"{system_prompt}\n\n{user_prompt}"
-                
+
                 # ОПТИМИЗАЦИЯ: ограничиваем размер нового промпта
                 if len(final_prompt) > 8000:
                     logger.warning(f"Prompts_v2 prompt too large ({len(final_prompt)} chars), truncating")
                     final_prompt = final_prompt[:8000] + "\n\n[Текст обрезан для ускорения]"
-                
+
                 logger.info(f"Prompts_v2 final size: {len(final_prompt)} characters")
                 return final_prompt
             except ImportError:
@@ -529,10 +553,9 @@ class DigestAIService:
 
         # Добавляем события к news_text если есть (для legacy системы тоже)
         if events:
-            events_text = "\n\n📅 ПРЕДСТОЯЩИЕ СОБЫТИЯ:\n" + "\n".join([
-                f"• {e['title']} ({e['date']})"
-                for e in events[:3]  # Ограничиваем для legacy
-            ])
+            events_text = "\n\n📅 ПРЕДСТОЯЩИЕ СОБЫТИЯ:\n" + "\n".join(
+                [f"• {e['title']} ({e['date']})" for e in events[:3]]  # Ограничиваем для legacy
+            )
             news_text += events_text
 
         # Проверяем, поддерживает ли legacy система этот стиль
@@ -548,12 +571,12 @@ class DigestAIService:
 
         # Форматируем финальный промт с данными
         final_prompt = formatted_prompt.replace("{text_block}", news_text).replace("{links_block}", links_block)
-        
+
         # ОПТИМИЗАЦИЯ: ограничиваем финальный размер промпта для ускорения
         if len(final_prompt) > 8000:  # Ограничиваем общий размер промпта
             logger.warning(f"Prompt too large ({len(final_prompt)} chars), truncating to 8000")
             final_prompt = final_prompt[:8000] + "\n\n[Текст обрезан для ускорения]"
-        
+
         logger.info(f"Final prompt size: {len(final_prompt)} characters")
         return final_prompt
 

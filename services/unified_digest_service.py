@@ -196,7 +196,9 @@ class UnifiedDigestService:
             # "daily" and other values default to None (no date filtering)
 
             logger.info(f"🔍 Period '{period}' converted to days_back={days_back} for category={categories}")
-            logger.info(f"🔍 Filtering parameters: categories={categories}, limit={limit}, min_importance={min_importance}")
+            logger.info(
+                f"🔍 Filtering parameters: categories={categories}, limit={limit}, min_importance={min_importance}"
+            )
 
             # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ С ФИЛЬТРАЦИЕЙ ПО ВАЖНОСТИ
             if min_importance is not None:
@@ -207,18 +209,28 @@ class UnifiedDigestService:
             else:
                 logger.info("🔍 Using standard filter (no min_importance)")
                 # Use updated function with date filtering
-                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit, days_back=days_back)
+                news_items = await self.db_service.async_get_latest_news(
+                    categories=categories, limit=limit, days_back=days_back
+                )
 
-            logger.info(f"📰 Retrieved {len(news_items)} news items for period={period}, days_back={days_back}, categories={categories}")
+            logger.info(
+                f"📰 Retrieved {len(news_items)} news items for period={period}, days_back={days_back}, categories={categories}"
+            )
 
             # Fallback: если не найдено новостей с фильтром по важности, попробуем без него
             if not news_items and min_importance is not None and categories:
-                logger.warning(f"⚠️ No news with importance filter, trying without importance filter for categories={categories}")
-                news_items = await self.db_service.async_get_latest_news(categories=categories, limit=limit, days_back=days_back)
+                logger.warning(
+                    f"⚠️ No news with importance filter, trying without importance filter for categories={categories}"
+                )
+                news_items = await self.db_service.async_get_latest_news(
+                    categories=categories, limit=limit, days_back=days_back
+                )
                 logger.info(f"📰 Fallback retrieved {len(news_items)} news items without importance filter")
             # Логируем первые несколько новостей для отладки
             if news_items:
-                logger.info(f"📰 First few news items: {[{'title': item.get('title', '')[:50], 'category': item.get('category'), 'importance': item.get('importance')} for item in news_items[:3]]}")
+                logger.info(
+                    f"📰 First few news items: {[{'title': item.get('title', '')[:50], 'category': item.get('category'), 'importance': item.get('importance')} for item in news_items[:3]]}"
+                )
             else:
                 logger.warning(f"⚠️ No news items found for categories={categories}, period={period}")
 
@@ -231,13 +243,14 @@ class UnifiedDigestService:
 
             # Create configuration with new parameters
             from digests.ai_service import DigestConfig
+
             config = DigestConfig(
                 use_multistage=use_multistage,
                 use_rag=use_rag,
                 use_personalization=use_personalization,
                 user_id=user_id,
                 audience=audience,
-                max_items=limit
+                max_items=limit,
             )
             ai_service = DigestAIService(config=config)
 

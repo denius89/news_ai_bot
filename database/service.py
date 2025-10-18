@@ -405,7 +405,13 @@ class DatabaseService:
             logger.error("❌ Failed to get async client: %s", e)
             return []
 
-        logger.debug("async_get_latest_news: source=%s, categories=%s, limit=%s, days_back=%s", source, categories, limit, days_back)
+        logger.debug(
+            "async_get_latest_news: source=%s, categories=%s, limit=%s, days_back=%s",
+            source,
+            categories,
+            limit,
+            days_back,
+        )
 
         query = (
             client.table("news")
@@ -426,6 +432,7 @@ class DatabaseService:
         # Add date filtering if days_back is specified
         if days_back:
             from datetime import datetime, timezone, timedelta
+
             cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
             cutoff_iso = cutoff_date.isoformat()
             query = query.gte("published_at", cutoff_iso)
@@ -509,13 +516,16 @@ class DatabaseService:
         # Add date filtering if days_back is specified
         if days_back:
             from datetime import datetime, timezone, timedelta
+
             cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_back)
             cutoff_iso = cutoff_date.isoformat()
             query = query.gte("published_at", cutoff_iso)
             logger.debug(f"Filtering news with importance from last {days_back} days (since {cutoff_iso})")
 
         try:
-            logger.debug(f"Executing importance query: categories={categories}, limit={limit}, min_importance={min_importance}, days_back={days_back}")
+            logger.debug(
+                f"Executing importance query: categories={categories}, limit={limit}, min_importance={min_importance}, days_back={days_back}"
+            )
             result = await self.async_safe_execute(query)
             news_items = result.data or []
             logger.debug(f"Importance query returned {len(news_items)} items")
@@ -749,7 +759,9 @@ class DatabaseService:
             logger.debug("🔍 Executing insert query for digest")
             result = self.safe_execute(query)
 
-            logger.debug(f"🔍 Insert result: data={result.data is not None}, count={len(result.data) if result.data else 0}")
+            logger.debug(
+                f"🔍 Insert result: data={result.data is not None}, count={len(result.data) if result.data else 0}"
+            )
             if result.data and len(result.data) > 0:
                 digest_id = result.data[0]["id"]
                 logger.info(f"✅ Digest saved successfully with ID: {digest_id}")
@@ -761,6 +773,7 @@ class DatabaseService:
         except Exception as e:
             logger.error("❌ Error saving digest: %s", e)
             import traceback
+
             logger.error("❌ Traceback: %s", traceback.format_exc())
             return None
 

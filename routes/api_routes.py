@@ -982,7 +982,7 @@ def generate_digest():
                 logger.debug(f"Применен умный фильтр по времени: min_importance={final_min_importance}")
             except Exception as e:
                 logger.warning(f"Не удалось получить умный фильтр: {e}")
-        
+
         logger.info(f"📋 final_min_importance: {final_min_importance}")
         digest_service = get_async_digest_service()
 
@@ -1027,12 +1027,13 @@ def generate_digest():
                 logger.info(f"🔍 Attempting to save digest for user_id={user_id}, save_digest={save_digest}")
                 # user_id уже является UUID строкой, не нужно искать пользователя
                 db_service = get_sync_service()
-                
+
                 # Проверяем существование пользователя в базе данных
                 from supabase import create_client
                 from config.core.settings import SUPABASE_URL, SUPABASE_KEY
+
                 supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
-                
+
                 try:
                     user_check = supabase_client.table("users").select("id").eq("id", user_id).execute()
                     if not user_check.data:
@@ -1043,7 +1044,7 @@ def generate_digest():
                 except Exception as user_check_error:
                     logger.error(f"❌ Error checking user existence: {user_check_error}")
                     # Не прерываем выполнение, попробуем сохранить
-                
+
                 digest_data = {
                     "user_id": str(user_id),
                     "summary": digest_text,  # Для обратной совместимости
@@ -1065,19 +1066,20 @@ def generate_digest():
                         "audience": audience,
                     },
                 }
-                
+
                 logger.info(f"🔍 Saving digest data: {len(str(digest_data))} chars, category={category}, style={style}")
                 digest_id = db_service.save_digest(digest_data)
                 logger.info(f"🔍 Save result: digest_id={digest_id}")
-                
+
                 if digest_id:
                     logger.info(f"✅ Дайджест сохранен для пользователя {user_id}: {digest_id}")
                 else:
                     logger.error(f"❌ save_digest вернул None для пользователя {user_id}")
-                    
+
             except Exception as save_error:
                 logger.error(f"❌ Exception при сохранении дайджеста: {save_error}")
                 import traceback
+
                 logger.error(f"❌ Traceback: {traceback.format_exc()}")
                 # Продолжаем выполнение даже если сохранение не удалось
         else:
