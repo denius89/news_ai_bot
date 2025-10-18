@@ -15,6 +15,7 @@ logger = logging.getLogger("prompts_v2")
 # Import personas for automatic selection
 try:
     from ai_modules.personas import PersonaSelector, select_persona_for_context
+
     PERSONAS_AVAILABLE = True
 except ImportError:
     PERSONAS_AVAILABLE = False
@@ -142,27 +143,27 @@ CATEGORY_CARDS = {
         "subcategories": {
             "bitcoin": {
                 "focus": "BTC, майнинг, халвинг, институциональное принятие",
-                "keywords": ["bitcoin", "btc", "халвинг", "майнинг", "etf"]
+                "keywords": ["bitcoin", "btc", "халвинг", "майнинг", "etf"],
             },
             "ethereum": {
                 "focus": "ETH, смарт-контракты, обновления сети, DeFi",
-                "keywords": ["ethereum", "eth", "eip", "merge", "staking"]
+                "keywords": ["ethereum", "eth", "eip", "merge", "staking"],
             },
             "defi": {
                 "focus": "Децентрализованные финансы, протоколы, TVL",
-                "keywords": ["defi", "tvl", "yield", "lending", "dex"]
+                "keywords": ["defi", "tvl", "yield", "lending", "dex"],
             },
             "nft": {
                 "focus": "NFT, метавселенные, коллекции",
-                "keywords": ["nft", "opensea", "метавселенная", "коллекция"]
+                "keywords": ["nft", "opensea", "метавселенная", "коллекция"],
             },
             "regulation": {
                 "focus": "Регуляция, законодательство, SEC, MiCA",
-                "keywords": ["sec", "регуляция", "mica", "закон", "запрет"]
-            }
+                "keywords": ["sec", "регуляция", "mica", "закон", "запрет"],
+            },
         },
         "focus": "блокчейн, DeFi, NFT, регуляция",
-        "keywords": ["блокчейн", "DeFi", "NFT", "регуляция"]
+        "keywords": ["блокчейн", "DeFi", "NFT", "регуляция"],
     },
     "markets": {
         "name": "Финансовые рынки",
@@ -170,47 +171,38 @@ CATEGORY_CARDS = {
         "subcategories": {
             "stocks": {
                 "focus": "Акции, индексы, корпоративные новости",
-                "keywords": ["акции", "s&p500", "nasdaq", "дивиденды"]
+                "keywords": ["акции", "s&p500", "nasdaq", "дивиденды"],
             },
             "forex": {
                 "focus": "Валютные пары, ЦБ, процентные ставки",
-                "keywords": ["forex", "доллар", "евро", "фрс", "ставка"]
+                "keywords": ["forex", "доллар", "евро", "фрс", "ставка"],
             },
             "commodities": {
                 "focus": "Нефть, золото, сырьевые товары",
-                "keywords": ["нефть", "золото", "газ", "металлы"]
+                "keywords": ["нефть", "золото", "газ", "металлы"],
             },
             "bonds": {
                 "focus": "Облигации, доходность, долговой рынок",
-                "keywords": ["облигации", "доходность", "трежерис"]
-            }
+                "keywords": ["облигации", "доходность", "трежерис"],
+            },
         },
         "focus": "фондовые рынки, валюты, сырьевые товары",
-        "keywords": ["акции", "валюта", "нефть", "золото"]
+        "keywords": ["акции", "валюта", "нефть", "золото"],
     },
     "tech": {
         "name": "Технологии",
         "expert": "Илон Маск",
         "subcategories": {
-            "ai": {
-                "focus": "ИИ, LLM, машинное обучение",
-                "keywords": ["ai", "gpt", "llm", "машинное обучение"]
-            },
-            "startups": {
-                "focus": "Стартапы, венчур, IPO, M&A",
-                "keywords": ["стартап", "венчур", "ipo", "сделка"]
-            },
+            "ai": {"focus": "ИИ, LLM, машинное обучение", "keywords": ["ai", "gpt", "llm", "машинное обучение"]},
+            "startups": {"focus": "Стартапы, венчур, IPO, M&A", "keywords": ["стартап", "венчур", "ipo", "сделка"]},
             "cybersecurity": {
                 "focus": "Кибербезопасность, уязвимости, атаки",
-                "keywords": ["взлом", "уязвимость", "кибератака", "cve"]
+                "keywords": ["взлом", "уязвимость", "кибератака", "cve"],
             },
-            "gadgets": {
-                "focus": "Гаджеты, релизы, обзоры",
-                "keywords": ["iphone", "samsung", "релиз", "анонс"]
-            }
+            "gadgets": {"focus": "Гаджеты, релизы, обзоры", "keywords": ["iphone", "samsung", "релиз", "анонс"]},
         },
         "focus": "ИИ, стартапы, кибербезопасность, гаджеты",
-        "keywords": ["ИИ", "стартапы", "кибербезопасность"]
+        "keywords": ["ИИ", "стартапы", "кибербезопасность"],
     },
     "sports": {
         "name": "Спорт",
@@ -218,23 +210,14 @@ CATEGORY_CARDS = {
         "subcategories": {
             "football": {
                 "focus": "Футбол, матчи, трансферы, турниры",
-                "keywords": ["футбол", "матч", "трансфер", "лига"]
+                "keywords": ["футбол", "матч", "трансфер", "лига"],
             },
-            "basketball": {
-                "focus": "Баскетбол, NBA, Евролига",
-                "keywords": ["баскетбол", "nba", "евролига"]
-            },
-            "esports": {
-                "focus": "Киберспорт, турниры, команды",
-                "keywords": ["esports", "dota", "csgo", "турнир"]
-            },
-            "other": {
-                "focus": "Другие виды спорта",
-                "keywords": ["хоккей", "теннис", "формула"]
-            }
+            "basketball": {"focus": "Баскетбол, NBA, Евролига", "keywords": ["баскетбол", "nba", "евролига"]},
+            "esports": {"focus": "Киберспорт, турниры, команды", "keywords": ["esports", "dota", "csgo", "турнир"]},
+            "other": {"focus": "Другие виды спорта", "keywords": ["хоккей", "теннис", "формула"]},
         },
         "focus": "результаты, трансферы, турниры",
-        "keywords": ["матчи", "трансферы", "турниры"]
+        "keywords": ["матчи", "трансферы", "турниры"],
     },
     "world": {
         "name": "Мир",
@@ -242,24 +225,21 @@ CATEGORY_CARDS = {
         "subcategories": {
             "geopolitics": {
                 "focus": "Геополитика, международные отношения",
-                "keywords": ["геополитика", "санкции", "саммит"]
+                "keywords": ["геополитика", "санкции", "саммит"],
             },
-            "conflicts": {
-                "focus": "Конфликты, военные действия",
-                "keywords": ["конфликт", "война", "перемирие"]
-            },
+            "conflicts": {"focus": "Конфликты, военные действия", "keywords": ["конфликт", "война", "перемирие"]},
             "diplomacy": {
                 "focus": "Дипломатия, переговоры, соглашения",
-                "keywords": ["дипломатия", "переговоры", "соглашение"]
+                "keywords": ["дипломатия", "переговоры", "соглашение"],
             },
             "elections": {
                 "focus": "Выборы, политика, референдумы",
-                "keywords": ["выборы", "референдум", "голосование"]
-            }
+                "keywords": ["выборы", "референдум", "голосование"],
+            },
         },
         "focus": "геополитика, конфликты, дипломатия",
-        "keywords": ["геополитика", "конфликты", "дипломатия"]
-    }
+        "keywords": ["геополитика", "конфликты", "дипломатия"],
+    },
 }
 
 # ============================================================================
@@ -761,10 +741,7 @@ def get_available_subcategories(category: str) -> List[str]:
     return list(category_config["subcategories"].keys())
 
 
-def build_prompt_with_subcategory(
-    input_payload: Dict[str, Any],
-    subcategory: str = None
-) -> Tuple[str, str]:
+def build_prompt_with_subcategory(input_payload: Dict[str, Any], subcategory: str = None) -> Tuple[str, str]:
     """
     Build system and user prompts with subcategory support.
 
@@ -806,11 +783,11 @@ def build_prompt_with_persona(
     urgency: float = 0.5,
     complexity: float = 0.5,
     news_count: int = 5,
-    avg_importance: float = 0.5
+    avg_importance: float = 0.5,
 ) -> Tuple[str, str]:
     """
     Build system and user prompts with automatic persona selection.
-    
+
     Args:
         input_payload: Dictionary with keys (same as build_prompt)
         persona_id: Optional persona ID to use (if None, auto-selects)
@@ -819,12 +796,12 @@ def build_prompt_with_persona(
         complexity: Complexity level (0.0-1.0)
         news_count: Number of news items
         avg_importance: Average importance of news items
-        
+
     Returns:
         Tuple of (system_prompt, user_prompt, selected_persona_id)
     """
     category = input_payload["category"]
-    
+
     # Auto-select persona if not provided and personas are available
     if not persona_id and PERSONAS_AVAILABLE:
         try:
@@ -834,40 +811,40 @@ def build_prompt_with_persona(
                 urgency=urgency,
                 complexity=complexity,
                 news_count=news_count,
-                avg_importance=avg_importance
+                avg_importance=avg_importance,
             )
-            
+
             # Override style_profile in input_payload with persona style
             if persona_config.get("style") in STYLE_CARDS:
                 input_payload["style_profile"] = persona_config["style"]
                 logger.info(f"Auto-selected persona: {persona_id} with style {persona_config['style']}")
-            
+
         except Exception as e:
             logger.warning(f"Failed to auto-select persona: {e}, using default style")
-    
+
     # Get base prompts (with or without subcategory)
     if subcategory:
         system_prompt, user_prompt = build_prompt_with_subcategory(input_payload, subcategory)
     else:
         system_prompt, user_prompt = build_prompt(input_payload)
-    
+
     # Enhance with persona context if available
     if persona_id and PERSONAS_AVAILABLE:
         try:
             selector = PersonaSelector()
             persona_context = selector.get_persona_prompt_context(persona_id)
-            
+
             # Add persona context to system prompt
             system_prompt += f"\n\n{persona_context}"
-            
+
             # Update input_payload meta to include persona info
             if "meta" not in input_payload:
                 input_payload["meta"] = {}
             input_payload["meta"]["selected_persona"] = persona_id
-            
+
             logger.info(f"Enhanced prompts with persona: {persona_id}")
-            
+
         except Exception as e:
             logger.warning(f"Failed to enhance prompts with persona {persona_id}: {e}")
-    
+
     return system_prompt, user_prompt
