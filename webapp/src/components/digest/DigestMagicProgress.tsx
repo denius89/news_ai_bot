@@ -154,13 +154,16 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
   // Анимация во второй кадр через requestAnimationFrame с дополнительной защитой
   useEffect(() => {
     if (showOverlay) {
-      // Помечаем как готовый к рендерингу
-      setIsReady(true);
-      
       // Двойной requestAnimationFrame для гарантии стабильности
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setIsVisible(true);
+          // Помечаем как готовый к рендерингу во втором кадре
+          setIsReady(true);
+          
+          // Анимация видимости в следующем кадре
+          requestAnimationFrame(() => {
+            setIsVisible(true);
+          });
         });
       });
     }
@@ -244,15 +247,25 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ 
           opacity: isReady && isVisible ? 1 : 0, 
-          y: isReady && isVisible ? 0 : 20, 
-          rotate: isReady && isVisible ? 360 : 0
+          y: isReady && isVisible ? 0 : 20,
+          rotate: isReady && isVisible ? [0, 360, 720, 1080] : 0
         }}
         transition={{ 
           opacity: { duration: 0.6, delay: 0.15 },
           y: { duration: 0.6, delay: 0.15, ease: "easeOut" },
-          rotate: { duration: 8, repeat: Infinity, ease: "linear", delay: 0.8 }
+          rotate: { 
+            duration: 8, 
+            repeat: Infinity, 
+            ease: "linear", 
+            delay: isReady && isVisible ? 0.8 : 0,
+            times: [0, 0.33, 0.66, 1]
+          }
         }}
-        style={{ willChange: 'opacity, transform' }}
+        style={{ 
+          willChange: 'opacity, transform',
+          opacity: isReady ? undefined : 0,
+          transform: isReady ? undefined : 'translateY(20px)'
+        }}
       >
         {persona.icon}
         <Bot className="w-10 h-10 text-white/80 mx-2" />
@@ -277,9 +290,13 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
       <motion.p
         key={phrase}
         initial={{ opacity: 0, y: 5 }}
-        animate={{ opacity: 1, y: 0 }}
+        animate={{ 
+          opacity: isReady && isVisible ? 1 : 0, 
+          y: isReady && isVisible ? 0 : 5 
+        }}
         transition={{ duration: 0.6 }}
         className="text-white/90 text-base max-w-md px-4 leading-relaxed mb-5"
+        style={{ willChange: 'opacity, transform' }}
       >
         {phrase}
       </motion.p>
@@ -288,18 +305,22 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
       <motion.div
         className="mt-4 h-1 w-3/4 bg-white/20 rounded-full overflow-hidden"
         initial={{ opacity: 0, scaleX: 0 }}
-        animate={{ opacity: 1, scaleX: 1 }}
+        animate={{ 
+          opacity: isReady && isVisible ? 1 : 0, 
+          scaleX: isReady && isVisible ? 1 : 0 
+        }}
         transition={{ 
           opacity: { duration: 0.6, delay: 0.45 },
           scaleX: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
         }}
+        style={{ willChange: 'opacity, transform' }}
       >
         <motion.div 
           className="h-full w-full bg-gradient-to-r from-white/70 via-white/40 to-white/80"
-          animate={{ 
+          animate={isReady && isVisible ? { 
             x: ["-100%", "100%"],
             opacity: [0.7, 1, 0.7]
-          }}
+          } : { opacity: 0 }}
           transition={{ 
             duration: 2, 
             repeat: Infinity, 
@@ -317,11 +338,12 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
             style={{
               left: `${20 + i * 15}%`,
               top: `${30 + (i % 3) * 20}%`,
+              opacity: isReady && isVisible ? undefined : 0
             }}
-            animate={{
+            animate={isReady && isVisible ? {
               y: [-20, 20, -20],
               opacity: [0.3, 0.8, 0.3],
-            }}
+            } : { opacity: 0 }}
             transition={{
               duration: 3 + i * 0.5,
               repeat: Infinity,
