@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { MobileHeader } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
@@ -634,7 +634,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             {activeTab === 'active' && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setIsGeneratorOpen(true)}
+                onClick={() => {
+                  setSelectedDigest(null); // Закрываем модалку просмотра дайджеста перед открытием генератора
+                  setIsGeneratorOpen(true);
+                }}
                 className="px-4 py-2 rounded-full font-medium text-sm text-white
                            bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500
                            hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] 
@@ -898,16 +901,21 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       {/* Digest Generator Modal */}
       <DigestGenerator
         isOpen={isGeneratorOpen}
-        onClose={() => setIsGeneratorOpen(false)}
+        onClose={() => {
+          setSelectedDigest(null); // Убеждаемся, что модалка просмотра дайджеста закрыта
+          setIsGeneratorOpen(false);
+        }}
         onGenerate={generateDigest}
       />
 
       {/* Magic Progress Overlay - показывается даже после закрытия модалки */}
-      {isGeneratingDigest && (
-        <DigestMagicProgress 
-          style={generatingStyle}
-        />
-      )}
+      <AnimatePresence>
+        {isGeneratingDigest && (
+          <DigestMagicProgress 
+            style={generatingStyle}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Digest Detail Modal */}
       {selectedDigest && (

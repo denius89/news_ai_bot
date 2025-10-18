@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Sparkles, Bot, Briefcase, Brain, Laugh, Newspaper, BookOpen, MessageCircle, FileText, Cpu } from "lucide-react";
 
@@ -103,6 +103,11 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
   tone = "neutral"
   // length и onComplete больше не используются - полагаемся на реальное завершение
 }) => {
+  // Состояния для оптимизированной анимации
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  
   // Защита от неожиданных значений style
   const safeStyle = style && personalities[style as keyof typeof personalities] ? style : "analytical";
   const persona = personalities[safeStyle] || personalities.analytical;
@@ -137,6 +142,30 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
   const adaptedPhrases = getPhrases(safeStyle, tone);
   const [phrase, setPhrase] = useState(adaptedPhrases[0] || "Генерирую дайджест...");
 
+  // Оптимизированная задержка для показа overlay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowOverlay(true);
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Анимация во второй кадр через requestAnimationFrame с дополнительной защитой
+  useEffect(() => {
+    if (showOverlay) {
+      // Помечаем как готовый к рендерингу
+      setIsReady(true);
+      
+      // Двойной requestAnimationFrame для гарантии стабильности
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsVisible(true);
+        });
+      });
+    }
+  }, [showOverlay]);
+
   useEffect(() => {
     if (adaptedPhrases.length === 0) {
       return;
@@ -156,22 +185,74 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
   // Убрали автотаймер и getGenerationTime - полагаемся только на реальное завершение генерации
   // Автотаймер может скрыть экран раньше времени, если генерация затягивается
 
+  // Не показываем overlay если не прошло 120мс
+  if (!showOverlay) {
+    return null;
+  }
+
   return (
-    <motion.div 
-      className={`fixed inset-0 flex flex-col items-center justify-center 
-                  bg-gradient-to-br ${persona.color} 
-                  dark:from-[#0d0d0d] dark:via-[#1a1a1a] dark:to-[#222] 
-                  backdrop-blur-xl text-center z-50 px-6 transition-all`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+    <div 
+      className="fixed inset-0 z-50"
+      style={{ 
+        opacity: isReady ? (isVisible ? 1 : 0) : 0,
+        visibility: isReady ? (isVisible ? 'visible' : 'hidden') : 'hidden',
+        willChange: 'opacity, transform',
+        pointerEvents: isReady ? 'auto' : 'none'
+      }}
     >
+      {/* Backdrop Layer - отдельно */}
+      <motion.div
+        className={`fixed inset-0 
+                    bg-gradient-to-br ${persona.color} 
+                    dark:from-[#0d0d0d] dark:via-[#1a1a1a] dark:to-[#222] 
+                    backdrop-blur-xl`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isReady && isVisible ? 1 : 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ 
+          duration: 0.4,
+          ease: [0.23, 1, 0.32, 1]
+        }}
+        style={{ 
+          willChange: 'opacity',
+          opacity: isReady ? undefined : 0
+        }}
+      />
+      
+      {/* Content Layer - отдельно */}
+      <motion.div 
+        className="fixed inset-0 flex flex-col items-center justify-center text-center px-6"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ 
+          opacity: isReady && isVisible ? 1 : 0, 
+          scale: isReady && isVisible ? 1 : 0.98
+        }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{ 
+          duration: 0.4,
+          ease: [0.23, 1, 0.32, 1],
+          delay: 0.1
+        }}
+        style={{ 
+          willChange: 'opacity, transform',
+          opacity: isReady ? undefined : 0
+        }}
+      >
       {/* Animated Icons */}
       <motion.div
         className="flex items-center justify-center mb-6"
-        animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: isReady && isVisible ? 1 : 0, 
+          y: isReady && isVisible ? 0 : 20, 
+          rotate: isReady && isVisible ? 360 : 0
+        }}
+        transition={{ 
+          opacity: { duration: 0.6, delay: 0.15 },
+          y: { duration: 0.6, delay: 0.15, ease: "easeOut" },
+          rotate: { duration: 8, repeat: Infinity, ease: "linear", delay: 0.8 }
+        }}
+        style={{ willChange: 'opacity, transform' }}
       >
         {persona.icon}
         <Bot className="w-10 h-10 text-white/80 mx-2" />
@@ -181,9 +262,13 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
       {/* Dynamic Title */}
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        animate={{ 
+          opacity: isReady && isVisible ? 1 : 0, 
+          y: isReady && isVisible ? 0 : 20 
+        }}
+        transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
         className="text-2xl font-semibold text-white mb-3 drop-shadow-lg"
+        style={{ willChange: 'opacity, transform' }}
       >
         AI думает в стиле "{safeStyle}"...
       </motion.h2>
@@ -202,9 +287,12 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
       {/* Animated Progress Bar */}
       <motion.div
         className="mt-4 h-1 w-3/4 bg-white/20 rounded-full overflow-hidden"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ 
+          opacity: { duration: 0.6, delay: 0.45 },
+          scaleX: { duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
+        }}
       >
         <motion.div 
           className="h-full w-full bg-gradient-to-r from-white/70 via-white/40 to-white/80"
@@ -243,7 +331,8 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
           />
         ))}
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
