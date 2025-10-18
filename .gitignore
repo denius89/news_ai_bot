@@ -70,3 +70,11 @@ __pycache__/
 logs/app.log
 logs/*.log
 logs/
+
+# Environment files (всех типов в любых папках)
+**/.env*
+**/.env.backup*
+**/.env.bak*
+**/.env.stash*
+config_files/environment/.env*
+
