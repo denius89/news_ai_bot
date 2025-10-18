@@ -181,3 +181,69 @@ review_mode:
   enabled: true
   admin_id: 123456789
   auto_post_timeout_min: 10
+
+# ============================================================================
+# SUPER JOURNALIST V3 - Advanced AI Features
+# ============================================================================
+
+super_journalist_v3:
+  enabled: false  # OFF by default, enable after testing
+  
+  # Self-improving feedback loop
+  feedback_loop:
+    enabled: true
+    auto_adjust: true
+    min_samples: 50  # Minimum feedback samples for adjustment
+    adjustment_frequency_days: 7
+    min_feedback_count: 2  # Minimum user ratings per digest
+    
+  # Editorial personas system  
+  personas:
+    enabled: true
+    auto_select: true
+    fallback_persona: "atlantic_writer"
+    # Persona selection thresholds
+    urgency_threshold: 0.8
+    complexity_threshold: 0.7
+    
+  # Story memory / News graph
+  story_memory:
+    enabled: true
+    lookback_days: 30
+    max_context_items: 3
+    similarity_threshold: 0.3
+    auto_link_news: true
+    
+  # Auto quality assurance
+  auto_qa:
+    enabled: true
+    sample_size: 5  # Random digests to check nightly
+    quality_threshold: 0.85
+    check_frequency_days: 1
+    
+  # Multi-model routing
+  model_routing:
+    enabled: true
+    default_model: "gpt-4o-mini"
+    # Model assignments by task
+    routing:
+      reasoning: "gpt-4o-mini"
+      generation: "gpt-4o-mini" 
+      fact_check: "gpt-4o-mini"
+      headline: "gpt-4o-mini"
+      editing: "gpt-4o-mini"
+    
+  # Human-in-the-loop feedback
+  human_review:
+    enabled: true
+    auto_send_drafts: false  # Manual review required
+    review_timeout_min: 10
+    admin_telegram_id: 123456789
+    
+  # Tone calibration
+  tone_calibration:
+    enabled: true
+    deviation_threshold: 0.3
+    use_lightweight_model: true
+    lazy_loading: true
+    reference_samples_count: 10

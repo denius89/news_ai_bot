@@ -53,20 +53,26 @@ async def ask_async(prompt: str, model: str = None, max_tokens: int = None, styl
     temperature = temps.get(style, 0.7)
 
     try:
-        # Run in thread pool to avoid blocking
+        # Run in thread pool to avoid blocking with timeout
         loop = asyncio.get_event_loop()
-        response = await loop.run_in_executor(
-            None,
-            lambda: client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                max_tokens=max_tokens,
-                temperature=temperature,
+        response = await asyncio.wait_for(
+            loop.run_in_executor(
+                None,
+                lambda: client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                ),
             ),
+            timeout=30.0,  # 30 seconds timeout
         )
         content = response.choices[0].message.content.strip()
         logger.debug("AI response (model=%s, style=%s): %s", model, style, content[:200])
         return content
+    except asyncio.TimeoutError:
+        logger.exception("❌ OpenAI API timeout (>30s)")
+        raise
     except Exception as e:
         logger.exception("❌ Ошибка в асинхронном запросе к OpenAI")
         raise e

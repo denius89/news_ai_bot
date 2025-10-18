@@ -235,6 +235,10 @@ class DigestAIService:
         logger.info(f"AI response length: {len(response) if response else 0}")
         logger.info(f"AI response preview: {response[:200] if response else 'EMPTY'}")
 
+        # 🚨 ПРОВЕРКА КАЧЕСТВА: убираем "воду" и выдуманную информацию
+        if response:
+            response = self._check_and_clean_response(response, news_data)
+
         # Process response - check if it's JSON and convert to HTML
         if response:
             # Import JSON formatter
@@ -350,18 +354,29 @@ class DigestAIService:
     ) -> str:
         """Create AI prompt based on news data, style, category, events, and RAG examples."""
 
-        # ОПТИМИЗАЦИЯ: ограничиваем размер новостного текста для ускорения
+        # 🚨 ПРОВЕРКА КАЧЕСТВА: фильтруем только достоверные новости
+        filtered_news = [
+            item
+            for item in news_data
+            if item.get("credibility", 0) >= 0.6
+            and item.get("importance", 0) >= 0.5
+            and item.get("content")
+            and len(item.get("content", "").strip()) > 50
+        ]
+
+        if not filtered_news:
+            logger.warning("No high-quality news found, using fallback sources")
+            filtered_news = news_data[:3]  # Fallback к первым 3
+
+        logger.info(f"Filtered news: {len(news_data)} -> {len(filtered_news)} high-quality items")
+
+        # Формируем новостной текст с акцентом на факты
         news_text = "\n\n".join(
             [
-                (
-                    f"{item['title'][:150]}...\n"  # Ограничиваем заголовок
-                    f"{item['published_at']} | {item['source']}\n"
-                    f"Достоверность: {item['credibility']:.1f} | Важность: {item['importance']:.1f}\n"
-                    f"{item['content'][:150]}..."  # Сокращаем с 200 до 150 символов
-                    if item["content"]
-                    else "Описание недоступно"
-                )
-                for item in news_data[:6]  # Максимум 6 новостей вместо всех
+                f"ИСТОЧНИК: {item['source']} ({item['published_at']}) | Достоверность: {item['credibility']:.1f}\n"
+                f"ЗАГОЛОВОК: {item['title']}\n"
+                f"ФАКТЫ: {item['content'][:300].strip()}"
+                for item in filtered_news[:6]  # Максимум 6 новостей
             ]
         )
 
@@ -504,10 +519,10 @@ class DigestAIService:
             # Вычисляем параметры для автоматического выбора персоны
             urgency = 0.5  # Default
             complexity = 0.5  # Default
-            if news_data:
-                avg_importance = sum(item.get("importance", 0.5) for item in news_data) / len(news_data)
+            if filtered_news:
+                avg_importance = sum(item.get("importance", 0.5) for item in filtered_news) / len(filtered_news)
                 urgency = min(avg_importance, 1.0)  # Use importance as urgency proxy
-                complexity = 0.8 if len(news_data) > 5 else 0.4  # More news = more complex
+                complexity = 0.8 if len(filtered_news) > 5 else 0.4  # More news = more complex
 
             try:
                 # Используем новую функцию с поддержкой персон и подкатегорий
@@ -520,8 +535,8 @@ class DigestAIService:
                         subcategory=subcategory,
                         urgency=urgency,
                         complexity=complexity,
-                        news_count=len(news_data),
-                        avg_importance=avg_importance if news_data else 0.5,
+                        news_count=len(filtered_news),
+                        avg_importance=avg_importance if filtered_news else 0.5,
                     )
                 else:
                     # Используем функцию с поддержкой подкатегорий без персон
@@ -567,7 +582,7 @@ class DigestAIService:
         formatted_prompt = get_prompt_for_category(fallback_style, category)
 
         # Создаем блок ссылок
-        links_block = "\n".join([f"- {item['source']}: {item.get('link', 'No link')}" for item in news_data])
+        links_block = "\n".join([f"- {item['source']}: {item.get('link', 'No link')}" for item in filtered_news])
 
         # Форматируем финальный промт с данными
         final_prompt = formatted_prompt.replace("{text_block}", news_text).replace("{links_block}", links_block)
@@ -621,6 +636,78 @@ class DigestAIService:
 — Важно для принятия финансовых решений
 — Помогает понимать тренды и изменения
 """
+
+    def _check_and_clean_response(self, response: str, news_data: List[Dict[str, Any]]) -> str:
+        """
+        Проверяет и очищает ответ AI от "воды" и выдуманной информации.
+
+        Args:
+            response: Ответ от AI
+            news_data: Исходные новости для проверки фактов
+
+        Returns:
+            Очищенный ответ
+        """
+        if not response:
+            return response
+
+        # Собираем все источники и факты из новостей
+        news_sources = set()
+        news_titles = set()
+        news_facts = []
+
+        for item in news_data:
+            if item.get("source"):
+                news_sources.add(item["source"].lower())
+            if item.get("title"):
+                news_titles.add(item["title"].lower())
+            if item.get("content"):
+                # Извлекаем ключевые факты (первые 100 символов контента)
+                content_preview = item["content"][:100].lower()
+                news_facts.append(content_preview)
+
+        # Проверяем на наличие "водянистых" фраз
+        water_phrases = [
+            "возможно",
+            "вероятно",
+            "скорее всего",
+            "вполне возможно",
+            "эксперты считают",
+            "многие полагают",
+            "аналитики предполагают",
+            "ожидается",
+            "предполагается",
+            "предположительно",
+            "не исключено",
+            "вполне вероятно",
+            "скорее всего",
+        ]
+
+        # Проверяем на наличие конкретных факторов из новостей
+        has_concrete_facts = any(source.lower() in response.lower() for source in news_sources)
+
+        # Проверяем на "воду"
+        has_water = any(phrase in response.lower() for phrase in water_phrases)
+
+        if has_water and not has_concrete_facts:
+            logger.warning("Response contains water phrases without concrete facts, cleaning...")
+
+            # Убираем предложения с "водянистыми" фразами
+            sentences = response.split(". ")
+            cleaned_sentences = []
+
+            for sentence in sentences:
+                sentence_lower = sentence.lower()
+                is_water_sentence = any(phrase in sentence_lower for phrase in water_phrases)
+
+                # Оставляем предложение только если оно содержит конкретный факт или источник
+                if not is_water_sentence or any(source in sentence_lower for source in news_sources):
+                    cleaned_sentences.append(sentence)
+
+            response = ". ".join(cleaned_sentences)
+            logger.info(f"Cleaned response, removed {len(sentences) - len(cleaned_sentences)} water sentences")
+
+        return response
 
 
 # Convenience functions for backward compatibility

@@ -86,6 +86,7 @@ def _dummy_news() -> NewsItem:
         published_at=now,
         source="test",
         category="crypto",
+        subcategory="bitcoin",
     )
 
 
@@ -107,7 +108,9 @@ def fetch_recent_news(limit: int = 10, category: Optional[str] = None) -> List[N
     try:
         query = (
             supabase.table("news")
-            .select("id, uid, title, content, link, published_at, source, category, importance, credibility")
+            .select(
+                "id, uid, title, content, link, published_at, source, category, subcategory, importance, credibility"
+            )
             .order("published_at", desc=True)
             .limit(limit)
         )
@@ -150,6 +153,9 @@ async def generate_digest(
     length: str = "medium",
     audience: str = "general",
     use_v2: bool = True,  # флаг для использования v2
+    use_multistage: bool = False,  # флаг для multi-stage генерации
+    use_rag: bool = True,  # флаг для RAG системы с примерами
+    use_personalization: bool = True,  # флаг для персонализации
     user_id: Optional[str] = None,  # для сохранения метрик
 ) -> str:
     """
@@ -160,6 +166,14 @@ async def generate_digest(
         category: Optional category filter
         ai: Whether to use AI summarization
         style: Digest style
+        tone: Tone of the digest
+        length: Length of the digest (short/medium/long)
+        audience: Target audience
+        use_v2: Whether to use v2 generation
+        use_multistage: Whether to use multi-stage generation with Chain-of-Thought
+        use_rag: Whether to use RAG system with high-quality examples
+        use_personalization: Whether to use personalization based on user profile
+        user_id: User ID for metrics saving and personalization
 
     Returns:
         Generated digest text
@@ -171,7 +185,15 @@ async def generate_digest(
         return "<b>Дайджест новостей</b>\n\nСегодня новостей нет."
 
     # Create service with configuration
-    config = DigestConfig(max_items=8, include_fallback=True)
+    config = DigestConfig(
+        max_items=8,
+        include_fallback=True,
+        use_multistage=use_multistage,
+        use_rag=use_rag,
+        use_personalization=use_personalization,
+        user_id=user_id,
+        audience=audience,
+    )
     service = DigestAIService(config)
 
     # Определяем категорию для контекста промта (нужна для всех случаев)
@@ -230,12 +252,25 @@ async def generate_digest(
                         )
                         # Fallback to legacy generation
                         digest_text = await service.build_digest(news_items, style, digest_category)
+                except asyncio.TimeoutError as e:
+                    # Don't fallback on timeout - let it propagate
+                    logger.error(f"AI generation timeout, not using fallback: {e}")
+                    raise
                 except Exception as e:
                     logger.warning(f"V2 generation error, falling back to legacy: {e}")
-                    digest_text = await service.build_digest(news_items, style, digest_category)
+                    try:
+                        digest_text = await service.build_digest(news_items, style, digest_category)
+                    except asyncio.TimeoutError:
+                        logger.error("Legacy generation also timeout - cannot fallback further")
+                        raise
             else:
                 # Use legacy generation
-                digest_text = await service.build_digest(news_items, style, digest_category)
+                try:
+                    digest_text = await service.build_digest(news_items, style, digest_category)
+                except asyncio.TimeoutError as e:
+                    # Don't fallback on timeout - let it propagate
+                    logger.error(f"AI generation timeout in legacy mode: {e}")
+                    raise
         else:
             digest_text = service._build_fallback_digest(news_items)
 

@@ -31,6 +31,7 @@ class NewsItem(BaseModel):
     published_at: Optional[datetime] = None
     source: Optional[str] = None
     category: Optional[str] = None
+    subcategory: Optional[str] = None
 
     @field_validator("published_at", mode="before")
     @classmethod

@@ -15,7 +15,7 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / "config_files" / "en
 # ---- CLOUDFLARE TUNNEL CONFIGURATION ----
 
 # Основной URL Cloudflare Tunnel
-CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://founded-shopper-miss-kruger.trycloudflare.com")
+CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://quilt-supports-every-tubes.trycloudflare.com")
 
 # Локальный URL для туннеля
 CLOUDFLARE_LOCAL_URL = os.getenv("CLOUDFLARE_LOCAL_URL", "http://localhost:8001")

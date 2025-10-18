@@ -400,6 +400,17 @@ def verify_telegram_auth(
                 "message": "Session authentication successful",
             }
         else:
+            # Специальная обработка для development пользователя
+            if telegram_id == 999999999:
+                logger.info("Development user detected in session, using fake UUID")
+                return {
+                    "success": True,
+                    "user_id": "dev-admin-999999999",  # Fake UUID для development
+                    "telegram_id": telegram_id,
+                    "method": "session",
+                    "message": "Development user session authentication successful",
+                }
+
             # Это Telegram ID, нужно получить UUID из базы
             real_user_id = get_user_uuid_by_telegram_id(telegram_id)
             if not real_user_id:
@@ -435,6 +446,17 @@ def verify_telegram_auth(
             telegram_id = user_info.get("id")
             if telegram_id:
                 log_auth_attempt(telegram_id, True, "userData_fallback")
+
+                # Специальная обработка для development пользователя
+                if telegram_id == 999999999:
+                    logger.info("Development user detected, using fake UUID")
+                    return {
+                        "success": True,
+                        "user_id": "dev-admin-999999999",  # Fake UUID для development
+                        "telegram_id": telegram_id,
+                        "method": "userData_fallback",
+                        "message": "Development user authentication successful",
+                    }
 
                 # Получаем реальный UUID из базы данных
                 real_user_id = get_user_uuid_by_telegram_id(telegram_id)

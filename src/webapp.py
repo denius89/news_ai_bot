@@ -64,6 +64,7 @@ def authenticate_request():
             "/api/categories",
             "/api/digests/categories",
             "/api/digests/styles",
+            # "/api/digests/generate",  # Вернули аутентификацию для production
             "/api/news/latest",  # Новости - публичный доступ
             "/api/dashboard/stats",
             "/api/dashboard/latest_news",

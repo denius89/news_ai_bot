@@ -237,7 +237,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
               Статистика
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 auto-rows-[1fr]">
-              {statsData.map((stat, index) => (
+              {statsData.map((stat) => (
                 <motion.div
                   key={stat.label}
                   variants={itemVariants}
