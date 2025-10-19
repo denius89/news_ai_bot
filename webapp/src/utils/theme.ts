@@ -50,7 +50,7 @@ export const applyTheme = (theme: Theme): void => {
   // Update meta theme-color for mobile browsers
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', theme === 'dark' ? '#0F1115' : '#00BFA6');
+    metaThemeColor.setAttribute('content', theme === 'dark' ? '#0F1216' : '#00A6C8');
   }
 };
 

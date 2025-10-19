@@ -53,13 +53,40 @@
     margin-top: 1rem;
   }
 
-  /* Glass effect */
-  .glass {
-    @apply backdrop-blur-sm bg-surface/80 border border-border/50;
+  /* Glass effect - moved to design-tokens.css */
+
+  /* Primary Button with AI Flow */
+  .btn-primary {
+    background: var(--grad-ai-flow);
+    color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 166, 200, 0.25);
+    transition: all 0.25s ease;
+    border: none;
+    font-weight: 600;
   }
   
-  .glass-strong {
-    @apply backdrop-blur-md bg-surface/90 border border-border/60;
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 18px rgba(0, 166, 200, 0.3);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Card styles with smooth interactions */
+  .card {
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
   }
 
   /* Premium shadows */
@@ -129,7 +156,8 @@
 
   /* Focus utilities */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-surface;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+    --tw-ring-offset-color: var(--color-surface);
   }
 
   /* Accessibility utilities */

@@ -1,0 +1,113 @@
+/* PulseAI v2 — AI-Driven NeoGlass Design Tokens */
+
+:root {
+  /* Background Colors */
+  --color-bg: #F5F7FA;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #EFF3F7;
+
+  /* Text Colors */
+  --color-text: #273548;
+  --color-text-muted: #6B7280;
+  --color-text-secondary: #475569;
+
+  /* Primary & Accent Colors */
+  --color-primary: #00A6C8;
+  --color-primary-700: #008AA7;
+  --color-primary-900: #006F87;
+  --color-accent: #7CFAD8;
+  --color-accent-soft: #A8FFE6;
+
+  /* Border Colors */
+  --color-border: #E2E8F0;
+
+  /* Semantic Colors */
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
+
+  /* Holographic Effects */
+  --holo-primary: #00C2B2;
+  --holo-glow: rgba(0, 191, 166, 0.20);
+  --holo-highlight: rgba(0, 166, 200, 0.28);
+
+  /* AI Gradients */
+  --grad-ai-flow: linear-gradient(90deg, #00A6C8, #4F46E5);
+  --grad-ai-holo: linear-gradient(135deg, rgba(0,166,200,0.20), rgba(0,191,166,0.22), rgba(168,255,230,0.18));
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark Theme */
+.dark {
+  /* Background Colors */
+  --color-bg: #0F1216;
+  --color-surface: #202428;
+  --color-surface-alt: #262B30;
+
+  /* Text Colors */
+  --color-text: #E8EAED;
+  --color-text-muted: #A0A6AD;
+  --color-text-secondary: #94A3B8;
+
+  /* Border Colors */
+  --color-border: #2E343B;
+
+  /* Shadows */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.30);
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.40);
+}
+
+/* Glass Surfaces (Liquid Glass Effect) */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass {
+  background: rgba(20, 24, 28, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.15);
+}
+
+/* Apply backdrop-filter if supported */
+@supports (backdrop-filter: blur(1px)) {
+  .glass {
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+/* Glass variants for different opacity levels */
+.glass-light {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+}
+
+.dark .glass-light {
+  background: rgba(20, 24, 28, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dark .glass-strong {
+  background: rgba(20, 24, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@supports (backdrop-filter: blur(1px)) {
+  .glass-light {
+    backdrop-filter: blur(24px) saturate(190%);
+  }
+  
+  .glass-strong {
+    backdrop-filter: blur(16px) saturate(170%);
+  }
+}
+

@@ -63,15 +63,15 @@ export const ChipsCarousel: React.FC<ChipsCarouselProps> = ({
 
   return (
     <div className="relative">
-      {label && <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{label}</p>}
+      {label && <p className="text-xs text-muted mb-2">{label}</p>}
       <div className="flex items-center gap-2">
         {showLeftArrow && (
           <button 
             onClick={() => scroll('left')}
-            className="shrink-0 p-1 bg-white dark:bg-surface-alt rounded-full shadow-md hover:shadow-lg transition-shadow"
+            className="shrink-0 p-1 bg-surface rounded-full shadow-md hover:shadow-lg transition-shadow"
             aria-label="Scroll left"
           >
-            <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            <ChevronLeft className="w-4 h-4 text-text" />
           </button>
         )}
         <div 
@@ -85,8 +85,8 @@ export const ChipsCarousel: React.FC<ChipsCarouselProps> = ({
               onClick={() => onSelect(chip.id)}
               className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 whitespace-nowrap ${
                 selectedId === chip.id
-                  ? 'bg-gradient-to-r from-[#00BFA6]/10 to-[#00E3BE]/10 text-primary shadow-[0_0_6px_rgba(0,191,166,0.2)]'
-                  : 'border border-border text-gray-600 dark:text-gray-300 hover:text-primary hover:border-primary/50'
+                  ? 'bg-ai-holo text-primary shadow-[0_0_6px_rgba(0,166,200,0.2)]'
+                  : 'border border-border text-text hover:text-primary hover:border-primary/50'
               }`}
             >
               {chip.icon && <span>{chip.icon}</span>}
@@ -97,10 +97,10 @@ export const ChipsCarousel: React.FC<ChipsCarouselProps> = ({
         {showRightArrow && (
           <button 
             onClick={() => scroll('right')}
-            className="shrink-0 p-1 bg-white dark:bg-surface-alt rounded-full shadow-md hover:shadow-lg transition-shadow"
+            className="shrink-0 p-1 bg-surface rounded-full shadow-md hover:shadow-lg transition-shadow"
             aria-label="Scroll right"
           >
-            <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+            <ChevronRight className="w-4 h-4 text-text" />
           </button>
         )}
       </div>

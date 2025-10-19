@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Sparkles, Bot, Briefcase, Brain, Laugh, Newspaper, BookOpen, MessageCircle, FileText, Cpu } from "lucide-react";
 

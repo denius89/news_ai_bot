@@ -627,7 +627,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         {/* Заголовок */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h1 className="text-xl font-semibold text-text">
               AI Дайджест
             </h1>
             {/* Кнопка создания дайджеста - только для активной вкладки */}
@@ -639,8 +639,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                   setIsGeneratorOpen(true);
                 }}
                 className="px-4 py-2 rounded-full font-medium text-sm text-white
-                           bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500
-                           hover:shadow-[0_0_12px_rgba(16,185,129,0.4)] 
+                           bg-ai-flow hover:shadow-[0_0_12px_rgba(0,166,200,0.4)] 
                            active:scale-95 transition-all duration-300 flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
@@ -648,12 +647,12 @@ const DigestPage: React.FC<DigestPageProps> = () => {
               </motion.button>
             )}
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-muted">
             PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле.
           </p>
         </div>
         {/* Фильтры и вкладки */}
-        <div className="flex space-x-1 mb-6 bg-gray-100/50 dark:bg-gray-800/40 rounded-xl p-1">
+        <div className="flex space-x-1 mb-6 bg-surface-alt/50 rounded-xl p-1">
           <motion.button
             layout
             whileTap={{ scale: 0.97 }}
@@ -661,8 +660,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             onClick={() => setActiveTab('active')}
             className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'active'
-                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
+                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
+                : "text-muted hover:bg-surface-alt/50"
             }`}
           >
             <Eye className="w-4 h-4 inline mr-2" />
@@ -675,8 +674,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             onClick={() => setActiveTab('archived')}
             className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'archived'
-                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
+                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
+                : "text-muted hover:bg-surface-alt/50"
             }`}
           >
             <Archive className="w-4 h-4 inline mr-2" />
@@ -689,8 +688,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             onClick={() => setActiveTab('deleted')}
             className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
               activeTab === 'deleted'
-                ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                : "text-gray-600 dark:text-gray-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/40"
+                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
+                : "text-muted hover:bg-surface-alt/50"
             }`}
           >
             <Trash2 className="w-4 h-4 inline mr-2" />
@@ -727,8 +726,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     onClick={() => setSelectedCategory(key)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                       selectedCategory === key
-                        ? "bg-gradient-to-r from-teal-400 to-emerald-400 text-white shadow-[0_0_12px_rgba(16,185,129,0.3)]"
-                        : "bg-surface-alt dark:bg-surface-alt text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
+                        : "bg-surface-alt text-muted hover:bg-surfaceAlt"
                     }`}
                   >
                     {getIcon(key)}
@@ -756,7 +755,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   >
                     {/* Заголовок - извлекаем заголовок из HTML или используем первые слова */}
-                    <h3 className="text-[15px] font-semibold text-gray-900 dark:text-white leading-snug">
+                    <h3 className="text-[15px] font-semibold text-text leading-snug">
                       {(() => {
                         // Пытаемся извлечь заголовок из HTML (например, <h1>, <h2>, <b>)
                         const htmlText = digest.summary;
@@ -776,23 +775,23 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         {categories[digest.category] || digest.category}
                       </span>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-                        {styles[digest.style] || digest.metadata?.style_name || digest.style}
+                        {styles[digest.style || ''] || digest.metadata?.style_name || digest.style}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                      <span className="text-xs text-muted">
                         {new Date(digest.createdAt).toLocaleDateString('ru-RU')}
                       </span>
                     </div>
 
                     {/* Preview с HTML-рендерингом */}
                     <div 
-                      className="mt-3 text-[14px] text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3"
+                      className="mt-3 text-[14px] text-text leading-relaxed line-clamp-3"
                       dangerouslySetInnerHTML={{ 
                         __html: truncateText(digest.summary, 200) 
                       }}
                     />
 
                     <div className="mt-4 flex justify-between items-center text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">{digest.sources?.join(', ') || 'AI Generated'}</span>
+                      <span className="text-muted">{digest.sources?.join(', ') || 'AI Generated'}</span>
                       <div className="flex items-center gap-2">
                         {/* Feedback buttons - only for active tab */}
                         {activeTab === 'active' && (
@@ -802,8 +801,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                 feedbackSubmitted[digest.id] === 'up'
                                   ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
                                   : feedbackSubmitted[digest.id] === 'down'
-                                  ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                  : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                                  ? 'text-muted cursor-not-allowed'
+                                  : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
                               }`}
                               onClick={() => handleFeedback(digest.id, 1.0)}
                               title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Понравилось"}
@@ -816,8 +815,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                 feedbackSubmitted[digest.id] === 'down'
                                   ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
                                   : feedbackSubmitted[digest.id] === 'up'
-                                  ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                  : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                  ? 'text-muted cursor-not-allowed'
+                                  : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
                               }`}
                               onClick={() => handleFeedback(digest.id, 0.0)}
                               title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Не понравилось"}
@@ -831,14 +830,14 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         {activeTab === 'active' && (
                           <>
                             <button 
-                              className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
+                              className="p-1.5 text-muted hover:text-warning hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
                               onClick={() => archiveDigest(digest.id)}
                               title="В архив"
                             >
                               <Archive className="w-4 h-4" />
                             </button>
                             <button 
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              className="p-1.5 text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                               onClick={() => softDeleteDigest(digest.id)}
                               title="Удалить"
                             >
@@ -848,7 +847,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         )}
                         {activeTab === 'archived' && (
                           <button 
-                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                            className="p-1.5 text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                             onClick={() => unarchiveDigest(digest.id)}
                             title="Восстановить"
                           >
@@ -857,7 +856,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         )}
                         {activeTab === 'deleted' && (
                           <button 
-                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                            className="p-1.5 text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                             onClick={() => restoreDigest(digest.id)}
                             title="Восстановить"
                           >
@@ -865,7 +864,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                           </button>
                         )}
                         <button 
-                          className="text-emerald-500 hover:text-emerald-400 font-medium flex items-center gap-1 transition-colors"
+                          className="text-primary hover:text-primary-700 font-medium flex items-center gap-1 transition-colors"
                           onClick={() => setSelectedDigest(digest)}
                         >
                           Подробнее
@@ -887,8 +886,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
               transition={{ duration: 2, repeat: Infinity }}
               className="flex flex-col items-center justify-center p-8 rounded-3xl bg-surface dark:bg-surface mt-6"
             >
-              <Bot className="w-10 h-10 text-emerald-400 mb-3" />
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <Bot className="w-10 h-10 text-primary mb-3" />
+              <p className="text-muted text-sm">
                 {activeTab === 'active' && "Пока пусто — но AI уже готов собрать первый дайджест."}
                 {activeTab === 'archived' && "В архиве пока ничего нет."}
                 {activeTab === 'deleted' && "Корзина пуста."}
@@ -936,18 +935,17 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="w-full max-w-2xl max-h-[75vh] 
-                       bg-surface dark:bg-surface 
-                       backdrop-blur-lg rounded-3xl 
-                       shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+                       glass rounded-3xl 
+                       shadow-card-hover
                        p-6 
                        overflow-hidden flex flex-col"
           >
             {/* Close button */}
             <button 
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-surfaceAlt transition-colors"
               onClick={() => setSelectedDigest(null)}
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-muted" />
             </button>
 
             {/* Header with badges only */}
@@ -972,9 +970,9 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                     };
                     return styleIcons[selectedDigest.style as keyof typeof styleIcons] || <Bot className="w-3 h-3 mr-1" />;
                   })()}
-                  {styles[selectedDigest.style] || selectedDigest.metadata?.style_name || selectedDigest.style}
+                  {styles[selectedDigest.style || ''] || selectedDigest.metadata?.style_name || selectedDigest.style}
                 </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-surface-alt text-muted">
                   <CalendarDays className="w-3 h-3 mr-1" />
                   {new Date(selectedDigest.createdAt).toLocaleDateString('ru-RU', { 
                     day: 'numeric', 
@@ -989,7 +987,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
 
             {/* Content - scrollable */}
             <div className="flex-1 overflow-y-auto mb-5">
-              <div className="text-[15px] leading-relaxed text-text/90 dark:text-gray-300 whitespace-pre-wrap">
+              <div className="text-[15px] leading-relaxed text-text whitespace-pre-wrap">
                 {selectedDigest.content ? (
                   <div 
                     className="prose prose-sm max-w-none dark:prose-invert"
@@ -1004,7 +1002,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             </div>
 
             {/* Footer - simplified */}
-            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500">
+            <div className="border-t border pt-4 mt-4 flex items-center justify-between text-xs text-muted">
               {/* Feedback buttons - only for active tab */}
               {activeTab === 'active' && (
                 <div className="flex gap-2">
@@ -1013,8 +1011,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                       feedbackSubmitted[selectedDigest.id] === 'up'
                         ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
                         : feedbackSubmitted[selectedDigest.id] === 'down'
-                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                        : 'text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                        ? 'text-muted cursor-not-allowed'
+                        : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
                     }`}
                     onClick={() => handleFeedback(selectedDigest.id, 1.0)}
                     title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Понравилось"}
@@ -1027,8 +1025,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                       feedbackSubmitted[selectedDigest.id] === 'down'
                         ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
                         : feedbackSubmitted[selectedDigest.id] === 'up'
-                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                        : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                        ? 'text-muted cursor-not-allowed'
+                        : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
                     }`}
                     onClick={() => handleFeedback(selectedDigest.id, 0.0)}
                     title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Не понравилось"}

@@ -155,26 +155,16 @@
 
   /* Navigation Components */
   .nav-header {
-    @apply sticky top-0 backdrop-blur-sm border-b px-6 py-4 flex justify-between items-center;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-bottom-color: var(--color-border);
-  }
-  
-  .dark .nav-header {
-    background-color: rgba(27, 30, 35, 0.7);
-    border-bottom-color: var(--color-border);
+    @apply sticky top-0 px-6 py-4 flex justify-between items-center glass;
+    border-bottom: 1px solid var(--color-border);
+    z-index: 40;
   }
   
   .nav-bottom {
-    @apply fixed bottom-0 inset-x-0 flex justify-around border-t py-2;
-    background-color: var(--color-surface);
-    border-top-color: var(--color-border);
+    @apply fixed bottom-0 inset-x-0 flex justify-around py-2 glass;
+    border-top: 1px solid var(--color-border);
     padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  .dark .nav-bottom {
-    background-color: var(--color-surface-alt);
-    border-top-color: var(--color-border);
+    z-index: 40;
   }
   
   .nav-item {
