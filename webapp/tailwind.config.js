@@ -20,21 +20,28 @@ module.exports = {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // PulseAI Design Tokens (CSS Variables)
+        // PulseAI v2 NeoGlass Design Tokens
         bg: 'var(--color-bg)',
         surface: 'var(--color-surface)',
-        'surface-alt': 'var(--color-surface-alt)',
-        border: 'var(--color-border)',
-        primary: 'var(--color-primary)',
-        accent: 'var(--color-accent)',
+        surfaceAlt: 'var(--color-surface-alt)',
         text: 'var(--color-text)',
-        muted: 'var(--color-muted)',
+        muted: 'var(--color-text-muted)',
+        border: 'var(--color-border)',
+        primary: {
+          DEFAULT: 'var(--color-primary)',
+          700: 'var(--color-primary-700)',
+          900: 'var(--color-primary-900)',
+        },
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          soft: 'var(--color-accent-soft)',
+        },
         success: 'var(--color-success)',
-        error: 'var(--color-error)',
         warning: 'var(--color-warning)',
-        highlight: 'var(--color-highlight)',
+        error: 'var(--color-error)',
         
-        // Legacy support
+        // Legacy support (deprecated)
+        'surface-alt': 'var(--color-surface-alt)',
         background: '#F8FAFC',
         foreground: '#1E293B',
         card: '#FFFFFF',
@@ -43,28 +50,28 @@ module.exports = {
         'popover-foreground': '#1E293B',
         secondary: '#F2F5F8',
         'secondary-foreground': '#1E293B',
-        muted: {
-          DEFAULT: '#F2F5F8',
-          foreground: '#64748B',
-        },
-        accent: {
-          DEFAULT: '#8AFFD7',
-          foreground: '#1E293B',
-        },
         destructive: {
           DEFAULT: '#F87171',
           foreground: '#FFFFFF',
         },
-        ring: '#00BFA6',
+        ring: 'var(--color-primary)',
         input: '#E2E8F0',
       },
       boxShadow: {
-        'card': '0 2px 8px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 4px 16px rgba(0, 0, 0, 0.12)',
+        card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
         'soft': '0 1px 3px rgba(0, 0, 0, 0.1)',
+        // Legacy shadows (deprecated)
         'card-dark': '0 2px 8px rgba(0, 0, 0, 0.3)',
         'card-hover-dark': '0 4px 16px rgba(0, 0, 0, 0.4)',
         'soft-dark': '0 1px 3px rgba(0, 0, 0, 0.2)',
+      },
+      backgroundImage: {
+        'ai-flow': 'var(--grad-ai-flow)',
+        'ai-holo': 'var(--grad-ai-holo)',
+      },
+      ringColor: {
+        DEFAULT: 'var(--color-primary)',
       },
       borderRadius: {
         lg: '1rem',

@@ -26,6 +26,7 @@ async def open_dashboard(message: types.Message):
     logger.info("📱 Dashboard command received from user %s", message.from_user.id)
 
     webapp_url = f"{WEBAPP_URL}/webapp"
+    logger.info("🔗 Using WebApp URL: %s", webapp_url)
 
     # Создаем inline клавиатуру с WebApp кнопкой и кнопкой "Назад"
     keyboard = InlineKeyboardMarkup(
@@ -71,6 +72,7 @@ async def cb_dashboard(query: types.CallbackQuery):
     logger.info("📱 Dashboard callback received from user %s", query.from_user.id)
 
     webapp_url = f"{WEBAPP_URL}/webapp"
+    logger.info("🔗 Using WebApp URL: %s", webapp_url)
 
     # Создаем inline клавиатуру с WebApp кнопкой и кнопкой "Назад"
     keyboard = InlineKeyboardMarkup(

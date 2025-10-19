@@ -205,7 +205,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
         >
           {/* Welcome Section */}
           <motion.section variants={itemVariants}>
-            <Card className="text-center py-8 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+            <Card className="text-center py-8 bg-ai-holo border-primary/20">
               <CardContent>
                 <div className="flex justify-center mb-4">
                   <Rocket className="w-16 h-16 text-primary" />
@@ -221,7 +221,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                 </p>
                 <Button 
                   size="lg" 
-                  className="btn-primary hover:scale-105 transition-transform duration-200"
+                  className="bg-ai-flow hover:scale-105 transition-transform duration-200 text-white"
                   onClick={() => onNavigate?.('news')}
                 >
                   {telegramUser ? "Поехали!" : "Начать с PulseAI"}

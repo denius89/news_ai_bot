@@ -5,81 +5,51 @@
 /* PulseAI Light Premium Design System */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* CSS Custom Properties for PulseAI Light Premium */
+/* Legacy HSL support for compatibility */
 :root {
-  /* PulseAI Light Premium Tokens */
-  --color-bg: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-surface-alt: #F2F5F8;
-  --color-border: #E2E8F0;
-  --color-primary: #00BFA6;
-  --color-accent: #8AFFD7;
-  --color-text: #1E293B;
-  --color-muted: #64748B;
-  --color-success: #1ED690;
-  --color-error: #F87171;
-  --color-warning: #FBBF24;
-  --color-highlight: #F0F9FF;
-
-  /* Legacy HSL support */
-  --background: 248 250 252;
+  --background: 245 247 250;
   --foreground: 30 41 59;
   --card: 255 255 255;
   --card-foreground: 30 41 59;
   --popover: 255 255 255;
   --popover-foreground: 30 41 59;
-  --primary: 0 191 166;
+  --primary: 0 166 200;
   --primary-foreground: 255 255 255;
-  --secondary: 242 245 248;
+  --secondary: 239 243 247;
   --secondary-foreground: 30 41 59;
-  --muted: 242 245 248;
+  --muted: 239 243 247;
   --muted-foreground: 100 116 139;
-  --accent: 138 255 215;
+  --accent: 124 250 216;
   --accent-foreground: 30 41 59;
-  --destructive: 248 113 113;
+  --destructive: 220 38 38;
   --destructive-foreground: 255 255 255;
   --border: 226 232 240;
   --input: 226 232 240;
-  --ring: 0 191 166;
+  --ring: 0 166 200;
   --radius: 1rem;
 }
 
-/* PulseAI Dark Premium Tokens */
+/* Legacy HSL support for dark theme */
 .dark {
-  /* PulseAI Dark Premium Design Tokens */
-  --color-bg: #0F1115;
-  --color-surface: #1B1E23;
-  --color-surface-alt: #23272E;
-  --color-border: #2C3138;
-  --color-primary: #00BFA6;
-  --color-accent: #8AFFD7;
-  --color-text: #E6E8EB;
-  --color-muted: #9EA2A7;
-  --color-success: #1ED690;
-  --color-error: #F87171;
-  --color-warning: #FBBF24;
-  --color-highlight: rgba(0, 191, 166, 0.08);
-
-  /* Legacy HSL support for dark theme */
-  --background: 15 17 21;
-  --foreground: 230 232 235;
-  --card: 27 30 35;
-  --card-foreground: 230 232 235;
-  --popover: 27 30 35;
-  --popover-foreground: 230 232 235;
-  --primary: 0 191 166;
+  --background: 15 18 22;
+  --foreground: 232 234 237;
+  --card: 32 36 40;
+  --card-foreground: 232 234 237;
+  --popover: 32 36 40;
+  --popover-foreground: 232 234 237;
+  --primary: 0 166 200;
   --primary-foreground: 255 255 255;
-  --secondary: 35 39 46;
-  --secondary-foreground: 230 232 235;
-  --muted: 35 39 46;
-  --muted-foreground: 158 162 167;
-  --accent: 138 255 215;
-  --accent-foreground: 27 30 35;
-  --destructive: 248 113 113;
+  --secondary: 38 43 48;
+  --secondary-foreground: 232 234 237;
+  --muted: 38 43 48;
+  --muted-foreground: 160 166 173;
+  --accent: 124 250 216;
+  --accent-foreground: 20 24 28;
+  --destructive: 220 38 38;
   --destructive-foreground: 255 255 255;
-  --border: 44 49 56;
-  --input: 44 49 56;
-  --ring: 0 191 166;
+  --border: 46 52 59;
+  --input: 46 52 59;
+  --ring: 0 166 200;
 }
 
 /* Base styles */
@@ -101,12 +71,12 @@
 
   /* Light theme gradient background */
   body {
-    background: linear-gradient(135deg, #FFFFFF 0%, #F9FBFC 100%);
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
   }
 
   /* Dark theme gradient background */
   .dark body {
-    background: radial-gradient(circle at top left, #0F1115, #121417 60%);
+    background: radial-gradient(circle at top left, var(--color-bg), #121417 60%);
   }
 
   /* Typography */
@@ -138,21 +108,13 @@
   /* Improved text contrast for better readability */
   .text-muted-strong {
     @apply text-sm;
-    color: #475569; /* Stronger contrast for light theme */
-  }
-  
-  .dark .text-muted-strong {
-    color: #94A3B8; /* Better contrast for dark theme */
+    color: var(--color-text-secondary);
   }
 
   /* Better contrast for success indicators */
   .text-success-strong {
     @apply text-xs;
-    color: #059669; /* Darker green for better contrast */
-  }
-  
-  .dark .text-success-strong {
-    color: #10B981; /* Brighter green for dark theme */
+    color: var(--color-success);
   }
 
   /* Focus styles */
