@@ -539,7 +539,6 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       <div className="min-h-screen bg-bg">
         <MobileHeader 
           title="Новости" 
-          subtitle="Загрузка..." 
           icon={<Newspaper className="w-6 h-6 text-primary" />}
         />
         <main className="container-main">
@@ -566,11 +565,14 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="Новости" 
-        subtitle={`${filteredNews.length} ${getNewsLabel(filteredNews.length)}`}
         icon={<Newspaper className="w-6 h-6 text-primary" />}
       />
       
       <main className="container-main">
+        {/* Компактный счетчик */}
+        <p className="text-xs text-muted mb-4 px-1">
+          {filteredNews.length} {getNewsLabel(filteredNews.length)}
+        </p>
         {/* Убрали индикатор свайпа - теперь только infinite scroll */}
 
         {/* Debug info - показываем состояние загрузки */}

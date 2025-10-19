@@ -236,7 +236,6 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="Настройки" 
-        subtitle="Выбор категорий для персонализации"
         icon={<Settings className="w-6 h-6 text-primary" />}
       />
       
