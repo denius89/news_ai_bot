@@ -45,10 +45,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
         
         className
       )}
-      style={{
-        left: '50%',
-        transform: 'translateX(-50%)'
-      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}

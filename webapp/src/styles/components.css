@@ -300,6 +300,13 @@
     transform: translateX(-50%) !important;
   }
 
+  /* Fix for BottomNav centering - более специфичное правило */
+  nav.fixed.bottom-4.z-50 {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+  }
+
   /* Layout Components */
   .container-main {
     @apply max-w-6xl mx-auto px-6 py-8;
