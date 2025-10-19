@@ -127,7 +127,7 @@
 
 /* Padding for floating bottom navigation */
 body {
-  padding-bottom: 90px;
+  padding-bottom: 110px;
 }
 
 @media (min-width: 768px) {

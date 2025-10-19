@@ -202,6 +202,7 @@
     position: fixed !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
+    bottom: 24px !important;
   }
 
   .dark .navbar-glass {
@@ -215,7 +216,7 @@
 
   @media (max-width: 480px) {
     .navbar-glass {
-      bottom: 8px !important;
+      bottom: 20px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       border-radius: 16px;
