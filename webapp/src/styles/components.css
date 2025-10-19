@@ -1,443 +1,468 @@
 /* PulseAI Light Premium UI Components */
 @layer components {
-  
-  /* AI Mist Card Components */
-  .card,
-  .Card,
-  .CardContent,
-  .CardHeader {
-    @apply rounded-2xl p-6 border;
-    background: linear-gradient(180deg, rgba(248,252,255,0.9) 0%, rgba(240,245,250,0.9) 100%);
-    border: 1px solid rgba(230, 235, 240, 0.7);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    backdrop-filter: blur(8px);
-    transition: all 0.25s ease;
-  }
-  
-  .dark .card,
-  .dark .Card,
-  .dark .CardContent,
-  .dark .CardHeader {
-    background: linear-gradient(180deg, rgba(26,28,33,0.85) 0%, rgba(18,20,25,0.85) 100%);
-    border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  }
-  
-  .card:hover,
-  .Card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-    transform: translateY(-2px);
-  }
-  
-  .dark .card:hover,
-  .dark .Card:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-    transform: translateY(-2px);
-  }
-  
-  .card-compact {
-    @apply rounded-xl p-4 border;
-    background: linear-gradient(180deg, rgba(248,252,255,0.9) 0%, rgba(240,245,250,0.9) 100%);
-    border: 1px solid rgba(230, 235, 240, 0.7);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-    backdrop-filter: blur(6px);
-    transition: all 0.25s ease;
-  }
-  
-  .dark .card-compact {
-    background: linear-gradient(180deg, rgba(26,28,33,0.85) 0%, rgba(18,20,25,0.85) 100%);
-    border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  }
-  
-  .card-compact:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
-  }
-  
-  .dark .card-compact:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    transform: translateY(-1px);
-  }
 
-  /* Button Components */
-  .btn {
-    @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-sm font-medium transition-all duration-200;
-    min-height: 44px;
-  }
-  
-  .btn-primary {
-    @apply text-white shadow-soft hover:shadow-md active:scale-[0.98];
-    background-color: var(--color-primary);
-    box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
-  }
-  
-  .btn-primary:hover {
-    background-color: var(--color-accent);
-  }
-  
-  .btn-secondary {
-    @apply border;
-    background-color: var(--color-surface);
-    border-color: var(--color-border);
-    color: var(--color-text);
-  }
-  
-  .btn-secondary:hover {
-    background-color: var(--color-highlight);
-  }
-  
-  .dark .btn-secondary {
-    background-color: var(--color-surface-alt);
-    border-color: var(--color-border);
-    color: var(--color-text);
-  }
-  
-  .dark .btn-secondary:hover {
-    background-color: var(--color-highlight);
-  }
-  
-  .btn-ghost {
-    @apply bg-transparent;
-    color: var(--color-text);
-  }
-  
-  .btn-ghost:hover {
-    background-color: var(--color-surface-alt);
-  }
-  
-  .dark .btn-ghost {
-    color: var(--color-text);
-  }
-  
-  .dark .btn-ghost:hover {
-    background-color: var(--color-surface-alt);
-  }
-  
-  .btn-sm {
-    @apply px-3 py-1.5 text-xs;
-    min-height: 32px;
-  }
-  
-  .btn-lg {
-    @apply px-6 py-3 text-base;
-    min-height: 48px;
-  }
-  
-  .btn-full {
-    @apply w-full;
-  }
+    /* AI Mist Card Components */
+    .card,
+    .Card,
+    .CardContent,
+    .CardHeader {
+        @apply rounded-2xl p-6 border;
+        background: linear-gradient(180deg, rgba(248, 252, 255, 0.9) 0%, rgba(240, 245, 250, 0.9) 100%);
+        border: 1px solid rgba(230, 235, 240, 0.7);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        backdrop-filter: blur(8px);
+        transition: all 0.25s ease;
+    }
 
-  /* Input Components */
-  .input {
-    @apply w-full rounded-xl border px-4 py-2 focus:ring-2 focus:border-transparent outline-none transition-all;
-    border-color: var(--color-border);
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    min-height: 44px;
-  }
-  
-  .input::placeholder {
-    color: var(--color-muted);
-  }
-  
-  .input:focus {
-    --tw-ring-color: var(--color-primary);
-  }
-  
-  .dark .input {
-    border-color: var(--color-border);
-    background-color: var(--color-surface-alt);
-    color: var(--color-text);
-  }
-  
-  .dark .input::placeholder {
-    color: var(--color-muted);
-  }
-  
-  .input-sm {
-    @apply px-3 py-1.5 text-sm;
-    min-height: 36px;
-  }
-  
-  .input-lg {
-    @apply px-5 py-3 text-base;
-    min-height: 52px;
-  }
+    .dark .card,
+    .dark .Card,
+    .dark .CardContent,
+    .dark .CardHeader {
+        background: linear-gradient(180deg, rgba(26, 28, 33, 0.85) 0%, rgba(18, 20, 25, 0.85) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
 
-  /* Navigation Components */
-  .nav-header {
-    @apply sticky top-0 px-6 py-4 flex justify-between items-center glass;
-    border-bottom: 1px solid var(--color-border);
-    z-index: 40;
-  }
-  
-  .nav-bottom {
-    @apply fixed bottom-0 inset-x-0 flex justify-around py-2 glass;
-    border-top: 1px solid var(--color-border);
-    padding-bottom: env(safe-area-inset-bottom);
-    z-index: 40;
-  }
-  
-  .nav-item {
-    @apply flex flex-col items-center transition-colors;
-    color: var(--color-muted);
-    min-height: 44px;
-  }
-  
-  .nav-item:hover {
-    color: var(--color-primary);
-  }
-  
-  .dark .nav-item {
-    color: var(--color-muted);
-  }
-  
-  .dark .nav-item:hover {
-    color: var(--color-primary);
-  }
-  
-  .nav-item.active {
-    @apply text-primary;
-  }
+    .card:hover,
+    .Card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        transform: translateY(-2px);
+    }
 
-  /* Telegram Glass Dock Navigation - Authentic Telegram Style */
-  .navbar-glass {
-    background: rgba(255, 255, 255, 0.85);
-    border: 0.5px solid rgba(255, 255, 255, 0.35);
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.12),
-      0 2px 8px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
-    -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
-    position: fixed !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    bottom: 24px !important;
-    /* Telegram specific */
-    border-radius: 20px;
-    overflow: hidden;
-  }
+    .dark .card:hover,
+    .dark .Card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        transform: translateY(-2px);
+    }
 
-  /* Telegram-style glass layer effect */
-  .navbar-glass::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%, 
-      rgba(255, 255, 255, 0.05) 50%, 
-      rgba(255, 255, 255, 0.02) 100%);
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: -1;
-  }
+    .card-compact {
+        @apply rounded-xl p-4 border;
+        background: linear-gradient(180deg, rgba(248, 252, 255, 0.9) 0%, rgba(240, 245, 250, 0.9) 100%);
+        border: 1px solid rgba(230, 235, 240, 0.7);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        backdrop-filter: blur(6px);
+        transition: all 0.25s ease;
+    }
 
-  .navbar-glass::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 20px;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 100%);
-    pointer-events: none;
-    border-radius: 0 0 20px 20px;
-    z-index: -1;
-  }
+    .dark .card-compact {
+        background: linear-gradient(180deg, rgba(26, 28, 33, 0.85) 0%, rgba(18, 20, 25, 0.85) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
 
-  .dark .navbar-glass {
-    background: rgba(30, 35, 42, 0.85);
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(40px) saturate(150%) brightness(0.95);
-    -webkit-backdrop-filter: blur(40px) saturate(150%) brightness(0.95);
-  }
+    .card-compact:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        transform: translateY(-1px);
+    }
 
-  .dark .navbar-glass::before {
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.04) 0%, 
-      rgba(255, 255, 255, 0.02) 50%, 
-      rgba(255, 255, 255, 0.01) 100%);
-  }
+    .dark .card-compact:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        transform: translateY(-1px);
+    }
 
-  .dark .navbar-glass::after {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
-  }
+    /* Button Components */
+    .btn {
+        @apply inline-flex items-center justify-center rounded-xl px-5 py-2 text-sm font-medium transition-all duration-200;
+        min-height: 44px;
+    }
 
-  @media (max-width: 480px) {
+    .btn-primary {
+        @apply text-white shadow-soft hover:shadow-md active:scale-[0.98];
+        background-color: var(--color-primary);
+        box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-accent);
+    }
+
+    .btn-secondary {
+        @apply border;
+        background-color: var(--color-surface);
+        border-color: var(--color-border);
+        color: var(--color-text);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-highlight);
+    }
+
+    .dark .btn-secondary {
+        background-color: var(--color-surface-alt);
+        border-color: var(--color-border);
+        color: var(--color-text);
+    }
+
+    .dark .btn-secondary:hover {
+        background-color: var(--color-highlight);
+    }
+
+    .btn-ghost {
+        @apply bg-transparent;
+        color: var(--color-text);
+    }
+
+    .btn-ghost:hover {
+        background-color: var(--color-surface-alt);
+    }
+
+    .dark .btn-ghost {
+        color: var(--color-text);
+    }
+
+    .dark .btn-ghost:hover {
+        background-color: var(--color-surface-alt);
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5 text-xs;
+        min-height: 32px;
+    }
+
+    .btn-lg {
+        @apply px-6 py-3 text-base;
+        min-height: 48px;
+    }
+
+    .btn-full {
+        @apply w-full;
+    }
+
+    /* Input Components */
+    .input {
+        @apply w-full rounded-xl border px-4 py-2 focus:ring-2 focus:border-transparent outline-none transition-all;
+        border-color: var(--color-border);
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        min-height: 44px;
+    }
+
+    .input::placeholder {
+        color: var(--color-muted);
+    }
+
+    .input:focus {
+        --tw-ring-color: var(--color-primary);
+    }
+
+    .dark .input {
+        border-color: var(--color-border);
+        background-color: var(--color-surface-alt);
+        color: var(--color-text);
+    }
+
+    .dark .input::placeholder {
+        color: var(--color-muted);
+    }
+
+    .input-sm {
+        @apply px-3 py-1.5 text-sm;
+        min-height: 36px;
+    }
+
+    .input-lg {
+        @apply px-5 py-3 text-base;
+        min-height: 52px;
+    }
+
+    /* Navigation Components */
+    .nav-header {
+        @apply sticky top-0 px-6 py-4 flex justify-between items-center glass;
+        border-bottom: 1px solid var(--color-border);
+        z-index: 40;
+    }
+
+    .nav-bottom {
+        @apply fixed bottom-0 inset-x-0 flex justify-around py-2 glass;
+        border-top: 1px solid var(--color-border);
+        padding-bottom: env(safe-area-inset-bottom);
+        z-index: 40;
+    }
+
+    .nav-item {
+        @apply flex flex-col items-center transition-colors;
+        color: var(--color-muted);
+        min-height: 44px;
+    }
+
+    .nav-item:hover {
+        color: var(--color-primary);
+    }
+
+    .dark .nav-item {
+        color: var(--color-muted);
+    }
+
+    .dark .nav-item:hover {
+        color: var(--color-primary);
+    }
+
+    .nav-item.active {
+        @apply text-primary;
+    }
+
+    /* Telegram Glass Dock Navigation - Authentic Telegram Style */
     .navbar-glass {
-      bottom: 20px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      border-radius: 18px;
-      padding: 6px 10px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 0.5px solid rgba(255, 255, 255, 0.35);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.6),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+        -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        bottom: 24px !important;
+        /* Telegram specific */
+        border-radius: 20px;
+        overflow: hidden;
     }
-  }
 
-  /* AI Dock v4.1: Perfect Balance - Enhanced mobile styling */
-  @media (max-width: 480px) {
-    /* Target the new BottomNav component with bottom-4 */
-    nav.fixed.bottom-4 {
-      bottom: 8px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      border-radius: 18px !important;
-      padding: 6px 10px !important;
+    /* Telegram-style glass layer effect */
+    .navbar-glass::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 50%,
+                rgba(255, 255, 255, 0.02) 100%);
+        border-radius: inherit;
+        pointer-events: none;
+        z-index: -1;
     }
-    
-    /* Fallback for any remaining bottom-6 */
-    nav.fixed.bottom-6 {
-      bottom: 8px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      border-radius: 16px !important;
-      padding: 6px 10px !important;
+
+    .navbar-glass::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 0%, transparent 100%);
+        pointer-events: none;
+        border-radius: 0 0 20px 20px;
+        z-index: -1;
     }
-  }
 
-  /* Ensure proper centering for AI Dock v4.1 */
-  nav.fixed.bottom-4.left-1\/2,
-  nav.fixed.bottom-6.left-1\/2 {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
-  /* Fix for BottomNav centering - более специфичное правило */
-  nav.fixed.bottom-4.z-50 {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
-    position: fixed !important;
-    bottom: 16px !important;
-    z-index: 50 !important;
-  }
-
-  /* Принудительное центрирование для BottomNav */
-  nav[class*="bottom-4"] {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
-  }
-
-  /* Layout Components */
-  .container-main {
-    @apply max-w-6xl mx-auto px-6 py-8;
-  }
-  
-  .container-compact {
-    @apply max-w-4xl mx-auto px-4 py-6;
-  }
-  
-  .grid-responsive {
-    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-  }
-  
-  .grid-cards {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
-  }
-
-  /* Status Components */
-  .status-indicator {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-  
-  .status-success {
-    @apply bg-success/10 text-success border border-success/20;
-  }
-  
-  .status-error {
-    @apply bg-error/10 text-error border border-error/20;
-  }
-  
-  .status-warning {
-    @apply bg-warning/10 text-warning border border-warning/20;
-  }
-  
-  .status-muted {
-    @apply bg-muted/10 text-muted border border-muted/20;
-  }
-
-  /* Skeleton Loading */
-  .skeleton {
-    @apply animate-pulse bg-gradient-to-r from-surface-alt via-surface to-surface-alt;
-    background-size: 200% 100%;
-    animation: pulse-soft 2s ease-in-out infinite;
-  }
-
-/* Shimmer Animation for Personality Frame */
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-.animate-shimmer {
-  animation: shimmer var(--speed, 3s) linear infinite;
-}
-
-/* Gradient Effect Animations */
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes gradient-glow {
-  0% {
-    opacity: 0.2;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0.4;
-    transform: scale(1.02);
-  }
-}
-
-/* Sparkle Animation */
-@keyframes pulse-sparkle {
-  0%, 100% { 
-    opacity: 0.8; 
-    transform: scale(1); 
-    filter: drop-shadow(0 0 2px rgba(16,185,129,0.3)); 
-  }
-  50% { 
-    opacity: 1; 
-    transform: scale(1.12); 
-    filter: drop-shadow(0 0 6px rgba(16,185,129,0.5)); 
-  }
-}
-
-.animate-pulse-sparkle {
-  animation: pulse-sparkle 3.5s ease-in-out infinite;
-}
-
-  /* Mobile-specific */
-  @media (max-width: 768px) {
-    .btn-mobile {
-      @apply w-full py-3 text-base;
+    .dark .navbar-glass {
+        background: rgba(30, 35, 42, 0.85);
+        border: 0.5px solid rgba(255, 255, 255, 0.08);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            0 2px 8px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(40px) saturate(150%) brightness(0.95);
+        -webkit-backdrop-filter: blur(40px) saturate(150%) brightness(0.95);
     }
-    
-    .card-mobile {
-      @apply rounded-xl p-4;
+
+    .dark .navbar-glass::before {
+        background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.04) 0%,
+                rgba(255, 255, 255, 0.02) 50%,
+                rgba(255, 255, 255, 0.01) 100%);
     }
-    
-    .container-mobile {
-      @apply px-4 py-4;
+
+    .dark .navbar-glass::after {
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
     }
-  }
+
+    @media (max-width: 480px) {
+        .navbar-glass {
+            bottom: 20px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            border-radius: 18px;
+            padding: 6px 10px;
+        }
+    }
+
+    /* AI Dock v4.1: Perfect Balance - Enhanced mobile styling */
+    @media (max-width: 480px) {
+
+        /* Target the new BottomNav component with bottom-4 */
+        nav.fixed.bottom-4 {
+            bottom: 8px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            border-radius: 18px !important;
+            padding: 6px 10px !important;
+        }
+
+        /* Fallback for any remaining bottom-6 */
+        nav.fixed.bottom-6 {
+            bottom: 8px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            border-radius: 16px !important;
+            padding: 6px 10px !important;
+        }
+    }
+
+    /* Ensure proper centering for AI Dock v4.1 */
+    nav.fixed.bottom-4.left-1\/2,
+    nav.fixed.bottom-6.left-1\/2 {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    /* Fix for BottomNav centering - более специфичное правило */
+    nav.fixed.bottom-4.z-50 {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        position: fixed !important;
+        bottom: 16px !important;
+        z-index: 50 !important;
+    }
+
+    /* Принудительное центрирование для BottomNav */
+    nav[class*="bottom-4"] {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+    }
+
+    /* Layout Components */
+    .container-main {
+        @apply max-w-6xl mx-auto px-6 py-8;
+    }
+
+    .container-compact {
+        @apply max-w-4xl mx-auto px-4 py-6;
+    }
+
+    .grid-responsive {
+        @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+    }
+
+    .grid-cards {
+        @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+    }
+
+    /* Status Components */
+    .status-indicator {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    }
+
+    .status-success {
+        @apply bg-success/10 text-success border border-success/20;
+    }
+
+    .status-error {
+        @apply bg-error/10 text-error border border-error/20;
+    }
+
+    .status-warning {
+        @apply bg-warning/10 text-warning border border-warning/20;
+    }
+
+    .status-muted {
+        @apply bg-muted/10 text-muted border border-muted/20;
+    }
+
+    /* Skeleton Loading */
+    .skeleton {
+        @apply animate-pulse bg-gradient-to-r from-surface-alt via-surface to-surface-alt;
+        background-size: 200% 100%;
+        animation: pulse-soft 2s ease-in-out infinite;
+    }
+
+    /* Shimmer Animation for Personality Frame */
+    @keyframes shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    .animate-shimmer {
+        animation: shimmer var(--speed, 3s) linear infinite;
+    }
+
+    /* Gradient Effect Animations */
+    @keyframes gradient-shift {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    @keyframes gradient-glow {
+        0% {
+            opacity: 0.2;
+            transform: scale(1);
+        }
+
+        100% {
+            opacity: 0.4;
+            transform: scale(1.02);
+        }
+    }
+
+    /* Sparkle Animation */
+    @keyframes pulse-sparkle {
+
+        0%,
+        100% {
+            opacity: 0.8;
+            transform: scale(1);
+            filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.3));
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.12);
+            filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
+        }
+    }
+
+    .animate-pulse-sparkle {
+        animation: pulse-sparkle 3.5s ease-in-out infinite;
+    }
+
+    /* Mobile-specific */
+    @media (max-width: 768px) {
+        .btn-mobile {
+            @apply w-full py-3 text-base;
+        }
+
+        .card-mobile {
+            @apply rounded-xl p-4;
+        }
+
+        .container-mobile {
+            @apply px-4 py-4;
+        }
+    }
+
+    /* Chip Components - Unified Filter/Tag Style
+   *
+   * Usage:
+   *   <button className="chip chip-active">Selected</button>
+   *   <button className="chip chip-inactive">Unselected</button>
+   *
+   * Active: Holographic gradient background with primary glow
+   * Inactive: Transparent with border, primary hover
+   *
+   * These classes are defined in utilities.css and provide consistent
+   * styling for all filter/tag components across the app.
+   */
 }

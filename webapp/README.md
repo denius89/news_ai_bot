@@ -9,6 +9,8 @@ Modern React-based web application for managing PulseAI notifications with a cle
 - ⚡ **Real-time updates** - Live notification status updates
 - 🎨 **Modern UI** - Built with shadcn/ui and Tailwind CSS
 - 📊 **TypeScript** - Full type safety throughout the application
+- 🚀 **AI Dock Navigation** - Telegram-style floating glass bottom navigation
+- ✨ **AI Mist Visual System** - Modern card components with glass effects
 
 ## Tech Stack
 
@@ -24,7 +26,7 @@ Modern React-based web application for managing PulseAI notifications with a cle
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - PulseAI backend running on localhost:8001
 
