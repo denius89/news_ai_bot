@@ -43,8 +43,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
             'flex flex-col items-center justify-center text-xs font-medium transition-all',
             'px-2 py-1 rounded-xl',
             item.active
-              ? 'text-primary bg-primary/15 shadow-[0_0_10px_rgba(0,166,200,0.25)]'
-              : 'text-muted hover:text-primary'
+              ? 'text-primary bg-primary/20 shadow-[0_0_12px_rgba(0,166,200,0.3)] border border-primary/20'
+              : 'text-muted hover:text-primary hover:bg-primary/5'
           )}
         >
           <div className="relative w-5 h-5 opacity-90">
