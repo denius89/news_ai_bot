@@ -24,7 +24,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
         'bottom-6 z-50',
         'flex justify-around items-center',
         'w-[90%] max-w-[600px]',
-        'px-3 py-2 rounded-2xl',
+        'px-3 py-2',
         'backdrop-blur-xl',
         'transition-all duration-300',
         className
