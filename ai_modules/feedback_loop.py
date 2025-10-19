@@ -84,7 +84,7 @@ class FeedbackAnalyzer:
                 if isinstance(meta, str):
                     try:
                         meta = json.loads(meta)
-                    except:
+                    except (json.JSONDecodeError, TypeError):
                         meta = {}
 
                 importance_vals.append(meta.get("avg_importance", 0.5))

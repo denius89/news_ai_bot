@@ -35,9 +35,6 @@ def get_digest_metrics():
         # Get analytics data
         if category:
             # Filter by category if specified
-            end_date = datetime.now(timezone.utc)
-            start_date = end_date - timedelta(days=days)
-
             analytics_data = get_digest_analytics(days=days)
             # Filter by category (would need to be implemented in get_digest_analytics)
             logger.info(f"Category filter requested for {category}, but not implemented yet")

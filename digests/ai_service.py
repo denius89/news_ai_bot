@@ -39,16 +39,16 @@ except ImportError:
     RAG_SYSTEM_AVAILABLE = False
 
 try:
-    from digests.personalization import PersonalizedDigestGenerator
+    from digests.personalization import PersonalizedDigestGenerator  # noqa: F401
 
     PERSONALIZATION_AVAILABLE = True
 except ImportError:
     PERSONALIZATION_AVAILABLE = False
 
 try:
-    from ai_modules.personas import select_persona_for_context
+    from ai_modules.personas import select_persona_for_context  # noqa: F401
     from ai_modules.news_graph import StoryContextManager
-    from ai_modules.feedback_loop import FeedbackAnalyzer
+    from ai_modules.feedback_loop import FeedbackAnalyzer  # noqa: F401
 
     SUPER_JOURNALIST_V3_AVAILABLE = True
 except ImportError:

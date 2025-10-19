@@ -133,7 +133,7 @@ if __name__ == "__main__":
     try:
         response = requests.get("http://localhost:5000/api/digests/categories", timeout=5)
         is_server_running = response.status_code in [200, 404, 401]
-    except:
+    except (requests.RequestException, ConnectionError, requests.Timeout):
         is_server_running = False
 
     if is_server_running:

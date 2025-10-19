@@ -262,7 +262,7 @@ class NewsGraphBuilder:
                 dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
                 return dt.strftime("%d.%m")
             return "неизв."
-        except:
+        except (ValueError, TypeError, AttributeError):
             return "неизв."
 
 
