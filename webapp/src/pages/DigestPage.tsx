@@ -1002,7 +1002,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             </div>
 
             {/* Footer - simplified */}
-            <div className="border-t border pt-4 mt-4 flex items-center justify-between text-xs text-muted">
+            <div className="pt-6 mt-6 flex items-center justify-between text-xs text-muted">
               {/* Feedback buttons - only for active tab */}
               {activeTab === 'active' && (
                 <div className="flex gap-2">
