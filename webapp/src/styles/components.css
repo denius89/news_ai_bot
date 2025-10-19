@@ -272,9 +272,18 @@
     }
   }
 
-  /* AI Glass Dock v3 - Enhanced mobile styling */
+  /* AI Dock v4: Light Flow Glass - Enhanced mobile styling */
   @media (max-width: 480px) {
-    /* Target the new BottomNav component */
+    /* Target the new BottomNav component with bottom-4 */
+    nav.fixed.bottom-4 {
+      bottom: 8px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      border-radius: 18px !important;
+      padding: 6px 10px !important;
+    }
+    
+    /* Fallback for any remaining bottom-6 */
     nav.fixed.bottom-6 {
       bottom: 8px !important;
       left: 50% !important;
@@ -284,7 +293,8 @@
     }
   }
 
-  /* Ensure proper centering for AI Glass Dock v3 */
+  /* Ensure proper centering for AI Dock v4 */
+  nav.fixed.bottom-4.left-1\/2,
   nav.fixed.bottom-6.left-1\/2 {
     left: 50% !important;
     transform: translateX(-50%) !important;

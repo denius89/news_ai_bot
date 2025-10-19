@@ -20,24 +20,24 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
   return (
     <motion.nav
       className={cn(
-        // Core positioning and layout
-        'fixed bottom-6 z-50',
-        'left-1/2 -translate-x-1/2',
+        // Core positioning and layout - AI Dock v4: Light Flow Glass
+        'fixed bottom-4 left-1/2 -translate-x-1/2 z-50',
         'flex justify-around items-center',
-        'w-[92%] max-w-[600px]',
-        'px-3 py-2 rounded-2xl',
+        'w-[92%] max-w-[580px] px-3 py-2 rounded-3xl',
         
-        // AI Glass Dock v3 styling
-        'bg-[linear-gradient(135deg,rgba(255,255,255,0.75),rgba(240,245,250,0.65))]',
-        'dark:bg-[linear-gradient(135deg,rgba(22,25,30,0.55),rgba(12,14,18,0.55))]',
-        'border border-white/20 dark:border-white/10',
-        
-        // Enhanced shadows and effects
-        'shadow-[0_4px_22px_rgba(0,0,0,0.08),inset_0_0_0.5px_rgba(255,255,255,0.3)]',
-        'dark:shadow-[0_4px_22px_rgba(0,0,0,0.5),inset_0_0_0.5px_rgba(255,255,255,0.1)]',
-        
-        // Backdrop and transitions
+        // Light Flow Glass effects
         'backdrop-blur-xl',
+        'border border-white/30 dark:border-white/10',
+        
+        // Enhanced gradient backgrounds for depth
+        'bg-[linear-gradient(180deg,rgba(255,255,255,0.75)_0%,rgba(245,248,250,0.6)_60%,rgba(230,235,240,0.55)_100%)]',
+        'dark:bg-[linear-gradient(180deg,rgba(28,30,35,0.55)_0%,rgba(20,22,26,0.45)_80%,rgba(12,14,18,0.4)_100%)]',
+        
+        // Light flow shadows and depth
+        'shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.3)]',
+        'dark:shadow-[0_4px_20px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)]',
+        
+        // Premium transitions
         'transition-all duration-300',
         'overflow-hidden',
         
@@ -51,15 +51,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
-      {/* AI Depth Balance Layer */}
-      <div
-        className="
-          absolute inset-0 pointer-events-none z-[-1]
-          bg-[linear-gradient(to_top,rgba(0,0,0,0.05),rgba(255,255,255,0))]
-          dark:bg-[linear-gradient(to_top,rgba(0,0,0,0.25),rgba(255,255,255,0))]
-          rounded-2xl
-        "
-      />
+      {/* Light Flow Glass - верхний "световой" слой */}
+      <div className="absolute inset-0 pointer-events-none rounded-3xl">
+        <div className="absolute top-0 left-0 right-0 h-[35%] bg-white/35 dark:bg-white/10 blur-xl"></div>
+      </div>
 
       {items.map((item) => (
         <motion.button
@@ -70,11 +65,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
           transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
           className={cn(
             'flex flex-col items-center justify-center text-[11px] font-medium',
-            'transition-all duration-200',
+            'transition-all duration-200 relative',
             'px-2 py-1 rounded-xl',
             item.active
-              ? 'text-primary drop-shadow-[0_0_6px_rgba(0,191,166,0.35)]'
-              : 'text-[rgba(30,41,59,0.65)] dark:text-[rgba(232,234,237,0.6)] hover:text-primary'
+              ? 'text-[var(--color-primary)] drop-shadow-[0_0_8px_rgba(0,191,166,0.4)]'
+              : 'text-[rgba(30,41,59,0.65)] dark:text-[rgba(232,234,237,0.6)] hover:text-[var(--color-primary)]'
           )}
         >
           <div className="relative w-5 h-5 mb-[2px] opacity-90">
@@ -86,6 +81,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
             )}
           </div>
           <span>{item.label}</span>
+          {/* Light Flow indicator for active state */}
+          {item.active && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-[var(--color-primary)]/60 rounded-full blur-[1px]" />
+          )}
         </motion.button>
       ))}
     </motion.nav>
