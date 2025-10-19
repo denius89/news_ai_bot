@@ -277,9 +277,17 @@
     /* Target the new BottomNav component */
     nav.fixed.bottom-6 {
       bottom: 8px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
       border-radius: 16px !important;
       padding: 6px 10px !important;
     }
+  }
+
+  /* Ensure proper centering for AI Glass Dock v3 */
+  nav.fixed.bottom-6.left-1\/2 {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   /* Layout Components */

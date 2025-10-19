@@ -21,7 +21,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
     <motion.nav
       className={cn(
         // Core positioning and layout
-        'fixed bottom-6 left-1/2 -translate-x-1/2 z-50',
+        'fixed bottom-6 z-50',
+        'left-1/2 -translate-x-1/2',
         'flex justify-around items-center',
         'w-[92%] max-w-[600px]',
         'px-3 py-2 rounded-2xl',
@@ -42,6 +43,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
         
         className
       )}
+      style={{
+        left: '50%',
+        transform: 'translateX(-50%)'
+      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
