@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, ChevronDown, ArrowUp } from 'lucide-react';
+import { Calendar, ChevronDown, ArrowUp, RefreshCw } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { MobileHeader } from '../components/ui/Header';
 import { motion } from 'framer-motion';
@@ -254,12 +254,16 @@ const EventsPage: React.FC<EventsPageProps> = () => {
         subtitle={isFilteredBySubscriptions ? "Показаны события по вашим подпискам" : `${filteredEvents.length} событий`}
         icon={<Calendar className="w-6 h-6 text-primary" />}
         actions={
-          <button
+          <motion.button
             onClick={fetchEvents}
-            className="text-sm text-primary hover:text-primary/80 px-3 py-1 rounded-md hover:bg-surface-alt transition-colors"
+            className="p-2 rounded-lg hover:bg-surface-alt transition-colors"
+            title="Обновить события"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95, rotate: 180 }}
+            transition={{ duration: 0.2 }}
           >
-            Обновить
-          </button>
+            <RefreshCw className="w-5 h-5 text-primary hover:text-primary/80" />
+          </motion.button>
         }
       />
 
