@@ -272,7 +272,7 @@
     }
   }
 
-  /* AI Dock v4: Light Flow Glass - Enhanced mobile styling */
+  /* AI Dock v4.1: Perfect Balance - Enhanced mobile styling */
   @media (max-width: 480px) {
     /* Target the new BottomNav component with bottom-4 */
     nav.fixed.bottom-4 {
@@ -293,7 +293,7 @@
     }
   }
 
-  /* Ensure proper centering for AI Dock v4 */
+  /* Ensure proper centering for AI Dock v4.1 */
   nav.fixed.bottom-4.left-1\/2,
   nav.fixed.bottom-6.left-1\/2 {
     left: 50% !important;
