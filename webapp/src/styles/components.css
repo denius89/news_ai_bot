@@ -155,7 +155,7 @@
 
   /* Navigation Components */
   .nav-header {
-    @apply sticky top-0 px-6 py-4 flex justify-between items-center glass;
+    @apply sticky top-0 px-6 py-3 flex justify-between items-center glass;
     border-bottom: 1px solid var(--color-border);
     z-index: 40;
   }

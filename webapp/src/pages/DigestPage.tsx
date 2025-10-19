@@ -629,7 +629,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       <MobileHeader 
         title="AI Дайджест" 
-        subtitle="PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле."
         icon={<Sparkles className="w-6 h-6 text-primary" />}
         actions={
           activeTab === 'active' && (
@@ -639,11 +638,11 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                 setSelectedDigest(null);
                 setIsGeneratorOpen(true);
               }}
-              className="px-4 py-2 rounded-full font-medium text-sm text-white
-                         bg-ai-flow hover:shadow-[0_0_12px_rgba(0,166,200,0.4)] 
-                         active:scale-95 transition-all duration-300 flex items-center gap-2"
+              className="px-3 py-1.5 rounded-lg font-medium text-xs text-white
+                         bg-ai-flow hover:shadow-[0_0_8px_rgba(0,166,200,0.3)] 
+                         active:scale-95 transition-all duration-200 flex items-center gap-1.5"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
               Создать
             </motion.button>
           )
@@ -651,6 +650,11 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       />
       
       <main className="container-main pb-32">
+        {/* Компактное описание */}
+        <p className="text-xs text-muted mb-4 px-1">
+          PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле
+        </p>
+        
         {/* Фильтры и вкладки */}
         <div className="flex space-x-1 mb-6 bg-surface-alt/50 rounded-xl p-1">
           <motion.button
