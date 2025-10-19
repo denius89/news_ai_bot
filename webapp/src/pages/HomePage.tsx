@@ -242,9 +242,7 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                   key={stat.label}
                   variants={itemVariants}
                   className={`h-full flex flex-col justify-between items-center text-center 
-                              bg-white dark:bg-surface-alt rounded-2xl 
-                              shadow-[0_1px_6px_rgba(0,0,0,0.04)] 
-                              py-5 px-4 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}
+                              card py-5 px-4 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}
                               ${stat.label.length > 25 ? "min-h-[140px]" : "min-h-[120px]"}`}
                 >
                   <div className="text-2xl font-semibold text-text dark:text-white">{stat.value}</div>

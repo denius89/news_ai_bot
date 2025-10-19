@@ -69,6 +69,8 @@ module.exports = {
       backgroundImage: {
         'ai-flow': 'var(--grad-ai-flow)',
         'ai-holo': 'var(--grad-ai-holo)',
+        'ai-mist-light': 'linear-gradient(180deg, rgba(248,252,255,0.9) 0%, rgba(240,245,250,0.9) 100%)',
+        'ai-mist-dark': 'linear-gradient(180deg, rgba(26,28,33,0.85) 0%, rgba(18,20,25,0.85) 100%)',
       },
       ringColor: {
         DEFAULT: 'var(--color-primary)',

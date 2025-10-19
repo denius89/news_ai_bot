@@ -637,7 +637,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
               {filteredNews.map((item) => (
                 <div
                   key={item.id}
-                  className={`bg-white dark:bg-surface-alt rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''} p-5`}
+                  className={`card p-5 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}`}
                 >
                   <div>
                     <div className="flex justify-between items-start">
@@ -798,8 +798,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
             className="w-full max-w-2xl max-h-[75vh] 
-                       bg-white dark:bg-surface-alt 
-                       backdrop-blur-lg rounded-3xl 
+                       card backdrop-blur-lg rounded-3xl 
                        shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]
                        p-6 
                        overflow-hidden flex flex-col"

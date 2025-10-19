@@ -748,7 +748,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                   transition={{ delay: index * 0.1 }}
                 >
                   <motion.div
-                    className="bg-surface dark:bg-surface backdrop-blur-md border border-border 
+                    className="card backdrop-blur-md border border-border 
                                rounded-3xl p-5 pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.05)] 
                                hover:scale-[1.02] transition-transform duration-300 ease-out mt-4"
                     whileHover={{ scale: 1.02 }}
@@ -884,7 +884,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="flex flex-col items-center justify-center p-8 rounded-3xl bg-surface dark:bg-surface mt-6"
+              className="flex flex-col items-center justify-center p-8 rounded-3xl card mt-6"
             >
               <Bot className="w-10 h-10 text-primary mb-3" />
               <p className="text-muted text-sm">

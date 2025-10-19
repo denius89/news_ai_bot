@@ -1,51 +1,63 @@
 /* PulseAI Light Premium UI Components */
 @layer components {
   
-  /* Card Components */
-  .card {
+  /* AI Mist Card Components */
+  .card,
+  .Card,
+  .CardContent,
+  .CardHeader {
     @apply rounded-2xl p-6 border;
-    background-color: var(--color-surface);
-    border-color: rgba(226, 232, 240, 0.5);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease-in-out;
+    background: linear-gradient(180deg, rgba(248,252,255,0.9) 0%, rgba(240,245,250,0.9) 100%);
+    border: 1px solid rgba(230, 235, 240, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s ease;
   }
   
-  .dark .card {
-    background-color: var(--color-surface-alt);
-    border-color: rgba(44, 49, 56, 0.6);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  .dark .card,
+  .dark .Card,
+  .dark .CardContent,
+  .dark .CardHeader {
+    background: linear-gradient(180deg, rgba(26,28,33,0.85) 0%, rgba(18,20,25,0.85) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
   }
   
-  .card:hover {
-    @apply scale-[1.02];
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  .card:hover,
+  .Card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
   }
   
-  .dark .card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  .dark .card:hover,
+  .dark .Card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
   }
   
   .card-compact {
     @apply rounded-xl p-4 border;
-    background-color: var(--color-surface);
-    border-color: rgba(226, 232, 240, 0.5);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease-in-out;
+    background: linear-gradient(180deg, rgba(248,252,255,0.9) 0%, rgba(240,245,250,0.9) 100%);
+    border: 1px solid rgba(230, 235, 240, 0.7);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(6px);
+    transition: all 0.25s ease;
   }
   
   .dark .card-compact {
-    background-color: var(--color-surface-alt);
-    border-color: rgba(44, 49, 56, 0.6);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(180deg, rgba(26,28,33,0.85) 0%, rgba(18,20,25,0.85) 100%);
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   }
   
   .card-compact:hover {
-    @apply scale-[1.01];
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
   }
   
   .dark .card-compact:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transform: translateY(-1px);
   }
 
   /* Button Components */

@@ -69,14 +69,16 @@
     min-height: 100vh;
   }
 
-  /* Light theme gradient background */
+  /* AI Mist Light theme gradient background */
   body {
-    background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg) 100%);
+    background-color: #F5F8FB;
+    background: linear-gradient(135deg, #F5F8FB 0%, #F0F5FA 100%);
   }
 
-  /* Dark theme gradient background */
+  /* AI Mist Dark theme gradient background */
   .dark body {
-    background: radial-gradient(circle at top left, var(--color-bg), #121417 60%);
+    background-color: #0F1115;
+    background: radial-gradient(circle at top left, #0F1115, #0C0E12 60%);
   }
 
   /* Typography */
