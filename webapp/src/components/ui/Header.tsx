@@ -31,7 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
     >
       <div className="flex items-center space-x-3">
         {icon && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center justify-center h-8">
             {icon}
           </div>
         )}
@@ -104,7 +104,7 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
           </button>
         )}
         {icon && !showBack && (
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center justify-center h-8">
             {icon}
           </div>
         )}
