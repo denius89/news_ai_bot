@@ -629,6 +629,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       
       <MobileHeader 
         title="AI Дайджест" 
+        subtitle="Ваши персональные дайджесты"
         icon={<Sparkles className="w-6 h-6 text-primary" />}
         actions={
           activeTab === 'active' && (
@@ -650,11 +651,6 @@ const DigestPage: React.FC<DigestPageProps> = () => {
       />
       
       <main className="container-main pb-32">
-        {/* Компактное описание */}
-        <p className="text-xs text-muted mb-4 px-1">
-          PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле
-        </p>
-        
         {/* Фильтры и вкладки */}
         <div className="flex space-x-1 mb-6 bg-surface-alt/50 rounded-xl p-1">
           <motion.button

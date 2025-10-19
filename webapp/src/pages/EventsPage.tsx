@@ -251,6 +251,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="События" 
+        subtitle={isFilteredBySubscriptions ? "По вашим подпискам" : `${filteredEvents.length} событий`}
         icon={<Calendar className="w-6 h-6 text-primary" />}
         actions={
           <motion.button
@@ -265,19 +266,6 @@ const EventsPage: React.FC<EventsPageProps> = () => {
           </motion.button>
         }
       />
-
-      {/* Компактная информация */}
-      <div className="px-4 pt-2">
-        {isFilteredBySubscriptions ? (
-          <p className="text-xs text-primary font-medium">
-            ✨ Показаны события по вашим подпискам
-          </p>
-        ) : (
-          <p className="text-xs text-muted">
-            {filteredEvents.length} событий
-          </p>
-        )}
-      </div>
 
       {/* Filters */}
       <div className="px-4 py-3 border-b border-border">

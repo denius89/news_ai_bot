@@ -182,7 +182,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
       <div className="min-h-screen bg-bg">
         <MobileHeader 
           title="Настройки" 
-          subtitle="Загрузка..." 
+          subtitle="Персонализация категорий"
           icon={<Settings className="w-6 h-6 text-primary" />}
         />
         <main className="container-main">
@@ -211,7 +211,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
       <div className="min-h-screen bg-bg">
         <MobileHeader
           title="Настройки"
-          subtitle="Ошибка загрузки"
+          subtitle="Персонализация категорий"
           icon={<Settings className="w-6 h-6 text-primary" />}
         />
         <main className="container-main">
@@ -236,6 +236,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
     <div className="min-h-screen bg-bg">
       <MobileHeader 
         title="Настройки" 
+        subtitle="Персонализация категорий"
         icon={<Settings className="w-6 h-6 text-primary" />}
       />
       
