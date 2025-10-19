@@ -1,0 +1,28 @@
+[
+    {
+        "key": "ctrl+shift+f",
+        "command": "python.execInTerminal",
+        "args": {
+            "command": "python -m black --line-length=120 ${file}"
+        },
+        "when": "editorTextFocus && resourceExtname == '.py'"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "python.execInTerminal", 
+        "args": {
+            "command": "python -m flake8 --max-line-length=120 ${file}"
+        },
+        "when": "editorTextFocus && resourceExtname == '.py'"
+    },
+    {
+        "key": "ctrl+alt+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Python: Format with Black"
+    },
+    {
+        "key": "ctrl+alt+c",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Python: Check with Flake8"
+    }
+]

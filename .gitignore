@@ -16,6 +16,10 @@ __pycache__/
 
 # IDE / Editor
 .vscode/
+!\.vscode/settings\.json
+!\.vscode/tasks\.json
+!\.vscode/keybindings\.json
+!\.vscode/extensions\.json
 .idea/
 
 # Logs
