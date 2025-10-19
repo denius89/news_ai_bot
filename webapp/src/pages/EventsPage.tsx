@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, ArrowUp } from 'lucide-react';
 import { Card } from '../components/ui/Card';
+import { MobileHeader } from '../components/ui/Header';
 import { motion } from 'framer-motion';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
@@ -247,33 +248,24 @@ const EventsPage: React.FC<EventsPageProps> = () => {
   }, [filteredEvents]);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-[var(--color-bg)] border-b border-[var(--color-border)] px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Calendar className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-[var(--color-text)]">Events</h1>
-          </div>
+    <div className="min-h-screen bg-bg">
+      <MobileHeader 
+        title="События" 
+        subtitle={isFilteredBySubscriptions ? "Показаны события по вашим подпискам" : `${filteredEvents.length} событий`}
+        icon={<Calendar className="w-6 h-6 text-primary" />}
+        actions={
           <button
             onClick={fetchEvents}
-            className="text-sm text-primary hover:text-primary/80"
+            className="text-sm text-primary hover:text-primary/80 px-3 py-1 rounded-md hover:bg-surface-alt transition-colors"
           >
-            Refresh
+            Обновить
           </button>
-        </div>
-        
-        {/* Filter indicator */}
-        {isFilteredBySubscriptions && (
-          <div className="mt-2">
-            <p className="text-xs text-primary font-medium text-center">
-              ✨ Показаны события по вашим подпискам
-            </p>
-          </div>
-        )}
+        }
+      />
 
-        {/* Filters */}
-        <div className="mt-3 space-y-2">
+      {/* Filters */}
+      <div className="px-4 py-3 border-b border-border">
+        <div className="space-y-2">
           {/* Date Range Filter */}
           <div className="flex space-x-2">
             {(['today', 'week', 'month'] as const).map((range) => (
@@ -356,7 +348,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-4 pb-20">
+      <main className="container-main pb-32">
         {loading && (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -423,7 +415,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
             )}
           </>
         )}
-      </div>
+      </main>
 
       {/* Scroll to Top Button */}
       {showScrollTop && (

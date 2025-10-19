@@ -537,7 +537,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader title="Новости" subtitle="Загрузка..." />
+        <MobileHeader 
+          title="Новости" 
+          subtitle="Загрузка..." 
+          icon={<Newspaper className="w-6 h-6 text-primary" />}
+        />
         <main className="container-main">
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -563,6 +567,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
       <MobileHeader 
         title="Новости" 
         subtitle={`${filteredNews.length} ${getNewsLabel(filteredNews.length)}`}
+        icon={<Newspaper className="w-6 h-6 text-primary" />}
       />
       
       <main className="container-main">

@@ -10,6 +10,7 @@ interface HeaderProps {
   className?: string;
   theme?: 'light' | 'dark';
   onThemeToggle?: () => void;
+  icon?: React.ReactNode;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -18,7 +19,8 @@ export const Header: React.FC<HeaderProps> = ({
   actions, 
   className,
   theme,
-  onThemeToggle
+  onThemeToggle,
+  icon
 }) => {
   return (
     <motion.header 
@@ -27,11 +29,18 @@ export const Header: React.FC<HeaderProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="flex flex-col space-y-1">
-        <h1 className="text-xl font-semibold text-text">{title}</h1>
-        {subtitle && (
-          <p className="text-sm text-muted-strong">{subtitle}</p>
+      <div className="flex items-center space-x-3">
+        {icon && (
+          <div className="flex-shrink-0">
+            {icon}
+          </div>
         )}
+        <div className="flex flex-col space-y-1">
+          <h1 className="text-xl font-semibold text-text">{title}</h1>
+          {subtitle && (
+            <p className="text-sm text-muted-strong">{subtitle}</p>
+          )}
+        </div>
       </div>
       
       <div className="flex items-center space-x-2">
@@ -62,7 +71,8 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
   onBack,
   className,
   theme,
-  onThemeToggle
+  onThemeToggle,
+  icon
 }) => {
   return (
     <motion.header 
@@ -93,11 +103,16 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             </svg>
           </button>
         )}
+        {icon && !showBack && (
+          <div className="flex-shrink-0">
+            {icon}
+          </div>
+        )}
         
         <div className="flex flex-col space-y-1">
-          <h1 className="text-lg font-semibold text-text">{title}</h1>
+          <h1 className="text-xl font-semibold text-text">{title}</h1>
           {subtitle && (
-            <p className="text-xs text-muted-strong">{subtitle}</p>
+            <p className="text-sm text-muted-strong">{subtitle}</p>
           )}
         </div>
       </div>

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { MobileHeader } from '../components/ui/Header';
+import { Settings } from 'lucide-react';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
 import { useUserPreferences } from '../hooks/useUserPreferences';
@@ -179,7 +180,11 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
   if (preferencesLoading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader title="Настройки" subtitle="Загрузка..." />
+        <MobileHeader 
+          title="Настройки" 
+          subtitle="Загрузка..." 
+          icon={<Settings className="w-6 h-6 text-primary" />}
+        />
         <main className="container-main">
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -207,6 +212,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
         <MobileHeader
           title="Настройки"
           subtitle="Ошибка загрузки"
+          icon={<Settings className="w-6 h-6 text-primary" />}
         />
         <main className="container-main">
           <Card>
@@ -231,6 +237,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
       <MobileHeader 
         title="Настройки" 
         subtitle="Выбор категорий для персонализации"
+        icon={<Settings className="w-6 h-6 text-primary" />}
       />
       
       <main className="container-main">

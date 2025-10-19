@@ -589,7 +589,11 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader title="AI Дайджест" subtitle="Загрузка..." />
+        <MobileHeader 
+          title="AI Дайджест" 
+          subtitle="Загрузка..." 
+          icon={<Sparkles className="w-6 h-6 text-primary" />}
+        />
         <main className="container-main">
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -623,34 +627,30 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         </div>
       )}
       
-      <main className="pb-32 pt-2 px-4 max-w-md mx-auto">
-        {/* Заголовок */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-xl font-semibold text-text">
-              AI Дайджест
-            </h1>
-            {/* Кнопка создания дайджеста - только для активной вкладки */}
-            {activeTab === 'active' && (
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setSelectedDigest(null); // Закрываем модалку просмотра дайджеста перед открытием генератора
-                  setIsGeneratorOpen(true);
-                }}
-                className="px-4 py-2 rounded-full font-medium text-sm text-white
-                           bg-ai-flow hover:shadow-[0_0_12px_rgba(0,166,200,0.4)] 
-                           active:scale-95 transition-all duration-300 flex items-center gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Создать
-              </motion.button>
-            )}
-          </div>
-          <p className="text-sm text-muted">
-            PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле.
-          </p>
-        </div>
+      <MobileHeader 
+        title="AI Дайджест" 
+        subtitle="PulseAI анализирует новости и создаёт короткие дайджесты в вашем стиле."
+        icon={<Sparkles className="w-6 h-6 text-primary" />}
+        actions={
+          activeTab === 'active' && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setSelectedDigest(null);
+                setIsGeneratorOpen(true);
+              }}
+              className="px-4 py-2 rounded-full font-medium text-sm text-white
+                         bg-ai-flow hover:shadow-[0_0_12px_rgba(0,166,200,0.4)] 
+                         active:scale-95 transition-all duration-300 flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Создать
+            </motion.button>
+          )
+        }
+      />
+      
+      <main className="container-main pb-32">
         {/* Фильтры и вкладки */}
         <div className="flex space-x-1 mb-6 bg-surface-alt/50 rounded-xl p-1">
           <motion.button
