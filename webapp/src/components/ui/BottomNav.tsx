@@ -21,7 +21,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
     <motion.nav
       className={cn(
         // Core positioning and layout - AI Dock v4.1: Perfect Balance
-        'fixed bottom-4 left-1/2 -translate-x-1/2 z-50',
+        'fixed bottom-4 left-1/2 z-50',
         'flex justify-around items-center',
         'w-[92%] max-w-[580px] px-3 py-2 rounded-3xl',
         
@@ -45,6 +45,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
         
         className
       )}
+      style={{
+        left: '50%',
+        transform: 'translateX(-50%)',
+        position: 'fixed',
+        bottom: '16px',
+        zIndex: 50
+      }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}

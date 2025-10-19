@@ -305,6 +305,16 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     right: auto !important;
+    position: fixed !important;
+    bottom: 16px !important;
+    z-index: 50 !important;
+  }
+
+  /* Принудительное центрирование для BottomNav */
+  nav[class*="bottom-4"] {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
   }
 
   /* Layout Components */
