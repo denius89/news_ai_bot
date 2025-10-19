@@ -673,10 +673,24 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             {/* Generate Button with Holographic Effect */}
                             <div className="mt-4">
                                 <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.96 }}
+                                    whileHover={!isGenerating ? { scale: 1.02 } : {}}
+                                    whileTap={!isGenerating ? { scale: 0.96 } : {}}
                                     transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                                    className="holo-button holo-surface w-full py-2.5 text-[14px] font-semibold"
+                                    className={cn(
+                                        "w-full py-2.5 text-[14px] font-semibold rounded-lg transition-all duration-300",
+                                        isGenerating 
+                                            ? "opacity-60 cursor-not-allowed" 
+                                            : "cursor-pointer"
+                                    )}
+                                    style={{
+                                        background: isGenerating 
+                                            ? 'linear-gradient(90deg, rgba(0,166,200,0.7), rgba(79,70,229,0.7))'
+                                            : 'var(--grad-ai-flow)',
+                                        color: 'white',
+                                        boxShadow: isGenerating 
+                                            ? '0 0 6px rgba(0, 166, 200, 0.2)'
+                                            : '0 0 12px rgba(0, 166, 200, 0.3)'
+                                    }}
                                     onClick={handleGenerate}
                                     disabled={isGenerating}
                                 >
