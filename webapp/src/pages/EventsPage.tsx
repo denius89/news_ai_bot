@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronDown, ArrowUp, RefreshCw } from 'lucide-react';
 import { Card } from '../components/ui/Card';
-import { MobileHeader } from '../components/ui/Header';
+import { Header } from '../components/ui/Header';
 import { motion } from 'framer-motion';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
@@ -249,7 +249,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
 
   return (
     <div className="min-h-screen bg-bg">
-      <MobileHeader 
+      <Header 
         title="События" 
         subtitle={isFilteredBySubscriptions ? "По вашим подпискам" : `${filteredEvents.length} событий`}
         icon={<Calendar className="w-6 h-6 text-primary" />}

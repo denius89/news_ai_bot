@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
-import { MobileHeader } from '../components/ui/Header';
+import { Header } from '../components/ui/Header';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
 import { DigestMagicProgress } from '../components/digest/DigestMagicProgress';
 import { Bot, Sparkles, Filter, Trash2, Archive, RotateCcw, Eye, ExternalLink, X, Bitcoin, LineChart, Trophy, Cpu, Globe2, CalendarDays, Newspaper, BookOpen, MessageCircle, ThumbsUp, ThumbsDown, ArrowUp, FileText, Settings } from 'lucide-react';
@@ -589,7 +589,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader 
+        <Header 
           title="AI Дайджест" 
           subtitle="Загрузка..." 
           icon={<Sparkles className="w-6 h-6 text-primary" />}
@@ -627,7 +627,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
         </div>
       )}
       
-      <MobileHeader 
+      <Header 
         title="AI Дайджест" 
         subtitle="Ваши персональные дайджесты"
         icon={<Sparkles className="w-6 h-6 text-primary" />}

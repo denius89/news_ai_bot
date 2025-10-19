@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { MobileHeader } from '../components/ui/Header';
+import { Header } from '../components/ui/Header';
 import { Settings } from 'lucide-react';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
@@ -180,7 +180,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
   if (preferencesLoading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader 
+        <Header 
           title="Настройки" 
           subtitle="Персонализация категорий"
           icon={<Settings className="w-6 h-6 text-primary" />}
@@ -209,7 +209,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
   if (preferencesError) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader
+        <Header
           title="Настройки"
           subtitle="Персонализация категорий"
           icon={<Settings className="w-6 h-6 text-primary" />}
@@ -234,7 +234,7 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
 
   return (
     <div className="min-h-screen bg-bg">
-      <MobileHeader 
+      <Header 
         title="Настройки" 
         subtitle="Персонализация категорий"
         icon={<Settings className="w-6 h-6 text-primary" />}

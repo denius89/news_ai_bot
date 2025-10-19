@@ -11,6 +11,8 @@ interface HeaderProps {
   theme?: 'light' | 'dark';
   onThemeToggle?: () => void;
   icon?: React.ReactNode;
+  showBack?: boolean;
+  onBack?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
@@ -20,63 +22,13 @@ export const Header: React.FC<HeaderProps> = ({
   className,
   theme,
   onThemeToggle,
-  icon
+  icon,
+  showBack = false,
+  onBack
 }) => {
   return (
     <motion.header 
       className={cn('nav-header', className)}
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="flex items-center space-x-3">
-        {icon && (
-          <div className="flex-shrink-0 flex items-center justify-center h-8">
-            {icon}
-          </div>
-        )}
-        <div className="flex flex-col space-y-1">
-          <h1 className="text-xl font-semibold text-text">{title}</h1>
-          {subtitle && (
-            <p className="text-sm text-muted-strong">{subtitle}</p>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        {theme && onThemeToggle && (
-          <ThemeToggle 
-            theme={theme} 
-            onToggle={onThemeToggle}
-            size="sm"
-          />
-        )}
-        {actions}
-      </div>
-    </motion.header>
-  );
-};
-
-// Mobile Header variant
-interface MobileHeaderProps extends HeaderProps {
-  showBack?: boolean;
-  onBack?: () => void;
-}
-
-export const MobileHeader: React.FC<MobileHeaderProps> = ({ 
-  title, 
-  subtitle, 
-  actions, 
-  showBack = false,
-  onBack,
-  className,
-  theme,
-  onThemeToggle,
-  icon
-}) => {
-  return (
-    <motion.header 
-      className={cn('nav-header safe-top', className)}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -108,7 +60,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
             {icon}
           </div>
         )}
-        
         <div className="flex flex-col space-y-1">
           <h1 className="text-xl font-semibold text-text">{title}</h1>
           {subtitle && (
@@ -130,3 +81,6 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({
     </motion.header>
   );
 };
+
+// For backwards compatibility
+export const MobileHeader = Header;

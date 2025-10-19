@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { MobileHeader } from '../components/ui/Header';
+import { Header } from '../components/ui/Header';
 import { ChipsCarousel } from '../components/ui/ChipsCarousel';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useAuth } from '../context/AuthContext';
@@ -537,7 +537,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-bg">
-        <MobileHeader 
+        <Header 
           title="Новости" 
           subtitle="Загрузка новостей..."
           icon={<Newspaper className="w-6 h-6 text-primary" />}
@@ -564,7 +564,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
   return (
     <div className="min-h-screen bg-bg">
-      <MobileHeader 
+      <Header 
         title="Новости" 
         subtitle={`${filteredNews.length} ${getNewsLabel(filteredNews.length)}`}
         icon={<Newspaper className="w-6 h-6 text-primary" />}
