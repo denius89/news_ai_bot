@@ -369,8 +369,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
           className={cn(
             "relative z-50 max-w-md mx-auto rounded-2xl p-4 pb-6 backdrop-blur-2xl border max-h-[90vh] flex flex-col",
             isDark
-              ? "bg-gradient-to-b from-[#0b0f10]/90 via-[#0f1416]/90 to-[#12181a]/90 border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.6)]"
-              : "bg-gradient-to-b from-white/95 via-white/90 to-[#f8f9fa]/95 border-white/60 shadow-[0_4px_35px_rgba(0,0,0,0.08)]"
+              ? "glass shadow-card-hover"
+              : "glass shadow-card"
           )}
         >
 
@@ -379,14 +379,14 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
             <div className="flex flex-col">
               <h2 className={cn(
                 "text-[16px] font-semibold flex items-center gap-2",
-                isDark ? "text-gray-100" : "text-gray-900"
+                "text-text"
               )}>
                 <Sparkles className="text-emerald-500 w-4 h-4 animate-pulse-sparkle" />
                 Создать AI-дайджест
               </h2>
               <p className={cn(
                 "text-[12px] mt-0.5",
-                isDark ? "text-gray-400" : "text-gray-500"
+                "text-muted"
               )}>
                 AI отберёт лучшее и соберёт персональный дайджест.
               </p>
@@ -395,7 +395,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
               className="p-1.5 rounded-full hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors flex-shrink-0"
               onClick={handleClose}
             >
-              <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <X className="w-4 h-4 text-muted" />
             </button>
           </div>
 
@@ -453,9 +453,9 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
               <div {...categoryBind()}>
                 <h3 className={cn(
                   "text-[13px] font-medium flex items-center gap-1.5 mb-2",
-                  isDark ? "text-gray-300" : "text-gray-700"
+                  "text-text"
                 )}>
-                  <Filter className="w-3.5 h-3.5 text-gray-400" /> 
+                  <Filter className="w-3.5 h-3.5 text-muted" /> 
                   Категория 
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
@@ -483,9 +483,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             ? isDark
                               ? "border-emerald-400/30 bg-emerald-950/40 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
                               : "border-emerald-400/40 bg-emerald-50 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
-                            : isDark
-                              ? "border-gray-800 bg-[#1a1e20]/80 text-gray-300 hover:border-gray-700"
-                              : "border-gray-200 bg-white hover:border-gray-300 text-gray-600"
+                            : "border-border bg-surface-alt text-text hover:border-primary/50 hover:text-primary"
                         )}
                         onClick={() => handleCategorySelect(key)}
                       >
@@ -502,9 +500,9 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                 <div>
                   <h3 className={cn(
                     "text-[13px] font-medium flex items-center gap-1.5 mb-2",
-                    isDark ? "text-gray-300" : "text-gray-700"
+                    "text-text"
                   )}>
-                    <FileText className="w-3.5 h-3.5 text-gray-400" /> 
+                    <FileText className="w-3.5 h-3.5 text-muted" /> 
                     Подкатегория
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
@@ -516,8 +514,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             ? "border-emerald-400/30 bg-emerald-950/40 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
                             : "border-emerald-400/40 bg-emerald-50 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
                           : isDark
-                            ? "border-gray-800 bg-[#1a1e20]/80 text-gray-300 hover:border-gray-700"
-                            : "border-gray-200 bg-white hover:border-gray-300 text-gray-600"
+                            ? "border bg-surface-alt text-text hover:border-primary-700"
+                            : "border bg-surface hover:border-primary text-text"
                       )}
                       onClick={() => handleSubcategorySelect(null)}
                     >
@@ -533,9 +531,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             ? isDark
                               ? "border-emerald-400/30 bg-emerald-950/40 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
                               : "border-emerald-400/40 bg-emerald-50 text-emerald-600 shadow-[0_0_8px_rgba(16,185,129,0.1)]"
-                            : isDark
-                              ? "border-gray-800 bg-[#1a1e20]/80 text-gray-300 hover:border-gray-700"
-                              : "border-gray-200 bg-white hover:border-gray-300 text-gray-600"
+                            : "border-border bg-surface-alt text-text hover:border-primary/50 hover:text-primary"
                         )}
                         onClick={() => handleSubcategorySelect(key)}
                       >
@@ -551,7 +547,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
               <div>
                 <h3 className={cn(
                   "text-[13px] font-medium flex items-center gap-1.5 mb-2",
-                  isDark ? "text-gray-300" : "text-gray-700"
+                  "text-text"
                 )}>
                   <Brain className="w-3.5 h-3.5 text-gray-400" /> 
                   Стиль AI
@@ -600,8 +596,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                                   'border-gray-400/60 bg-gray-50 text-gray-600'
                                 } shadow-[0_0_20px_rgba(59,130,246,0.2)]`
                             : isDark
-                              ? "border border-gray-700 bg-[#1a1e20]/80 text-gray-300 hover:border-gray-600"
-                              : "border border-gray-200 bg-white hover:border-gray-300 text-gray-600"
+                              ? "border bg-surface-alt text-text hover:border-primary-700"
+                              : "border bg-surface hover:border-primary text-text"
                         )}
                         onClick={() => handleStyleSelect(key)}
                       >
@@ -632,9 +628,9 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
               <div>
                 <h3 className={cn(
                   "text-[13px] font-medium flex items-center gap-1.5 mb-2",
-                  isDark ? "text-gray-300" : "text-gray-700"
+                  "text-text"
                 )}>
-                  <CalendarDays className="w-3.5 h-3.5 text-gray-400" /> Период
+                  <CalendarDays className="w-3.5 h-3.5 text-muted" /> Период
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.entries(data.periods).map(([key, label]) => (
@@ -649,8 +645,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             ? "bg-emerald-900/40 border border-emerald-400/40 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.2)]"
                             : "bg-emerald-50 border border-emerald-400/40 text-emerald-700 shadow-[0_0_6px_rgba(16,185,129,0.1)]"
                           : isDark
-                            ? "bg-[#1a1e20] border border-gray-800 text-gray-400 hover:border-gray-700"
-                            : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
+                            ? "bg-surface-alt border text-text hover:border-primary-700"
+                            : "bg-surface border text-text hover:border-primary"
                       )}
                       onClick={() => handlePeriodSelect(key)}
                     >
@@ -664,9 +660,9 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
               <div>
                 <h3 className={cn(
                   "text-[13px] font-medium flex items-center gap-1.5 mb-2",
-                  isDark ? "text-gray-300" : "text-gray-700"
+                  "text-text"
                 )}>
-                  <FileText className="w-3.5 h-3.5 text-gray-400" /> Длина текста
+                  <FileText className="w-3.5 h-3.5 text-muted" /> Длина текста
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {Object.entries(data.lengths).map(([key, label]) => (
@@ -681,8 +677,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             ? "bg-emerald-900/40 border border-emerald-400/40 text-emerald-300 shadow-[0_0_6px_rgba(16,185,129,0.2)]"
                             : "bg-emerald-50 border border-emerald-400/40 text-emerald-700 shadow-[0_0_6px_rgba(16,185,129,0.1)]"
                           : isDark
-                            ? "bg-[#1a1e20] border border-gray-800 text-gray-400 hover:border-gray-700"
-                            : "bg-white border border-gray-200 text-gray-600 hover:border-gray-300"
+                            ? "bg-surface-alt border text-text hover:border-primary-700"
+                            : "bg-surface border text-text hover:border-primary"
                       )}
                       onClick={() => handleLengthSelect(key)}
                     >
@@ -720,7 +716,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                 
                 <p className={cn(
                   "text-[10px] text-center mt-1.5",
-                  isDark ? "text-gray-500" : "text-gray-400"
+                  "text-muted"
                 )}>
                   Готовлю дайджест как личный аналитик. Это займёт пару секунд.
                 </p>
