@@ -330,49 +330,67 @@ def get_upcoming_events():
 
             events = []
 
-            # Если есть полные категории - загружаем их
-            if full_categories:
-                logger.info(f"📊 Загружаем события для полных категорий: {full_categories}")
-                for cat in full_categories:
-                    cat_events = events_service.get_upcoming_events_sync(
-                        days_ahead=days, category=cat, min_importance=min_importance
-                    )
-                    events.extend(cat_events)
-                    logger.info(f"📊 Категория {cat}: {len(cat_events)} событий")
+            # Определяем все доступные категории событий
+            all_available_categories = ["sports", "crypto", "tech", "markets", "world"]
 
-            # Если есть подкатегории - загружаем и фильтруем
-            if subcategories_filter:
-                logger.info(f"📊 Загружаем события для подкатегорий: {subcategories_filter}")
-                for cat, subcats in subcategories_filter.items():
-                    # Загружаем все события категории
-                    cat_events = events_service.get_upcoming_events_sync(
-                        days_ahead=days, category=cat, min_importance=min_importance
-                    )
-                    # Фильтруем по нужным подкатегориям
-                    filtered_cat_events = [e for e in cat_events if e.subcategory in subcats]
-                    events.extend(filtered_cat_events)
-                    logger.info(
-                        f"📊 Категория {cat}: загружено {len(cat_events)}, "
-                        f"отфильтровано {len(filtered_cat_events)} по подкатегориям {subcats}"
-                    )
-
-            # Убираем дубликаты (событие могло попасть и через полную категорию, и через подкатегорию)
-            seen_ids = set()
-            unique_events = []
-            for event in events:
-                if event.id not in seen_ids:
-                    seen_ids.add(event.id)
-                    unique_events.append(event)
-            events = unique_events
-
-            logger.info(f"📊 Всего уникальных событий по подпискам: {len(events)}")
-
-            # ВАЖНО: Если подписок нет - показываем все события
-            if not events and not (full_categories or subcategories_filter):
-                logger.info("⚠️ Нет подписок - показываем все события")
+            # ОПТИМИЗАЦИЯ: Проверяем, подписан ли пользователь на все категории
+            is_subscribed_to_all = (
+                set(full_categories) == set(all_available_categories)
+                and not subcategories_filter
+                and len(full_categories) == len(all_available_categories)
+            )
+            if is_subscribed_to_all:
+                logger.info("🚀 Подписка на все категории - использую единый запрос для оптимизации")
                 events = events_service.get_upcoming_events_sync(
                     days_ahead=days, category=category, min_importance=min_importance
                 )
+                logger.info(f"📊 Загружено {len(events)} событий из всех категорий одним запросом")
+            else:
+                # Обычная логика для частичных подписок
+                # Если есть полные категории - загружаем их
+                if full_categories:
+                    logger.info(f"📊 Загружаем события для полных категорий: {full_categories}")
+                    for cat in full_categories:
+                        cat_events = events_service.get_upcoming_events_sync(
+                            days_ahead=days, category=cat, min_importance=min_importance
+                        )
+                        events.extend(cat_events)
+                        logger.info(f"📊 Категория {cat}: {len(cat_events)} событий")
+
+                # Если есть подкатегории - загружаем и фильтруем
+                if subcategories_filter:
+                    logger.info(f"📊 Загружаем события для подкатегорий: {subcategories_filter}")
+                    for cat, subcats in subcategories_filter.items():
+                        # Загружаем все события категории
+                        cat_events = events_service.get_upcoming_events_sync(
+                            days_ahead=days, category=cat, min_importance=min_importance
+                        )
+                        # Фильтруем по нужным подкатегориям
+                        filtered_cat_events = [e for e in cat_events if e.subcategory in subcats]
+                        events.extend(filtered_cat_events)
+                        logger.info(
+                            f"📊 Категория {cat}: загружено {len(cat_events)}, "
+                            f"отфильтровано {len(filtered_cat_events)} по подкатегориям {subcats}"
+                        )
+
+                # Убираем дубликаты только если было несколько запросов
+                if full_categories and len(full_categories) > 1 or subcategories_filter:
+                    seen_ids = set()
+                    unique_events = []
+                    for event in events:
+                        if event.id not in seen_ids:
+                            seen_ids.add(event.id)
+                            unique_events.append(event)
+                    events = unique_events
+
+                logger.info(f"📊 Всего уникальных событий по подпискам: {len(events)}")
+
+                # ВАЖНО: Если подписок нет - показываем все события
+                if not events and not (full_categories or subcategories_filter):
+                    logger.info("⚠️ Нет подписок - показываем все события")
+                    events = events_service.get_upcoming_events_sync(
+                        days_ahead=days, category=category, min_importance=min_importance
+                    )
 
         else:
             # Без фильтрации или если категория уже указана

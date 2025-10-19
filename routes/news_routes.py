@@ -205,39 +205,56 @@ def api_latest_news():
                 # Вместо загрузки всех новостей и фильтрации, загружаем сразу нужные категории
                 all_news = []
 
-                if full_categories:
-                    # Если есть полные категории - загружаем их
-                    logger.info(f"📊 Загружаем новости для полных категорий: {full_categories}")
-                    for category in full_categories:
-                        category_news = db_service.get_latest_news(
-                            categories=[category],
-                            limit=fetch_limit // len(full_categories) if len(full_categories) > 0 else fetch_limit,
-                        )
-                        all_news.extend(category_news)
+                # Получаем все доступные категории из сервиса
+                from services.categories import get_categories
 
-                if subcategories_filter:
-                    # Загружаем новости для категорий с подкатегориями
-                    logger.info(f"📊 Загружаем новости для подкатегорий: {subcategories_filter}")
-                    for category, subcats in subcategories_filter.items():
-                        # Загружаем больше новостей из категории для фильтрации по подкатегориям
-                        category_limit = min(fetch_limit * 3, 500)  # x3 для фильтрации по подкатегориям
-                        category_news = db_service.get_latest_news(categories=[category], limit=category_limit)
-                        # Фильтруем по нужным подкатегориям
-                        filtered_category_news = [n for n in category_news if n.get("subcategory") in subcats]
-                        all_news.extend(filtered_category_news)
-                        logger.info(
-                            f"📊 Категория {category}: загружено {len(category_news)}, "
-                            f"отфильтровано {len(filtered_category_news)} по подкатегориям {subcats}"
-                        )
+                all_available_categories = get_categories()
 
-                logger.info(f"📊 Всего загружено новостей по подпискам: {len(all_news)}")
-
-                # Новости уже отфильтрованы при загрузке, дополнительная фильтрация не нужна
-                if not all_news and (full_categories or subcategories_filter):
-                    logger.warning("⚠️ Нет новостей по подпискам пользователя")
-                elif not (full_categories or subcategories_filter):
-                    logger.info("⚠️ Нет активных предпочтений - загружаем все новости")
+                # ОПТИМИЗАЦИЯ: Проверяем, подписан ли пользователь на все категории
+                is_subscribed_to_all = (
+                    set(full_categories) == set(all_available_categories)
+                    and not subcategories_filter
+                    and len(full_categories) == len(all_available_categories)
+                )
+                if is_subscribed_to_all:
+                    logger.info("🚀 Подписка на все категории - использую единый запрос для оптимизации")
                     all_news = db_service.get_latest_news(limit=fetch_limit)
+                    logger.info(f"📊 Загружено {len(all_news)} новостей из всех категорий одним запросом")
+                else:
+                    # Обычная логика для частичных подписок
+                    if full_categories:
+                        # Если есть полные категории - загружаем их
+                        logger.info(f"📊 Загружаем новости для полных категорий: {full_categories}")
+                        for category in full_categories:
+                            category_news = db_service.get_latest_news(
+                                categories=[category],
+                                limit=fetch_limit // len(full_categories) if len(full_categories) > 0 else fetch_limit,
+                            )
+                            all_news.extend(category_news)
+
+                    if subcategories_filter:
+                        # Загружаем новости для категорий с подкатегориями
+                        logger.info(f"📊 Загружаем новости для подкатегорий: {subcategories_filter}")
+                        for category, subcats in subcategories_filter.items():
+                            # Загружаем больше новостей из категории для фильтрации по подкатегориям
+                            category_limit = min(fetch_limit * 3, 500)  # x3 для фильтрации по подкатегориям
+                            category_news = db_service.get_latest_news(categories=[category], limit=category_limit)
+                            # Фильтруем по нужным подкатегориям
+                            filtered_category_news = [n for n in category_news if n.get("subcategory") in subcats]
+                            all_news.extend(filtered_category_news)
+                            logger.info(
+                                f"📊 Категория {category}: загружено {len(category_news)}, "
+                                f"отфильтровано {len(filtered_category_news)} по подкатегориям {subcats}"
+                            )
+
+                    logger.info(f"📊 Всего загружено новостей по подпискам: {len(all_news)}")
+
+                    # Новости уже отфильтрованы при загрузке, дополнительная фильтрация не нужна
+                    if not all_news and (full_categories or subcategories_filter):
+                        logger.warning("⚠️ Нет новостей по подпискам пользователя")
+                    elif not (full_categories or subcategories_filter):
+                        logger.info("⚠️ Нет активных предпочтений - загружаем все новости")
+                        all_news = db_service.get_latest_news(limit=fetch_limit)
         else:
             # Без фильтра по подпискам
             if selected_category:
