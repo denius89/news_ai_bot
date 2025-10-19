@@ -272,6 +272,16 @@
     }
   }
 
+  /* AI Glass Dock v3 - Enhanced mobile styling */
+  @media (max-width: 480px) {
+    /* Target the new BottomNav component */
+    nav.fixed.bottom-6 {
+      bottom: 8px !important;
+      border-radius: 16px !important;
+      padding: 6px 10px !important;
+    }
+  }
+
   /* Layout Components */
   .container-main {
     @apply max-w-6xl mx-auto px-6 py-8;

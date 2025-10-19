@@ -125,9 +125,15 @@
   }
 }
 
-/* Padding for floating bottom navigation */
+/* AI Glass Dock v3 - Padding for floating bottom navigation */
 body {
-  padding-bottom: 110px;
+  padding-bottom: 90px;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding-bottom: 85px;
+  }
 }
 
 @media (min-width: 768px) {
