@@ -189,6 +189,31 @@
     @apply text-primary;
   }
 
+  /* Telegram Glass Dock Navigation */
+  .navbar-glass {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08),
+                inset 0 0 0.5px rgba(255,255,255,0.3);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+
+  .dark .navbar-glass {
+    background: rgba(20,24,28,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4),
+                inset 0 0 0.5px rgba(255,255,255,0.1);
+  }
+
+  @media (max-width: 480px) {
+    .navbar-glass {
+      bottom: 8px;
+      border-radius: 16px;
+      padding: 6px 10px;
+    }
+  }
+
   /* Layout Components */
   .container-main {
     @apply max-w-6xl mx-auto px-6 py-8;

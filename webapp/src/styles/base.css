@@ -124,3 +124,14 @@
     --tw-ring-offset-color: var(--color-surface);
   }
 }
+
+/* Padding for floating bottom navigation */
+body {
+  padding-bottom: 90px;
+}
+
+@media (min-width: 768px) {
+  body {
+    padding-bottom: 0;
+  }
+}

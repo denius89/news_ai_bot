@@ -13,7 +13,7 @@ import SettingsPage from './pages/SettingsPage';
 import { SimpleAdminLayout } from './admin/components/SimpleAdminLayout';
 
 // Components
-import { BottomNavigation } from './components/ui/BottomNavigation';
+import { BottomNav } from './components/ui/BottomNav';
 import { TelegramWebApp } from './components/TelegramWebApp';
 
 // Utils
@@ -235,9 +235,8 @@ const AppContent: React.FC<{
 
       {/* Bottom Navigation for Mobile */}
       {isMobile && (
-        <BottomNavigation 
+        <BottomNav 
           items={navigationItems}
-          className="fixed bottom-0 inset-x-0 z-50"
         />
       )}
 
