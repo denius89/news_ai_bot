@@ -197,6 +197,9 @@
                 inset 0 0 0.5px rgba(255,255,255,0.3);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   .dark .navbar-glass {
@@ -208,7 +211,9 @@
 
   @media (max-width: 480px) {
     .navbar-glass {
-      bottom: 8px;
+      bottom: 8px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
       border-radius: 16px;
       padding: 6px 10px;
     }

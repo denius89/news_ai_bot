@@ -21,7 +21,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ items, className }) => {
     <motion.nav
       className={cn(
         'navbar-glass',
-        'fixed bottom-3 left-1/2 -translate-x-1/2 z-50',
+        'bottom-3 z-50',
         'flex justify-around items-center',
         'w-[90%] max-w-[600px]',
         'px-3 py-2 rounded-2xl',
