@@ -1,10 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Archive, ArrowUp, Bitcoin, BookOpen, Bot, CalendarDays, Cpu, ExternalLink, Eye, FileText, Filter, Globe2, LineChart, MessageCircle, Newspaper, RotateCcw, Settings, Sparkles, ThumbsDown, ThumbsUp, Trash2, Trophy, X } from 'lucide-react';
+import { Archive, ArrowUp, BookOpen, Bot, CalendarDays, ExternalLink, FileText, MessageCircle, Newspaper, RotateCcw, Settings, Sparkles, ThumbsDown, ThumbsUp, Trash2, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { DigestGenerator } from '../components/digest/DigestGenerator';
 import { DigestMagicProgress } from '../components/digest/DigestMagicProgress';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
+import { FilterBar } from '../components/ui/FilterBar';
+import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
+import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
@@ -482,7 +485,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             if (data.status === 'success') {
 
                 // Показываем уведомление об успешной генерации
-                showNotification('success', 'Дайджест успешно создан');
+                showNotification('success', 'Дайджест готов!');
 
                 // Перезагружаем историю для обновления списка (без дублирования)
                 console.log('🔍 Checking if digest was saved:', {
@@ -511,12 +514,12 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                 return data.data.digest;
             } else {
                 const errorMessage = data.message || 'Failed to generate digest';
-                showNotification('error', `Ошибка генерации: ${errorMessage}`);
+                showNotification('error', `Не удалось создать дайджест: ${errorMessage}`);
                 throw new Error(errorMessage);
             }
         } catch (error) {
             console.error('Error generating digest:', error);
-            showNotification('error', `Ошибка генерации: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
+            showNotification('error', `Не удалось создать дайджест: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`);
             throw error;
         } finally {
             // Сбрасываем состояние загрузки
@@ -619,8 +622,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             {/* Уведомления */}
             {notification && (
                 <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg ${notification.type === 'success'
-                        ? 'bg-green-500 dark:bg-green-600 text-white'
-                        : 'bg-red-500 dark:bg-red-600 text-white'
+                    ? 'bg-green-500 dark:bg-green-600 text-white'
+                    : 'bg-red-500 dark:bg-red-600 text-white'
                     }`}>
                     {notification.message}
                 </div>
@@ -650,87 +653,50 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             />
 
             <main className="container-main pb-32">
-                {/* Фильтры и вкладки */}
-                <div className="flex space-x-1 mb-6 bg-surface-alt/50 rounded-xl p-1">
-                    <motion.button
-                        layout
-                        whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                        onClick={() => setActiveTab('active')}
-                        className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === 'active'
-                                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
-                                : "text-muted hover:bg-surface-alt/50"
-                            }`}
-                    >
-                        <Eye className="w-4 h-4 inline mr-2" />
-                        Активные
-                    </motion.button>
-                    <motion.button
-                        layout
-                        whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                        onClick={() => setActiveTab('archived')}
-                        className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === 'archived'
-                                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
-                                : "text-muted hover:bg-surface-alt/50"
-                            }`}
-                    >
-                        <Archive className="w-4 h-4 inline mr-2" />
-                        Архив
-                    </motion.button>
-                    <motion.button
-                        layout
-                        whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 250, damping: 20 }}
-                        onClick={() => setActiveTab('deleted')}
-                        className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === 'deleted'
-                                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
-                                : "text-muted hover:bg-surface-alt/50"
-                            }`}
-                    >
-                        <Trash2 className="w-4 h-4 inline mr-2" />
-                        Корзина
-                    </motion.button>
-                </div>
-
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
                     className="space-y-6"
                 >
-                    {/* Категории */}
+                    {/* Фильтры */}
                     <motion.section variants={itemVariants}>
-                        <div className="flex flex-wrap justify-center gap-x-2 gap-y-3 mt-4">
-                            {Object.entries(categories).map(([key, label]) => {
-                                const getIcon = (categoryKey: string) => {
-                                    switch (categoryKey) {
-                                        case 'all': return <Filter className="w-4 h-4" />;
-                                        case 'crypto': return <Bitcoin className="w-4 h-4" />;
-                                        case 'markets': return <LineChart className="w-4 h-4" />;
-                                        case 'sports': return <Trophy className="w-4 h-4" />;
-                                        case 'tech': return <Cpu className="w-4 h-4" />;
-                                        case 'world': return <Globe2 className="w-4 h-4" />;
-                                        default: return <Filter className="w-4 h-4" />;
-                                    }
-                                };
+                        <FilterCard>
+                            {/* Табы статуса */}
+                            <div>
+                                <p className="text-xs text-muted mb-2 text-center">Статус</p>
+                                <FilterBar
+                                    type="status"
+                                    options={[
+                                        { id: 'active', label: 'Активные' },
+                                        { id: 'archived', label: 'Архив' },
+                                        { id: 'deleted', label: 'Корзина' }
+                                    ]}
+                                    activeId={activeTab}
+                                    onChange={(id) => setActiveTab(id as 'active' | 'archived' | 'deleted')}
+                                />
+                            </div>
 
-                                return (
-                                    <motion.button
-                                        key={key}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => setSelectedCategory(key)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${selectedCategory === key
-                                                ? "bg-ai-flow text-white shadow-[0_0_12px_rgba(0,166,200,0.3)]"
-                                                : "bg-surface-alt text-muted hover:bg-surfaceAlt"
-                                            }`}
-                                    >
-                                        {getIcon(key)}
-                                        {label}
-                                    </motion.button>
-                                );
-                            })}
-                        </div>
+                            {/* Категории */}
+                            <div>
+                                <p className="text-xs text-muted mb-2 text-center">Категории</p>
+                                <FilterBar
+                                    type="category"
+                                    options={Object.entries(categories).map(([key, label]) => ({ id: key, label }))}
+                                    activeId={selectedCategory}
+                                    onChange={setSelectedCategory}
+                                />
+                            </div>
+                        </FilterCard>
+                    </motion.section>
+
+                    {/* Section Hint */}
+                    <motion.section variants={itemVariants}>
+                        <SectionHint
+                            icon="💫"
+                            title="Ваши персональные AI-дайджесты"
+                            subtitle="AI собирает и анализирует важное по выбранным категориям"
+                        />
                     </motion.section>
 
                     {/* Digest List */}
@@ -793,10 +759,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                                     <>
                                                         <button
                                                             className={`p-1.5 rounded-lg transition-colors ${feedbackSubmitted[digest.id] === 'up'
-                                                                    ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
-                                                                    : feedbackSubmitted[digest.id] === 'down'
-                                                                        ? 'text-muted cursor-not-allowed'
-                                                                        : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
+                                                                ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                                                                : feedbackSubmitted[digest.id] === 'down'
+                                                                    ? 'text-muted cursor-not-allowed'
+                                                                    : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
                                                                 }`}
                                                             onClick={() => handleFeedback(digest.id, 1.0)}
                                                             title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Понравилось"}
@@ -806,10 +772,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                                         </button>
                                                         <button
                                                             className={`p-1.5 rounded-lg transition-colors ${feedbackSubmitted[digest.id] === 'down'
-                                                                    ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
-                                                                    : feedbackSubmitted[digest.id] === 'up'
-                                                                        ? 'text-muted cursor-not-allowed'
-                                                                        : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                                ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+                                                                : feedbackSubmitted[digest.id] === 'up'
+                                                                    ? 'text-muted cursor-not-allowed'
+                                                                    : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
                                                                 }`}
                                                             onClick={() => handleFeedback(digest.id, 0.0)}
                                                             title={feedbackSubmitted[digest.id] ? "Отзыв уже отправлен" : "Не понравилось"}
@@ -1003,10 +969,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                 <div className="flex gap-2">
                                     <button
                                         className={`p-2 rounded-lg transition-colors ${feedbackSubmitted[selectedDigest.id] === 'up'
-                                                ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
-                                                : feedbackSubmitted[selectedDigest.id] === 'down'
-                                                    ? 'text-muted cursor-not-allowed'
-                                                    : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
+                                            ? 'text-green-600 bg-green-50 dark:bg-green-900/20'
+                                            : feedbackSubmitted[selectedDigest.id] === 'down'
+                                                ? 'text-muted cursor-not-allowed'
+                                                : 'text-muted hover:text-success hover:bg-green-50 dark:hover:bg-green-900/20'
                                             }`}
                                         onClick={() => handleFeedback(selectedDigest.id, 1.0)}
                                         title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Понравилось"}
@@ -1016,10 +982,10 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                     </button>
                                     <button
                                         className={`p-2 rounded-lg transition-colors ${feedbackSubmitted[selectedDigest.id] === 'down'
-                                                ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
-                                                : feedbackSubmitted[selectedDigest.id] === 'up'
-                                                    ? 'text-muted cursor-not-allowed'
-                                                    : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
+                                            ? 'text-red-600 bg-red-50 dark:bg-red-900/20'
+                                            : feedbackSubmitted[selectedDigest.id] === 'up'
+                                                ? 'text-muted cursor-not-allowed'
+                                                : 'text-muted hover:text-error hover:bg-red-50 dark:hover:bg-red-900/20'
                                             }`}
                                         onClick={() => handleFeedback(selectedDigest.id, 0.0)}
                                         title={feedbackSubmitted[selectedDigest.id] ? "Отзыв уже отправлен" : "Не понравилось"}

@@ -2,7 +2,10 @@ import { motion } from 'framer-motion';
 import { ArrowUp, Calendar, ChevronDown, RefreshCw } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Card } from '../components/ui/Card';
+import { FilterBar } from '../components/ui/FilterBar';
+import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
+import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
@@ -251,13 +254,13 @@ const EventsPage: React.FC<EventsPageProps> = () => {
         <div className="min-h-screen bg-bg">
             <Header
                 title="События"
-                subtitle={isFilteredBySubscriptions ? "По вашим подпискам" : `${filteredEvents.length} событий`}
+                subtitle={isFilteredBySubscriptions ? "По твоим подпискам" : `${filteredEvents.length} событий`}
                 icon={<Calendar className="w-6 h-6 text-primary" />}
                 actions={
                     <motion.button
                         onClick={fetchEvents}
                         className="p-2 rounded-lg hover:bg-surface-alt transition-colors"
-                        title="Обновить события"
+                        title="Обновить"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95, rotate: 180 }}
                         transition={{ duration: 0.2 }}
@@ -268,90 +271,69 @@ const EventsPage: React.FC<EventsPageProps> = () => {
             />
 
             {/* Filters */}
-            <div className="px-4 py-3 border-b border-border">
-                <div className="space-y-2">
-                    {/* Date Range Filter */}
-                    <div className="flex space-x-2">
-                        {(['today', 'week', 'month'] as const).map((range) => (
-                            <button
-                                key={range}
-                                onClick={() => setDateRange(range)}
-                                className={`chip flex-1 rounded-lg ${dateRange === range
-                                        ? 'chip-active'
-                                        : 'chip-inactive'
-                                    }`}
-                            >
-                                {range === 'today' ? 'Today' : range === 'week' ? 'Week' : 'Month'}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Category Filter */}
-                    <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
-                        <button
-                            onClick={() => {
-                                setCategory('all');
-                                setSubcategory('all');
-                            }}
-                            className={`chip rounded-lg whitespace-nowrap ${category === 'all'
-                                    ? 'chip-active'
-                                    : 'chip-inactive'
-                                }`}
-                        >
-                            All
-                        </button>
-                        {Object.entries(categories).map(([key, cat]) => (
-                            <button
-                                key={key}
-                                onClick={() => {
-                                    setCategory(key);
-                                    setSubcategory('all');
-                                }}
-                                className={`chip rounded-lg whitespace-nowrap ${category === key
-                                        ? 'chip-active'
-                                        : 'chip-inactive'
-                                    }`}
-                            >
-                                {cat.emoji} {cat.name}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Subcategory Filter (if category selected) */}
-                    {category !== 'all' && getSubcategories().length > 0 && (
-                        <div className="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
-                            <button
-                                onClick={() => setSubcategory('all')}
-                                className={`chip text-xs whitespace-nowrap ${subcategory === 'all'
-                                        ? 'chip-active'
-                                        : 'chip-inactive'
-                                    }`}
-                            >
-                                All
-                            </button>
-                            {getSubcategories().map(([key, sub]) => (
-                                <button
-                                    key={key}
-                                    onClick={() => setSubcategory(key)}
-                                    className={`chip text-xs whitespace-nowrap ${subcategory === key
-                                            ? 'chip-active'
-                                            : 'chip-inactive'
-                                        }`}
-                                >
-                                    {sub.icon} {sub.name}
-                                </button>
-                            ))}
-                        </div>
-                    )}
+            <FilterCard className="mx-4 mb-4">
+                {/* Date Range Filter */}
+                <div>
+                    <p className="text-xs text-muted mb-2 text-center">Период</p>
+                    <FilterBar
+                        type="time"
+                        options={[
+                            { id: 'today', label: 'Сегодня' },
+                            { id: 'week', label: 'Неделя' },
+                            { id: 'month', label: 'Месяц' }
+                        ]}
+                        activeId={dateRange}
+                        onChange={(id) => setDateRange(id as 'today' | 'week' | 'month')}
+                    />
                 </div>
-            </div>
+
+                {/* Category Filter */}
+                <div>
+                    <p className="text-xs text-muted mb-2 text-center">Категории</p>
+                    <FilterBar
+                        type="category"
+                        options={[
+                            { id: 'all', label: 'Все' },
+                            ...Object.entries(categories).map(([key, cat]) => ({ id: key, label: cat.name }))
+                        ]}
+                        activeId={category}
+                        onChange={(id) => {
+                            setCategory(id);
+                            setSubcategory('all');
+                        }}
+                    />
+                </div>
+
+                {/* Subcategory Filter (if category selected) */}
+                {category !== 'all' && getSubcategories().length > 0 && (
+                    <div>
+                        <p className="text-xs text-muted mb-2 text-center">Подкатегории</p>
+                        <FilterBar
+                            type="category"
+                            options={[
+                                { id: 'all', label: 'Все' },
+                                ...getSubcategories().map(([key, sub]) => ({ id: key, label: sub.name }))
+                            ]}
+                            activeId={subcategory}
+                            onChange={setSubcategory}
+                        />
+                    </div>
+                )}
+            </FilterCard>
+
+            {/* Section Hint */}
+            <SectionHint
+                icon="🗓️"
+                title="Предстоящие события по вашим подпискам"
+                subtitle="AI показывает только важные матчи, релизы и конференции"
+            />
 
             {/* Content */}
             <main className="container-main pb-32">
                 {loading && (
                     <div className="text-center py-8">
                         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <p className="mt-2 text-[var(--color-text)]-secondary">Loading events...</p>
+                        <p className="mt-2 text-[var(--color-text)]-secondary">Загружаем события...</p>
                     </div>
                 )}
 
@@ -365,7 +347,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
                     <Card className="p-8">
                         <div className="text-center">
                             <Calendar className="w-12 h-12 mx-auto text-[var(--color-text)]-secondary/50" />
-                            <p className="mt-2 text-[var(--color-text)]-secondary">No events found</p>
+                            <p className="mt-2 text-[var(--color-text)]-secondary">Событий пока нет</p>
                         </div>
                     </Card>
                 )}
@@ -388,7 +370,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
                         {loadingMore && (
                             <div className="mt-4 text-center py-4">
                                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                                <p className="mt-2 text-sm text-[var(--color-text)]-secondary">Загрузка событий...</p>
+                                <p className="mt-2 text-sm text-[var(--color-text)]-secondary">Загружаем ещё...</p>
                             </div>
                         )}
 
@@ -399,7 +381,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
                                     📊 Показано {displayedCount} из {allFilteredEvents.length} событий
                                 </p>
                                 <p className="text-xs text-primary mt-1">
-                                    Прокрутите вниз для загрузки ещё
+                                    Пролистай вниз
                                 </p>
                             </div>
                         )}
@@ -429,7 +411,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
                      rounded-full p-3
                      shadow-lg hover:shadow-xl
                      transition-all duration-300"
-                    aria-label="Прокрутить вверх"
+                    aria-label="Вернуться наверх"
                 >
                     <ArrowUp className="w-6 h-6" />
                 </motion.button>
@@ -496,7 +478,7 @@ const GroupedEventCard: React.FC<{ events: Event[]; groupKey: string }> = ({ eve
                         <div className="flex items-center space-x-2 mb-1">
                             <span className="text-xl">{getCategoryIcon()}</span>
                             <span className="px-2 py-0.5 rounded text-xs font-medium bg-primary/20 text-primary border border-primary/20">
-                                {events.length} events
+                                {events.length} событий
                             </span>
                         </div>
 
@@ -666,7 +648,7 @@ const EventCard: React.FC<{ event: Event }> = ({ event }) => {
                                 onClick={(e) => e.stopPropagation()}
                                 className="inline-block mt-3 text-sm text-primary hover:underline"
                             >
-                                🔗 View Details
+                                🔗 Подробнее
                             </a>
                         )}
                     </div>

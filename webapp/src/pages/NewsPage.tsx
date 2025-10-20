@@ -9,8 +9,10 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
-import { ChipsCarousel } from '../components/ui/ChipsCarousel';
+import { FilterBar } from '../components/ui/FilterBar';
+import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
+import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { shouldReduceMotion } from '../utils/performance';
@@ -162,7 +164,6 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMoreNews, setHasMoreNews] = useState(true);
-    const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -309,9 +310,6 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             console.log(`📊 API response:`, data);
 
             if (data.status === 'success') {
-                // Set filter indicator
-                setIsFilteredBySubscriptions(data.filtered_by_subscriptions || false);
-
                 // Transform API data to match our interface
                 const transformedNews: NewsItem[] = data.data.map((item: any) => ({
                     id: item.id || Math.random().toString(),
@@ -558,7 +556,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             <div className="min-h-screen bg-bg">
                 <Header
                     title="Новости"
-                    subtitle="Загрузка новостей..."
+                    subtitle="Ищем свежие новости..."
                     icon={<Newspaper className="w-6 h-6 text-primary" />}
                 />
                 <main className="container-main">
@@ -608,46 +606,42 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                     animate="visible"
                     className="space-y-6"
                 >
-                    {/* Category Filters - Двухуровневый с ChipsCarousel */}
+                    {/* Category Filters */}
                     <motion.section variants={itemVariants}>
-                        <Card>
-                            <CardContent className="pt-6 space-y-3">
-                                {/* Уровень 1: Основные категории */}
-                                <ChipsCarousel
-                                    chips={categories}
-                                    selectedId={selectedCategory}
-                                    onSelect={handleCategorySelect}
-                                    label="Категории"
+                        <FilterCard>
+                            {/* Основные категории */}
+                            <div>
+                                <p className="text-xs text-muted mb-2 text-center">Категории</p>
+                                <FilterBar
+                                    type="category"
+                                    options={categories}
+                                    activeId={selectedCategory}
+                                    onChange={handleCategorySelect}
                                 />
+                            </div>
 
-                                {/* Уровень 2: Подкатегории (показывается только если категория выбрана) */}
-                                {selectedCategory !== 'all' && availableSubcategories.length > 0 && (
-                                    <ChipsCarousel
-                                        chips={availableSubcategories}
-                                        selectedId={selectedSubcategory || ''}
-                                        onSelect={handleSubcategorySelect}
-                                        label="Подкатегории"
+                            {/* Подкатегории (показывается только если категория выбрана) */}
+                            {selectedCategory !== 'all' && availableSubcategories.length > 0 && (
+                                <div>
+                                    <p className="text-xs text-muted mb-2 text-center">Подкатегории</p>
+                                    <FilterBar
+                                        type="category"
+                                        options={availableSubcategories.map(sub => ({ id: sub.id, label: sub.label }))}
+                                        activeId={selectedSubcategory || ''}
+                                        onChange={handleSubcategorySelect}
                                     />
-                                )}
-
-                                {/* Hints и индикаторы */}
-                                <div className="mt-3 text-center space-y-1">
-                                    {isFilteredBySubscriptions && selectedCategory !== 'all' && (
-                                        <p className="text-xs text-primary font-medium">
-                                            💡 Показаны новости категории "{categories.find(c => c.id === selectedCategory)?.label}" (независимо от подписки)
-                                        </p>
-                                    )}
-                                    {isFilteredBySubscriptions && selectedCategory === 'all' && (
-                                        <p className="text-xs text-primary font-medium">
-                                            ✨ Показаны новости по вашим подпискам
-                                        </p>
-                                    )}
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        PulseAI отбирает новости с наибольшей вероятностью интереса.
-                                    </p>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            )}
+                        </FilterCard>
+                    </motion.section>
+
+                    {/* Section Hint */}
+                    <motion.section variants={itemVariants}>
+                        <SectionHint
+                            icon="✨"
+                            title="Новости по твоим подпискам"
+                            subtitle="AI отбирает самое интересное для тебя"
+                        />
                     </motion.section>
 
                     {/* News List */}
@@ -696,7 +690,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                                 className="text-primary font-medium hover:underline flex items-center gap-1"
                                                 onClick={() => setSelectedNews(item)}
                                             >
-                                                Читать
+                                                Читать полностью
                                                 <ExternalLink className="w-3 h-3" />
                                             </button>
                                         </div>
@@ -714,7 +708,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                <span>Загрузка новостей...</span>
+                                <span>Загружаем ещё...</span>
                             </div>
                         </motion.section>
                     )}
@@ -726,7 +720,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                 <svg className="w-6 h-6 mx-auto mb-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                                 </svg>
-                                <p>Прокрутите вниз для загрузки новых новостей</p>
+                                <p>Пролистай вниз, чтобы увидеть больше</p>
                             </div>
                         </motion.section>
                     )}
@@ -738,8 +732,8 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                 <svg className="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
-                                <p>Все новости загружены</p>
-                                <p className="text-sm mt-1">Обновите страницу для получения новых новостей</p>
+                                <p>Это всё на сегодня</p>
+                                <p className="text-sm mt-1">Обнови страницу для свежих новостей</p>
                             </div>
                         </motion.section>
                     )}
@@ -752,16 +746,16 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                             </div>
                             <h3 className="text-xl font-semibold text-text mb-2">
                                 {selectedCategory === 'all'
-                                    ? 'Новости не найдены'
-                                    : `Нет новостей в категории "${categories.find(c => c.id === selectedCategory)?.label}"`
+                                    ? 'Пока ничего нет'
+                                    : `В этой категории пусто`
                                 }
                             </h3>
                             <p className="text-muted-strong mb-6">
                                 {selectedSubcategory
-                                    ? 'Попробуйте выбрать другую подкатегорию'
+                                    ? 'Попробуй другую подкатегорию'
                                     : selectedCategory !== 'all'
-                                        ? 'Попробуйте выбрать другую категорию или посмотрите все новости'
-                                        : 'Попробуйте позже или измените фильтры'
+                                        ? 'Попробуй другую категорию или смотри всё'
+                                        : 'Попробуй позже'
                                 }
                             </p>
                             {selectedCategory !== 'all' && (
@@ -769,7 +763,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                     variant="secondary"
                                     onClick={() => handleCategorySelect('all')}
                                 >
-                                    Показать все новости
+                                    Показать всё
                                 </Button>
                             )}
                         </motion.section>
@@ -780,8 +774,8 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                         <motion.section variants={itemVariants}>
                             <div className="text-center py-4">
                                 <p className="text-sm text-muted-strong">
-                                    💡 Найдено всего {filteredNews.length} {getNewsLabel(filteredNews.length)} по выбранным фильтрам.
-                                    {selectedCategory !== 'all' && ' Попробуйте расширить критерии поиска.'}
+                                    💡 Нашли только {filteredNews.length} {getNewsLabel(filteredNews.length)}.
+                                    {selectedCategory !== 'all' && ' Попробуй другие фильтры'}
                                 </p>
                             </div>
                         </motion.section>
@@ -802,7 +796,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                      rounded-full p-3
                      shadow-lg hover:shadow-xl
                      transition-all duration-300"
-                    aria-label="Прокрутить вверх"
+                    aria-label="Вернуться наверх"
                 >
                     <ArrowUp className="w-6 h-6" />
                 </motion.button>
