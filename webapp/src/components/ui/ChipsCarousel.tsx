@@ -84,11 +84,10 @@ export const ChipsCarousel: React.FC<ChipsCarouselProps> = ({
                             key={chip.id}
                             onClick={() => onSelect(chip.id)}
                             className={`chip ${selectedId === chip.id
-                                    ? 'chip-active'
-                                    : 'chip-inactive'
+                                ? 'chip-active'
+                                : 'chip-inactive'
                                 }`}
                         >
-                            {chip.icon && <span>{chip.icon}</span>}
                             {chip.label}
                         </button>
                     ))}

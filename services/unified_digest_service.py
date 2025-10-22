@@ -152,8 +152,8 @@ class UnifiedDigestService:
         length: str = "medium",  # НОВЫЙ ПАРАМЕТР ДЛИНЫ ТЕКСТА
         limit: int = 20,
         min_importance: Optional[float] = None,  # НОВЫЙ ПАРАМЕТР ДЛЯ УМНОЙ ФИЛЬТРАЦИИ
-        # Новые параметры для расширенных возможностей
-        use_multistage: bool = False,
+        # Новые параметры для расширенных возможностей - ВСЕ ВКЛЮЧЕНО для живых дайджестов!
+        use_multistage: bool = True,  # Включено по умолчанию для максимального качества
         use_rag: bool = True,
         use_personalization: bool = True,
         user_id: Optional[str] = None,
@@ -248,6 +248,9 @@ class UnifiedDigestService:
                 use_multistage=use_multistage,
                 use_rag=use_rag,
                 use_personalization=use_personalization,
+                use_personas=True,  # Включить персоны для живых дайджестов
+                use_story_memory=True,  # Включить исторический контекст
+                use_feedback_loop=True,  # Включить обратную связь
                 user_id=user_id,
                 audience=audience,
                 max_items=limit,

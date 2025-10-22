@@ -4,12 +4,15 @@ TokenUnlocks Provider for token unlock schedules.
 Fetches token unlock events from TokenUnlocks.app.
 """
 
+import asyncio
 import logging
 import os
+import ssl
 from datetime import datetime
 from typing import Dict, List
 
 import aiohttp
+import certifi
 
 from events.providers.base_provider import BaseEventProvider
 
@@ -46,10 +49,31 @@ class TokenUnlocksProvider(BaseEventProvider):
         """
         try:
             if not self.session:
-                headers = {}
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache",
+                    "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                    "Sec-Ch-Ua-Mobile": "?0",
+                    "Sec-Fetch-Dest": "document",
+                    "Sec-Fetch-Mode": "navigate",
+                    "Sec-Fetch-Site": "none",
+                    "Sec-Fetch-User": "?1",
+                    "Upgrade-Insecure-Requests": "1",
+                }
                 if self.api_key:
                     headers["Authorization"] = f"Bearer {self.api_key}"
-                self.session = aiohttp.ClientSession(headers=headers)
+
+                # Enhanced SSL and connection handling
+                ssl_context = ssl.create_default_context(cafile=certifi.where())
+                connector = aiohttp.TCPConnector(
+                    ssl=ssl_context, limit=10, force_close=False, enable_cleanup_closed=True
+                )
+                timeout = aiohttp.ClientTimeout(total=30, connect=10)
+                self.session = aiohttp.ClientSession(headers=headers, connector=connector, timeout=timeout)
 
             # TokenUnlocks закрыл публичный API, но есть RSS альтернатива
             # Пробуем RSS endpoint (обычно публичный)
@@ -58,57 +82,69 @@ class TokenUnlocksProvider(BaseEventProvider):
             # Apply rate limit (conservative: 1 req/sec)
             await self.rate_limiter.acquire()
 
-            async with self.session.get(url) as response:
-                if response.status == 403:
-                    logger.warning("TokenUnlocks API requires authentication - provider temporarily disabled")
-                    logger.info("Добавьте TOKEN_UNLOCKS_API_KEY в .env для включения провайдера")
-                    return []
+            # Add retry logic for connection issues
+            for attempt in range(3):
+                try:
+                    async with self.session.get(url, timeout=15) as response:
+                        if response.status == 403:
+                            logger.warning("TokenUnlocks API requires authentication - provider temporarily disabled")
+                            logger.info("Добавьте TOKEN_UNLOCKS_API_KEY в .env для включения провайдера")
+                            return []
 
-                if response.status != 200:
-                    logger.error(f"TokenUnlocks API error: {response.status}")
-                    return []
+                        if response.status != 200:
+                            logger.error(f"TokenUnlocks API error: {response.status}")
+                            return []
 
-                # Если это RSS - парсим XML
-                content = await response.text()
+                        # Если это RSS - парсим XML
+                        content = await response.text()
 
-                # Проверяем это RSS или JSON
-                if content.strip().startswith("<"):
-                    # RSS format - парсим через feedparser
-                    import feedparser
+                        # Проверяем это RSS или JSON
+                        if content.strip().startswith("<"):
+                            # RSS format - парсим через feedparser
+                            import feedparser
 
-                    feed = feedparser.parse(content)
-                    unlocks = []
+                            feed = feedparser.parse(content)
+                            unlocks = []
 
-                    for entry in feed.entries[:50]:
-                        # Извлекаем данные из RSS entry
-                        unlocks.append(
-                            {
-                                "title": entry.get("title", ""),
-                                "description": entry.get("summary", ""),
-                                "link": entry.get("link", ""),
-                                "pub_date": entry.get("published_parsed"),
-                            }
-                        )
-                else:
-                    # JSON format
-                    data = await response.json()
-                    unlocks = data.get("unlocks", [])
+                            for entry in feed.entries[:50]:
+                                # Извлекаем данные из RSS entry
+                                unlocks.append(
+                                    {
+                                        "title": entry.get("title", ""),
+                                        "description": entry.get("summary", ""),
+                                        "link": entry.get("link", ""),
+                                        "pub_date": entry.get("published_parsed"),
+                                    }
+                                )
+                        else:
+                            # JSON format
+                            data = await response.json()
+                            unlocks = data.get("unlocks", [])
 
-                events = []
-                for unlock in unlocks:
-                    # Проверяем формат данных (RSS или JSON)
-                    if "pub_date" in unlock:  # RSS формат
-                        event = self._parse_rss_entry(unlock)
-                    else:  # JSON формат
-                        event = self._parse_unlock(unlock)
+                        events = []
+                        for unlock in unlocks:
+                            # Проверяем формат данных (RSS или JSON)
+                            if "pub_date" in unlock:  # RSS формат
+                                event = self._parse_rss_entry(unlock)
+                            else:  # JSON формат
+                                event = self._parse_unlock(unlock)
 
-                    if event:
-                        normalized = self.normalize_event(event)
-                        if normalized:
-                            events.append(normalized)
+                            if event:
+                                normalized = self.normalize_event(event)
+                                if normalized:
+                                    events.append(normalized)
 
-                logger.info(f"Fetched {len(events)} events from TokenUnlocks")
-                return [e for e in events if e is not None]
+                        logger.info(f"Fetched {len(events)} events from TokenUnlocks")
+                        return [e for e in events if e is not None]
+
+                except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                    if attempt < 2:
+                        logger.warning(f"Connection error for TokenUnlocks (attempt {attempt + 1}/3): {e}")
+                        await asyncio.sleep(2**attempt)  # exponential backoff
+                        continue
+                    else:
+                        logger.error(f"Failed to connect to TokenUnlocks after 3 attempts: {e}")
+                        return []
 
         except Exception as e:
             logger.error(f"Error fetching TokenUnlocks events: {e}")

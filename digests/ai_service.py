@@ -64,17 +64,17 @@ class DigestConfig:
     max_items: int = 8
     include_fallback: bool = True
     style: str = "analytical"
-    use_multistage: bool = False  # Enable multi-stage generation with Chain-of-Thought
+    use_multistage: bool = True  # Enable multi-stage generation with Chain-of-Thought - ВКЛЮЧЕНО для живых дайджестов!
     use_rag: bool = True  # Enable RAG system with high-quality examples
     use_personalization: bool = True  # Enable personalization based on user profile
     use_events: bool = True  # Enable events fetching from database
     user_id: Optional[str] = None  # User ID for personalization
     audience: str = "general"  # Target audience type
 
-    # Super Journalist v3 features
-    use_personas: bool = False  # Enable automatic persona selection
-    use_story_memory: bool = False  # Enable historical context from news graph
-    use_feedback_loop: bool = False  # Enable feedback-based improvements
+    # Super Journalist v3 features - ВСЕ ВКЛЮЧЕНО для максимального качества!
+    use_personas: bool = True  # Enable automatic persona selection
+    use_story_memory: bool = True  # Enable historical context from news graph
+    use_feedback_loop: bool = True  # Enable feedback-based improvements
 
 
 class DigestAIService:
@@ -162,6 +162,16 @@ class DigestAIService:
         Returns:
             AI-generated digest text
         """
+        # Log enabled features for quality debugging
+        logger.info("🚀 AI Digest Generation - Advanced Features:")
+        logger.info(f"  • Multistage: {self.config.use_multistage}")
+        logger.info(f"  • RAG Examples: {self.config.use_rag}")
+        logger.info(f"  • Personalization: {self.config.use_personalization}")
+        logger.info(f"  • Personas: {self.config.use_personas}")
+        logger.info(f"  • Story Memory: {self.config.use_story_memory}")
+        logger.info(f"  • Feedback Loop: {self.config.use_feedback_loop}")
+        logger.info(f"  • Events: {self.config.use_events}")
+
         # Prepare news data for AI
         news_data = []
         for item in news_items:
@@ -216,10 +226,18 @@ class DigestAIService:
         logger.info(f"Created prompt length: {len(prompt)}")
         logger.info(f"News data count: {len(news_data)}")
 
-        # Calculate max_tokens and timeout based on length
+        # Calculate max_tokens and timeout based on length and multistage
         max_tokens = self._get_max_tokens_for_length(length)
-        timeout_seconds = 30.0 if length == "long" else 15.0  # Longer timeout for long digests
-        logger.info(f"Using max_tokens={max_tokens}, timeout={timeout_seconds}s for length={length}")
+
+        # Увеличиваем таймауты для multistage генерации (5 этапов требуют больше времени)
+        if self.config.use_multistage:
+            timeout_seconds = 60.0 if length == "long" else 45.0  # Больше времени для multistage
+        else:
+            timeout_seconds = 30.0 if length == "long" else 15.0  # Стандартные таймауты
+
+        logger.info(
+            f"Using max_tokens={max_tokens}, timeout={timeout_seconds}s for length={length}, multistage={self.config.use_multistage}"
+        )
 
         # Call OpenAI API with timeout
         import asyncio

@@ -353,19 +353,27 @@
     }
 
     .status-success {
-        @apply bg-success/10 text-success border border-success/20;
+        @apply text-success border;
+        background-color: rgba(22, 163, 74, 0.1);
+        border-color: rgba(22, 163, 74, 0.2);
     }
 
     .status-error {
-        @apply bg-error/10 text-error border border-error/20;
+        @apply text-error border;
+        background-color: rgba(220, 38, 38, 0.1);
+        border-color: rgba(220, 38, 38, 0.2);
     }
 
     .status-warning {
-        @apply bg-warning/10 text-warning border border-warning/20;
+        @apply text-warning border;
+        background-color: rgba(217, 119, 6, 0.1);
+        border-color: rgba(217, 119, 6, 0.2);
     }
 
     .status-muted {
-        @apply bg-muted/10 text-muted border border-muted/20;
+        @apply text-muted border;
+        background-color: rgba(107, 114, 128, 0.1);
+        border-color: rgba(107, 114, 128, 0.2);
     }
 
     /* Skeleton Loading */

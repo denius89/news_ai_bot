@@ -4,6 +4,7 @@ Liquipedia Provider for esports events.
 Fetches esports tournament information from Liquipedia via MediaWiki API.
 """
 
+import asyncio
 import logging
 import re
 import ssl
@@ -38,6 +39,9 @@ class LiquipediaProvider(BaseEventProvider):
         "starcraft": "liquipedia.net/starcraft2",
     }
 
+    # Fallback to main domain if subdomain fails
+    FALLBACK_DOMAIN = "liquipedia.net"
+
     def __init__(self):
         """Initialize Liquipedia provider."""
         super().__init__("liquipedia", "sports")
@@ -58,8 +62,13 @@ class LiquipediaProvider(BaseEventProvider):
             if not self.session:
                 # Создаем SSL context для устранения connection errors
                 ssl_context = ssl.create_default_context(cafile=certifi.where())
-                connector = aiohttp.TCPConnector(ssl=ssl_context)
-                self.session = aiohttp.ClientSession(headers={"User-Agent": self.user_agent}, connector=connector)
+                connector = aiohttp.TCPConnector(
+                    ssl=ssl_context, limit=10, force_close=False, enable_cleanup_closed=True
+                )
+                timeout = aiohttp.ClientTimeout(total=30, connect=10)
+                self.session = aiohttp.ClientSession(
+                    headers={"User-Agent": self.user_agent}, connector=connector, timeout=timeout
+                )
 
             all_events = []
 
@@ -112,32 +121,78 @@ class LiquipediaProvider(BaseEventProvider):
             # Apply rate limit (action=parse: 1 req/30sec = 2 req/min)
             await self.rate_limiter.acquire()
 
-            async with self.session.get(api_url, params=params) as response:
-                if response.status != 200:
-                    logger.warning(f"Liquipedia API error for {game}: {response.status}")
-                    return []
+            # Try primary subdomain first, then fallback to main domain
+            urls_to_try = [api_url]
+            # If using subdomain and it looks like DNS issue, try main domain
+            if "." in wiki_url and "liquipedia.net" in wiki_url and wiki_url != self.FALLBACK_DOMAIN:
+                fallback_url = f"https://{self.FALLBACK_DOMAIN}/api.php"
+                urls_to_try.append(fallback_url)
+                # For main domain, use different page structure - try multiple variants
+                fallback_params = [
+                    params.copy(),  # Original params first
+                    params.copy(),  # Then try variants
+                ]
+                fallback_params[1]["page"] = f"{game.title()}:Upcoming_and_ongoing_tournaments"
+                params_to_try = [params] + fallback_params
+            else:
+                params_to_try = [params]
 
-                data = await response.json()
+            for i, (url, api_params) in enumerate(zip(urls_to_try, params_to_try)):
+                try:
+                    async with self.session.get(url, params=api_params) as response:
+                        if response.status != 200:
+                            if i < len(urls_to_try) - 1:
+                                logger.warning(
+                                    f"Liquipedia API error for {game} (attempt {i+1}): {response.status}, trying fallback..."
+                                )
+                                continue
+                            else:
+                                logger.warning(f"Liquipedia API error for {game}: {response.status}")
+                                return []
 
-                # Extract wikitext
-                wikitext = data.get("parse", {}).get("wikitext", {}).get("*", "")
+                        # Check content type before parsing JSON
+                        content_type = response.headers.get("content-type", "").lower()
+                        if "application/json" not in content_type:
+                            if i < len(urls_to_try) - 1:
+                                logger.warning(f"Non-JSON response for {game} (attempt {i+1}), trying fallback...")
+                                continue
+                            else:
+                                logger.warning(f"Non-JSON response for {game}: {content_type}")
+                                return []
 
-                if not wikitext:
-                    logger.warning(f"No wikitext found for {game}")
-                    return []
+                        data = await response.json()
 
-                # Parse tournaments from wikitext
-                events = self._parse_wikitext(wikitext, game)
+                        # Extract wikitext
+                        wikitext = data.get("parse", {}).get("wikitext", {}).get("*", "")
 
-                # Filter by date range
-                filtered_events = []
-                for event in events:
-                    if event and "starts_at" in event:
-                        if start_date <= event["starts_at"] <= end_date:
-                            filtered_events.append(event)
+                        if not wikitext:
+                            if i < len(urls_to_try) - 1:
+                                logger.warning(f"No wikitext found for {game} (attempt {i+1}), trying fallback...")
+                                continue
+                            else:
+                                logger.warning(f"No wikitext found for {game}")
+                                return []
 
-                logger.info(f"Parsed {len(filtered_events)} {game} tournaments from Liquipedia")
-                return filtered_events
+                        # Parse tournaments from wikitext
+                        events = self._parse_wikitext(wikitext, game)
+
+                        # Filter by date range
+                        filtered_events = []
+                        for event in events:
+                            if event and "starts_at" in event:
+                                if start_date <= event["starts_at"] <= end_date:
+                                    filtered_events.append(event)
+
+                        logger.info(f"Parsed {len(filtered_events)} {game} tournaments from Liquipedia")
+                        return filtered_events
+
+                except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                    if i < len(urls_to_try) - 1:
+                        logger.warning(f"Connection error for {game} (attempt {i+1}): {e}, trying fallback...")
+                        continue
+                    else:
+                        logger.warning(f"Connection error for {game}: {e}, skipping...")
+                        return []
 
         except Exception as e:
             logger.error(f"Error fetching {game} tournaments: {e}")

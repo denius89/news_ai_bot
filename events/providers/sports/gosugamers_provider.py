@@ -99,21 +99,36 @@ class GosugamersProvider(BaseEventProvider):
 
                 # Parse XML с обработкой невалидных символов
                 try:
+                    # Попробуем сначала стандартный parser
                     root = ElementTree.fromstring(rss_content)
                 except ElementTree.ParseError as e:
-                    logger.warning(f"XML parse error for {game}: {e}, trying to clean...")
+                    logger.warning(f"XML parse error for {game}: {e}, trying lxml with recover...")
 
-                    # Пробуем очистить невалидные символы
+                    # Используем lxml с recover=True для более устойчивого парсинга
                     try:
-                        import re
+                        from lxml import etree
 
-                        # Удаляем невалидные XML символы
-                        cleaned_content = re.sub(r"[^\x09\x0A\x0D\x20-\x7F\x80-\xFF]+", "", rss_content)
-                        root = ElementTree.fromstring(cleaned_content)
-                        logger.info(f"Successfully parsed {game} XML after cleaning")
-                    except Exception as clean_error:
-                        logger.error(f"Failed to parse {game} XML even after cleaning: {clean_error}")
-                        return []
+                        parser = etree.XMLParser(recover=True, encoding="utf-8")
+                        root_etree = etree.fromstring(rss_content.encode("utf-8"), parser=parser)
+
+                        # Конвертируем обратно в ElementTree для совместимости
+                        root_string = etree.tostring(root_etree, encoding="unicode")
+                        root = ElementTree.fromstring(root_string)
+                        logger.info(f"Successfully parsed {game} XML using lxml recover")
+
+                    except Exception as lxml_error:
+                        logger.warning(f"lxml recovery failed for {game}: {lxml_error}, trying character cleanup...")
+
+                        # Fallback: очистка невалидных символов
+                        try:
+                            import re
+
+                            cleaned_content = re.sub(r"[^\x09\x0A\x0D\x20-\x7F\x80-\xFF]+", "", rss_content)
+                            root = ElementTree.fromstring(cleaned_content)
+                            logger.info(f"Successfully parsed {game} XML after character cleanup")
+                        except Exception as clean_error:
+                            logger.error(f"Failed to parse {game} XML even after cleanup: {clean_error}")
+                            return []
 
                 events = []
 

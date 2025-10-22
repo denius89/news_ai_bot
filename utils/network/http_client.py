@@ -59,7 +59,10 @@ class HTTPConnectionManager:
             self._aiohttp_session = aiohttp.ClientSession(
                 connector=connector,
                 timeout=timeout,
-                headers={"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"},
+                headers={
+                    "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)",
+                    "Accept-Encoding": "gzip, deflate",  # Explicitly exclude 'br' to avoid Brotli errors
+                },
             )
             logger.info("Created new aiohttp session with connection pooling")
 

@@ -48,7 +48,10 @@ class UnifiedParser:
         else:
             self.db_service = get_sync_service()
 
-        self.headers = {"User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)"}
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)",
+            "Accept-Encoding": "gzip, deflate",  # Explicitly exclude 'br' to avoid Brotli errors
+        }
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=10))
     async def _fetch_url_async(self, session: aiohttp.ClientSession, url: str) -> Optional[str]:
@@ -91,9 +94,14 @@ class UnifiedParser:
             logger.warning(f"Failed to parse date: {date_str} ({e})")
             return None
 
-    def make_uid(self, url: str, title: str) -> str:
+    def make_uid(self, url: str, title: str, source: str = "") -> str:
         """Generate unique ID for content."""
-        return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
+        if not url or url.strip() == "":
+            # For records without URL, use title + source for uniqueness
+            return hashlib.sha256(f"{title}|{source}".encode()).hexdigest()
+        else:
+            # For records with URL, use standard approach
+            return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
 
     def parse_rss_feed(self, content: str, source_name: str) -> List[Dict]:
         """Parse RSS feed content."""
@@ -124,7 +132,7 @@ class UnifiedParser:
 
                     # Create news item
                     news_item = {
-                        "uid": self.make_uid(entry.get("link", ""), title),
+                        "uid": self.make_uid(entry.get("link", ""), title, source_name),
                         "title": title,
                         "content": content_text,
                         "link": entry.get("link", ""),
@@ -157,7 +165,8 @@ class UnifiedParser:
     async def parse_source_async(self, url: str, category: str, subcategory: str, source_name: str) -> List[Dict]:
         """Parse single RSS source asynchronously."""
         try:
-            async with aiohttp.ClientSession() as session:
+            # Configure session to avoid Brotli decoding issues
+            async with aiohttp.ClientSession(headers=self.headers) as session:
                 content = await self._fetch_url_async(session, url)
 
                 if not content:

@@ -82,3 +82,5 @@ logs/
 **/.env.stash*
 config_files/environment/.env*
 
+# Runtime state files
+data/progress_state.json

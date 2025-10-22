@@ -1,9 +1,16 @@
 # PulseAI — Master Development Log
 
-This file contains the master rules, architecture, and agreements for the PulseAI project.  
+This file contains the master rules, architecture, and agreements for the PulseAI project.
 This is the main document for developers and project participants.
 
 ## ✨ Latest Updates
+
+**🎨 UI/UX & Development Experience (October 17, 2025):**
+- ✅ **AI Dock v4.1 Navigation** - Perfect Balance design with Telegram-style glass effects
+- ✅ **IDE Optimization** - VS Code auto-formatting configured (Black + Flake8)
+- ✅ **Code Quality** - All flake8 errors fixed, pre-push hooks working
+- ✅ **AI Mist Visual System** - All card components updated to new visual system
+- ✅ **Performance API** - Request optimization for subscription categories
 
 **🎉 STABLE VERSION v2.1 - Production Ready (October 10, 2025):**
 - ✅ **Personalized Greeting** - stable Telegram WebApp API integration
@@ -209,8 +216,8 @@ Project uses **Supabase (PostgreSQL)** instead of local SQLite.
 | source        | text         | Source name (from configuration) |
 | category      | text         | Category (crypto, economy, world, tech, etc.) |
 
-**Features**  
-`upsert_news` function saves news by unique `uid = sha256(url|title)`.  
+**Features**
+`upsert_news` function saves news by unique `uid = sha256(url|title)`.
 Insertion happens via `upsert` with `on_conflict="uid"`.
 
 ### `events` Table
@@ -244,7 +251,7 @@ Insertion happens via `upsert` with `on_conflict="uid"`.
 - Dates normalized to **UTC**
 - `content` field can be `NULL` if missing
 - AI scores (`credibility`, `importance`) saved when inserting news and events
-- Tables created via Supabase or local SQL scripts (`database/init_tables.sql`, `seed_data.sql`)   
+- Tables created via Supabase or local SQL scripts (`database/init_tables.sql`, `seed_data.sql`)
 
 ## Logging System
 
@@ -301,7 +308,7 @@ python main.py --digest 5 --ai
 - `--per-source-limit` — max news loaded from **each source** (default 20)
 - `--limit` — total max news per run (top slice after combining all sources)
 - `--digest` — generate text digest (default 5 news)
-- `--ai` — use AI for digest generation (instead of simple list)  
+- `--ai` — use AI for digest generation (instead of simple list)
 
 ### Utility `tools/show_news.py`
 Displays latest news from database for verification.
@@ -496,14 +503,14 @@ python tools/fix_old_news.py --mode fill-missing
    - Add "CI passing" badge to `README.md`
 
 ## Task Context
-Briefly document "why" we're doing a task to avoid losing logic.  
+Briefly document "why" we're doing a task to avoid losing logic.
 Example: "Topic filter needed to form personalized digests"
 
 ## Communication Rules
 - You are the project architect (set tasks, approve decisions)
 - I am the assistant (clarify tasks, format checklists, remind about git)
 - Task priorities: 🔴 urgent, 🟡 soon, 🟢 can be postponed
-- Work cycle:  
+- Work cycle:
   1. Task → 2. Clarification → 3. Checklist → 4. Git commit → 5. Summary in TASKS.md
 
 ## Checklist Format

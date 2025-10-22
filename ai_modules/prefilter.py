@@ -82,8 +82,8 @@ class Prefilter:
         # Calculate relevance score based on importance markers
         score = self._calculate_relevance_score(title, content, category)
 
-        # If score is too low, filter out
-        if score < 0.3:  # Minimum relevance threshold
+        # If score is too low, filter out (понижено для большего количества новостей)
+        if score < 0.1:  # Minimum relevance threshold
             return PrefilterResult(passed=False, reason="pre_filter", score=score)
 
         return PrefilterResult(passed=True, reason="pre_filter_pass", score=score)
@@ -100,7 +100,8 @@ class Prefilter:
         Returns:
             Relevance score between 0.0 and 1.0
         """
-        score = 0.0
+        # Базовая оценка для всех новостей (чтобы не отсеивать все)
+        score = 0.2
         text = f"{title} {content}".lower()
 
         # Get category-specific markers

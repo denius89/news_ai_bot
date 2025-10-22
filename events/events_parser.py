@@ -234,7 +234,7 @@ class EventsParser:
                 "liquipedia": "LiquipediaProvider",
                 "gosugamers": "GosugamersProvider",
                 "github_releases": "GitHubReleasesProvider",
-                "oecd_events": "OECDProvider",
+                "oecd": "OECDProvider",  # Fixed mapping to match config change
                 "un_sc": "UNSecurityCouncilProvider",
             }
 

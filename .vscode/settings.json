@@ -10,7 +10,6 @@
     "html.suggest.html5": true,
     "html.format.enable": false,
     "makefile.configureOnOpen": false,
-    
     // Python форматирование и автоисправление
     "python.linting.flake8Enabled": true,
     "python.linting.flake8Args": [
@@ -20,7 +19,6 @@
     "python.formatting.blackArgs": [
         "--line-length=120"
     ],
-    
     // Автоисправление при сохранении
     "editor.formatOnSave": true,
     "editor.formatOnPaste": true,
@@ -30,19 +28,16 @@
         "source.fixAll": "explicit",
         "source.fixAll.flake8": "explicit"
     },
-    
     // Удаление trailing whitespace
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
     "files.trimAutoWhitespace": true,
-    
     // Дополнительные настройки редактора для контроля whitespace
     "editor.renderWhitespace": "boundary",
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
     "editor.tabSize": 4,
-    
     // Дополнительные настройки для Python
     "[python]": {
         "editor.formatOnSave": true,
@@ -52,14 +47,15 @@
             "source.fixAll.flake8": "explicit",
             "source.fixAll": "explicit"
         },
-        "editor.rulers": [120],
+        "editor.rulers": [
+            120
+        ],
         "editor.wordWrap": "wordWrapColumn",
         "editor.wordWrapColumn": 120,
         "editor.insertSpaces": true,
         "editor.tabSize": 4,
         "editor.detectIndentation": false
     },
-    
     // Настройки для других языков
     "[javascript]": {
         "editor.formatOnSave": true

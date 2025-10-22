@@ -1,6 +1,6 @@
 # Contributing to PulseAI
 
-Thank you for your interest in contributing to **PulseAI**!  
+Thank you for your interest in contributing to **PulseAI**!
 This project is open to pull requests, suggestions, and improvements.
 
 ## Table of Contents
@@ -100,18 +100,26 @@ pytest --cov --cov-report=term-missing
 ## Code Style
 
 ### Linting and Formatting
-We use **flake8** and **black**:
+We use **flake8** and **black** with VS Code integration:
 
 ```bash
 # Check code style
-flake8 .
+flake8 --max-line-length=120 .
 
 # Check formatting
-black --check .
+black --check --line-length=120 .
 
 # Auto-format code
-black .
+black --line-length=120 .
 ```
+
+### VS Code Configuration
+The project includes pre-configured VS Code settings for automatic code formatting:
+- **Auto-format on save** enabled for Python, TypeScript, JSON, YAML
+- **Flake8 integration** with line length 120
+- **Black formatting** with line length 120
+- **Auto-fix import organization** on save
+- **Pre-tasks configured** for manual code quality checks
 
 ### Code Standards
 - Follow PEP 8 style guidelines
@@ -242,5 +250,5 @@ Brief description of changes
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).  
+This project is licensed under the [MIT License](LICENSE).
 By contributing, you agree that your contributions will be licensed under the same license.

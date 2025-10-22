@@ -128,6 +128,7 @@ class TestDatabaseService:
         """Test _make_uid method."""
         service = DatabaseService(async_mode=False)
 
+        # Test with URL
         uid1 = service._make_uid("http://example.com", "Test News")
         uid2 = service._make_uid("http://example.com", "Test News")
         uid3 = service._make_uid("http://other.com", "Test News")
@@ -135,6 +136,14 @@ class TestDatabaseService:
         assert uid1 == uid2  # Same URL and title should produce same UID
         assert uid1 != uid3  # Different URL should produce different UID
         assert len(uid1) == 64  # SHA256 produces 64-character hex string
+
+        # Test without URL (should use title + source)
+        uid4 = service._make_uid("", "Test News", "Source1")
+        uid5 = service._make_uid("", "Test News", "Source1")
+        uid6 = service._make_uid("", "Test News", "Source2")
+
+        assert uid4 == uid5  # Same title and source should produce same UID
+        assert uid4 != uid6  # Different source should produce different UID
 
     @patch("database.service.evaluate_importance")
     @patch("database.service.evaluate_credibility")

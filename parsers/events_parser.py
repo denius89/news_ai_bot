@@ -8,7 +8,11 @@ from bs4 import BeautifulSoup
 from utils.text.clean_text import extract_text as clean_text
 
 BASE_URL = "https://www.investing.com/economic-calendar/"
-HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "en-US,en;q=0.9"}
+HEADERS = {
+    "User-Agent": "Mozilla/5.0",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate",  # Explicitly exclude 'br' to avoid Brotli errors
+}
 
 logger = logging.getLogger("parsers.events")
 

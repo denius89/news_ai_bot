@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 # Путь к файлу источников
 SOURCES_FILE = Path(__file__).parent.parent / "config" / "data" / "sources.yaml"
 
+# Настоящие категории новостей (исключаем технические настройки из sources.yaml)
+NEWS_CATEGORIES = {"crypto", "sports", "markets", "tech", "world"}
+
 # Кэш для загруженных данных
 _sources_cache: Optional[Dict] = None
 _cache_timestamp: Optional[float] = None
@@ -44,7 +47,8 @@ def get_categories() -> List[str]:
         List[str]: Список названий категорий
     """
     sources = _load_sources()
-    return list(sources.keys())
+    # Фильтруем только настоящие категории новостей, исключаем технические настройки
+    return [cat for cat in sources.keys() if cat in NEWS_CATEGORIES]
 
 
 def get_subcategories(category: str) -> List[str]:
@@ -110,7 +114,11 @@ def get_all_sources() -> List[Tuple[str, str, str, str]]:
     all_sources = []
     sources = _load_sources()
 
+    # Фильтруем только настоящие категории новостей
     for category, subcategories in sources.items():
+        if category not in NEWS_CATEGORIES:
+            continue
+
         for subcategory, data in subcategories.items():
             sources_list = data.get("sources", [])
             for source in sources_list:
@@ -126,7 +134,9 @@ def get_category_structure() -> Dict[str, Dict[str, Dict]]:
     Returns:
         Dict: Структура {category: {subcategory: {icon: str, sources: [...]}}}
     """
-    return _load_sources()
+    sources = _load_sources()
+    # Фильтруем только настоящие категории новостей, исключаем технические настройки
+    return {cat: data for cat, data in sources.items() if cat in NEWS_CATEGORIES}
 
 
 def get_emoji_icon(category: str, subcategory: str) -> str:
@@ -260,11 +270,14 @@ def validate_sources() -> Tuple[bool, List[str]]:
     errors = []
     sources = _load_sources()
 
-    if not sources:
+    # Фильтруем только настоящие категории новостей
+    filtered_sources = {cat: data for cat, data in sources.items() if cat in NEWS_CATEGORIES}
+
+    if not filtered_sources:
         errors.append("Файл источников пуст или не найден")
         return False, errors
 
-    for category, subcategories in sources.items():
+    for category, subcategories in filtered_sources.items():
         if not isinstance(subcategories, dict):
             errors.append(f"Категория '{category}' должна быть словарем")
             continue
@@ -306,11 +319,14 @@ def get_statistics() -> Dict:
     """
     sources = _load_sources()
 
-    total_categories = len(sources)
+    # Фильтруем только настоящие категории новостей
+    filtered_sources = {cat: data for cat, data in sources.items() if cat in NEWS_CATEGORIES}
+
+    total_categories = len(filtered_sources)
     total_subcategories = 0
     total_sources = 0
 
-    for category, subcategories in sources.items():
+    for category, subcategories in filtered_sources.items():
         total_subcategories += len(subcategories)
         for subcategory, data in subcategories.items():
             sources_list = data.get("sources", [])

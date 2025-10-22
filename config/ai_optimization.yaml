@@ -19,19 +19,19 @@ thresholds:
 
 # Адаптивные пороги по категориям
 category_thresholds:
-  crypto: 
+  crypto:
     importance: 0.55
     credibility: 0.65
-  markets: 
+  markets:
     importance: 0.6
     credibility: 0.7
-  tech: 
+  tech:
     importance: 0.6
     credibility: 0.7
-  sports: 
+  sports:
     importance: 0.5
     credibility: 0.6
-  world: 
+  world:
     importance: 0.7
     credibility: 0.7
 
@@ -48,20 +48,20 @@ timeouts:
 
 # Предфильтр правила
 prefilter:
-  # Минимальная длина заголовка
-  min_title_words: 6
-  
+  # Минимальная длина заголовка (понижено для большего количества новостей)
+  min_title_words: 3
+
   # Стоп-маркеры для исключения
   stop_markers:
     - "opinion"
-    - "advertorial" 
+    - "advertorial"
     - "sponsored"
     - "how to buy"
     - "price prediction"
     - "click here"
     - "read more"
     - "advertisement"
-  
+
   # Ключевые маркеры важности по категориям
   importance_markers:
     crypto:

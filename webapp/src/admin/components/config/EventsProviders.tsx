@@ -93,8 +93,8 @@ export function EventsProviders() {
                         <button
                             onClick={() => setSelectedCategory('all')}
                             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedCategory === 'all'
-                                    ? 'border-b-2 border-primary text-primary bg-primary/5'
-                                    : 'text-muted hover:text-text hover:bg-muted/50'
+                                ? 'border-b-2 border-primary text-primary bg-primary/5'
+                                : 'text-muted hover:text-text hover:bg-muted/50'
                                 }`}
                         >
                             <div className="flex items-center justify-center gap-2">
@@ -129,8 +129,8 @@ export function EventsProviders() {
                                     key={category}
                                     onClick={() => setSelectedCategory(category)}
                                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedCategory === category
-                                            ? 'border-b-2 border-primary text-primary bg-primary/5'
-                                            : 'text-muted hover:text-text hover:bg-muted/50'
+                                        ? 'border-b-2 border-primary text-primary bg-primary/5'
+                                        : 'text-muted hover:text-text hover:bg-muted/50'
                                         }`}
                                 >
                                     <div className="flex items-center justify-center gap-2">

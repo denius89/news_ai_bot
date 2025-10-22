@@ -7,22 +7,22 @@ crypto:
     api_key_required: true
     env_var: COINMARKETCAL_TOKEN
     description: "Crypto events calendar"
-  
+
   coingecko:
     enabled: true
     api_key_required: false
     description: "Crypto events from CoinGecko"
-  
+
   defillama:
     enabled: true
     api_key_required: false
     description: "DeFi protocol events"
-  
+
   tokenunlocks:
     enabled: true
     api_key_required: false
     description: "Token unlock schedules"
-  
+
   coindar:
     enabled: false  # Not activated yet
     api_key_required: true
@@ -35,28 +35,28 @@ sports:
     api_key_required: true
     env_var: FOOTBALL_DATA_TOKEN
     description: "Football matches and tournaments"
-  
+
   thesportsdb:
     enabled: true
     api_key_required: false
     description: "Multi-sport events database"
-  
+
   espn:
     enabled: true
     api_key_required: false
     description: "NBA, NHL, MLB, Tennis from ESPN API"
-  
+
   pandascore:
     enabled: true
     api_key_required: true
     env_var: PANDASCORE_TOKEN
     description: "Esports matches and tournaments"
-  
+
   liquipedia:
     enabled: true
     api_key_required: false
     description: "Esports wiki events via MediaWiki API"
-  
+
   gosugamers:
     enabled: true
     api_key_required: false
@@ -64,38 +64,38 @@ sports:
 
 markets:
   eodhd:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: true
     env_var: EODHD_TOKEN
     description: "Economic calendar and earnings"
-  
+
   fmp:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: true
     env_var: FMP_TOKEN
     description: "Financial Modeling Prep events"
-  
+
   finnhub:
     enabled: true
     api_key_required: true
     env_var: FINNHUB_TOKEN
     description: "Stock market events"
-  
+
   nasdaq_rss:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "Nasdaq IPO calendar RSS"
-  
-  oecd_events:
+
+  oecd:  # Fixed name to match oecd_provider.py
     enabled: true
     api_key_required: false
     description: "OECD economic events (HTML)"
-  
+
   imf_events:
     enabled: false  # Not yet implemented
     api_key_required: false
     description: "IMF meetings and events (HTML)"
-  
+
   wef_events:
     enabled: false  # Not yet implemented
     api_key_required: false
@@ -103,44 +103,43 @@ markets:
 
 tech:
   lf_events:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "Linux Foundation events (ICS/HTML)"
-  
+
   cncf_events:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "CNCF events (ICS/HTML)"
-  
+
   github_releases:
     enabled: true
     api_key_required: true
     env_var: GITHUB_TOKEN
     description: "Major project releases via GitHub API"
-  
+
   wikidata_sparql:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "Tech conferences via Wikidata SPARQL"
 
 world:
   ifes_electionguide:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "Global elections calendar"
-  
+
   un_sc:
     enabled: true
     api_key_required: false
     description: "UN Security Council meetings"
-  
+
   eu_council:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "EU Council meetings calendar"
-  
+
   unfccc_events:
-    enabled: true
+    enabled: false  # File not implemented yet
     api_key_required: false
     description: "Climate conferences and events"
-

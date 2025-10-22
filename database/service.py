@@ -612,9 +612,10 @@ class DatabaseService:
                 # Extract and validate fields
                 title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
                 content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
+                source = (enriched.get("source") or "").strip()
 
                 # Generate UID
-                uid = self._make_uid(enriched.get("link", ""), title)
+                uid = self._make_uid(enriched.get("link", ""), title, source)
 
                 # Prepare row
                 row = {
@@ -629,6 +630,7 @@ class DatabaseService:
                     "subcategory": enriched.get("subcategory"),
                     "credibility": enriched.get("credibility"),
                     "importance": enriched.get("importance"),
+                    "created_at": datetime.now(timezone.utc).isoformat(),
                 }
 
                 rows.append(row)
@@ -660,20 +662,26 @@ class DatabaseService:
 
         return news_item
 
-    def _make_uid(self, url: str, title: str) -> str:
+    def _make_uid(self, url: str, title: str, source: str = "") -> str:
         """
         Generate unique ID for news item.
 
         Args:
             url: News URL
             title: News title
+            source: News source (for records without URL)
 
         Returns:
             SHA256 hash as UID
         """
         import hashlib
 
-        return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
+        if not url or url.strip() == "":
+            # For records without URL, use title + source for uniqueness
+            return hashlib.sha256(f"{title}|{source}".encode()).hexdigest()
+        else:
+            # For records with URL, use standard approach
+            return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
 
     def close(self):
         """Close database connections."""

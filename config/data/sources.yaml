@@ -15,7 +15,7 @@ crypto:
       - name: Bitcoin.com News
         url: https://news.bitcoin.com/feed
       - name: The Daily Hodl
-        url: https://dailyhodl.com/feed
+        url: https://dailyhodl.com/wp-json/wp/v2/posts
       - name: 99Bitcoins News
         url: https://99bitcoins.com/feed
   ethereum:
@@ -132,6 +132,7 @@ sports:
   football:
     icon: football
     sources:
+      # Основные футбольные источники
       - name: UEFA
         url: https://www.uefa.com/rssfeed/news/rss.xml
       - name: FIFA
@@ -144,6 +145,47 @@ sports:
         url: https://www.theguardian.com/football/rss
       - name: FourFourTwo
         url: https://www.fourfourtwo.com/feed
+      # Лига чемпионов
+      - name: UEFA Champions League
+        url: https://www.uefa.com/rssfeed/championsleague/rss.xml
+      # Премьер лига
+      - name: Premier League
+        url: https://www.premierleague.com/rss
+      # Лига Европы
+      - name: ESPN Europa League
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: OneFootball Europa League
+        url: https://onefootball.com/en/rss
+      # Лига конференций
+      - name: ESPN Conference League
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: OneFootball Conference
+        url: https://onefootball.com/en/rss
+      # Бундеслига
+      - name: Bundesliga Official
+        url: https://www.bundesliga.com/en/bundesliga/news/rss
+      - name: ESPN Bundesliga
+        url: https://www.espn.com/espn/rss/soccer/news
+      # Ла Лига
+      - name: ESPN La Liga
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Marca La Liga
+        url: https://www.marca.com/rss/futbol/primera.xml
+      # Серия А
+      - name: ESPN Serie A
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Football Italia
+        url: https://www.football-italia.net/rss
+      # Лига 1
+      - name: ESPN Ligue 1
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: Get French Football
+        url: https://www.getfootballnewsfrance.com/feed/
+      # Чемпионат мира
+      - name: ESPN World Cup
+        url: https://www.espn.com/espn/rss/soccer/news
+      - name: FIFA World Cup News
+        url: https://www.fifa.com/rss-feeds/news
   basketball:
     icon: basketball
     sources:
@@ -248,16 +290,6 @@ sports:
         url: https://www.nhl.com/info/rss-feeds
       - name: The Hockey News
         url: https://thehockeynews.com/feed
-  champions_league:
-    icon: football
-    sources:
-      - name: UEFA Champions League
-        url: https://www.uefa.com/rssfeed/championsleague/rss.xml
-  premier_league:
-    icon: football
-    sources:
-      - name: Premier League
-        url: https://www.premierleague.com/rss
   lol:
     icon: esports
     sources:
@@ -284,56 +316,6 @@ sports:
         url: https://valorantesports.com/rss
       - name: GoHa Valorant
         url: https://www.goha.ru/rss/:VALORANT
-  # Дополнительные футбольные лиги
-  europa_league:
-    icon: football
-    sources:
-      - name: ESPN Europa League
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: OneFootball Europa League
-        url: https://onefootball.com/en/rss
-  conference_league:
-    icon: football
-    sources:
-      - name: ESPN Conference League
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: OneFootball
-        url: https://onefootball.com/en/rss
-  bundesliga:
-    icon: football
-    sources:
-      - name: Bundesliga Official
-        url: https://www.bundesliga.com/en/bundesliga/news/rss
-      - name: ESPN Bundesliga
-        url: https://www.espn.com/espn/rss/soccer/news
-  la_liga:
-    icon: football
-    sources:
-      - name: ESPN La Liga
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: Marca La Liga
-        url: https://www.marca.com/rss/futbol/primera.xml
-  serie_a:
-    icon: football
-    sources:
-      - name: ESPN Serie A
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: Football Italia
-        url: https://www.football-italia.net/rss
-  ligue_1:
-    icon: football
-    sources:
-      - name: ESPN Ligue 1
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: Get French Football
-        url: https://www.getfootballnewsfrance.com/feed/
-  world_cup:
-    icon: football
-    sources:
-      - name: ESPN World Cup
-        url: https://www.espn.com/espn/rss/soccer/news
-      - name: FIFA News
-        url: https://www.fifa.com/rss-feeds/news
   # Дополнительные киберспорт игры
   dota2:
     icon: dota2
@@ -732,3 +714,47 @@ world:
         url: https://time.com/feed/
       - name: The Economist World
         url: https://www.economist.com/international/rss.xml
+
+# Network settings for Phase 1
+network:
+  max_response_bytes: 8388608  # 8 MB
+  max_xml_depth: 50
+  timeout_total: 90
+  timeout_connect: 20
+  timeout_read: 60
+
+# Rate limits per domain (requests per second)
+rate_limits:
+  default: 10
+  espn.com: 2
+  nhl.com: 2
+  mlb.com: 2
+  lolesports.com: 2
+
+# Circuit breaker settings
+circuit_breaker:
+  fail_threshold: 5
+  cool_down: 300  # seconds
+
+# Parser settings
+parser:
+  use_trafilatura: true
+  use_jsonfeed: true
+  use_playwright_fallback: true
+  language_whitelist: ['en', 'ru', 'uk', 'pl']
+  content_quality_threshold: 0.3
+
+  # Phase 4: Deduplication settings
+  simhash_threshold: 3  # Maximum SimHash distance for duplicates
+  minhash_threshold: 0.8  # Minimum MinHash similarity for duplicates
+  enable_quality_filtering: true
+  min_content_quality: 0.4
+
+  # Phase 5: Browser Parser settings
+  browser_headless: true  # Run browser in headless mode
+  browser_timeout: 30000  # Browser timeout in milliseconds
+  enable_browser_fallback: true  # Use browser for failed HTTP requests
+  browser_fallback_patterns:  # Domains that require browser parsing
+    - "*.medium.com"
+    - "*.substack.com"
+    - "*.cloudflare.com"

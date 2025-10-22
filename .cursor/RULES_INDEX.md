@@ -40,7 +40,7 @@
 ### 30-49: Security & Critical Operations
 
 #### `30-env-backup-security.mdc` ⭐ CRITICAL
-**Priority:** CRITICAL  
+**Priority:** CRITICAL
 **Impact:** Data leaks prevention
 
 **Key Rules:**
@@ -62,7 +62,7 @@
 ---
 
 #### `40-ai-prompts-management.mdc` ⭐ HIGH
-**Priority:** HIGH  
+**Priority:** HIGH
 **Impact:** News quality & AI performance
 
 **Key Rules:**
@@ -83,7 +83,7 @@
 ### 50-69: Data & Dependencies
 
 #### `50-database-migrations.mdc` ⭐ HIGH
-**Priority:** HIGH  
+**Priority:** HIGH
 **Impact:** Can destroy production data
 
 **Key Rules:**
@@ -102,7 +102,7 @@
 ---
 
 #### `60-dependencies-management.mdc`
-**Priority:** MEDIUM  
+**Priority:** MEDIUM
 **Impact:** Can break environment
 
 **Key Rules:**
@@ -122,7 +122,7 @@
 ### 70-89: Development Workflow
 
 #### `70-git-commits.mdc`
-**Priority:** LOW  
+**Priority:** LOW
 **Impact:** Code organization
 
 **Key Rules:**
@@ -138,7 +138,7 @@
 ---
 
 #### `80-testing.mdc`
-**Priority:** MEDIUM  
+**Priority:** MEDIUM
 **Impact:** Code quality
 
 **Key Rules:**
@@ -158,7 +158,7 @@
 ### 90-99: Production Operations
 
 #### `90-logging-monitoring.mdc` ⭐ HIGH
-**Priority:** HIGH  
+**Priority:** HIGH
 **Impact:** Production debugging & monitoring
 
 **Key Rules:**
@@ -176,7 +176,7 @@
 ---
 
 #### `91-error-handling.mdc` ⭐ HIGH
-**Priority:** HIGH  
+**Priority:** HIGH
 **Impact:** Production stability
 
 **Key Rules:**
@@ -194,7 +194,7 @@
 ---
 
 #### `92-background-jobs.mdc`
-**Priority:** MEDIUM  
+**Priority:** MEDIUM
 **Impact:** Data freshness & ML accuracy
 
 **Key Rules:**
@@ -212,7 +212,7 @@
 ---
 
 #### `93-performance.mdc`
-**Priority:** MEDIUM  
+**Priority:** MEDIUM
 **Impact:** Cost & speed
 
 **Key Rules:**
@@ -226,6 +226,25 @@
 - Performance optimization
 - Reducing API costs
 - Fixing slow queries
+
+---
+
+#### `94-tone-voice.mdc`
+**Priority:** MEDIUM
+**Impact:** UX consistency & user experience
+
+**Key Rules:**
+- PulseAI tone: умный но не заумный, дружелюбный но не слащавый
+- 3 контекста: интерактивный (UI), редакторский (контент), системный (ошибки)
+- Обращение на "ты", активные глаголы, краткость
+- Избегать технического жаргона и роботических фраз
+- Для ошибок обязательно указывать решение
+
+**When AI will use:**
+- Generating UI text (buttons, hints, notifications)
+- Creating error messages and success states
+- Writing modal titles and section headers
+- Adding tooltips and help text
 
 ---
 
@@ -245,6 +264,7 @@
 | "Fix production bug" | 91-error-handling | Add retry logic, graceful degradation |
 | "Create background job" | 92-background-jobs | Use template, add monitoring |
 | "Optimize performance" | 93-performance | Check ML predictor, caching, indexes |
+| "Generate UI text" | 94-tone-voice | Use PulseAI tone, match context |
 
 ---
 
@@ -275,6 +295,9 @@
 - Background jobs: `92-background-jobs.mdc`
 - Performance: `93-performance.mdc`
 
+**UX/Copy:**
+- Tone & Voice: `94-tone-voice.mdc`
+
 ---
 
 ## ✅ Verification Checklist
@@ -291,6 +314,7 @@ After restart, AI should:
 - [ ] Add retry logic for API errors
 - [ ] Log background job metrics
 - [ ] Check for performance optimizations (ML predictor, caching)
+- [ ] Use PulseAI tone for UI text generation
 
 ---
 
@@ -309,7 +333,7 @@ After restart, AI should:
    tags: [tag1, tag2]
    priority: HIGH|MEDIUM|LOW
    ---
-   
+
    # Rule Content
    ```
 
@@ -321,15 +345,13 @@ After restart, AI should:
 
 ## 📊 Statistics
 
-- **Total rules:** 12 files
-- **Total lines:** ~2,200
+- **Total rules:** 13 files
+- **Total lines:** ~2,400
 - **Critical rules:** 5 (env, prompts, migrations, logging, errors)
-- **Coverage areas:** 10 (security, AI, DB, deps, git, testing, logging, errors, background, performance)
+- **Coverage areas:** 11 (security, AI, DB, deps, git, testing, logging, errors, background, performance, tone-voice)
 
 ---
 
-**Last Updated:** 2025-10-17  
-**Version:** 1.1  
+**Last Updated:** 2025-10-17
+**Version:** 1.1
 **Status:** Active
-
-

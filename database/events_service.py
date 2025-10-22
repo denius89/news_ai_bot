@@ -252,6 +252,7 @@ class EventsService:
                     "metadata": event.get("metadata", {}),
                     "group_name": event.get("group_name"),
                     "unique_hash": unique_hash,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
                 }
                 rows.append(row)
 

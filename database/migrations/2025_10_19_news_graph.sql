@@ -5,20 +5,20 @@
 -- News links table for connecting related news articles
 CREATE TABLE IF NOT EXISTS news_links (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     news_id_1 UUID NOT NULL REFERENCES news(id) ON DELETE CASCADE,
     news_id_2 UUID NOT NULL REFERENCES news(id) ON DELETE CASCADE,
-    
+
     link_type VARCHAR(50) NOT NULL DEFAULT 'related', -- "continuation", "related", "opposite", "context"
-    
+
     similarity_score FLOAT DEFAULT 0.0,
     semantic_distance FLOAT DEFAULT 0.0,
-    
+
     keywords_overlap JSONB DEFAULT '{}',
     entities_overlap JSONB DEFAULT '{}',
-    
+
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Ensure we don't have duplicate links (both directions)
     CONSTRAINT no_duplicate_links CHECK (news_id_1 < news_id_2),
     UNIQUE(news_id_1, news_id_2)
@@ -33,18 +33,18 @@ CREATE INDEX IF NOT EXISTS idx_news_links_similarity ON news_links(similarity_sc
 -- Digest drafts table for human-in-the-loop feedback
 CREATE TABLE IF NOT EXISTS digest_drafts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     content TEXT NOT NULL,
     metadata JSONB DEFAULT '{}',
-    
+
     status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'approved', 'rejected', 'published'
     reviewer_id UUID REFERENCES users(id),
     admin_feedback TEXT,
     admin_rating FLOAT CHECK (admin_rating >= 0 AND admin_rating <= 1),
-    
+
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     reviewed_at TIMESTAMP WITH TIME ZONE,
-    
+
     -- Track what was used to generate this draft
     category VARCHAR(50),
     style VARCHAR(50),

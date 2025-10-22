@@ -144,13 +144,19 @@ class FootballDataProvider(BaseEventProvider):
             # Get match status
             status = match.get("status", "SCHEDULED")
 
-            # Get venue/stadium - Football-Data API не предоставляет точный стадион
-            # Используем area (страну) или город команды
+            # Get venue/stadium - улучшенная обработка venue
             venue_data = match.get("venue")
             if venue_data:
-                venue = venue_data
+                # Если venue - строка (название стадиона)
+                if isinstance(venue_data, str):
+                    venue = venue_data
+                # Если venue - объект с именем
+                elif isinstance(venue_data, dict):
+                    venue = venue_data.get("name") or venue_data.get("fullName", "Stadium TBA")
+                else:
+                    venue = "Stadium TBA"
             else:
-                # Fallback: берем страну из area
+                # Fallback: используем город или страну
                 area = match.get("area", {})
                 if isinstance(area, dict):
                     venue = area.get("name", "Stadium TBA")

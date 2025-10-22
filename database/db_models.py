@@ -129,8 +129,17 @@ def safe_execute(query, retries: int = 5, delay: float = 1.0):
 
 
 # --- UID для новостей ---
-def make_uid(url: str, title: str) -> str:
-    return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
+def make_uid(url: str, title: str, source: str = "") -> str:
+    """
+    Генерирует уникальный ID для новости.
+    Если URL пустой, включает source для предотвращения дублей.
+    """
+    if not url or url.strip() == "":
+        # Для записей без URL используем title + source для уникальности
+        return hashlib.sha256(f"{title}|{source}".encode()).hexdigest()
+    else:
+        # Для записей с URL используем стандартный подход
+        return hashlib.sha256(f"{url}|{title}".encode()).hexdigest()
 
 
 # --- Event ID для событий ---
@@ -226,7 +235,8 @@ def upsert_news(items: List[Dict]):
 
             title = (enriched.get("title") or "").strip() or enriched.get("source") or "Без названия"
             content = (enriched.get("content") or "").strip() or (enriched.get("summary") or "").strip() or title
-            uid = make_uid(enriched.get("url", ""), title)
+            source = (enriched.get("source") or "").strip()
+            uid = make_uid(enriched.get("url", ""), title, source)
 
             row = {
                 "uid": uid,
@@ -238,6 +248,7 @@ def upsert_news(items: List[Dict]):
                 "category": (enriched.get("category") or "").lower() or None,
                 "credibility": enriched.get("credibility"),
                 "importance": enriched.get("importance"),
+                "created_at": datetime.now(timezone.utc).isoformat(),
             }
             logger.debug("Prepared news row: %s", row)
             rows.append(row)

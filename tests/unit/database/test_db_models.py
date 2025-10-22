@@ -4,10 +4,18 @@ from database import db_models
 
 
 def test_make_uid_and_event_id_are_stable():
+    # Test with URL
     uid1 = db_models.make_uid("http://test.com", "Hello")
     uid2 = db_models.make_uid("http://test.com", "Hello")
     assert uid1 == uid2
     assert re.match(r"^[a-f0-9]{64}$", uid1)
+
+    # Test without URL (should use title + source)
+    uid3 = db_models.make_uid("", "Hello", "Source1")
+    uid4 = db_models.make_uid("", "Hello", "Source1")
+    uid5 = db_models.make_uid("", "Hello", "Source2")
+    assert uid3 == uid4  # Same title and source
+    assert uid3 != uid5  # Different source should produce different UID
 
     event_id1 = db_models.make_event_id("Event", "US", "2025-09-30T12:00:00Z")
     event_id2 = db_models.make_event_id("Event", "US", "2025-09-30T12:00:00Z")

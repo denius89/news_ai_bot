@@ -7,10 +7,10 @@ const personalities = {
         color: "from-blue-400 via-cyan-300 to-blue-500",
         icon: <Brain className="w-10 h-10 text-blue-400" />,
         phrases: [
-            "Провожу глубокий анализ новостных трендов...",
-            "Сравниваю источники и выявляю закономерности...",
+            "Анализирую новости...",
+            "Сравниваю источники...",
             "Оцениваю достоверность и важность...",
-            "Формирую объективный дайджест на основе данных..."
+            "Создаю дайджест..."
         ]
     },
     business: {
@@ -296,7 +296,7 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
                     className="text-2xl font-semibold text-white mb-3 drop-shadow-lg"
                     style={{ willChange: 'opacity, transform' }}
                 >
-                    AI думает в стиле "{safeStyle}"...
+                    AI создаёт дайджест...
                 </motion.h2>
 
                 {/* Dynamic Phrases with improved animation */}
@@ -312,7 +312,7 @@ export const DigestMagicProgress: React.FC<DigestMagicProgressProps> = ({
                         className="text-white/90 text-base max-w-md px-4 leading-relaxed mb-5"
                         style={{ willChange: 'opacity, transform' }}
                     >
-                        {adaptedPhrases[phraseIndex] || adaptedPhrases[0] || "Генерирую дайджест..."}
+                        {adaptedPhrases[phraseIndex] || adaptedPhrases[0] || "Создаю дайджест..."}
                     </motion.p>
                 </AnimatePresence>
 

@@ -26,16 +26,19 @@ class NewsRepository:
         self,
         limit: int = 10,
         categories: Optional[Union[str, List[str]]] = None,
+        subcategories: Optional[Union[str, List[str]]] = None,
     ) -> List[NewsItem]:
         """
         Получить список последних новостей с упорядочиванием по важности и времени публикации.
 
         - Возвращает список валидированных моделей `NewsItem`.
-        - Поддерживает фильтрацию по категории: можно передать строку или список строк.
+        - Поддерживает фильтрацию по категории и субкатегории: можно передать строку или список строк.
 
         :param limit: максимальное количество элементов (1..50). Значение вне диапазона будет ограничено.
         :param categories: категория или список категорий для фильтрации.
                            Регистр не учитывается, значения нормализуются к lower().
+        :param subcategories: субкатегория или список субкатегорий для фильтрации.
+                             Регистр не учитывается, значения нормализуются к lower().
         :return: список объектов `NewsItem`.
         """
         if not self._db:
@@ -65,6 +68,16 @@ class NewsRepository:
                     elif len(cats) > 1:
                         q = q.in_("category", cats)
 
+            if subcategories:
+                if isinstance(subcategories, str):
+                    q = q.eq("subcategory", subcategories.lower())
+                elif isinstance(subcategories, list):
+                    subcats = [sc.strip().lower() for sc in subcategories if sc and sc.strip()]
+                    if len(subcats) == 1:
+                        q = q.eq("subcategory", subcats[0])
+                    elif len(subcats) > 1:
+                        q = q.in_("subcategory", subcats)
+
             data = q.execute().data or []
 
             items: List[NewsItem] = []
@@ -90,15 +103,53 @@ class NewsRepository:
                     logger.warning("Ошибка валидации новости: %s (row=%s)", e, d)
 
             logger.debug(
-                "NewsRepository.get_recent_news → %d rows (limit=%s, categories=%s)",
+                "NewsRepository.get_recent_news → %d rows (limit=%s, categories=%s, subcategories=%s)",
                 len(items),
                 safe_limit,
                 categories,
+                subcategories,
             )
             return items
 
         except Exception as e:
             logger.error("Ошибка при получении новостей: %s", e, exc_info=True)
+            return []
+
+    def get_news_by_subcategory(self, subcategory: str, limit: int = 15) -> List[NewsItem]:
+        """
+        Получить новости по конкретной субкатегории.
+
+        :param subcategory: субкатегория для фильтрации
+        :param limit: максимальное количество элементов
+        :return: список объектов `NewsItem`
+        """
+        return self.get_recent_news(limit=limit, subcategories=subcategory)
+
+    def get_all_subcategories(self) -> List[str]:
+        """
+        Получить список всех уникальных субкатегорий из базы данных.
+
+        :return: список уникальных субкатегорий
+        """
+        if not self._db:
+            logger.warning("⚠️ Supabase не инициализирован")
+            return []
+
+        try:
+            response = self._db.table("news").select("subcategory").execute()
+            data = response.data or []
+
+            # Извлекаем уникальные субкатегории
+            subcategories = set()
+            for item in data:
+                subcat = item.get("subcategory")
+                if subcat and subcat.strip():
+                    subcategories.add(subcat.strip().lower())
+
+            return sorted(list(subcategories))
+
+        except Exception as e:
+            logger.error("Ошибка при получении субкатегорий: %s", e, exc_info=True)
             return []
 
 

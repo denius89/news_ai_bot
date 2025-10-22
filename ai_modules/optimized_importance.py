@@ -45,7 +45,8 @@ def evaluate_importance(news_item: Dict) -> float:
         if not prefilter_result.passed:
             metrics.increment_ai_skipped_prefilter()
             logger.debug(f"News filtered by prefilter: {prefilter_result.reason}")
-            return 0.0  # Low importance for filtered items
+            # Возвращаем низкую, но не нулевую важность для дальнейшей обработки
+            return 0.1
     except Exception as e:
         logger.error(f"Error in prefilter: {e}")
         metrics.increment_prefilter_errors()
