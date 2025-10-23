@@ -10,6 +10,7 @@ import { AdminContentControl } from './pages/AdminContentControl';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { AdminLogs } from './pages/AdminLogs';
 import { AdminMetrics } from './pages/AdminMetrics';
+import { AdminTelegramBot } from './pages/AdminTelegramBot';
 
 // Создаем QueryClient для TanStack Query
 const queryClient = new QueryClient({
@@ -32,6 +33,7 @@ export function AdminRoutes() {
                     <Route path="content" element={<AdminContentControl />} />
                     <Route path="logs" element={<AdminLogs />} />
                     <Route path="config" element={<AdminConfig />} />
+                    <Route path="telegram" element={<AdminTelegramBot />} />
                 </Route>
             </Routes>
         </QueryClientProvider>

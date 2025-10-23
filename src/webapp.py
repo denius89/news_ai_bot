@@ -14,6 +14,7 @@ from utils.auth.telegram_auth import verify_telegram_auth
 from routes.news_routes import news_bp
 from routes.events_routes import register_events_routes
 from routes.config_routes import config_bp
+from routes.telegram_admin import telegram_admin_bp
 
 # webapp_bp удален - конфликтовал с serve_react()
 from routes.api_routes import api_bp
@@ -120,12 +121,17 @@ def process_telegram_request():
 
 
 # Настройка CORS для Telegram WebApp
-from config.core.cloudflare import CLOUDFLARE_TUNNEL_URL
+def get_cloudflare_url():
+    """Получает текущий URL Cloudflare tunnel динамически"""
+    from config.core.cloudflare import get_cloudflare_tunnel_url
+
+    return get_cloudflare_tunnel_url()
+
 
 CORS(
     app,
     origins=[  # noqa: E305
-        CLOUDFLARE_TUNNEL_URL,
+        get_cloudflare_url(),
         "https://*.trycloudflare.com",
         "https://telegram.org",
         "https://web.telegram.org",
@@ -139,10 +145,11 @@ def set_frame_options(response):
     """Устанавливает заголовки для разрешения встраивания в iframe"""
     response.headers["X-Frame-Options"] = "ALLOWALL"
     # Обновленная CSP политика для Telegram WebApp
-    # Используем конфигурацию из cloudflare.py
+    # Используем конфигурацию из cloudflare.py динамически
+    cloudflare_url = get_cloudflare_url()
     csp_policy = (
         "frame-ancestors *; "
-        f"connect-src 'self' {CLOUDFLARE_TUNNEL_URL} https://*.trycloudflare.com https://telegram.org https://web.telegram.org wss://*.telegram.org wss://*.web.telegram.org data:; "
+        f"connect-src 'self' {cloudflare_url} https://*.trycloudflare.com https://telegram.org https://web.telegram.org wss://*.telegram.org wss://*.web.telegram.org data:; "
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://telegram.org; "
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
@@ -308,6 +315,7 @@ app.register_blueprint(metrics_bp)
 from routes.admin_routes import admin_bp
 
 app.register_blueprint(admin_bp)  # url_prefix='/admin/api' уже в Blueprint
+app.register_blueprint(telegram_admin_bp)  # Telegram bot admin panel
 
 # WebSocket initialization removed - using FastAPI now
 # if REACTOR_ENABLED:

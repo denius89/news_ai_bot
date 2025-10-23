@@ -14,8 +14,15 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / "config_files" / "en
 
 # ---- CLOUDFLARE TUNNEL CONFIGURATION ----
 
+
 # Основной URL Cloudflare Tunnel
-CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://serves-custody-make-twiki.trycloudflare.com")
+def get_cloudflare_tunnel_url():
+    """Получает URL Cloudflare tunnel динамически"""
+    return os.getenv("CLOUDFLARE_TUNNEL_URL", "https://boutique-mart-visiting-happy.trycloudflare.com")
+
+
+# Для обратной совместимости
+CLOUDFLARE_TUNNEL_URL = get_cloudflare_tunnel_url()
 
 # Локальный URL для туннеля
 CLOUDFLARE_LOCAL_URL = os.getenv("CLOUDFLARE_LOCAL_URL", "http://localhost:8001")

@@ -68,57 +68,53 @@ class SubscriptionService:
         """
         return await self.unsubscribe_from_category(user_id, category)
 
-    async def get_or_create_user(self, telegram_id: int, username: Optional[str] = None) -> Dict:
+    async def get_or_create_user(
+        self,
+        telegram_id: int,
+        username: Optional[str] = None,
+        first_name: Optional[str] = None,
+        language_code: Optional[str] = "ru",
+    ) -> Optional[Dict]:
         """
-        Get or create user in database.
+        Get or create user with normalized name.
+        Uses the same pattern as webapp.
 
         Args:
             telegram_id: Telegram user ID
             username: Optional username
+            first_name: Optional first name
+            language_code: User language code
 
         Returns:
-            User data dictionary
+            User data dictionary or None if failed
         """
         try:
-            if self.async_mode:
-                client = await self.db_service._get_async_client()
-                result = await self.db_service.async_safe_execute(
-                    client.table("users").select("*").eq("telegram_id", telegram_id).single()
-                )
-            else:
-                result = self.db_service.safe_execute(
-                    self.db_service.sync_client.table("users").select("*").eq("telegram_id", telegram_id).single()
-                )
+            # Import here to avoid circular imports
+            from utils.text.name_normalizer import normalize_user_name
+            from database.db_models import create_user, get_user_by_telegram
 
-            if result and result.data:
-                return result.data
+            # Check if user exists
+            existing_user = get_user_by_telegram(telegram_id)
+            if existing_user:
+                return existing_user
 
-            # Create new user
-            user_data = {
-                "telegram_id": telegram_id,
-                "username": username,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            }
+            # Normalize name before creating
+            normalized_name = normalize_user_name(raw_name=first_name, username=username, user_id=telegram_id)
 
-            if self.async_mode:
-                client = await self.db_service._get_async_client()
-                result = await self.db_service.async_safe_execute(
-                    client.table("users").insert(user_data).select().single()
-                )
-            else:
-                result = self.db_service.safe_execute(
-                    self.db_service.sync_client.table("users").insert(user_data).select().single()
-                )
+            # Create user using db_models.create_user (webapp pattern)
+            new_user_id = create_user(
+                telegram_id=telegram_id, username=username, locale=language_code, first_name=normalized_name
+            )
 
-            if result and result.data:
-                return result.data
+            if new_user_id:
+                return {"id": new_user_id, "telegram_id": telegram_id}
             else:
                 logger.error(f"Failed to create user {telegram_id}")
-                return {"telegram_id": telegram_id, "username": username}
+                return None
 
         except Exception as e:
             logger.error(f"Error in get_or_create_user: {e}")
-            return {"telegram_id": telegram_id, "username": username}
+            return None
 
     async def get_user_subscriptions(self, user_id: int) -> Dict[str, List[str]]:
         """

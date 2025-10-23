@@ -1,0 +1,16 @@
+{
+  "rate_limits": {
+    "commands": {
+      "limit": 5,
+      "window": 30
+    }
+  },
+  "features": {
+    "notifications": {
+      "enabled": true,
+      "name": "Уведомления",
+      "description": "Push-уведомления о важных событиях",
+      "details": "Автоматические уведомления при появлении критических новостей"
+    }
+  }
+}

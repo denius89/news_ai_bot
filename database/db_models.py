@@ -518,6 +518,19 @@ def get_user_by_telegram(telegram_id: int) -> dict | None:
         return None
 
 
+def get_user_by_telegram_id(telegram_id: int) -> Optional[Dict]:
+    """
+    Get user by telegram_id (alias for get_user_by_telegram for compatibility).
+
+    Args:
+        telegram_id: Telegram user ID
+
+    Returns:
+        User data dict or None if not found
+    """
+    return get_user_by_telegram(telegram_id)
+
+
 def add_subscription(user_id: str, category: str) -> bool:
     """
     Добавляет подписку на категорию для пользователя.

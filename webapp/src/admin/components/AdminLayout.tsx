@@ -3,7 +3,7 @@
  */
 
 import { cn } from '@/lib/utils';
-import { BarChart3, FileText, LayoutDashboard, LogOut, Settings, Zap } from 'lucide-react';
+import { BarChart3, Bot, FileText, LayoutDashboard, LogOut, Settings, Zap } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
     { path: '/admin/content', icon: Zap, label: 'Контент' },
     { path: '/admin/logs', icon: FileText, label: 'Логи' },
     { path: '/admin/config', icon: Settings, label: 'Настройки' },
+    { path: '/admin/telegram', icon: Bot, label: 'Telegram Bot' },
 ];
 
 export function AdminLayout() {
