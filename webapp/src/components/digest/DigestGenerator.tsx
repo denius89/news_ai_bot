@@ -614,22 +614,28 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                                         Новости за какой период
                                     </p>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {Object.entries(data.periods).map(([key, label]) => (
-                                            <motion.button
-                                                key={key}
-                                                whileHover={{ scale: 1.03 }}
-                                                whileTap={{ scale: 0.97 }}
-                                                className={cn(
-                                                    "chip",
-                                                    selectedPeriod === key
-                                                        ? "chip-active"
-                                                        : "chip-inactive"
-                                                )}
-                                                onClick={() => handlePeriodSelect(key)}
-                                            >
-                                                {label}
-                                            </motion.button>
-                                        ))}
+                                        {Object.entries(data.periods)
+                                            .sort(([a], [b]) => {
+                                                // Сортируем в логичном порядке: сегодня -> неделя -> месяц
+                                                const order = { 'today': 0, '7d': 1, '30d': 2 };
+                                                return (order[a as keyof typeof order] || 999) - (order[b as keyof typeof order] || 999);
+                                            })
+                                            .map(([key, label]) => (
+                                                <motion.button
+                                                    key={key}
+                                                    whileHover={{ scale: 1.03 }}
+                                                    whileTap={{ scale: 0.97 }}
+                                                    className={cn(
+                                                        "chip",
+                                                        selectedPeriod === key
+                                                            ? "chip-active"
+                                                            : "chip-inactive"
+                                                    )}
+                                                    onClick={() => handlePeriodSelect(key)}
+                                                >
+                                                    {label}
+                                                </motion.button>
+                                            ))}
                                     </div>
                                 </motion.section>
 
