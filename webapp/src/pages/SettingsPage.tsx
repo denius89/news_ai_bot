@@ -291,17 +291,18 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
                                             {category.enabled && (
                                                 <div className="space-y-2">
                                                     <p className="text-xs text-muted-strong mb-2">Подкатегории:</p>
-                                                    <div className="grid grid-cols-2 gap-2">
+                                                    <div className="flex flex-wrap gap-2.5">
                                                         {category.subcategories.map((subcategory) => (
-                                                            <Button
+                                                            <button
                                                                 key={subcategory.id}
-                                                                variant={subcategory.enabled ? 'primary' : 'outline'}
-                                                                size="sm"
                                                                 onClick={() => toggleSubcategory(category.id, subcategory.id)}
-                                                                className="justify-start text-sm"
+                                                                className={`chip transition-all duration-200 ${subcategory.enabled
+                                                                    ? 'chip-active'
+                                                                    : 'chip-inactive'
+                                                                    }`}
                                                             >
                                                                 {subcategory.name}
-                                                            </Button>
+                                                            </button>
                                                         ))}
                                                     </div>
                                                 </div>

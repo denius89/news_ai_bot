@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Telegram Bot Admin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            🤖 Telegram Bot Admin
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+            Управление настройками и мониторинг Telegram-бота
+        </p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Всего запросов</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ metrics.total_handler_calls }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ошибки</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ metrics.total_handler_errors }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Активные пользователи</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ metrics.active_users }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+                    <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Среднее время</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ "%.0f"|format(metrics.average_execution_time_ms) }}ms</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="-mb-px flex space-x-8 px-6">
+                <a href="{{ url_for('telegram_admin.dashboard') }}"
+                   class="py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-600 dark:text-blue-400">
+                    📊 Дашборд
+                </a>
+                <a href="{{ url_for('telegram_admin.rate_limits') }}"
+                   class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    ⏱️ Rate Limits
+                </a>
+                <a href="{{ url_for('telegram_admin.metrics') }}"
+                   class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    📈 Метрики
+                </a>
+                <a href="{{ url_for('telegram_admin.features') }}"
+                   class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    ⚙️ Функции
+                </a>
+            </nav>
+        </div>
+
+        <div class="p-6">
+            <!-- Current Rate Limits -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Текущие Rate Limits
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for limit_name, limit_config in rate_limits.rate_limits.items() %}
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-medium text-gray-900 dark:text-white">
+                                {{ limit_config.description }}
+                            </h4>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ limit_name }}
+                            </span>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            <p>Лимит: <span class="font-medium">{{ limit_config.limit }}</span></p>
+                            <p>Окно: <span class="font-medium">{{ limit_config.window }} сек</span></p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Top Commands -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Популярные команды
+                </h3>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    {% if metrics.top_commands %}
+                        {% for command, count in metrics.top_commands.items() %}
+                        <div class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+                            <span class="font-mono text-sm text-gray-900 dark:text-white">{{ command }}</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">{{ count }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-500 dark:text-gray-400">Нет данных</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Features Status -->
+            <div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    Статус функций
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for feature_name, enabled in features.items() %}
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                {{ feature_name.replace('_', ' ').title() }}
+                            </span>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                {% if enabled %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% else %}bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200{% endif %}">
+                                {% if enabled %}Включено{% else %}Отключено{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

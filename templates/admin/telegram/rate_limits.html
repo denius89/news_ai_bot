@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Rate Limits - Telegram Bot Admin{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            ⏱️ Rate Limits
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+            Настройка лимитов для защиты от спама и злоупотреблений
+        </p>
+    </div>
+
+    <!-- Current Settings -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                Текущие настройки
+            </h2>
+        </div>
+        <div class="p-6">
+            <form id="rate-limits-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for limit_name, limit_config in rate_limits.items() %}
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="mb-4">
+                            <h3 class="font-medium text-gray-900 dark:text-white mb-1">
+                                {{ limit_config.description }}
+                            </h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ limit_name }}
+                            </p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Лимит (количество запросов)
+                                </label>
+                                <input type="number"
+                                       name="{{ limit_name }}_limit"
+                                       value="{{ limit_config.limit }}"
+                                       min="1" max="1000"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Окно (секунды)
+                                </label>
+                                <input type="number"
+                                       name="{{ limit_name }}_window"
+                                       value="{{ limit_config.window }}"
+                                       min="1" max="3600"
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="button"
+                            onclick="resetToDefaults()"
+                            class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Сбросить к умолчаниям
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Сохранить изменения
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow mb-8">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">
+                Готовые настройки
+            </h2>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="applyPreset('development')"
+                        class="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-left">
+                    <h3 class="font-medium text-gray-900 dark:text-white mb-2">Разработка</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Быстрое тестирование
+                    </p>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <li>• Дайджест: 5/60 сек</li>
+                        <li>• Подписки: 10/60 сек</li>
+                        <li>• Команды: 20/60 сек</li>
+                    </ul>
+                </button>
+
+                <button onclick="applyPreset('production')"
+                        class="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-left">
+                    <h3 class="font-medium text-gray-900 dark:text-white mb-2">Продакшен</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Стандартные лимиты
+                    </p>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <li>• Дайджест: 1/120 сек</li>
+                        <li>• Подписки: 5/60 сек</li>
+                        <li>• Команды: 10/60 сек</li>
+                    </ul>
+                </button>
+
+                <button onclick="applyPreset('strict')"
+                        class="p-4 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-left">
+                    <h3 class="font-medium text-gray-900 dark:text-white mb-2">Строгие</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        Максимальная защита
+                    </p>
+                    <ul class="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <li>• Дайджест: 1/300 сек</li>
+                        <li>• Подписки: 3/60 сек</li>
+                        <li>• Команды: 5/60 сек</li>
+                    </ul>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Messages -->
+    <div id="status-message" class="hidden fixed top-4 right-4 z-50"></div>
+</div>
+
+<script>
+// Presets
+const presets = {
+    development: {
+        digest_generation: { limit: 5, window: 60 },
+        subscriptions: { limit: 10, window: 60 },
+        commands: { limit: 20, window: 60 },
+        callbacks: { limit: 30, window: 60 }
+    },
+    production: {
+        digest_generation: { limit: 1, window: 120 },
+        subscriptions: { limit: 5, window: 60 },
+        commands: { limit: 10, window: 60 },
+        callbacks: { limit: 20, window: 60 }
+    },
+    strict: {
+        digest_generation: { limit: 1, window: 300 },
+        subscriptions: { limit: 3, window: 60 },
+        commands: { limit: 5, window: 60 },
+        callbacks: { limit: 10, window: 60 }
+    }
+};
+
+function applyPreset(presetName) {
+    const preset = presets[presetName];
+    if (!preset) return;
+
+    // Apply preset values to form
+    Object.keys(preset).forEach(limitName => {
+        const limitConfig = preset[limitName];
+        document.querySelector(`input[name="${limitName}_limit"]`).value = limitConfig.limit;
+        document.querySelector(`input[name="${limitName}_window"]`).value = limitConfig.window;
+    });
+
+    showStatus(`Применен пресет: ${presetName}`, 'success');
+}
+
+function resetToDefaults() {
+    applyPreset('production');
+}
+
+function showStatus(message, type = 'info') {
+    const statusDiv = document.getElementById('status-message');
+    statusDiv.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-md shadow-lg ${
+        type === 'success' ? 'bg-green-100 text-green-800 border border-green-200' :
+        type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' :
+        'bg-blue-100 text-blue-800 border border-blue-200'
+    }`;
+    statusDiv.textContent = message;
+    statusDiv.classList.remove('hidden');
+
+    setTimeout(() => {
+        statusDiv.classList.add('hidden');
+    }, 3000);
+}
+
+// Form submission
+document.getElementById('rate-limits-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const rateLimits = {};
+
+    // Parse form data
+    const limitNames = ['digest_generation', 'subscriptions', 'commands', 'callbacks'];
+    limitNames.forEach(limitName => {
+        const limit = parseInt(formData.get(`${limitName}_limit`));
+        const window = parseInt(formData.get(`${limitName}_window`));
+
+        if (limit && window) {
+            rateLimits[limitName] = { limit, window };
+        }
+    });
+
+    try {
+        const response = await fetch('{{ url_for("telegram_admin.update_rate_limits") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ rate_limits: rateLimits })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showStatus('Лимиты успешно обновлены!', 'success');
+        } else {
+            showStatus(result.error || 'Ошибка при обновлении', 'error');
+        }
+    } catch (error) {
+        showStatus('Ошибка сети', 'error');
+    }
+});
+</script>
+{% endblock %}

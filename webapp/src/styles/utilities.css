@@ -182,31 +182,140 @@
         --tw-ring-offset-color: var(--color-surface);
     }
 
-    /* Chip Components - Unified Filter/Tag Style */
+    /* Chip Components - Soft Glass Style */
     .chip {
-        @apply shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer;
+        /* Единая высота для всех кнопок */
+        @apply inline-flex items-center justify-center rounded-full;
+        @apply h-9 px-3 sm:px-4;
+        @apply select-none whitespace-nowrap cursor-pointer;
+        @apply transition-all duration-200;
+
+        /* ЖЕСТКАЯ фиксация размера шрифта для всех состояний */
+        font-size: 0.75rem !important;
+        /* 12px - как на кнопке "Включено" */
+        line-height: 1rem !important;
+        /* 16px */
+        font-weight: 500 !important;
+        /* Фиксированный вес */
+
+        /* Нормализация рендеринга текста */
+        text-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        /* Soft Glass эффект */
+        min-width: 80px;
+        backdrop-filter: blur(8px);
+    }
+
+    /* Адаптивный размер шрифта только для больших экранов */
+    @media (min-width: 640px) {
+        .chip {
+            font-size: 0.875rem !important;
+            /* 14px - чуть больше для планшетов */
+            line-height: 1.25rem !important;
+            /* 20px */
+        }
+
+        .chip-active,
+        .chip-inactive,
+        .dark .chip-active,
+        .dark .chip-inactive {
+            font-size: 0.875rem !important;
+            /* 14px - принудительно для всех состояний */
+            line-height: 1.25rem !important;
+            /* 20px */
+        }
+    }
+
+    /* Принудительная фиксация для всех состояний chip */
+    .chip-active,
+    .chip-inactive,
+    .dark .chip-active,
+    .dark .chip-inactive {
+        font-size: 0.75rem !important;
+        /* 12px - принудительно для всех состояний */
+        line-height: 1rem !important;
+        /* 16px */
+        font-weight: 500 !important;
+        /* Фиксированный вес */
     }
 
     .chip-active {
+        /* AI Flow gradient */
         background: var(--grad-ai-flow);
         @apply text-white;
-        box-shadow: 0 0 12px rgba(0, 166, 200, 0.3);
+        /* Soft glow эффект */
+        box-shadow: 0 0 12px var(--holo-glow), 0 0 20px rgba(0, 166, 200, 0.15);
+        border: 1px solid rgba(0, 166, 200, 0.3);
+    }
+
+    .chip-active:hover {
+        box-shadow: 0 0 16px var(--holo-glow), 0 0 24px rgba(0, 166, 200, 0.2);
+        transform: translateY(-1px);
     }
 
     .chip-inactive {
-        @apply bg-white text-text hover:bg-gray-50;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        /* Soft Glass фон */
+        background: var(--color-surface-alt);
+        @apply text-text;
+        border: 1px solid var(--color-border);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+            0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .chip-inactive:hover {
+        background: var(--color-surface);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+        @apply text-primary;
     }
 
     /* Dark theme variants */
     .dark .chip-active {
         background: var(--grad-ai-flow);
         @apply text-white;
-        box-shadow: 0 0 12px rgba(0, 166, 200, 0.3);
+        box-shadow: 0 0 16px var(--holo-glow), 0 0 24px rgba(0, 166, 200, 0.2);
+        border: 1px solid rgba(0, 166, 200, 0.4);
+    }
+
+    .dark .chip-active:hover {
+        box-shadow: 0 0 20px var(--holo-glow), 0 0 28px rgba(0, 166, 200, 0.25);
+        transform: translateY(-1px);
     }
 
     .dark .chip-inactive {
-        @apply bg-surface-alt text-muted hover:bg-surfaceAlt border-transparent;
+        /* Dark Soft Glass */
+        background: rgba(255, 255, 255, 0.04);
+        @apply text-muted;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+            0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .dark .chip-inactive:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--color-primary);
+        transform: translateY(-1px);
+        @apply text-primary;
+    }
+
+    /* Compact spacing utilities */
+    .space-y-compact>*+* {
+        margin-top: 0.5rem;
+        /* 8px mobile */
+    }
+
+    @media (min-width: 640px) {
+        .space-y-compact>*+* {
+            margin-top: 0.75rem;
+            /* 12px tablet+ */
+        }
+    }
+
+    .space-y-tight>*+* {
+        margin-top: 0.5rem;
+        /* 8px */
     }
 
     /* Accessibility utilities */

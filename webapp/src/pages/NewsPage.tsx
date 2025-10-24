@@ -12,9 +12,9 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { FilterBar } from '../components/ui/FilterBar';
 import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
-import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
+import { formatCount, PLURAL_FORMS } from '../utils/formatters';
 import { shouldReduceMotion } from '../utils/performance';
 
 interface NewsItem {
@@ -38,12 +38,7 @@ interface NewsPageProps {
 
 // Утилита для склонения чисел
 function getNewsLabel(count: number) {
-    const mod10 = count % 10;
-    const mod100 = count % 100;
-    if (mod10 === 1 && mod100 !== 11) return "новость";
-    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
-        return "новости";
-    return "новостей";
+    return formatCount(count, PLURAL_FORMS.NEWS);
 }
 
 // Маппинг icon codes в emoji
@@ -583,13 +578,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
         <div className="min-h-screen bg-bg">
             <Header
                 title="Новости"
-                subtitle={`${filteredNews.length} ${getNewsLabel(filteredNews.length)}`}
+                subtitle={getNewsLabel(filteredNews.length)}
                 icon={<Newspaper className="w-6 h-6 text-primary" />}
             />
 
-            <main className="container-main">
-                {/* Убрали индикатор свайпа - теперь только infinite scroll */}
-
+            <main className="container-main pb-16 sm:pb-20 lg:pb-24 px-3 sm:px-4">
                 {/* Debug info - показываем состояние загрузки */}
                 {process.env.NODE_ENV === 'development' && (
                     <div className="fixed top-4 right-4 bg-black/80 text-white text-xs p-2 rounded-lg z-50">
@@ -604,57 +597,56 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="space-y-6"
+                    className="space-y-3"
                 >
                     {/* Category Filters */}
                     <motion.section variants={itemVariants}>
-                        <FilterCard>
+                        <FilterCard className="p-3">
                             {/* Основные категории */}
                             <div>
-                                <p className="text-xs text-muted mb-2 text-center">Категории</p>
                                 <FilterBar
                                     type="category"
                                     options={categories}
                                     activeId={selectedCategory}
                                     onChange={handleCategorySelect}
+                                    hint="AI обновляет подборку по выбранным категориям"
                                 />
                             </div>
 
                             {/* Подкатегории (показывается только если категория выбрана) */}
                             {selectedCategory !== 'all' && availableSubcategories.length > 0 && (
-                                <div>
-                                    <p className="text-xs text-muted mb-2 text-center">Подкатегории</p>
-                                    <FilterBar
-                                        type="category"
-                                        options={availableSubcategories.map(sub => ({ id: sub.id, label: sub.label }))}
-                                        activeId={selectedSubcategory || ''}
-                                        onChange={handleSubcategorySelect}
-                                    />
-                                </div>
+                                <>
+                                    {/* Разделитель */}
+                                    <div className="flex items-center my-2 sm:my-3">
+                                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                                        <span className="px-2 sm:px-3 text-[10px] sm:text-xs text-muted-foreground font-medium">Подкатегории</span>
+                                        <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                                    </div>
+
+                                    <div>
+                                        <FilterBar
+                                            type="category"
+                                            options={availableSubcategories.map(sub => ({ id: sub.id, label: sub.label }))}
+                                            activeId={selectedSubcategory || ''}
+                                            onChange={handleSubcategorySelect}
+                                        />
+                                    </div>
+                                </>
                             )}
                         </FilterCard>
                     </motion.section>
 
-                    {/* Section Hint */}
-                    <motion.section variants={itemVariants}>
-                        <SectionHint
-                            icon="✨"
-                            title="Новости по твоим подпискам"
-                            subtitle="AI отбирает самое интересное для тебя"
-                        />
-                    </motion.section>
-
                     {/* News List */}
                     <motion.section variants={itemVariants}>
-                        <div className="space-y-4">
+                        <div className="space-y-2 sm:space-y-3">
                             {filteredNews.map((item) => (
                                 <div
                                     key={item.id}
-                                    className={`card p-5 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}`}
+                                    className={`card p-3 sm:p-4 transition-all duration-300 ${!reduceMotion ? 'hover:scale-[1.01]' : ''}`}
                                 >
                                     <div>
                                         <div className="flex justify-between items-start">
-                                            <h3 className="text-lg font-semibold text-text dark:text-white leading-snug">
+                                            <h3 className="text-base sm:text-lg font-semibold text-text dark:text-white leading-snug">
                                                 {truncateText(item.title, 100)}
                                             </h3>
                                             <span className="ml-2 text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">
@@ -681,7 +673,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                             {truncateText(item.content, 200)}
                                         </p>
 
-                                        <div className="mt-4 flex justify-between items-center text-sm">
+                                        <div className="mt-3 flex justify-between items-center text-sm">
                                             <div className="flex items-center gap-1">
                                                 {getImportanceStars(item.importance)}
                                             </div>
@@ -740,22 +732,22 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
                     {/* Empty State с динамическими сообщениями */}
                     {filteredNews.length === 0 && !loading && (
-                        <motion.section variants={itemVariants} className="text-center py-20">
-                            <div className="flex justify-center mb-4">
-                                <Newspaper className="w-16 h-16 text-muted" />
+                        <motion.section variants={itemVariants} className="text-center py-12">
+                            <div className="flex justify-center mb-3">
+                                <Newspaper className="w-12 h-12 text-muted" />
                             </div>
-                            <h3 className="text-xl font-semibold text-text mb-2">
+                            <h3 className="text-lg font-semibold text-text mb-2">
                                 {selectedCategory === 'all'
-                                    ? 'Пока ничего нет'
+                                    ? 'Нет свежих новостей'
                                     : `В этой категории пусто`
                                 }
                             </h3>
-                            <p className="text-muted-strong mb-6">
+                            <p className="text-muted-strong mb-4">
                                 {selectedSubcategory
                                     ? 'Попробуй другую подкатегорию'
                                     : selectedCategory !== 'all'
                                         ? 'Попробуй другую категорию или смотри всё'
-                                        : 'Попробуй позже'
+                                        : 'Пока пусто — AI обновит позже'
                                 }
                             </p>
                             {selectedCategory !== 'all' && (
@@ -772,7 +764,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                     {/* Индикатор при малом количестве новостей */}
                     {filteredNews.length > 0 && filteredNews.length < 10 && !hasMoreNews && !loading && (
                         <motion.section variants={itemVariants}>
-                            <div className="text-center py-4">
+                            <div className="text-center py-3">
                                 <p className="text-sm text-muted-strong">
                                     💡 Нашли только {filteredNews.length} {getNewsLabel(filteredNews.length)}.
                                     {selectedCategory !== 'all' && ' Попробуй другие фильтры'}

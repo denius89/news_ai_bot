@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { FilterBar } from '../components/ui/FilterBar';
 import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
-import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 
@@ -630,8 +629,7 @@ const DigestPage: React.FC<DigestPageProps> = () => {
             )}
 
             <Header
-                title="AI Дайджест"
-                subtitle="Ваши персональные дайджесты"
+                title="AI Дайджесты"
                 icon={<Sparkles className="w-6 h-6 text-primary" />}
                 actions={
                     activeTab === 'active' && (
@@ -641,30 +639,31 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                 setSelectedDigest(null);
                                 setIsGeneratorOpen(true);
                             }}
-                            className="px-3 py-1.5 rounded-lg font-medium text-xs text-white
-                         bg-ai-flow hover:shadow-[0_0_8px_rgba(0,166,200,0.3)]
-                         active:scale-95 transition-all duration-200 flex items-center gap-1.5"
+                            className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg font-medium
+                                     text-[10px] sm:text-xs text-white bg-ai-flow
+                                     hover:shadow-[0_0_8px_rgba(0,166,200,0.3)]
+                                     active:scale-95 transition-all duration-200
+                                     flex items-center gap-1 sm:gap-1.5"
                         >
-                            <Sparkles className="w-3.5 h-3.5" />
+                            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             Создать
                         </motion.button>
                     )
                 }
             />
 
-            <main className="container-main pb-32">
+            <main className="container-main pb-16 sm:pb-20 lg:pb-24 px-3 sm:px-4">
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="space-y-6"
+                    className="space-y-2 sm:space-y-3"
                 >
                     {/* Фильтры */}
                     <motion.section variants={itemVariants}>
-                        <FilterCard>
+                        <FilterCard className="p-3">
                             {/* Табы статуса */}
                             <div>
-                                <p className="text-xs text-muted mb-2 text-center">Статус</p>
                                 <FilterBar
                                     type="status"
                                     options={[
@@ -679,29 +678,20 @@ const DigestPage: React.FC<DigestPageProps> = () => {
 
                             {/* Категории */}
                             <div>
-                                <p className="text-xs text-muted mb-2 text-center">Категории</p>
                                 <FilterBar
                                     type="category"
                                     options={Object.entries(categories).map(([key, label]) => ({ id: key, label }))}
                                     activeId={selectedCategory}
                                     onChange={setSelectedCategory}
+                                    hint="Фильтры влияют на подборку AI-дайджестов"
                                 />
                             </div>
                         </FilterCard>
                     </motion.section>
 
-                    {/* Section Hint */}
-                    <motion.section variants={itemVariants}>
-                        <SectionHint
-                            icon="💫"
-                            title="Ваши персональные AI-дайджесты"
-                            subtitle="AI собирает и анализирует важное по выбранным категориям"
-                        />
-                    </motion.section>
-
                     {/* Digest List */}
                     <motion.section variants={itemVariants}>
-                        <div className="space-y-4">
+                        <div className="space-y-2 sm:space-y-3">
                             {filteredDigests.map((digest, index) => (
                                 <motion.div
                                     key={digest.id}
@@ -710,8 +700,8 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                                 >
                                     <motion.div
                                         className="card backdrop-blur-md border border-border
-                               rounded-3xl p-5 pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.05)]
-                               hover:scale-[1.02] transition-transform duration-300 ease-out mt-4"
+                               rounded-3xl p-3 sm:p-4 pb-3 sm:pb-4 shadow-[0_6px_20px_rgba(0,0,0,0.05)]
+                               hover:scale-[1.02] transition-transform duration-300 ease-out"
                                         whileHover={{ scale: 1.02 }}
                                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                     >
@@ -843,13 +833,13 @@ const DigestPage: React.FC<DigestPageProps> = () => {
                         <motion.div
                             animate={{ scale: [1, 1.05, 1] }}
                             transition={{ duration: 2, repeat: Infinity }}
-                            className="flex flex-col items-center justify-center p-8 rounded-3xl card mt-6"
+                            className="flex flex-col items-center justify-center p-6 rounded-3xl card"
                         >
-                            <Bot className="w-10 h-10 text-primary mb-3" />
+                            <Bot className="w-8 h-8 text-primary mb-2" />
                             <p className="text-muted text-sm">
-                                {activeTab === 'active' && "Пока пусто — но AI уже готов собрать первый дайджест."}
-                                {activeTab === 'archived' && "В архиве пока ничего нет."}
-                                {activeTab === 'deleted' && "Корзина пуста."}
+                                {activeTab === 'active' && "Создай свой первый дайджест"}
+                                {activeTab === 'archived' && "В архиве пока ничего нет"}
+                                {activeTab === 'deleted' && "Корзина пуста"}
                             </p>
                         </motion.div>
                     )}

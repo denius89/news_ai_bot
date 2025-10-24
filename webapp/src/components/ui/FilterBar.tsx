@@ -13,6 +13,7 @@ interface FilterBarProps {
     activeId: string;
     onChange: (id: string) => void;
     className?: string;
+    hint?: string; // Опциональная подсказка под фильтрами
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -20,25 +21,33 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     options,
     activeId,
     onChange,
-    className
+    className,
+    hint
 }) => {
     return (
-        <div className={cn('flex flex-wrap justify-center gap-2', className)}>
-            {options.map((option) => (
-                <motion.button
-                    key={option.id}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => onChange(option.id)}
-                    className={cn(
-                        'chip transition-all duration-200 ease-out',
-                        activeId === option.id
-                            ? 'chip-active'
-                            : 'chip-inactive'
-                    )}
-                >
-                    {option.label}
-                </motion.button>
-            ))}
+        <div>
+            <div className={cn('flex flex-wrap justify-center gap-2.5', className)}>
+                {options.map((option) => (
+                    <motion.button
+                        key={option.id}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => onChange(option.id)}
+                        className={cn(
+                            'chip transition-all duration-200 ease-out',
+                            activeId === option.id
+                                ? 'chip-active'
+                                : 'chip-inactive'
+                        )}
+                    >
+                        {option.label}
+                    </motion.button>
+                ))}
+            </div>
+            {hint && (
+                <p className="text-xs text-muted-foreground mt-2 pl-1 text-center">
+                    {hint}
+                </p>
+            )}
         </div>
     );
 };

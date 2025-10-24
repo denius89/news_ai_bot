@@ -288,8 +288,8 @@ const HomePage: React.FC<HomePageProps> = ({ theme, onThemeToggle, onNavigate })
                                         </CardHeader>
                                         <CardContent>
                                             <Button
-                                                variant="outline"
-                                                className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary transition-all duration-200"
+                                                variant="primary"
+                                                className="w-full"
                                                 onClick={() => onNavigate?.(action.page)}
                                             >
                                                 {action.title === 'AI Дайджест' ? 'Открыть дайджесты' :

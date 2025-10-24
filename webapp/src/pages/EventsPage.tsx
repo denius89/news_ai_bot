@@ -5,9 +5,9 @@ import { Card } from '../components/ui/Card';
 import { FilterBar } from '../components/ui/FilterBar';
 import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
-import { SectionHint } from '../components/ui/SectionHint';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
+import { formatCount, PLURAL_FORMS } from '../utils/formatters';
 
 interface Event {
     id: number;
@@ -254,7 +254,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
         <div className="min-h-screen bg-bg">
             <Header
                 title="События"
-                subtitle={isFilteredBySubscriptions ? "По твоим подпискам" : `${filteredEvents.length} событий`}
+                subtitle={isFilteredBySubscriptions ? "Ближайшие события" : formatCount(filteredEvents.length, PLURAL_FORMS.EVENTS)}
                 icon={<Calendar className="w-6 h-6 text-primary" />}
                 actions={
                     <motion.button
@@ -271,10 +271,9 @@ const EventsPage: React.FC<EventsPageProps> = () => {
             />
 
             {/* Filters */}
-            <FilterCard className="mx-4 mb-4">
+            <FilterCard className="mx-4 mb-3 p-3">
                 {/* Date Range Filter */}
                 <div>
-                    <p className="text-xs text-muted mb-2 text-center">Период</p>
                     <FilterBar
                         type="time"
                         options={[
@@ -289,7 +288,6 @@ const EventsPage: React.FC<EventsPageProps> = () => {
 
                 {/* Category Filter */}
                 <div>
-                    <p className="text-xs text-muted mb-2 text-center">Категории</p>
                     <FilterBar
                         type="category"
                         options={[
@@ -306,30 +304,31 @@ const EventsPage: React.FC<EventsPageProps> = () => {
 
                 {/* Subcategory Filter (if category selected) */}
                 {category !== 'all' && getSubcategories().length > 0 && (
-                    <div>
-                        <p className="text-xs text-muted mb-2 text-center">Подкатегории</p>
-                        <FilterBar
-                            type="category"
-                            options={[
-                                { id: 'all', label: 'Все' },
-                                ...getSubcategories().map(([key, sub]) => ({ id: key, label: sub.name }))
-                            ]}
-                            activeId={subcategory}
-                            onChange={setSubcategory}
-                        />
-                    </div>
+                    <>
+                        {/* Разделитель */}
+                        <div className="flex items-center my-3">
+                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                            <span className="px-3 text-xs text-muted-foreground font-medium">Подкатегории</span>
+                            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
+                        </div>
+
+                        <div>
+                            <FilterBar
+                                type="category"
+                                options={[
+                                    { id: 'all', label: 'Все' },
+                                    ...getSubcategories().map(([key, sub]) => ({ id: key, label: sub.name }))
+                                ]}
+                                activeId={subcategory}
+                                onChange={setSubcategory}
+                            />
+                        </div>
+                    </>
                 )}
             </FilterCard>
 
-            {/* Section Hint */}
-            <SectionHint
-                icon="🗓️"
-                title="Предстоящие события по вашим подпискам"
-                subtitle="AI показывает только важные матчи, релизы и конференции"
-            />
-
             {/* Content */}
-            <main className="container-main pb-32">
+            <main className="container-main pb-24">
                 {loading && (
                     <div className="text-center py-8">
                         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -344,10 +343,10 @@ const EventsPage: React.FC<EventsPageProps> = () => {
                 )}
 
                 {!loading && !error && filteredEvents.length === 0 && (
-                    <Card className="p-8">
+                    <Card className="p-6">
                         <div className="text-center">
-                            <Calendar className="w-12 h-12 mx-auto text-[var(--color-text)]-secondary/50" />
-                            <p className="mt-2 text-[var(--color-text)]-secondary">Событий пока нет</p>
+                            <Calendar className="w-10 h-10 mx-auto text-[var(--color-text)]-secondary/50" />
+                            <p className="mt-2 text-[var(--color-text)]-secondary">Нет новых событий</p>
                         </div>
                     </Card>
                 )}
