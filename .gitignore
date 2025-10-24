@@ -3,7 +3,6 @@
 
 # Virtual environment
 venv/
-.env
 
 # Python caches
 __pycache__/
@@ -23,64 +22,32 @@ __pycache__/
 .idea/
 
 # Logs
-logs/# Операционная система
-.DS_Store
+logs/
+logs/app.log
+logs/*.log
 
-# Виртуальное окружение
-venv/
-
-# Python кэш
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Базы данных
-*.sqlite3
-
-# Конфигурация окружения
+# Environment files (всех типов в любых папках)
 .env
 .env.backup
 .env.backup*
 .env.local
 .env.*.local
-
-# IDE / Editor
-.vscode/
-.idea/
-
-# Логи
-logs/__pycache__/
-.env
-*.sqlite3
-.DS_Store
-
-# виртуальное окружение
-venv/
-
-# кеши Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# env
-.env
-
-# IDE/Editor
-.vscode/
-.idea/
-
-logs/app.log
-logs/*.log
-logs/
-
-# Environment files (всех типов в любых папках)
 **/.env*
 **/.env.backup*
 **/.env.bak*
 **/.env.stash*
 config_files/environment/.env*
 
+# Cache files
+cache/
+cache/feeds/
+cache/feeds_meta/
+
+# Model backups
+models/*_backup_*.pkl
+
 # Runtime state files
 data/progress_state.json
+
+# PID files
+*.pid
