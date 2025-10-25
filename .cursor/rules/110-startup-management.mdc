@@ -1,0 +1,169 @@
+# 🚀 Startup Management Rules
+
+## ⚠️ CRITICAL: Always Use venv/bin/python
+
+**NEVER use:**
+- `python` (command not found)
+- `python3` (system Python, not venv)
+- `source venv/bin/activate && python` (unreliable)
+
+**ALWAYS use:**
+- `venv/bin/python` (direct path to venv Python)
+
+## 🛑 Process Management
+
+### Before Starting Services:
+1. **Check for existing processes:**
+   ```bash
+   ps aux | grep -E "(venv/bin/python|telegram_bot|webapp)"
+   ```
+
+2. **Stop old processes:**
+   ```bash
+   pkill -f "venv/bin/python.*src/webapp.py"
+   pkill -f "venv/bin/python.*-m telegram_bot.bot"
+   pkill -f "cloudflared tunnel"
+   ```
+
+3. **Wait for cleanup:**
+   ```bash
+   sleep 2
+   ```
+
+### Process Patterns:
+- **Flask:** `venv/bin/python src/webapp.py`
+- **Bot:** `venv/bin/python -m telegram_bot.bot`
+- **Cloudflare:** `cloudflared tunnel --url http://localhost:8001`
+
+## 📋 Startup Scripts
+
+### Use Correct Scripts:
+- **All services:** `./start_services.sh`
+- **Bot only:** `./start_bot.sh`
+- **Cloudflare only:** `./start_cloudflare.sh`
+- **Stop all:** `./stop_services.sh`
+- **Check status:** `./check_processes.sh`
+
+### Never Run Services Manually:
+```bash
+# ❌ WRONG
+python -m telegram_bot.bot
+python3 src/webapp.py
+
+# ✅ CORRECT
+./start_bot.sh
+./start_services.sh
+```
+
+## 🔍 Environment Checks
+
+### Before Starting:
+1. **Check venv exists:**
+   ```bash
+   if [ ! -d "venv" ]; then
+       echo "❌ Virtual environment not found!"
+       exit 1
+   fi
+   ```
+
+2. **Check .env exists:**
+   ```bash
+   if [ ! -f ".env" ]; then
+       echo "❌ .env file not found!"
+       exit 1
+   fi
+   ```
+
+3. **Check Flask is running (for Cloudflare):**
+   ```bash
+   curl -s http://localhost:8001/webapp > /dev/null 2>&1
+   ```
+
+## 🚫 Common Mistakes
+
+### Telegram Bot Conflicts:
+- **Problem:** "TelegramConflictError: Conflict: terminated by other getUpdates request"
+- **Cause:** Multiple bot instances running
+- **Solution:** Always stop old processes before starting new ones
+
+### Python Command Not Found:
+- **Problem:** "python: command not found"
+- **Cause:** Using `python` instead of `venv/bin/python`
+- **Solution:** Always use full path to venv Python
+
+### Port Already in Use:
+- **Problem:** Flask fails to start
+- **Cause:** Old Flask process still running
+- **Solution:** Use `./stop_services.sh` before `./start_services.sh`
+
+## 📊 Status Checking
+
+### Check All Services:
+```bash
+./check_processes.sh
+```
+
+### Check Individual Services:
+```bash
+# Flask
+curl -s http://localhost:8001/webapp | head -3
+
+# Bot (check logs)
+tail -5 logs/app.log
+
+# Cloudflare
+curl -s https://your-url.trycloudflare.com/webapp | head -3
+```
+
+## 🔧 Troubleshooting Commands
+
+### Kill All PulseAI Processes:
+```bash
+pkill -f "venv/bin/python.*src/webapp.py"
+pkill -f "venv/bin/python.*-m telegram_bot.bot"
+pkill -f "cloudflared tunnel"
+```
+
+### Check Process Details:
+```bash
+ps aux | grep -E "(venv/bin/python|telegram_bot|webapp|cloudflared)"
+```
+
+### View Logs:
+```bash
+tail -f logs/app.log      # Main app logs
+tail -f logs/webapp.log  # Flask logs
+tail -f logs/bot.log     # Bot logs
+tail -f logs/cloudflare.log # Cloudflare logs
+```
+
+## 🎯 Best Practices
+
+1. **Always use scripts** - never run services manually
+2. **Stop before start** - prevent conflicts
+3. **Check status** - verify services are running
+4. **Read logs** - debug issues quickly
+5. **Use venv/bin/python** - avoid Python path issues
+6. **Wait between operations** - allow processes to clean up
+
+## 📝 Quick Reference
+
+```bash
+# Full restart
+./stop_services.sh && ./start_services.sh
+
+# Bot only
+./stop_services.sh && ./start_bot.sh
+
+# Check everything
+./check_processes.sh
+
+# View logs
+tail -f logs/app.log
+```
+
+---
+
+**Priority:** HIGH
+**Impact:** Prevents startup failures and conflicts
+**Version:** 1.0

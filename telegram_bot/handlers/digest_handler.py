@@ -167,7 +167,26 @@ class TelegramDigestHandler:
             Escaped text
         """
         # Characters that need escaping in Markdown v2
-        escape_chars = ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]
+        escape_chars = [
+            "_",
+            "*",
+            "[",
+            "]",
+            "(",
+            ")",
+            "~",
+            "`",
+            ">",
+            "#",
+            "+",
+            "-",
+            "=",
+            "|",
+            "{",
+            "}",
+            ".",
+            "!",
+        ]
 
         for char in escape_chars:
             text = text.replace(char, f"\\{char}")
@@ -430,7 +449,11 @@ class TelegramDigestHandler:
             # Check if autopublish is enabled
             if not self.enabled:
                 publish_logger.info("Autopublish is disabled")
-                return {"success": False, "reason": "disabled", "message": "Autopublish is disabled"}
+                return {
+                    "success": False,
+                    "reason": "disabled",
+                    "message": "Autopublish is disabled",
+                }
 
             # Get unpublished digests
             digests = await self._get_unpublished_digests()

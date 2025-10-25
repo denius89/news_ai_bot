@@ -94,11 +94,11 @@ echo ""
 # Автоматическое восстановление .env файла
 if [ ! -f ".env" ]; then
     log_warning "⚠️ Файл .env отсутствует"
-    
+
     # Проверяем наличие бэкапов в git stash
     if git stash list | grep -q "env-backup\|production config\|initial backup" 2>/dev/null; then
         log_info "📦 Восстанавливаю .env из последнего бэкапа..."
-        
+
         # Восстанавливаем без удаления из стеша
         if git checkout stash@{0} -- .env >> "$LOG_FILE" 2>&1; then
             # Убираем из staged area
@@ -119,10 +119,17 @@ else
 fi
 echo ""
 
+# Проверяем существование виртуального окружения
+if [ ! -d "venv" ]; then
+    log_error "❌ Виртуальное окружение не найдено!"
+    log_error "💡 Создайте виртуальное окружение: python3 -m venv venv"
+    exit 1
+fi
+
 # Проверяем здоровье проекта (если не отключено)
 if [ "$SKIP_HEALTH_CHECK" = false ]; then
     log_info "🔍 Проверка здоровья проекта..."
-    if python3 scripts/health_check.py >> "$LOG_FILE" 2>&1; then
+    if venv/bin/python scripts/health_check.py >> "$LOG_FILE" 2>&1; then
         log_success "✅ Проект здоров, продолжаем запуск..."
     else
         log_error "❌ Проверка здоровья не пройдена!"
@@ -140,17 +147,52 @@ fi
 export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
 log "INFO" "PYTHONPATH установлен: $PYTHONPATH"
 
+# Функция принудительной очистки всех процессов
+force_kill_all_instances() {
+    log_info "🧹 Принудительная очистка всех экземпляров сервисов..."
+
+    # Убиваем все Flask процессы
+    if pkill -9 -f "Python.*src/webapp.py" 2>/dev/null; then
+        log_warning "⚠️ Принудительно остановлены Flask процессы"
+        sleep 1
+    fi
+
+    # Убиваем все Telegram Bot процессы
+    if pkill -9 -f "Python.*telegram_bot" 2>/dev/null; then
+        log_warning "⚠️ Принудительно остановлены Telegram Bot процессы"
+        sleep 1
+    fi
+
+    # Проверяем что всё убито
+    FLASK_COUNT=$(ps aux | grep -E "Python.*src/webapp.py" | grep -v grep | wc -l)
+    BOT_COUNT=$(ps aux | grep -E "Python.*telegram_bot" | grep -v grep | wc -l)
+
+    if [ "$FLASK_COUNT" -eq 0 ] && [ "$BOT_COUNT" -eq 0 ]; then
+        log_success "✅ Все процессы успешно остановлены"
+    else
+        log_error "❌ Остались процессы: Flask=$FLASK_COUNT, Bot=$BOT_COUNT"
+        log_error "Запуск прерван для безопасности"
+        exit 1
+    fi
+}
+
+# Вызвать функцию перед запуском
+force_kill_all_instances
+echo ""
+
 # Останавливаем старые процессы
 log_info "🔄 Остановка старых процессов..."
-pkill -f "python.*webapp.py" 2>/dev/null || true
-pkill -f "python.*telegram_bot" 2>/dev/null || true
+pkill -f "venv/bin/python.*src/webapp.py" 2>/dev/null || true
+pkill -f "venv/bin/python.*-m telegram_bot.bot" 2>/dev/null || true
+pkill -f "python3.*src/webapp.py" 2>/dev/null || true
+pkill -f "python3.*telegram_bot" 2>/dev/null || true
 sleep 2
 log_success "✅ Старые процессы остановлены"
 echo ""
 
 # Запускаем Flask WebApp
 log_info "🌐 Запуск Flask WebApp..."
-python3 src/webapp.py > logs/webapp.log 2>&1 &
+venv/bin/python src/webapp.py > logs/webapp.log 2>&1 &
 FLASK_PID=$!
 log "INFO" "Flask WebApp запущен с PID: $FLASK_PID"
 
@@ -170,7 +212,7 @@ echo ""
 
 # Запускаем Telegram Bot
 log_info "🤖 Запуск Telegram Bot..."
-python3 -m telegram_bot.bot > logs/bot.log 2>&1 &
+venv/bin/python -m telegram_bot.bot > logs/bot.log 2>&1 &
 BOT_PID=$!
 log "INFO" "Telegram Bot запущен с PID: $BOT_PID"
 
@@ -189,7 +231,7 @@ fi
 echo ""
 
 # Получаем URL из конфига
-WEBAPP_URL=$(python3 -c "
+WEBAPP_URL=$(venv/bin/python -c "
 import sys
 sys.path.append('/Users/denisfedko/news_ai_bot')
 try:

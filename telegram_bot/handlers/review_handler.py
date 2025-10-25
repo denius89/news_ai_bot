@@ -154,7 +154,8 @@ class ReviewHandler:
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="✅ Опубликовать", callback_data=f"approve_{review_request.digest_id}"
+                            text="✅ Опубликовать",
+                            callback_data=f"approve_{review_request.digest_id}",
                         ),
                         InlineKeyboardButton(text="❌ Пропустить", callback_data=f"reject_{review_request.digest_id}"),
                     ],
@@ -167,7 +168,10 @@ class ReviewHandler:
 
             # Send message to admin
             message = await self.bot.send_message(
-                chat_id=self.admin_id, text=preview_text, reply_markup=keyboard, parse_mode="Markdown"
+                chat_id=self.admin_id,
+                text=preview_text,
+                reply_markup=keyboard,
+                parse_mode="Markdown",
             )
 
             review_request.admin_message_id = message.message_id

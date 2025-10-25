@@ -90,23 +90,27 @@ fi
 echo ""
 log_info "🔍 Принудительная остановка по имени процесса..."
 
+
 # Принудительная остановка по имени процесса
 KILLED_PROCESSES=false
 
-if pkill -f "python3 src/webapp.py" 2>/dev/null; then
+# Flask - любой Python с src/webapp.py
+if pkill -f "Python.*src/webapp.py" 2>/dev/null; then
     log_warning "⚠️ Остановлены дополнительные процессы Flask"
     KILLED_PROCESSES=true
 fi
 
-if pkill -f "python3 telegram_bot/bot.py" 2>/dev/null; then
-    log_warning "⚠️ Остановлены дополнительные процессы Bot (telegram_bot/bot.py)"
-    KILLED_PROCESSES=true
-fi
-
-if pkill -f "python3 -m telegram_bot.bot" 2>/dev/null; then
+# Telegram Bot - любой Python с telegram_bot
+if pkill -f "Python.*telegram_bot.bot" 2>/dev/null; then
     log_warning "⚠️ Остановлены дополнительные процессы Bot (telegram_bot.bot)"
     KILLED_PROCESSES=true
 fi
+
+if pkill -f "Python.*-m telegram_bot" 2>/dev/null; then
+    log_warning "⚠️ Остановлены дополнительные процессы Bot (-m telegram_bot)"
+    KILLED_PROCESSES=true
+fi
+
 
 if [ "$KILLED_PROCESSES" = false ]; then
     log_success "✅ Дополнительных процессов не найдено"
@@ -120,7 +124,6 @@ log_success "✅ Lock и PID файлы очищены"
 
 echo ""
 log_success "✅ Все сервисы остановлены"
-echo -e "${YELLOW}💡 Cloudflare Tunnel продолжает работать${NC}"
 echo -e "${CYAN}📋 Лог остановки: $LOG_FILE${NC}"
 
 log "INFO" "Остановка завершена успешно"
