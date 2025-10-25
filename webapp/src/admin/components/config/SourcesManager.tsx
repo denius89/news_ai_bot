@@ -163,11 +163,11 @@ export function SourcesManager() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {Object.entries(sources.structure).map(([category, subcategories]) => (
+                                {sources.structure && typeof sources.structure === 'object' && Object.entries(sources.structure).map(([category, subcategories]) => (
                                     <div key={category} className="border rounded p-4">
                                         <h3 className="text-lg font-semibold capitalize mb-3">{category}</h3>
                                         <div className="space-y-3">
-                                            {Object.entries(subcategories).map(([subcat, data]) => (
+                                            {subcategories && typeof subcategories === 'object' && Object.entries(subcategories).map(([subcat, data]) => (
                                                 <div key={subcat} className="pl-4 border-l-2 border-muted">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <span className="font-medium">{subcat}</span>

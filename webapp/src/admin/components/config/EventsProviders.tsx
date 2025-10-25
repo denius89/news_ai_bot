@@ -103,7 +103,7 @@ export function EventsProviders() {
                             </div>
                         </button>
 
-                        {eventsData?.categories && Object.entries(eventsData.categories).map(([category, count]: [string, any]) => {
+                        {eventsData?.categories && typeof eventsData.categories === 'object' && Object.entries(eventsData.categories).map(([category, count]: [string, any]) => {
                             const categoryNames: { [key: string]: string } = {
                                 'sports': 'Спорт',
                                 'crypto': 'Криптовалюты',

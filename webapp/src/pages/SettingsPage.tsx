@@ -7,6 +7,7 @@ import { Header } from '../components/ui/Header';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
 import { useUserPreferences } from '../hooks/useUserPreferences';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface Category {
     id: string;
@@ -40,19 +41,23 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
         updatePreferences
     } = useUserPreferences(userId, authHeaders);
 
+    // Use translation hook
+    const { getCategoryName, getSubcategoryName } = useTranslation();
+
     // Map preferences to UI format with useMemo for performance
     const categories = useMemo(() => {
         if (!categoriesStructure) return [];
 
-        return Object.entries(categoriesStructure).map(([catId, catData]: [string, any]) => {
+        return Object.keys(categoriesStructure).map(catId => {
+            const catData = categoriesStructure[catId];
             const userCatPref = userPreferences ? userPreferences[catId] : undefined;
 
             // Default behavior: if no preferences set, enable all categories
             // Category enabled if: no preference (undefined), null (all), or array with items
             const categoryEnabled = userCatPref === undefined || userCatPref === null || (Array.isArray(userCatPref) && userCatPref.length > 0);
 
-            // Map subcategories
-            const subcategories = Object.entries(catData.subcategories || {}).map(([subId, subData]: [string, any]) => {
+            // Map subcategories with translations
+            const subcategories = Object.keys(catData.subcategories || {}).map(subId => {
                 let subEnabled = false;
 
                 if (userCatPref === undefined || userCatPref === null) {
@@ -65,20 +70,20 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
 
                 return {
                     id: subId,
-                    name: subData.name || subId,
+                    name: getSubcategoryName(subId), // Use translation
                     enabled: subEnabled
                 };
             });
 
             return {
                 id: catId,
-                name: catData.name || catId,
+                name: getCategoryName(catId), // Use translation
                 icon: catData.emoji || '📁',
                 enabled: categoryEnabled,
                 subcategories
             };
         });
-    }, [categoriesStructure, userPreferences]);
+    }, [categoriesStructure, userPreferences, getCategoryName, getSubcategoryName]);
 
 
     const savePreferences = async (updatedCategories: Category[]) => {
@@ -279,13 +284,14 @@ const SettingsPage: React.FC<SettingsPageProps> = () => {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <Button
-                                                    variant={category.enabled ? 'primary' : 'secondary'}
-                                                    size="sm"
+                                                <motion.button
+                                                    whileTap={{ scale: 0.95 }}
                                                     onClick={() => toggleCategory(category.id)}
+                                                    className={`chip transition-all duration-200 ${category.enabled ? 'chip-active' : 'chip-inactive'
+                                                        }`}
                                                 >
                                                     {category.enabled ? 'Включено' : 'Выключено'}
-                                                </Button>
+                                                </motion.button>
                                             </div>
 
                                             {category.enabled && (

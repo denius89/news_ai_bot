@@ -249,36 +249,37 @@ export function AdminTelegramBot() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {Object.entries(botStatus.rate_limits).map(([name, config]) => (
-                                <div key={name} className="flex items-center justify-between p-4 border rounded-lg">
-                                    <div>
-                                        <h3 className="font-medium">{config.description}</h3>
-                                        <p className="text-sm text-muted-foreground">{name}</p>
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-right">
-                                            <p className="text-sm">Лимит: <strong>{config.limit}</strong></p>
-                                            <p className="text-sm">Окно: <strong>{config.window} сек</strong></p>
+                            {botStatus?.rate_limits && typeof botStatus.rate_limits === 'object' &&
+                                Object.entries(botStatus.rate_limits).map(([name, config]) => (
+                                    <div key={name} className="flex items-center justify-between p-4 border rounded-lg">
+                                        <div>
+                                            <h3 className="font-medium">{config.description}</h3>
+                                            <p className="text-sm text-muted-foreground">{name}</p>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant={config.window === 30 ? "primary" : "outline"}
-                                                onClick={() => updateRateLimit(name, config.limit, 30)}
-                                            >
-                                                30 сек
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant={config.window === 60 ? "primary" : "outline"}
-                                                onClick={() => updateRateLimit(name, config.limit, 60)}
-                                            >
-                                                1 мин
-                                            </Button>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <p className="text-sm">Лимит: <strong>{config.limit}</strong></p>
+                                                <p className="text-sm">Окно: <strong>{config.window} сек</strong></p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant={config.window === 30 ? "primary" : "outline"}
+                                                    onClick={() => updateRateLimit(name, config.limit, 30)}
+                                                >
+                                                    30 сек
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant={config.window === 60 ? "primary" : "outline"}
+                                                    onClick={() => updateRateLimit(name, config.limit, 60)}
+                                                >
+                                                    1 мин
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -296,33 +297,34 @@ export function AdminTelegramBot() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {Object.entries(botStatus.features_details).map(([key, feature]) => (
-                                    <div key={key} className="p-4 border rounded-lg space-y-3">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <h3 className="font-medium text-lg">{feature.name}</h3>
-                                                <p className="text-sm text-muted-foreground mt-1">
-                                                    {feature.description}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground mt-2">
-                                                    {feature.details}
-                                                </p>
-                                            </div>
-                                            <div className="flex items-center gap-3 ml-4">
-                                                <Badge variant={feature.enabled ? "default" : "secondary"}>
-                                                    {feature.enabled ? "Включено" : "Отключено"}
-                                                </Badge>
-                                                <Button
-                                                    size="sm"
-                                                    variant={feature.enabled ? "outline" : "primary"}
-                                                    onClick={() => toggleFeature(key, !feature.enabled)}
-                                                >
-                                                    {feature.enabled ? "Отключить" : "Включить"}
-                                                </Button>
+                                {botStatus?.features_details && typeof botStatus.features_details === 'object' &&
+                                    Object.entries(botStatus.features_details).map(([key, feature]) => (
+                                        <div key={key} className="p-4 border rounded-lg space-y-3">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex-1">
+                                                    <h3 className="font-medium text-lg">{feature.name}</h3>
+                                                    <p className="text-sm text-muted-foreground mt-1">
+                                                        {feature.description}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground mt-2">
+                                                        {feature.details}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center gap-3 ml-4">
+                                                    <Badge variant={feature.enabled ? "default" : "secondary"}>
+                                                        {feature.enabled ? "Включено" : "Отключено"}
+                                                    </Badge>
+                                                    <Button
+                                                        size="sm"
+                                                        variant={feature.enabled ? "outline" : "primary"}
+                                                        onClick={() => toggleFeature(key, !feature.enabled)}
+                                                    >
+                                                        {feature.enabled ? "Отключить" : "Включить"}
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </CardContent>
                     </Card>

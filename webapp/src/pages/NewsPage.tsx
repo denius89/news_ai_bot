@@ -12,8 +12,10 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { FilterBar } from '../components/ui/FilterBar';
 import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
+import { apiUrl } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
+import { useTranslation } from '../i18n/useTranslation';
 import { formatCount, PLURAL_FORMS } from '../utils/formatters';
 import { shouldReduceMotion } from '../utils/performance';
 
@@ -170,6 +172,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     // Get user data from authentication context
     const { userData } = useTelegramUser();
     const { authHeaders } = useAuth();
+    const { getCategoryName, getSubcategoryName } = useTranslation();
     const userId = userData?.user_id;
 
 
@@ -194,7 +197,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
     const loadCategories = useCallback(async () => {
         try {
             console.log('[NewsPage] Loading categories...');
-            const response = await fetch('/api/categories', {
+            const response = await fetch(apiUrl('/api/categories'), {
                 headers: authHeaders
             });
             const data = await response.json();
@@ -205,13 +208,13 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
                 // Формируем список основных категорий
                 const cats: Array<{ id: string, label: string, icon: string }> = [
-                    { id: 'all', label: 'Все', icon: '📰' }
+                    { id: 'all', label: getCategoryName('all'), icon: '📰' }
                 ];
 
                 Object.entries(data.data).forEach(([catId, catData]: [string, any]) => {
                     cats.push({
                         id: catId,
-                        label: catData.name || catId,
+                        label: getCategoryName(catId),
                         icon: catData.emoji || '📁'
                     });
                 });
@@ -246,13 +249,13 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
 
         if (categoryData.subcategories) {
             const subcats: Array<{ id: string, label: string, icon: string }> = [
-                { id: '', label: `Все ${categoryData.name}`, icon: '📰' }
+                { id: '', label: `Все ${getCategoryName(categoryId)}`, icon: '📰' }
             ];
 
             Object.entries(categoryData.subcategories).forEach(([subId, subData]: [string, any]) => {
                 subcats.push({
                     id: subId,
-                    label: subData.name || subId,
+                    label: getSubcategoryName(subId),
                     icon: getEmojiFromIconCode(subData.icon || '')
                 });
             });
@@ -275,10 +278,10 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
             }
 
             // Build API URL - загружаем все новости без категорийной фильтрации
-            let apiUrl = `/api/news/latest?page=${page}&limit=50`; // Увеличим лимит для клиентской фильтрации
+            let apiPath = `/api/news/latest?page=${page}&limit=50`; // Увеличим лимит для клиентской фильтрации
 
             if (userId) {
-                apiUrl += `&filter_by_subscriptions=true`;
+                apiPath += `&filter_by_subscriptions=true`;
             }
 
             // Убираем серверную фильтрацию по категориям - будем фильтровать на клиенте
@@ -288,10 +291,10 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                 selectedCategory,
                 selectedSubcategory,
                 userId,
-                apiUrl
+                apiPath
             });
 
-            const response = await fetch(apiUrl, {
+            const response = await fetch(apiUrl(apiPath), {
                 headers: authHeaders
             });
 

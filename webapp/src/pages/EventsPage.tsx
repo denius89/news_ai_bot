@@ -5,8 +5,10 @@ import { Card } from '../components/ui/Card';
 import { FilterBar } from '../components/ui/FilterBar';
 import { FilterCard } from '../components/ui/FilterCard';
 import { Header } from '../components/ui/Header';
+import { apiUrl } from '../config/api';
 import { useAuth } from '../context/AuthContext';
 import { useTelegramUser } from '../hooks/useTelegramUser';
+import { useTranslation } from '../i18n/useTranslation';
 import { formatCount, PLURAL_FORMS } from '../utils/formatters';
 
 interface Event {
@@ -26,17 +28,17 @@ interface Event {
     group_name?: string;
 }
 
-interface CategoryInfo {
-    name: string;
-    emoji: string;
-    color: string;
-    subcategories: Record<string, { name: string; icon: string }>;
-}
-
 interface EventsPageProps {
     theme?: string;
     onThemeToggle?: () => void;
     onNavigate?: (page: string) => void;
+}
+
+interface CategoryData {
+    name: string;
+    emoji: string;
+    color: string;
+    subcategories: Record<string, { name: string; icon: string }>;
 }
 
 const EventsPage: React.FC<EventsPageProps> = () => {
@@ -48,7 +50,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     const [category, setCategory] = useState<string>('all');
     const [subcategory, setSubcategory] = useState<string>('all');
     const [dateRange, setDateRange] = useState<'today' | 'week' | 'month'>('week');
-    const [categories, setCategories] = useState<Record<string, CategoryInfo>>({});
+    const [categories, setCategories] = useState<Record<string, CategoryData>>({});
     const [isFilteredBySubscriptions, setIsFilteredBySubscriptions] = useState(false);
     const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -59,6 +61,7 @@ const EventsPage: React.FC<EventsPageProps> = () => {
     // Get user data from authentication context
     const { userData } = useTelegramUser();
     const { authHeaders } = useAuth();
+    const { getCategoryName } = useTranslation();
     const userId = userData?.user_id;
 
     // Fetch categories on mount
@@ -105,11 +108,23 @@ const EventsPage: React.FC<EventsPageProps> = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('/api/events/categories');
+            const response = await fetch(apiUrl('/api/events/categories'));
             const data = await response.json();
 
             if (data.success) {
-                setCategories(data.data);
+                // Переводим категории на русский язык
+                const translatedCategories: Record<string, CategoryData> = {};
+
+                Object.entries(data.data).forEach(([key, catData]: [string, any]) => {
+                    translatedCategories[key] = {
+                        name: getCategoryName(key),
+                        emoji: catData.emoji || '📁',
+                        color: catData.color || '#666',
+                        subcategories: catData.subcategories || {}
+                    };
+                });
+
+                setCategories(translatedCategories);
             }
         } catch (err) {
             console.error('Error fetching categories:', err);
@@ -125,13 +140,13 @@ const EventsPage: React.FC<EventsPageProps> = () => {
             const categoryParam = category !== 'all' ? `&category=${category}` : '';
 
             // Build API URL with filtering
-            let apiUrl = `/api/events/upcoming?days=${days}${categoryParam}`;
+            let apiPath = `/api/events/upcoming?days=${days}${categoryParam}`;
 
             if (userId) {
-                apiUrl += `&filter_by_subscriptions=true`;
+                apiPath += `&filter_by_subscriptions=true`;
             }
 
-            const response = await fetch(apiUrl, {
+            const response = await fetch(apiUrl(apiPath), {
                 headers: authHeaders
             });
             const data = await response.json();

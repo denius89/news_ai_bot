@@ -40,31 +40,32 @@ export function PromptsViewer() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
-                            {Object.entries(prompts.styles).map(([key, style]) => (
-                                <div key={key} className="border-l-4 border-primary pl-4 py-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <h3 className="font-semibold text-lg text-text">{style.name}</h3>
-                                        <Badge variant="outline" className="text-xs">{key}</Badge>
-                                    </div>
-                                    <p className="text-sm text-muted mb-2">{style.description}</p>
+                            {prompts?.styles && typeof prompts.styles === 'object' &&
+                                Object.entries(prompts.styles).map(([key, style]) => (
+                                    <div key={key} className="border-l-4 border-primary pl-4 py-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <h3 className="font-semibold text-lg text-text">{style.name}</h3>
+                                            <Badge variant="outline" className="text-xs">{key}</Badge>
+                                        </div>
+                                        <p className="text-sm text-muted mb-2">{style.description}</p>
 
-                                    <div className="mt-3">
-                                        <div className="text-xs font-semibold text-muted mb-1">Характеристики:</div>
-                                        <ul className="list-disc list-inside text-sm space-y-1 text-text">
-                                            {style.characteristics.map((char, idx) => (
-                                                <li key={idx}>{char}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                        <div className="mt-3">
+                                            <div className="text-xs font-semibold text-muted mb-1">Характеристики:</div>
+                                            <ul className="list-disc list-inside text-sm space-y-1 text-text">
+                                                {style.characteristics.map((char, idx) => (
+                                                    <li key={idx}>{char}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
 
-                                    <div className="mt-3 bg-muted/10 p-3 rounded-lg text-sm border border-border">
-                                        <div className="font-semibold mb-1 text-text">Экспертная роль:</div>
-                                        <div className="text-text">{style.expert_persona}</div>
-                                        <div className="mt-2 font-semibold mb-1 text-text">Стиль написания:</div>
-                                        <div className="italic text-text">{style.writing_style}</div>
+                                        <div className="mt-3 bg-muted/10 p-3 rounded-lg text-sm border border-border">
+                                            <div className="font-semibold mb-1 text-text">Экспертная роль:</div>
+                                            <div className="text-text">{style.expert_persona}</div>
+                                            <div className="mt-2 font-semibold mb-1 text-text">Стиль написания:</div>
+                                            <div className="italic text-text">{style.writing_style}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </CardContent>
                 </Card>
@@ -76,27 +77,28 @@ export function PromptsViewer() {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
-                            {Object.entries(prompts.tones).map(([key, tone]) => (
-                                <div key={key} className="border-l-4 border-accent pl-4 py-3">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <h3 className="font-semibold text-lg text-text">{tone.name}</h3>
-                                        <Badge variant="outline" className="text-xs">{key}</Badge>
-                                    </div>
-                                    <p className="text-sm text-muted mb-2">{tone.description}</p>
+                            {prompts?.tones && typeof prompts.tones === 'object' &&
+                                Object.entries(prompts.tones).map(([key, tone]) => (
+                                    <div key={key} className="border-l-4 border-accent pl-4 py-3">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <h3 className="font-semibold text-lg text-text">{tone.name}</h3>
+                                            <Badge variant="outline" className="text-xs">{key}</Badge>
+                                        </div>
+                                        <p className="text-sm text-muted mb-2">{tone.description}</p>
 
-                                    <div className="mt-3">
-                                        <div className="text-xs font-semibold text-muted mb-1">Voice:</div>
-                                        <div className="text-sm italic mb-2 text-text">{tone.voice}</div>
+                                        <div className="mt-3">
+                                            <div className="text-xs font-semibold text-muted mb-1">Voice:</div>
+                                            <div className="text-sm italic mb-2 text-text">{tone.voice}</div>
 
-                                        <div className="text-xs font-semibold text-muted mb-1">Характеристики:</div>
-                                        <ul className="list-disc list-inside text-sm space-y-1 text-text">
-                                            {tone.characteristics.map((char, idx) => (
-                                                <li key={idx}>{char}</li>
-                                            ))}
-                                        </ul>
+                                            <div className="text-xs font-semibold text-muted mb-1">Характеристики:</div>
+                                            <ul className="list-disc list-inside text-sm space-y-1 text-text">
+                                                {tone.characteristics.map((char, idx) => (
+                                                    <li key={idx}>{char}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </CardContent>
                 </Card>

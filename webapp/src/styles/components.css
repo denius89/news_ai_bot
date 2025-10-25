@@ -23,17 +23,6 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
-    .card:hover,
-    .Card:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-        transform: translateY(-2px);
-    }
-
-    .dark .card:hover,
-    .dark .Card:hover {
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        transform: translateY(-2px);
-    }
 
     .card-compact {
         @apply rounded-xl p-4 border;
@@ -50,15 +39,6 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
-    .card-compact:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-        transform: translateY(-1px);
-    }
-
-    .dark .card-compact:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        transform: translateY(-1px);
-    }
 
     /* Button Components */
     .btn {
@@ -67,13 +47,9 @@
     }
 
     .btn-primary {
-        @apply text-white shadow-soft hover:shadow-md active:scale-[0.98];
+        @apply text-white shadow-soft active:scale-[0.98];
         background-color: var(--color-primary);
         box-shadow: 0 0 20px rgba(0, 191, 166, 0.3);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--color-accent);
     }
 
     .btn-secondary {
@@ -83,9 +59,7 @@
         color: var(--color-text);
     }
 
-    .btn-secondary:hover {
-        background-color: var(--color-highlight);
-    }
+    /* Hover removed for mobile optimization - not used in Telegram WebApp */
 
     .dark .btn-secondary {
         background-color: var(--color-surface-alt);
@@ -93,25 +67,15 @@
         color: var(--color-text);
     }
 
-    .dark .btn-secondary:hover {
-        background-color: var(--color-highlight);
-    }
+    /* Hover removed for mobile optimization - not used in Telegram WebApp */
 
     .btn-ghost {
         @apply bg-transparent;
         color: var(--color-text);
     }
 
-    .btn-ghost:hover {
-        background-color: var(--color-surface-alt);
-    }
-
     .dark .btn-ghost {
         color: var(--color-text);
-    }
-
-    .dark .btn-ghost:hover {
-        background-color: var(--color-surface-alt);
     }
 
     .btn-sm {
@@ -185,16 +149,8 @@
         min-height: 44px;
     }
 
-    .nav-item:hover {
-        color: var(--color-primary);
-    }
-
     .dark .nav-item {
         color: var(--color-muted);
-    }
-
-    .dark .nav-item:hover {
-        color: var(--color-primary);
     }
 
     .nav-item.active {

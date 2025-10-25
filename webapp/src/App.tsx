@@ -1,24 +1,29 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 
-// Pages
-import DigestPage from './pages/DigestPage';
-import EventsPage from './pages/EventsPage';
-import HomePage from './pages/HomePage';
-import NewsPage from './pages/NewsPage';
-import SettingsPage from './pages/SettingsPage';
+// Lazy load pages for code splitting
+const DigestPage = lazy(() => import('./pages/DigestPage'));
+const EventsPage = lazy(() => import('./pages/EventsPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const NewsPage = lazy(() => import('./pages/NewsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const TestPage = lazy(() => import('./pages/TestPage'));
 
 // Admin Panel
 import { AdminRoutes } from './admin/AdminRoutes';
 
 // Components
+import AuthDebugger from './components/AuthDebugger';
+import PerformanceDisplay from './components/PerformanceDisplay';
 import { TelegramWebApp } from './components/TelegramWebApp';
 import { BottomNav } from './components/ui/BottomNav';
 
 // Utils
 import { AuthProvider } from './context/AuthContext';
 import { shouldReduceMotion } from './utils/performance';
+import { performanceMonitor } from './utils/performanceMonitor';
+import { registerServiceWorker } from './utils/serviceWorker';
 import { getThemePreference, initializeTheme, toggleTheme, type Theme } from './utils/theme';
 
 // Styles
@@ -47,6 +52,12 @@ const App: React.FC = () => {
         // Initialize theme system
         initializeTheme();
         setTheme(getThemePreference());
+
+        // Register Service Worker for caching
+        registerServiceWorker();
+
+        // Initialize performance monitoring
+        performanceMonitor.init();
 
         // Listen for theme changes from other tabs/windows
         const handleStorageChange = (e: StorageEvent) => {
@@ -167,19 +178,55 @@ const App: React.FC = () => {
             onNavigate: setActivePage
         };
 
+        const LoadingFallback = () => (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
+
         switch (activePage) {
             case 'home':
-                return <HomePage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <HomePage {...pageProps} />
+                    </Suspense>
+                );
             case 'news':
-                return <NewsPage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <NewsPage {...pageProps} />
+                    </Suspense>
+                );
             case 'digest':
-                return <DigestPage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <DigestPage {...pageProps} />
+                    </Suspense>
+                );
             case 'events':
-                return <EventsPage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <EventsPage {...pageProps} />
+                    </Suspense>
+                );
             case 'settings':
-                return <SettingsPage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <SettingsPage {...pageProps} />
+                    </Suspense>
+                );
+            case 'test':
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <TestPage />
+                    </Suspense>
+                );
             default:
-                return <HomePage {...pageProps} />;
+                return (
+                    <Suspense fallback={<LoadingFallback />}>
+                        <HomePage {...pageProps} />
+                    </Suspense>
+                );
         }
     };
 
@@ -248,8 +295,8 @@ const AppContent: React.FC<{
                             <motion.button
                                 key={item.id}
                                 className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.active
-                                        ? 'bg-primary text-white'
-                                        : 'text-muted hover:text-text hover:bg-surface-alt'
+                                    ? 'bg-primary text-white'
+                                    : 'text-muted hover:text-text hover:bg-surface-alt'
                                     }`}
                                 onClick={item.onClick}
                                 whileHover={{ scale: 1.02 }}
@@ -267,6 +314,12 @@ const AppContent: React.FC<{
                     </div>
                 </nav>
             )}
+
+            {/* Performance Display (Development Only) */}
+            <PerformanceDisplay />
+
+            {/* Auth Debugger (Development Only) */}
+            <AuthDebugger />
         </div>
     );
 };
