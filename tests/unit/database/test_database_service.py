@@ -3,6 +3,7 @@ Tests for unified DatabaseService.
 """
 
 import pytest
+import os
 from unittest.mock import Mock, patch, AsyncMock
 from database.service import DatabaseService, get_sync_service, get_async_service
 
@@ -13,8 +14,7 @@ class TestDatabaseService:
     def test_init_sync_mode(self):
         """Test initialization in sync mode."""
         with (
-            patch("database.service.SUPABASE_URL", "test_url"),
-            patch("database.service.SUPABASE_KEY", "test_key"),
+            patch.dict("os.environ", {"SUPABASE_URL": "test_url", "SUPABASE_KEY": "test_key"}),
             patch("database.service.create_client") as mock_create,
         ):
 

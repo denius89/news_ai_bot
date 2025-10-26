@@ -21,8 +21,10 @@ class TestHTTPConnectionManager:
         """Create a connection manager for testing."""
         return HTTPConnectionManager()
 
-    def test_aiohttp_session_creation(self, manager):
+    @pytest.mark.asyncio
+    async def test_aiohttp_session_creation(self, manager):
         """Test aiohttp session creation."""
+        # aiohttp session requires running event loop
         session = manager.aiohttp_session
         assert session is not None
         assert not session.closed
@@ -88,13 +90,17 @@ class TestOptimizedHTTPClient:
     @pytest.mark.asyncio
     async def test_get_error_handling(self, client):
         """Test GET request error handling."""
+        # Use unique URL to avoid cache from previous tests
+        test_url = "http://example.com/error"
+
         with patch.object(client.session, "get") as mock_get:
             # Mock failed response
             mock_response = AsyncMock()
             mock_response.status = 404
+            mock_response.text = AsyncMock(return_value="404 error")
             mock_get.return_value.__aenter__.return_value = mock_response
 
-            result = await client.get("http://example.com")
+            result = await client.get(test_url)
             assert result is None
 
     def test_get_sync(self, client):

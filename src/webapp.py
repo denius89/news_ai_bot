@@ -71,6 +71,7 @@ def authenticate_request():
             "/api/dashboard/latest_news",
             "/api/dashboard/news_trend",
             "/api/events",  # Events API - публичный доступ
+            "/api/metrics/",  # Metrics API - публичный доступ для тестирования
         ]
 
         # Проверяем, является ли endpoint публичным

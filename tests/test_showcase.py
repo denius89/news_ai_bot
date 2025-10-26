@@ -129,16 +129,14 @@ class TestShowcaseGeneration:
         # Mock file operations
         mock_file_content = []
 
-        def mock_open_side_effect(path, mode, **kwargs):
-            if "w" in mode:
-                mock_file = MagicMock()
-                mock_file.write = lambda content: mock_file_content.append(content)
-                return mock_file
-            return MagicMock()
+        def mock_json_dump(data, file_obj, **kwargs):
+            # Capture what would be dumped
+            mock_file_content.append(json.dumps(data))
 
-        with patch("builtins.open", side_effect=mock_open_side_effect):
+        with patch("builtins.open", MagicMock()) as mock_open:
             with patch("pathlib.Path.mkdir", MagicMock()):
-                await generate_showcase()
+                with patch("json.dump", side_effect=mock_json_dump):
+                    await generate_showcase()
 
         # Verify file was written
         assert len(mock_file_content) > 0

@@ -35,3 +35,12 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: marks tests as integration (deselect with '-m \"not integration\"')",
+    "unit: marks tests as unit (deselect with '-m \"not unit\"')",
+    "external: marks tests that require external API keys"
+]
+asyncio_mode = "auto"

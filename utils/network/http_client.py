@@ -29,11 +29,11 @@ class HTTPConnectionManager:
     def get_aiohttp_session(self) -> aiohttp.ClientSession:
         """Get or create aiohttp session."""
         if self._aiohttp_session is None or self._aiohttp_session.closed:
+            # Try to get current event loop
             try:
-                # Try to get current event loop
                 loop = asyncio.get_running_loop()
             except RuntimeError:
-                # No running loop, create connector without loop
+                # No running loop - create connector without loop for sync usage
                 connector = aiohttp.TCPConnector(
                     limit=100,  # Total connection pool size
                     limit_per_host=30,  # Per-host connection limit
@@ -42,17 +42,28 @@ class HTTPConnectionManager:
                     keepalive_timeout=30,
                     enable_cleanup_closed=True,
                 )
-            else:
-                # Running loop exists, create connector with loop
-                connector = aiohttp.TCPConnector(
-                    limit=100,  # Total connection pool size
-                    limit_per_host=30,  # Per-host connection limit
-                    ttl_dns_cache=300,  # DNS cache TTL
-                    use_dns_cache=True,
-                    keepalive_timeout=30,
-                    enable_cleanup_closed=True,
-                    loop=loop,
+                timeout = aiohttp.ClientTimeout(total=30, connect=10, sock_read=10)
+                self._aiohttp_session = aiohttp.ClientSession(
+                    connector=connector,
+                    timeout=timeout,
+                    headers={
+                        "User-Agent": "Mozilla/5.0 (compatible; PulseAI/1.0; +https://pulseai.bot)",
+                        "Accept-Encoding": "gzip, deflate",  # Explicitly exclude 'br' to avoid Brotli errors
+                    },
                 )
+                logger.info("Created new aiohttp session without event loop")
+                return self._aiohttp_session
+
+            # Running loop exists, create connector with loop
+            connector = aiohttp.TCPConnector(
+                limit=100,  # Total connection pool size
+                limit_per_host=30,  # Per-host connection limit
+                ttl_dns_cache=300,  # DNS cache TTL
+                use_dns_cache=True,
+                keepalive_timeout=30,
+                enable_cleanup_closed=True,
+                loop=loop,
+            )
 
             timeout = aiohttp.ClientTimeout(total=30, connect=10, sock_read=10)
 
@@ -67,6 +78,11 @@ class HTTPConnectionManager:
             logger.info("Created new aiohttp session with connection pooling")
 
         return self._aiohttp_session
+
+    @property
+    def aiohttp_session(self) -> aiohttp.ClientSession:
+        """Get or create aiohttp session (property)."""
+        return self.get_aiohttp_session()
 
     @property
     def httpx_client(self) -> httpx.Client:

@@ -1,4 +1,4 @@
 def test_main_import():
-    import src.main as main
+    import src.webapp as webapp
 
-    assert main is not None
+    assert webapp is not None
