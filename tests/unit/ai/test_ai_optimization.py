@@ -435,9 +435,7 @@ class TestOptimizedEvaluation:
 
     def test_evaluate_both_with_optimization_exists(self):
         """Test that evaluate_both functions exist and are callable."""
-        from ai_modules.optimized_importance import evaluate_importance
-        from ai_modules.optimized_credibility import evaluate_credibility
-
+        # Functions already imported at top
         assert callable(evaluate_importance)
         assert callable(evaluate_credibility)
 

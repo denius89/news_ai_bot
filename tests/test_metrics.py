@@ -173,14 +173,11 @@ class TestDigestAnalytics:
 
     def test_get_digest_analytics_is_function(self):
         """Test that get_digest_analytics is a callable function."""
-        from database.db_models import get_digest_analytics
-
+        # get_digest_analytics already imported at top
         assert callable(get_digest_analytics)
 
     def test_get_digest_analytics_returns_list(self):
         """Test that get_digest_analytics returns a list."""
-        from database.db_models import get_digest_analytics
-
         # Function returns list
         analytics = get_digest_analytics(days=7)
         assert isinstance(analytics, list)
@@ -246,8 +243,7 @@ class TestSaveDigestWithMetrics:
 
     def test_save_digest_with_metrics_is_function(self):
         """Test that save_digest_with_metrics is a callable function."""
-        from database.db_models import save_digest_with_metrics
-
+        # save_digest_with_metrics already imported at top
         assert callable(save_digest_with_metrics)
 
 
