@@ -292,14 +292,16 @@ class DatabaseService:
         source: Optional[str] = None,
         categories: Optional[List[str]] = None,
         limit: int = 10,
+        offset: int = 0,
     ) -> List[Dict]:
         """
-        Get latest news (sync version).
+        Get latest news (sync version) with pagination support.
 
         Args:
             source: Filter by source name
             categories: Filter by categories
             limit: Maximum number of news items
+            offset: Number of items to skip (for pagination)
 
         Returns:
             List of news dictionaries
@@ -308,7 +310,9 @@ class DatabaseService:
             logger.warning("⚠️ Sync Supabase client not available")
             return []
 
-        logger.debug("get_latest_news: source=%s, categories=%s, limit=%s", source, categories, limit)
+        logger.debug(
+            "get_latest_news: source=%s, categories=%s, limit=%s, offset=%s", source, categories, limit, offset
+        )
 
         query = (
             self.sync_client.table("news")
@@ -316,7 +320,7 @@ class DatabaseService:
                 "id, uid, title, content, link, published_at, source, category, subcategory, credibility, importance"
             )
             .order("published_at", desc=True)
-            .limit(limit)
+            .range(offset, offset + limit - 1)
         )
 
         if source:
@@ -336,11 +340,49 @@ class DatabaseService:
 
                     item["published_at_fmt"] = format_datetime(item["published_at"])
 
-            logger.info("✅ Retrieved %d news items", len(news_items))
+            logger.info("✅ Retrieved %d news items (offset=%d, limit=%d)", len(news_items), offset, limit)
             return news_items
         except Exception as e:
             logger.error("❌ Error retrieving news: %s", e)
             return []
+
+    def count_news(
+        self,
+        source: Optional[str] = None,
+        categories: Optional[List[str]] = None,
+    ) -> int:
+        """
+        Count news items matching criteria (sync version).
+
+        Args:
+            source: Filter by source name
+            categories: Filter by categories
+
+        Returns:
+            Total count of news items
+        """
+        if not self.sync_client:
+            logger.warning("⚠️ Sync Supabase client not available")
+            return 0
+
+        logger.debug("count_news: source=%s, categories=%s", source, categories)
+
+        query = self.sync_client.table("news").select("id", count="exact")
+
+        if source:
+            query = query.eq("source", source)
+
+        if categories:
+            query = query.in_("category", categories)
+
+        try:
+            result = self.safe_execute(query)
+            count = result.count or 0
+            logger.info("✅ Counted %d news items", count)
+            return count
+        except Exception as e:
+            logger.error("❌ Error counting news: %s", e)
+            return 0
 
     def upsert_news(self, items: List[Dict]) -> int:
         """
