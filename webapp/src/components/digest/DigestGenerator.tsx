@@ -184,6 +184,38 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
         initHoloMotion(deviceOrientation);
     }, [deviceOrientation]);
 
+    // Блокировка скролла body при открытии модалки
+    useEffect(() => {
+        if (isOpen) {
+            // Сохраняем текущую позицию скролла
+            const scrollY = window.scrollY;
+
+            // Блокируем скролл body
+            document.body.style.overflow = 'hidden';
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+        } else {
+            // Восстанавливаем скролл
+            const scrollY = document.body.style.top;
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+
+            // Восстанавливаем позицию скролла
+            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+        }
+
+        return () => {
+            // Cleanup при размонтировании
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+        };
+    }, [isOpen]);
+
     // ФУНКЦИИ ДЛЯ МОБИЛЬНЫХ ЖЕСТОВ И HAPTIC FEEDBACK
     const triggerHapticFeedback = (type: 'light' | 'medium' | 'heavy' = 'light') => {
         // if (!preferences.enable_haptic_feedback || !navigator.vibrate) return;
@@ -250,25 +282,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                 const categoriesData = await categoriesRes.json();
 
                 if (stylesData.status === 'success' && categoriesData.status === 'success') {
-                    // Нормализуем тексты периодов для корректного отображения
-                    const normalizePeriods = (periods: any) => {
-                        const normalized: Record<string, string> = {};
-                        for (const [key, value] of Object.entries(periods)) {
-                            if (typeof value === 'string') {
-                                // Нормализуем по ключу (сохраняет исходный порядок)
-                                if (key === 'today') {
-                                    normalized[key] = "Сегодня";
-                                } else if (key === '7d') {
-                                    normalized[key] = "За неделю";
-                                } else if (key === '30d') {
-                                    normalized[key] = "За месяц";
-                                } else {
-                                    normalized[key] = value;
-                                }
-                            }
-                        }
-                        return normalized;
-                    };
+                    // Используем периоды напрямую из API (без нормализации)
+                    // API уже возвращает правильные тексты: "Сегодня", "За неделю", "За месяц"
 
                     // Применяем переводы к стилям из API
                     const translateStyles = (styles: Record<string, string>) => {
@@ -292,7 +307,7 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         styles: translateStyles(stylesData.data.styles),
                         categories: { all: 'Все категории', ...categoriesData.data.categories },
                         subcategories: categoriesData.data.subcategories || {},
-                        periods: normalizePeriods(categoriesData.data.periods) || defaultData.periods,
+                        periods: categoriesData.data.periods || defaultData.periods,
                         lengths: {
                             short: "Короткий",
                             medium: "Средний",
@@ -399,6 +414,8 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+                        onClick={handleClose}
+                        onTouchMove={(e) => e.preventDefault()}
                     />
 
                     <div className="fixed inset-0 flex items-center justify-center z-50 p-3 pb-16">
@@ -441,7 +458,14 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                             </div>
 
                             {/* Generation Form */}
-                            <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
+                            <div
+                                className="flex-1 overflow-y-auto scrollbar-hide space-y-3"
+                                style={{
+                                    overscrollBehavior: 'contain',
+                                    WebkitOverflowScrolling: 'touch',
+                                    touchAction: 'pan-y'
+                                }}
+                            >
                                 {/* Error Display */}
                                 {error && (
                                     <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
