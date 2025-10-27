@@ -96,9 +96,7 @@ def handle_errors(f: Callable) -> Callable:
     return wrapper
 
 
-def build_pagination_response(
-    data: list, page: int, limit: int, total: int
-) -> Dict[str, Any]:
+def build_pagination_response(data: list, page: int, limit: int, total: int) -> Dict[str, Any]:
     """
     Build standardized pagination response.
 
@@ -156,5 +154,3 @@ def calculate_offset(page: int, limit: int) -> int:
         calculate_offset(3, 20) -> 40
     """
     return (page - 1) * limit
-
-
