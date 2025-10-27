@@ -56,6 +56,7 @@ from flask import Blueprint, render_template, request, jsonify
 from services.unified_digest_service import get_sync_digest_service
 from services.categories import get_categories
 from database.service import get_sync_service
+from utils.route_helpers import validate_pagination, handle_errors, build_pagination_response
 
 logger = logging.getLogger(__name__)
 
@@ -130,20 +131,19 @@ def events():
 # --- API Endpoints ---
 @news_bp.route("/latest")
 @news_bp.route("/api/latest")  # Добавляем альтернативный маршрут для совместимости
-def api_latest_news():
+@validate_pagination(max_limit=100)
+@handle_errors
+def api_latest_news(page: int, limit: int):
     """
-    API endpoint для получения последних новостей.
+    API endpoint для получения последних новостей с поддержкой pagination.
 
     Query params:
         page: номер страницы (default: 1)
-        limit: количество новостей на странице (default: 20)
+        limit: количество новостей на странице (default: 20, max: 100)
         filter_by_subscriptions: фильтровать по предпочтениям пользователя (default: false)
         user_id: UUID пользователя (требуется если filter_by_subscriptions=true)
     """
     try:
-        # Получаем параметры пагинации
-        page = int(request.args.get("page", 1))
-        limit = int(request.args.get("limit", 20))
 
         # Параметры фильтрации
         filter_by_subscriptions = request.args.get("filter_by_subscriptions", "false").lower() == "true"
@@ -305,39 +305,35 @@ def api_latest_news():
             f"✅ [API] Returning {len(paginated_news)} news items, " f"total={total}, has_next={end_idx < total}"
         )
 
-        return jsonify(
+        # Format news items
+        formatted_news = [
             {
-                "status": "success",
-                "data": [
-                    {
-                        "id": n.get("id"),
-                        "title": n.get("title"),
-                        "content": n.get("content"),
-                        "source": n.get("source"),
-                        "url": n.get("link"),  # Добавляем ссылку на новость
-                        "published_at": (
-                            n.get("published_at").isoformat()
-                            if hasattr(n.get("published_at"), "isoformat")
-                            else n.get("published_at")
-                        ),
-                        "category": n.get("category"),
-                        "subcategory": n.get("subcategory"),
-                        "credibility": n.get("credibility"),
-                        "importance": n.get("importance"),
-                    }
-                    for n in paginated_news
-                ],
-                "pagination": {
-                    "page": page,
-                    "limit": limit,
-                    "total": total,
-                    "total_pages": (total + limit - 1) // limit,
-                    "has_next": end_idx < total,
-                    "has_prev": page > 1,
-                },
-                "filtered_by_subscriptions": filter_by_subscriptions and user_id is not None,
+                "id": n.get("id"),
+                "title": n.get("title"),
+                "content": n.get("content"),
+                "source": n.get("source"),
+                "url": n.get("link"),
+                "published_at": (
+                    n.get("published_at").isoformat()
+                    if hasattr(n.get("published_at"), "isoformat")
+                    else n.get("published_at")
+                ),
+                "category": n.get("category"),
+                "subcategory": n.get("subcategory"),
+                "credibility": n.get("credibility"),
+                "importance": n.get("importance"),
             }
-        )
+            for n in paginated_news
+        ]
+
+        # Build pagination response
+        response_data = build_pagination_response(data=formatted_news, page=page, limit=limit, total=total)
+
+        # Add additional metadata
+        response_data["status"] = "success"
+        response_data["filtered_by_subscriptions"] = filter_by_subscriptions and user_id is not None
+
+        return jsonify(response_data)
     except Exception as e:
         logger.error(f"Ошибка получения новостей: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
