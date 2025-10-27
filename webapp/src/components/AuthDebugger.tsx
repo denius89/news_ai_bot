@@ -8,12 +8,12 @@ const AuthDebugger: React.FC = () => {
         // Принудительно устанавливаем правильные заголовки для разработки
         if (!isAuthenticated && !loading && !error) {
             console.log('🔧 AuthDebugger: Setting fake auth headers');
-            
+
             const fakeHeaders = {
                 'X-Telegram-Init-Data': '',
                 'X-Telegram-User-Data': 'eyJpZCI6OTk5OTk5OTk5LCJmaXJzdF9uYW1lIjoiRGV2IEFkbWluIiwidXNlcm5hbWUiOiJkZXZfYWRtaW4ifQ=='
             };
-            
+
             // Используем setTimeout чтобы избежать конфликта с AuthContext
             setTimeout(() => {
                 setAuthHeaders(fakeHeaders);
@@ -25,14 +25,14 @@ const AuthDebugger: React.FC = () => {
     // Отладочная информация
     if (process.env.NODE_ENV === 'development') {
         return (
-            <div 
-                style={{ 
-                    position: 'fixed', 
-                    top: 0, 
-                    left: 0, 
-                    background: 'black', 
-                    color: 'white', 
-                    padding: '10px', 
+            <div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    background: 'black',
+                    color: 'white',
+                    padding: '10px',
                     fontSize: '12px',
                     zIndex: 9999,
                     maxWidth: '300px',

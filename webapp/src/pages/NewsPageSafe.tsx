@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 interface NewsItem {
@@ -23,7 +23,7 @@ const NewsPageSafe: React.FC = () => {
             try {
                 setLoading(true);
                 console.log('[NewsPageSafe] Fetching news...');
-                
+
                 const response = await fetch('/api/news/latest?page=1&limit=10', {
                     headers: authHeaders
                 });
@@ -47,7 +47,7 @@ const NewsPageSafe: React.FC = () => {
                         credibility: typeof item.credibility === 'number' ? item.credibility : 0.5,
                         importance: typeof item.importance === 'number' ? item.importance : 0.5,
                     }));
-                    
+
                     setNews(transformedNews);
                     console.log('[NewsPageSafe] News loaded:', transformedNews.length);
                 } else {

@@ -255,13 +255,13 @@ export const DigestGenerator: React.FC<DigestGeneratorProps> = ({
                         const normalized: Record<string, string> = {};
                         for (const [key, value] of Object.entries(periods)) {
                             if (typeof value === 'string') {
-                                // Исправляем неправильные формулировки
-                                if (value.includes('30') || key === '30d') {
-                                    normalized[key] = "За месяц";
-                                } else if (value.includes('7') || key === '7d') {
-                                    normalized[key] = "За неделю";
-                                } else if (value.includes('день') || value.includes('today') || key === 'today') {
+                                // Нормализуем по ключу (сохраняет исходный порядок)
+                                if (key === 'today') {
                                     normalized[key] = "Сегодня";
+                                } else if (key === '7d') {
+                                    normalized[key] = "За неделю";
+                                } else if (key === '30d') {
+                                    normalized[key] = "За месяц";
                                 } else {
                                     normalized[key] = value;
                                 }

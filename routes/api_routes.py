@@ -885,7 +885,7 @@ def get_digest_categories():
                 "data": {
                     "categories": categories_dict,
                     "subcategories": subcategories_dict,
-                    "periods": {"today": "Сегодня", "7d": "Последние 7 дней", "30d": "Последние 30 дней"},
+                    "periods": {"today": "Сегодня", "7d": "За неделю", "30d": "За месяц"},
                 },
             }
         )

@@ -150,7 +150,7 @@ CATEGORY_CARDS = {
                 "keywords": ["ethereum", "eth", "eip", "merge", "staking"],
             },
             "defi": {
-                "focus": "Децентрализованные финансы, протоколы, TVL",
+                "focus": "DeFi, протоколы, TVL",
                 "keywords": ["defi", "tvl", "yield", "lending", "dex"],
             },
             "nft": {
