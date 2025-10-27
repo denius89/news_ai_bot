@@ -84,12 +84,14 @@ def test_fetch_rss_dedup_disabled(monkeypatch):
     """Проверка, что одинаковые новости не дублируются."""
     # Just check that rss_parser module exists and has functions
     from parsers import rss_parser
-    assert hasattr(rss_parser, 'parse_source')
+
+    assert hasattr(rss_parser, "parse_source")
 
 
-@pytest.mark.unit  
+@pytest.mark.unit
 def test_fetch_rss_two_different_disabled(monkeypatch):
     """Проверка, что разные новости сохраняются обе."""
     # Just check that parser module exists and has functions
     from parsers import rss_parser
-    assert hasattr(rss_parser, 'parse_all_sources')
+
+    assert hasattr(rss_parser, "parse_all_sources")

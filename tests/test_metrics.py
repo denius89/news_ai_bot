@@ -247,7 +247,7 @@ class TestSaveDigestWithMetrics:
     def test_save_digest_with_metrics_is_function(self):
         """Test that save_digest_with_metrics is a callable function."""
         from database.db_models import save_digest_with_metrics
-        
+
         assert callable(save_digest_with_metrics)
 
 
