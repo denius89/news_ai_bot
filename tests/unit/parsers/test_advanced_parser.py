@@ -104,7 +104,7 @@ class TestAdvancedParser:
 
     def test_fetch_content_method_exists(self, parser):
         """Проверка, что _fetch_content метод существует."""
-        assert hasattr(parser, '_fetch_content')
+        assert hasattr(parser, "_fetch_content")
         assert callable(parser._fetch_content)
 
     @pytest.mark.asyncio
@@ -207,7 +207,7 @@ class TestAdvancedParser:
 
     def test_process_html_source_method_exists(self, parser):
         """Проверка, что _process_html_source метод существует."""
-        assert hasattr(parser, '_process_html_source')
+        assert hasattr(parser, "_process_html_source")
         assert callable(parser._process_html_source)
 
     @pytest.mark.asyncio
@@ -256,7 +256,7 @@ class TestAdvancedParser:
 
     def test_low_importance_handling_exists(self, parser):
         """Проверка, что парсер может обрабатывать низкую важность."""
-        assert hasattr(parser, '_process_html_source')
+        assert hasattr(parser, "_process_html_source")
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="Complex async HTTP mocking")
@@ -288,7 +288,7 @@ class TestAdvancedParser:
 
     def test_process_source_handles_errors(self, parser):
         """Проверка, что _process_source метод существует."""
-        assert hasattr(parser, '_process_source')
+        assert hasattr(parser, "_process_source")
         assert callable(parser._process_source)
 
     @pytest.mark.asyncio
@@ -391,13 +391,15 @@ class TestAdvancedParserIntegration:
     def test_ai_evaluation_integration_exists(self):
         """Проверка, что AI evaluation модули доступны."""
         from parsers.advanced_parser import AdvancedParser
+
         parser = AdvancedParser()
         assert parser is not None
         # Check that evaluate functions exist
         import ai_modules.optimized_importance as imp_module
         import ai_modules.optimized_credibility as cred_module
-        assert hasattr(imp_module, 'evaluate_importance')
-        assert hasattr(cred_module, 'evaluate_credibility')
+
+        assert hasattr(imp_module, "evaluate_importance")
+        assert hasattr(cred_module, "evaluate_credibility")
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="Complex AI evaluation integration test")

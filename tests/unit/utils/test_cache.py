@@ -116,6 +116,7 @@ class TestCacheDecorator:
         """Test caching of async functions."""
         # Just check cached decorator exists
         from utils.system.cache import cached
+
         assert callable(cached)
 
     def test_sync_cached_function(self):

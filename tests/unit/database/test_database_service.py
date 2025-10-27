@@ -14,7 +14,7 @@ class TestDatabaseService:
     def test_database_service_exists(self):
         """Test that DatabaseService class exists and can be instantiated."""
         # Just check class exists
-        assert hasattr(DatabaseService, '__init__')
+        assert hasattr(DatabaseService, "__init__")
 
     @pytest.mark.asyncio
     async def test_init_async_mode(self):
@@ -26,12 +26,12 @@ class TestDatabaseService:
     def test_get_latest_news_is_method(self):
         """Test that get_latest_news is a method."""
         service = DatabaseService(async_mode=False)
-        assert hasattr(service, 'get_latest_news')
+        assert hasattr(service, "get_latest_news")
 
     def test_upsert_news_is_method(self):
         """Test that upsert_news is a method."""
         service = DatabaseService(async_mode=False)
-        assert hasattr(service, 'upsert_news')
+        assert hasattr(service, "upsert_news")
 
     def test_safe_execute_sync(self):
         """Test safe_execute in sync mode."""

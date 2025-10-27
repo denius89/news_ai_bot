@@ -209,14 +209,16 @@ class TestTelegramBotIntegration:
         """Смоук-тест структуры клавиатур бота"""
         # Check that keyboards_builder module exists and can be imported
         import telegram_bot.utils.keyboards_builder as kb_module
+
         assert kb_module is not None
 
     def test_callback_data_format(self):
         """Тест формата callback_data в клавиатурах"""
         # Just check that keyboard builder module exists and has build function
         import telegram_bot.utils.keyboards_builder as kb_module
+
         assert kb_module is not None
-        assert hasattr(kb_module, 'build_confirmation_keyboard')
+        assert hasattr(kb_module, "build_confirmation_keyboard")
 
 
 class TestWebAppAPI:
