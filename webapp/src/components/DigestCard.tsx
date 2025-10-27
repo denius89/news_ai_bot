@@ -51,7 +51,7 @@ export const DigestCard = React.memo<DigestCardProps>(({
     return (
         <div className="card backdrop-blur-md border border-border rounded-3xl p-3 sm:p-4 pb-3 sm:pb-4 shadow-[0_6px_20px_rgba(0,0,0,0.05)] hover:scale-[1.02] transition-transform duration-300 ease-out">
             {/* Заголовок - извлекаем заголовок из HTML или используем первые слова */}
-            <h3 className="text-[15px] font-semibold text-text leading-snug">
+            <h3 className="card-title text-text">
                 {(() => {
                     // Пытаемся извлечь заголовок из HTML (например, <h1>, <h2>, <b>)
                     const htmlText = digest.summary;
@@ -67,25 +67,25 @@ export const DigestCard = React.memo<DigestCardProps>(({
 
             {/* Бейджи в одну строку */}
             <div className="flex items-center gap-2 flex-wrap mt-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
+                <span className="inline-flex items-center px-2 py-0.5 rounded-md card-badge bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400">
                     {categories[digest.category] || digest.category}
                 </span>
 
                 {digest.metadata?.style_name && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md card-badge bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
                         {digest.metadata.style_name}
                     </span>
                 )}
 
                 {digest.readTime && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md card-badge bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400">
                         {digest.readTime} мин
                     </span>
                 )}
             </div>
 
             {/* Краткое описание */}
-            <p className="mt-3 text-sm text-text/80 leading-relaxed line-clamp-3">
+            <p className="mt-3 card-description text-text/80 line-clamp-3">
                 {truncateText(digest.summary.replace(/<[^>]*>/g, ''), 200)}
             </p>
 
@@ -106,7 +106,7 @@ export const DigestCard = React.memo<DigestCardProps>(({
 
             {/* Источники */}
             {digest.sources && digest.sources.length > 0 && (
-                <div className="mt-2 text-xs text-gray-500">
+                <div className="mt-2 card-meta text-gray-500">
                     Источники: {digest.sources.slice(0, 3).join(', ')}
                     {digest.sources.length > 3 && ` +${digest.sources.length - 3}`}
                 </div>
@@ -117,10 +117,10 @@ export const DigestCard = React.memo<DigestCardProps>(({
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => onSelect(digest)}
-                        className="text-primary font-medium hover:underline flex items-center gap-1 text-sm"
+                        className="text-primary font-medium hover:underline flex items-center gap-1 card-footer"
                     >
                         Подробнее
-                        <ExternalLink className="w-3 h-3" />
+                        <ExternalLink className="card-icon-sm" />
                     </button>
                 </div>
 
@@ -136,7 +136,7 @@ export const DigestCard = React.memo<DigestCardProps>(({
                         )}
                         aria-label="Понравилось"
                     >
-                        <ThumbsUp className="w-4 h-4" />
+                        <ThumbsUp className="card-icon-md" />
                     </button>
                     <button
                         onClick={() => handleFeedback(0)}
@@ -148,7 +148,7 @@ export const DigestCard = React.memo<DigestCardProps>(({
                         )}
                         aria-label="Не понравилось"
                     >
-                        <ThumbsDown className="w-4 h-4" />
+                        <ThumbsDown className="card-icon-md" />
                     </button>
                 </div>
             </div>

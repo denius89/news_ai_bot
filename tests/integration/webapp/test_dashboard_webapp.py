@@ -3,15 +3,13 @@ Unit tests for Dashboard WebApp functionality.
 """
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-
-# Skip test until dashboard handler is implemented
-# from telegram_bot.handlers.dashboard import open_dashboard
+from unittest.mock import AsyncMock, MagicMock, patch
+from telegram_bot.handlers.dashboard import open_dashboard
 from aiogram.types import Message, User
 
 
-@pytest.mark.skip(reason="Dashboard handler not implemented yet")
 @pytest.mark.asyncio
+@patch("telegram_bot.handlers.dashboard.WEBAPP_URL", "http://test.example.com")
 async def test_dashboard_command():
     """Test /dashboard command handler."""
     # Mock message and user
@@ -31,7 +29,7 @@ async def test_dashboard_command():
     assert "PulseAI Dashboard" in args[0]
     assert "Подписками" in args[0]
     assert "Уведомлениями" in args[0]
-    assert "Back to Bot" in args[0]
+    assert "Настройками" in args[0]
 
     # Check markup
     assert "reply_markup" in kwargs
@@ -41,27 +39,30 @@ async def test_dashboard_command():
     keyboard = kwargs["reply_markup"]
     assert hasattr(keyboard, "inline_keyboard")
     assert len(keyboard.inline_keyboard) == 2  # WebApp button + Back button
-    assert len(keyboard.inline_keyboard[0]) == 1
+    
+    # Check WebApp button
+    webapp_button = keyboard.inline_keyboard[0][0]
+    assert "Открыть Dashboard" in webapp_button.text
+    assert webapp_button.web_app is not None
+    assert "webapp" in webapp_button.web_app.url
+    
+    # Check Back button
+    back_button = keyboard.inline_keyboard[1][0]
+    assert "Back" in back_button.text
 
-    button = keyboard.inline_keyboard[0][0]
-    assert "Открыть Dashboard" in button.text
-    assert button.web_app is not None
-    assert "webapp" in button.web_app.url
 
-
-@pytest.mark.skip(reason="Dashboard handler not implemented yet")
+@patch("telegram_bot.handlers.dashboard.WEBAPP_URL", "http://test.example.com")
 def test_webapp_url_config():
     """Test that WebApp URL is properly configured."""
-    # from telegram_bot.handlers.dashboard import open_dashboard
+    from telegram_bot.handlers.dashboard import open_dashboard
     import inspect
 
     # Get source code to check URL configuration
-    # source = inspect.getsource(open_dashboard)
+    source = inspect.getsource(open_dashboard)
 
     # Should contain WebApp URL
-    # assert "webapp_url" in source
-    # assert "/webapp" in source
+    assert "webapp_url" in source
+    assert "/webapp" in source
 
     # URL should use WEBAPP_URL from config (not hardcoded)
-    # assert "WEBAPP_URL" in source or "config" in source.lower()
-    pass
+    assert "WEBAPP_URL" in source or "config" in source.lower()

@@ -47,17 +47,17 @@ export const EventCard = React.memo<EventCardProps>(({
     return (
         <div className="card p-3 sm:p-4 transition-all duration-300 hover:scale-[1.01]">
             <div className="flex justify-between items-start mb-2">
-                <h3 className="text-base sm:text-lg font-semibold text-text dark:text-white leading-snug flex-1">
+                <h3 className="card-title text-text dark:text-white flex-1">
                     {truncateText(event.title, 80)}
                 </h3>
-                <span className="ml-2 text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                <span className="ml-2 card-badge bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">
                     {Math.round(event.importance * 100)}%
                 </span>
             </div>
 
-            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <div className="space-y-2 card-meta text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
+                    <Calendar className="card-icon-md" />
                     <span>
                         {startTime.date} в {startTime.time}
                         {endTime && ` - ${endTime.time}`}
@@ -66,13 +66,13 @@ export const EventCard = React.memo<EventCardProps>(({
 
                 {event.location && (
                     <div className="flex items-center gap-2">
-                        <MapPin className="w-4 h-4" />
+                        <MapPin className="card-icon-md" />
                         <span>{truncateText(event.location, 60)}</span>
                     </div>
                 )}
 
                 {event.organizer && (
-                    <div className="text-xs text-gray-500">
+                    <div className="card-meta text-gray-500">
                         Организатор: {event.organizer}
                     </div>
                 )}
@@ -93,7 +93,7 @@ export const EventCard = React.memo<EventCardProps>(({
             )}
 
             {event.description && (
-                <p className="mt-2 text-sm text-text/90 leading-relaxed line-clamp-2">
+                <p className="mt-2 card-description text-text/90 line-clamp-2">
                     {truncateText(event.description, 150)}
                 </p>
             )}
@@ -103,14 +103,14 @@ export const EventCard = React.memo<EventCardProps>(({
                     {getImportanceStars(event.importance)}
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{event.source}</span>
+                    <span className="card-meta text-gray-500">{event.source}</span>
                     {event.link && (
                         <button
-                            className="text-primary font-medium hover:underline flex items-center gap-1 text-sm"
+                            className="text-primary font-medium hover:underline flex items-center gap-1 card-footer"
                             onClick={() => onSelect(event)}
                         >
                             Подробнее
-                            <ExternalLink className="w-3 h-3" />
+                            <ExternalLink className="card-icon-sm" />
                         </button>
                     )}
                 </div>

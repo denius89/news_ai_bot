@@ -288,7 +288,8 @@
 
     /* Layout Components */
     .container-main {
-        @apply max-w-6xl mx-auto px-6 py-8;
+        @apply max-w-6xl mx-auto py-8;
+        @apply px-3 xs:px-4 sm:px-6;
     }
 
     .container-compact {

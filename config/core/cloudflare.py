@@ -18,7 +18,7 @@ load_dotenv(Path(__file__).resolve().parent.parent.parent / "config_files" / "en
 # Основной URL Cloudflare Tunnel
 def get_cloudflare_tunnel_url():
     """Получает URL Cloudflare tunnel динамически"""
-    return os.getenv("CLOUDFLARE_TUNNEL_URL", "https://afford-discussion-containers-sufficiently.trycloudflare.com")
+    return os.getenv("CLOUDFLARE_TUNNEL_URL", "https://remained-occurs-quebec-singh.trycloudflare.com")
 
 
 # Для обратной совместимости

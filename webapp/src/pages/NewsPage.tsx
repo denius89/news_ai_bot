@@ -649,15 +649,15 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                 >
                                     <div>
                                         <div className="flex justify-between items-start">
-                                            <h3 className="text-base sm:text-lg font-semibold text-text dark:text-white leading-snug">
+                                            <h3 className="card-title text-text dark:text-white">
                                                 {truncateText(item.title, 100)}
                                             </h3>
-                                            <span className="ml-2 text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">
+                                            <span className="ml-2 card-badge bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
                                                 {Math.round(item.importance * 100)}%
                                             </span>
                                         </div>
 
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        <p className="card-meta text-gray-500 dark:text-gray-400 mt-1">
                                             {item.url ? (
                                                 <a
                                                     href={item.url}
@@ -672,11 +672,11 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                             )} • {new Date(item.publishedAt).toLocaleDateString('ru-RU')}
                                         </p>
 
-                                        <p className="mt-2 text-[15px] text-text/90 leading-relaxed line-clamp-3">
+                                        <p className="mt-2 card-description text-text/90 line-clamp-3">
                                             {truncateText(item.content, 200)}
                                         </p>
 
-                                        <div className="mt-3 flex justify-between items-center text-sm">
+                                        <div className="mt-3 flex justify-between items-center card-footer">
                                             <div className="flex items-center gap-1">
                                                 {getImportanceStars(item.importance)}
                                             </div>
@@ -686,7 +686,7 @@ const NewsPage: React.FC<NewsPageProps> = ({ onNavigate: _onNavigate }) => {
                                                 onClick={() => setSelectedNews(item)}
                                             >
                                                 Читать полностью
-                                                <ExternalLink className="w-3 h-3" />
+                                                <ExternalLink className="card-icon-sm" />
                                             </button>
                                         </div>
                                     </div>

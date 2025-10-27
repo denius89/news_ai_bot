@@ -3,6 +3,9 @@ from pathlib import Path
 import asyncio
 import logging
 
+# Добавляем корень проекта в PYTHONPATH ПЕРЕД импортами
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
@@ -18,8 +21,6 @@ from telegram_bot.middleware import (
 from telegram_bot.config import BOT_COMMANDS
 from utils.logging.logging_setup import setup_logging
 from database.service import get_async_service
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # --- ЛОГИРОВАНИЕ ---
 setup_logging()

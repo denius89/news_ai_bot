@@ -1,0 +1,35 @@
+@layer components {
+    /* Card Typography - адаптивные размеры
+     * Используем именованные размеры шрифтов для лучшей читаемости
+     * Breakpoints: <390px (базовый) → 390-640px (xs:) → ≥640px (sm:)
+     */
+
+    .card-title {
+        @apply text-xs xs:text-sm sm:text-base font-semibold leading-snug;
+    }
+
+    .card-badge {
+        @apply text-xxs xs:text-xxxs sm:text-xs font-medium;
+    }
+
+    .card-meta {
+        @apply text-xxxs xs:text-xs sm:text-sm;
+    }
+
+    .card-description {
+        @apply text-xs xs:text-sm sm:text-base leading-relaxed;
+    }
+
+    .card-footer {
+        @apply text-xxxs xs:text-xs sm:text-sm;
+    }
+
+    /* Card Icons - адаптивные размеры иконок */
+    .card-icon-sm {
+        @apply w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3;
+    }
+
+    .card-icon-md {
+        @apply w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4;
+    }
+}

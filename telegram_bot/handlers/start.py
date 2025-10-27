@@ -1,10 +1,10 @@
 # telegram_bot/handlers/start.py
 from aiogram import Router, types
-import os
+from config.core.cloudflare import get_webapp_url
 
 router = Router()
 
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://pants-corps-benchmark-finest.trycloudflare.com")
+WEBAPP_URL = get_webapp_url()
 
 WELCOME_TEXT = (
     "👋 Привет! Я PulseAI — твой AI-ассистент новостей\n\n"
