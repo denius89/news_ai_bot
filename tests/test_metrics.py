@@ -174,13 +174,13 @@ class TestDigestAnalytics:
     def test_get_digest_analytics_is_function(self):
         """Test that get_digest_analytics is a callable function."""
         from database.db_models import get_digest_analytics
-        
+
         assert callable(get_digest_analytics)
 
     def test_get_digest_analytics_returns_list(self):
         """Test that get_digest_analytics returns a list."""
         from database.db_models import get_digest_analytics
-        
+
         # Function returns list
         analytics = get_digest_analytics(days=7)
         assert isinstance(analytics, list)
