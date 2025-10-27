@@ -39,13 +39,13 @@ async def test_dashboard_command():
     keyboard = kwargs["reply_markup"]
     assert hasattr(keyboard, "inline_keyboard")
     assert len(keyboard.inline_keyboard) == 2  # WebApp button + Back button
-    
+
     # Check WebApp button
     webapp_button = keyboard.inline_keyboard[0][0]
     assert "Открыть Dashboard" in webapp_button.text
     assert webapp_button.web_app is not None
     assert "webapp" in webapp_button.web_app.url
-    
+
     # Check Back button
     back_button = keyboard.inline_keyboard[1][0]
     assert "Back" in back_button.text

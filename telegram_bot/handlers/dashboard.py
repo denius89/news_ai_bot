@@ -20,23 +20,15 @@ async def open_dashboard(message: types.Message):
     """
     # Build WebApp URL
     webapp_url = f"{WEBAPP_URL}/webapp"
-    
+
     # Create keyboard with WebApp button
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(
-                text="Открыть Dashboard",
-                web_app=types.WebAppInfo(url=webapp_url)
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text="◀️ Back to Bot",
-                callback_data="back_to_bot"
-            )
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="Открыть Dashboard", web_app=types.WebAppInfo(url=webapp_url))],
+            [InlineKeyboardButton(text="◀️ Back to Bot", callback_data="back_to_bot")],
         ]
-    ])
-    
+    )
+
     # Send message with WebApp button
     text = (
         "🚀 <b>PulseAI Dashboard</b>\n\n"
@@ -46,10 +38,5 @@ async def open_dashboard(message: types.Message):
         "• Настройками\n\n"
         "Нажмите кнопку ниже, чтобы открыть Dashboard"
     )
-    
-    await message.answer(
-        text,
-        reply_markup=keyboard,
-        parse_mode="HTML"
-    )
 
+    await message.answer(text, reply_markup=keyboard, parse_mode="HTML")
