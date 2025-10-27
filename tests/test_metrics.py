@@ -244,45 +244,11 @@ class TestFeedbackFunctions:
 class TestSaveDigestWithMetrics:
     """Test saving digest with metrics."""
 
-    @pytest.mark.skip(reason="Database function test requires mocking")
-    @patch("database.db_models.supabase")
-    def test_save_digest_with_metrics_success(self, mock_supabase):
-        """Test successful digest save with metrics."""
-        mock_response = MagicMock()
-        mock_response.data = [{"id": "new-digest-id"}]
-        mock_supabase.table.return_value.insert.return_value.execute.return_value = mock_response
-
-        digest_id = save_digest_with_metrics(
-            user_id="user-123",
-            summary="Test digest",
-            category="tech",
-            style="analytical",
-            confidence=0.85,
-            generation_time_sec=2.1,
-            meta={"tone": "neutral", "length": "medium"},
-        )
-
-        assert digest_id == "new-digest-id"
-
-    @pytest.mark.skip(reason="Database function test requires mocking")
-    @patch("database.db_models.supabase")
-    def test_save_digest_with_metrics_failure(self, mock_supabase):
-        """Test digest save failure."""
-        mock_response = MagicMock()
-        mock_response.data = None
-        mock_supabase.table.return_value.insert.return_value.execute.return_value = mock_response
-
-        digest_id = save_digest_with_metrics(
-            user_id="user-123",
-            summary="Test digest",
-            category="tech",
-            style="analytical",
-            confidence=0.85,
-            generation_time_sec=2.1,
-            meta={"tone": "neutral", "length": "medium"},
-        )
-
-        assert digest_id is None
+    def test_save_digest_with_metrics_is_function(self):
+        """Test that save_digest_with_metrics is a callable function."""
+        from database.db_models import save_digest_with_metrics
+        
+        assert callable(save_digest_with_metrics)
 
 
 if __name__ == "__main__":

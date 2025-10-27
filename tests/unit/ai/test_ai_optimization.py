@@ -320,7 +320,7 @@ class TestLocalPredictor:
         """Test keyword-based importance scoring."""
         mock_enabled.return_value = False  # Disabled - test will skip real predictor
         # This test validates predictor exists and is callable
-        assert hasattr(self.predictor, 'predict')
+        assert hasattr(self.predictor, "predict")
         assert callable(self.predictor.predict)
 
     def test_predictor_disabled(self):
@@ -413,6 +413,7 @@ class TestOptimizedEvaluation:
         """Test that prefilter function exists."""
         # Just check prefilter module exists
         import ai_modules.prefilter as prefilter_module
+
         assert prefilter_module is not None
 
     @patch("ai_modules.optimized_importance.original_evaluate_importance")
@@ -436,7 +437,7 @@ class TestOptimizedEvaluation:
         """Test that evaluate_both functions exist and are callable."""
         from ai_modules.optimized_importance import evaluate_importance
         from ai_modules.optimized_credibility import evaluate_credibility
-        
+
         assert callable(evaluate_importance)
         assert callable(evaluate_credibility)
 
