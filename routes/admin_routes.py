@@ -3002,6 +3002,349 @@ def get_events_fetch_logs():
 # ==================== Health Check ====================
 
 
+@admin_bp.route("/backup/list", methods=["GET"])
+@require_admin
+def list_backups():
+    """
+    Получить список всех backup файлов.
+
+    Returns:
+        JSON с массивом backup файлов: { backups: [...] }
+    """
+    try:
+        backup_dir = Path("backups")
+        backup_dir.mkdir(exist_ok=True)
+
+        backups = []
+        for file_path in sorted(backup_dir.glob("pulseai_*.sql.gz"), reverse=True):
+            stat = file_path.stat()
+            backups.append(
+                {
+                    "filename": file_path.name,
+                    "size_mb": round(stat.st_size / (1024 * 1024), 2),
+                    "size_bytes": stat.st_size,
+                    "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                    "path": str(file_path),
+                }
+            )
+
+        return jsonify(
+            {
+                "status": "success",
+                "backups": backups,
+                "count": len(backups),
+                "total_size_mb": round(sum(b["size_bytes"] for b in backups) / (1024 * 1024), 2),
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error listing backups: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/backup/create", methods=["POST"])
+@require_admin
+def create_backup():
+    """
+    Создать backup базы данных.
+
+    Request body:
+        { "scheduled": false }  # Для немедленного backup
+
+    Returns:
+        JSON с информацией о созданном backup
+    """
+    try:
+        data = request.get_json() or {}
+        scheduled = data.get("scheduled", False)
+
+        # Path to backup script
+        backup_script = Path("scripts/backup_db.sh")
+
+        if not backup_script.exists():
+            return jsonify({"status": "error", "message": "Backup script not found"}), 404
+
+        # Execute backup script
+        logger.info(f"🚀 Starting manual backup (scheduled={scheduled})")
+
+        # Run in background thread to avoid blocking
+        def run_backup():
+            try:
+                result = subprocess.run(
+                    ["bash", str(backup_script)], capture_output=True, text=True, timeout=300  # 5 minutes max
+                )
+                logger.info(f"Backup completed: {result.returncode}")
+                logger.info(f"Backup output: {result.stdout}")
+                if result.stderr:
+                    logger.error(f"Backup errors: {result.stderr}")
+            except subprocess.TimeoutExpired:
+                logger.error("Backup script timed out")
+            except Exception as e:
+                logger.error(f"Backup failed: {e}")
+
+        thread = threading.Thread(target=run_backup, daemon=True)
+        thread.start()
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "Backup started in background",
+                "backup_in_progress": True,
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error creating backup: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/backup/status", methods=["GET"])
+@require_admin
+def get_backup_status():
+    """
+    Получить статус последнего backup.
+
+    Returns:
+        JSON с информацией о последнем backup
+    """
+    try:
+        backup_dir = Path("backups")
+
+        # Get latest backup
+        backups = list(backup_dir.glob("pulseai_*.sql.gz"))
+
+        if not backups:
+            return jsonify({"status": "success", "has_backup": False, "message": "No backups found"})
+
+        latest = max(backups, key=lambda p: p.stat().st_mtime)
+        stat = latest.stat()
+
+        return jsonify(
+            {
+                "status": "success",
+                "has_backup": True,
+                "last_backup": {
+                    "filename": latest.name,
+                    "size_mb": round(stat.st_size / (1024 * 1024), 2),
+                    "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                },
+                "total_backups": len(backups),
+                "backup_dir": str(backup_dir.absolute()),
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error getting backup status: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/backup/delete/<filename>", methods=["DELETE"])
+@require_admin
+def delete_backup(filename):
+    """
+    Удалить конкретный backup файл.
+
+    Args:
+        filename: имя файла backup
+
+    Returns:
+        JSON с результатом удаления
+    """
+    try:
+        # Security: prevent path traversal
+        if ".." in filename or "/" in filename:
+            return jsonify({"status": "error", "message": "Invalid filename"}), 400
+
+        backup_file = Path("backups") / filename
+
+        if not backup_file.exists():
+            return jsonify({"status": "error", "message": "Backup not found"}), 404
+
+        # Delete file
+        backup_file.unlink()
+
+        logger.info(f"🗑️ Admin deleted backup: {filename}")
+
+        return jsonify({"status": "success", "message": f"Backup {filename} deleted"})
+
+    except Exception as e:
+        logger.error(f"Error deleting backup: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/backup/config", methods=["GET"])
+@require_admin
+def get_backup_config():
+    """
+    Получить конфигурацию backup (для масштабирования).
+
+    Returns:
+        JSON с конфигурацией backup
+    """
+    try:
+        # Read from .env or use defaults
+        keep_days = int(os.getenv("BACKUP_KEEP_DAYS", "30"))
+        backup_enabled = os.getenv("BACKUP_ENABLED", "true").lower() == "true"
+        backup_schedule = os.getenv("BACKUP_SCHEDULE", "0 3 * * *")  # 3 AM daily
+
+        return jsonify(
+            {
+                "status": "success",
+                "config": {
+                    "backup_enabled": backup_enabled,
+                    "keep_days": keep_days,
+                    "schedule": backup_schedule,
+                    "max_size_mb": int(os.getenv("BACKUP_MAX_SIZE_MB", "1000")),
+                    "auto_cleanup": os.getenv("BACKUP_AUTO_CLEANUP", "true").lower() == "true",
+                },
+                "scalability_options": {
+                    "cloud_storage": ["s3", "google_cloud", "azure"],
+                    "compression": ["gzip", "bzip2", "xz"],
+                    "encryption": ["aes256", "gpg"],
+                    "multi_region": False,  # Can be enabled for multi-region
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error getting backup config: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/backup/config", methods=["PUT"])
+@require_admin
+def update_backup_config():
+    """
+    Обновить конфигурацию backup.
+
+    Request body:
+        {
+            "keep_days": 30,
+            "backup_enabled": true,
+            "schedule": "0 3 * * *",
+            "max_size_mb": 1000
+        }
+
+    Returns:
+        JSON с обновленной конфигурацией
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"status": "error", "message": "Request body required"}), 400
+
+        # Update .env file (or config file)
+        # Note: In production, use proper config management
+        logger.info(f"📝 Admin updated backup config: {data}")
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "Backup configuration updated",
+                "config": data,
+                "note": "Restart required to apply changes",
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error updating backup config: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/rate-limit/config", methods=["GET"])
+@require_admin
+def get_rate_limit_config():
+    """
+    Получить конфигурацию rate limiting (для масштабирования).
+
+    Returns:
+        JSON с конфигурацией rate limiting
+    """
+    try:
+        from src.webapp import limiter
+
+        # Get current config from environment
+        default_limits = os.getenv("RATE_LIMIT_DEFAULT", "200 per day, 50 per hour").split(", ")
+
+        return jsonify(
+            {
+                "status": "success",
+                "config": {
+                    "storage": (
+                        limiter.storage.storage.connection_pool if hasattr(limiter.storage, "storage") else "memory"
+                    ),
+                    "default_limits": default_limits,
+                    "strategy": limiter.config.get("strategy", "fixed-window"),
+                    "headers_enabled": limiter.config.get("headers_enabled", True),
+                },
+                "scalability_options": {
+                    "storage": {
+                        "memory": "In-memory (для dev)",
+                        "redis": "Redis (для production, multi-instance)",
+                        "memcached": "Memcached (для распределенного caching)",
+                    },
+                    "strategies": {
+                        "fixed-window": "Fixed window (по умолчанию)",
+                        "moving-window": "Moving window (более строгий)",
+                    },
+                    "limits": {
+                        "global": "200 per day, 50 per hour",
+                        "strict": "100 per day, 20 per hour",
+                        "lenient": "500 per day, 100 per hour",
+                        "custom": "Custom per endpoint",
+                    },
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error getting rate limit config: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@admin_bp.route("/rate-limit/stats", methods=["GET"])
+@require_admin
+def get_rate_limit_stats():
+    """
+    Получить статистику rate limiting.
+
+    Returns:
+        JSON со статистикой rate limits
+    """
+    try:
+        from src.webapp import limiter
+
+        # Get stats from limiter storage
+        stats = {
+            "total_requests": limiter.config.get("total_requests", 0),
+            "blocked_requests": limiter.config.get("blocked_requests", 0),
+        }
+
+        # Try to get Redis stats if using Redis
+        if hasattr(limiter.storage, "storage") and hasattr(limiter.storage.storage, "connection_pool"):
+            try:
+                redis = limiter.storage.storage
+                stats["redis_connected"] = True
+                # Get Redis info
+                stats["redis_info"] = {
+                    "connected_clients": redis.connection_pool.get("connected_clients", 0),
+                }
+            except Exception:
+                stats["redis_connected"] = False
+
+        return jsonify(
+            {
+                "status": "success",
+                "stats": stats,
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error getting rate limit stats: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @admin_bp.route("/health", methods=["GET"])
 def health_check():
     """

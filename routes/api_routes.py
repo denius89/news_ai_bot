@@ -1204,14 +1204,20 @@ def get_digest_history():
             }
             formatted_digests.append(formatted_digest)
 
+        # Calculate pagination metadata (TODO: implement count_digests in database/service.py)
+        total = len(formatted_digests)
+        page = (offset // limit) + 1
+
         return jsonify(
             {
                 "status": "success",
-                "data": {
-                    "digests": formatted_digests,
-                    "total": len(formatted_digests),
+                "data": formatted_digests,
+                "pagination": {
+                    "page": page,
                     "limit": limit,
-                    "offset": offset,
+                    "total": total,
+                    "has_next": offset + limit < 100,  # Fallback estimate
+                    "has_prev": offset > 0,
                 },
             }
         )

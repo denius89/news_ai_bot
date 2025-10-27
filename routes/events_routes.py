@@ -264,17 +264,21 @@ def get_events():
 @cross_origin()
 def get_upcoming_events():
     """
-    Get upcoming events within specified days.
+    Get upcoming events within specified days with pagination support.
 
     Query parameters:
     - days: Number of days to look ahead (default: 30)
     - category: Filter by category
     - min_importance: Minimum importance threshold
+    - page: Page number (default: 1)
+    - limit: Items per page (default: 20, max: 100)
     - filter_by_subscriptions: Filter by user preferences (default: false)
     - user_id: UUID пользователя (требуется если filter_by_subscriptions=true)
     """
     try:
         # Parse query parameters
+        page = max(1, int(request.args.get("page", 1)))
+        limit = min(int(request.args.get("limit", 20)), 100)
         days = int(request.args.get("days", 30))
         category = request.args.get("category")
         min_importance = float(request.args.get("min_importance", 0.0))
@@ -398,9 +402,14 @@ def get_upcoming_events():
                 days_ahead=days, category=category, min_importance=min_importance
             )
 
+        # Apply pagination
+        offset = (page - 1) * limit
+        total = len(events)
+        paginated_events = events[offset : offset + limit]
+
         # Convert to JSON format
         events_data = []
-        for event in events:
+        for event in paginated_events:
             event_data = {
                 "id": event.id,
                 "title": event.title,
@@ -420,19 +429,26 @@ def get_upcoming_events():
             }
             events_data.append(event_data)
 
+        total_pages = (total + limit - 1) // limit if total > 0 else 1
+
         return jsonify(
             {
                 "success": True,
-                "data": {
-                    "events": events_data,
-                    "count": len(events_data),
-                    "days_ahead": days,
-                    "filters": {
-                        "category": category,
-                        "min_importance": min_importance,
-                    },
-                    "filtered_by_subscriptions": filter_by_subscriptions and user_id is not None,
+                "data": events_data,
+                "pagination": {
+                    "page": page,
+                    "limit": limit,
+                    "total": total,
+                    "pages": total_pages,
+                    "has_next": page < total_pages,
+                    "has_prev": page > 1,
                 },
+                "days_ahead": days,
+                "filters": {
+                    "category": category,
+                    "min_importance": min_importance,
+                },
+                "filtered_by_subscriptions": filter_by_subscriptions and user_id is not None,
             }
         )
 

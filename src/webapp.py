@@ -3,6 +3,8 @@ import os
 from flask import Flask, send_from_directory, redirect, session, request, g
 from flask_cors import CORS
 from flask_caching import Cache
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from datetime import timedelta
 
 import sys
@@ -50,6 +52,9 @@ cache = Cache(
         "CACHE_THRESHOLD": 500,  # Max 500 items in cache
     },
 )
+
+# Flask-Limiter будет инициализирован после импорта всех blueprints
+# чтобы избежать циклических зависимостей
 
 
 # Middleware для единой аутентификации
@@ -318,6 +323,16 @@ from routes.admin_routes import admin_bp
 
 app.register_blueprint(admin_bp)  # url_prefix='/admin/api' уже в Blueprint
 app.register_blueprint(telegram_admin_bp)  # Telegram bot admin panel
+
+# Flask-Limiter configuration для rate limiting (инициализируем после всех импортов)
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri=os.getenv("REDIS_URL", "memory://"),  # Redis для масштабирования, memory для dev
+    strategy="fixed-window",  # "moving-window" для более строгого контроля
+    headers_enabled=True,  # Добавляет headers с информацией о rate limit
+)
 
 # WebSocket initialization removed - using FastAPI now
 # if REACTOR_ENABLED:
