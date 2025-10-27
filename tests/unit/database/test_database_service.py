@@ -19,7 +19,9 @@ class TestDatabaseService:
     @pytest.mark.asyncio
     async def test_init_async_mode(self):
         """Test initialization in async mode."""
-        pytest.skip("❌ Требует сложного мокирования Supabase async client для MVP")
+        # Just check async mode is supported
+        service = DatabaseService(async_mode=True)
+        assert service.async_mode == True
 
     def test_get_latest_news_is_method(self):
         """Test that get_latest_news is a method."""
