@@ -21,7 +21,7 @@ on:
       verbose:
         description: 'Verbose output'
         required: false
-        default: 'true'
+        default: true
         type: boolean
 
 jobs:
@@ -77,11 +77,11 @@ jobs:
       - name: Setup tmate session (SSH debug)
         if: failure() || (github.event_name == 'workflow_dispatch')
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
         with:
           limit-access-to-actor: true
+        timeout-minutes: 30
 
-      - name: Debug: Show test summary
+      - name: "Debug: Show test summary"
         if: failure()
         run: |
           echo "⚠️ Some tests failed. Checking details..."
@@ -139,7 +139,7 @@ jobs:
           python -m flake8 --select=E9,F63,F7,F82 --exclude=venv,node_modules,__pycache__,webapp .
         continue-on-error: true
 
-      - name: Debug: Show environment info on failure
+      - name: "Debug: Show environment info on failure"
         if: failure()
         run: |
           echo "🐛 Debugging failed run..."
