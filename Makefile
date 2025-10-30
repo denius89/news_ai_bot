@@ -23,7 +23,7 @@ NC = \033[0m # No Color
 # 🎯 ОСНОВНЫЕ КОМАНДЫ
 # =============================================================================
 
-.PHONY: help start stop restart check-ports logs clean cloudflare-config update-config smart-push strict-check detailed-fix
+.PHONY: help start stop restart check-ports logs clean cloudflare-config update-config smart-push strict-check detailed-fix lint
 
 # Показать справку
 help:
@@ -58,6 +58,9 @@ help:
 	@echo "  $(YELLOW)Flask (порт $(FLASK_PORT)):$(NC)   React статика + API"
 	@echo "  $(YELLOW)Telegram Bot:$(NC)                 Управление подписками"
 	@echo "  $(YELLOW)React:$(NC)                        Статические файлы в Flask"
+	@echo "  $(YELLOW)repo-map:$(NC)                     Генерация CODEMAP/ARCHITECTURE/ROADMAP"
+	@echo "  $(YELLOW)guard:$(NC)                        Проверка public_api (refactor guard)"
+	@echo "  $(YELLOW)ai-qa:$(NC)                        Комплексная AI-проверка"
 
 # =============================================================================
 # 🎯 ПРОВЕРКА ПОРТОВ
@@ -306,3 +309,44 @@ showcase:
 # =============================================================================
 
 .DEFAULT_GOAL := help
+
+# =============================================================================
+# 🧭 REPO MAP
+# =============================================================================
+
+.PHONY: repo-map
+repo-map:
+	@echo "$(BLUE)🧭 Генерация репортов репозитория...$(NC)"
+	@python3 tools/utils/repo_map.py
+	@echo "$(GREEN)✅ Обновлены: CODEMAP.md, docs/CODEMAP.md, docs/ARCHITECTURE.md, docs/ROADMAP.md, architecture.json$(NC)"
+
+# =============================================================================
+# 🛡️ REFACTOR GUARD
+# =============================================================================
+
+.PHONY: guard
+guard:
+	@echo "$(BLUE)🛡️ Проверка public_api...$(NC)"
+	@python3 tools/refactor_guard.py --check public_api || true
+	@echo "$(YELLOW)ℹ️  Для обновления снимка: python3 tools/refactor_guard.py --snapshot$(NC)"
+
+# =============================================================================
+# 🧹 LINT
+# =============================================================================
+
+.PHONY: lint
+lint:
+	@echo "$(BLUE)🧹 Lint checks (flake8, black --check, isort --check-only, bandit)$(NC)"
+	@flake8 . || true
+	@black --check . || true
+	@isort --check-only . || true
+	@bandit -q -r . || true
+
+# =============================================================================
+# 🤖 AI QA
+# =============================================================================
+
+.PHONY: ai-qa
+ai-qa:
+	@echo "$(BLUE)🤖 Running AI QA...$(NC)"
+	@python3 tools/ai_qa.py || true

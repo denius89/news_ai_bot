@@ -1,0 +1,2109 @@
+{
+  "summary": {
+    "threshold": 0.8,
+    "functions_scanned": 1509,
+    "pairs_detected": 140
+  },
+  "duplicates": [
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/news_graph.py",
+        "func": "__init__",
+        "line": 18,
+        "tokens": 31
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/feedback_loop.py",
+        "func": "__init__",
+        "line": 21,
+        "tokens": 31
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "is_enabled",
+        "line": 459,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "is_enabled",
+        "line": 360,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "is_enabled",
+        "line": 604,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "is_enabled",
+        "line": 557,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_health_url",
+        "line": 41,
+        "tokens": 61
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_health_url",
+        "line": 46,
+        "tokens": 61
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_vite_allowed_hosts",
+        "line": 54,
+        "tokens": 169
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_vite_allowed_hosts",
+        "line": 59,
+        "tokens": 169
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_webapp_url",
+        "line": 31,
+        "tokens": 57
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_webapp_url",
+        "line": 36,
+        "tokens": 57
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_api_url",
+        "line": 36,
+        "tokens": 58
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_api_url",
+        "line": 41,
+        "tokens": 58
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_dashboard_url",
+        "line": 46,
+        "tokens": 57
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_dashboard_url",
+        "line": 51,
+        "tokens": 57
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "get_deployment_info",
+        "line": 65,
+        "tokens": 203
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "get_deployment_info",
+        "line": 70,
+        "tokens": 203
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/archive/config_backup_20251008_103645/cloudflare.py",
+        "func": "validate_cloudflare_config",
+        "line": 81,
+        "tokens": 272
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/config/core/cloudflare.py",
+        "func": "validate_cloudflare_config",
+        "line": 86,
+        "tokens": 272
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/notifications/telegram_sender.py",
+        "func": "_get_category_emoji",
+        "line": 196,
+        "tokens": 202
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/notification_service.py",
+        "func": "_get_category_emoji",
+        "line": 376,
+        "tokens": 202
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/advanced_parser.py",
+        "func": "__aexit__",
+        "line": 234,
+        "tokens": 95
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/sources/validate_sources.py",
+        "func": "__aexit__",
+        "line": 125,
+        "tokens": 95
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/unified_parser.py",
+        "func": "close",
+        "line": 357,
+        "tokens": 49
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "close",
+        "line": 357,
+        "tokens": 49
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/unified_parser.py",
+        "func": "aclose",
+        "line": 361,
+        "tokens": 55
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "aclose",
+        "line": 361,
+        "tokens": 55
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/update_tools_imports.py",
+        "func": "update_file_imports",
+        "line": 84,
+        "tokens": 607
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/update_imports.py",
+        "func": "update_file_imports",
+        "line": 47,
+        "tokens": 607
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/middleware/rate_limiter.py",
+        "func": "_get_user_id",
+        "line": 86,
+        "tokens": 161
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/middleware/error_handler.py",
+        "func": "_get_user_id",
+        "line": 164,
+        "tokens": 161
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/middleware/user_middleware.py",
+        "func": "__init__",
+        "line": 33,
+        "tokens": 28
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/middleware/error_handler.py",
+        "func": "__init__",
+        "line": 32,
+        "tokens": 28
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/feedback_tracker.py",
+        "func": "_load_config",
+        "line": 69,
+        "tokens": 343
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/teaser_generator.py",
+        "func": "_load_config",
+        "line": 72,
+        "tokens": 341
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/post_selector.py",
+        "func": "_load_config",
+        "line": 59,
+        "tokens": 343
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/feedback_tracker.py",
+        "func": "_load_config",
+        "line": 69,
+        "tokens": 343
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/post_selector.py",
+        "func": "_load_config",
+        "line": 59,
+        "tokens": 343
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/teaser_generator.py",
+        "func": "_load_config",
+        "line": 72,
+        "tokens": 341
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 1.0,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.966,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/adaptive_thresholds.py",
+        "func": "_load_config",
+        "line": 44,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "_load_config",
+        "line": 61,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_load_config",
+        "line": 62,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/review_handler.py",
+        "func": "_load_config",
+        "line": 76,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "_load_config",
+        "line": 65,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.947,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "_load_config",
+        "line": 74,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "info",
+        "line": 188,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "error",
+        "line": 196,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "info",
+        "line": 188,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "warning",
+        "line": 204,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "info",
+        "line": 188,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "debug",
+        "line": 212,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "error",
+        "line": 196,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "warning",
+        "line": 204,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "error",
+        "line": 196,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "debug",
+        "line": 212,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.935,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "warning",
+        "line": 204,
+        "tokens": 178
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/logging/standard_logging.py",
+        "func": "debug",
+        "line": 212,
+        "tokens": 178
+      }
+    },
+    {
+      "score": 0.914,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "_load_config",
+        "line": 42,
+        "tokens": 324
+      }
+    },
+    {
+      "score": 0.914,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "_load_config",
+        "line": 41,
+        "tokens": 324
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.914,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/handlers/digest_handler.py",
+        "func": "_load_config",
+        "line": 84,
+        "tokens": 326
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/local_predictor.py",
+        "func": "_load_config",
+        "line": 118,
+        "tokens": 321
+      }
+    },
+    {
+      "score": 0.905,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/database/service.py",
+        "func": "safe_execute",
+        "line": 238,
+        "tokens": 542
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/database/service.py",
+        "func": "async_safe_execute",
+        "line": 263,
+        "tokens": 552
+      }
+    },
+    {
+      "score": 0.903,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "get_news_with_analysis",
+        "line": 295,
+        "tokens": 522
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "async_get_news_with_analysis",
+        "line": 326,
+        "tokens": 528
+      }
+    },
+    {
+      "score": 0.896,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "build_daily_digest",
+        "line": 40,
+        "tokens": 551
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "async_build_daily_digest",
+        "line": 70,
+        "tokens": 557
+      }
+    },
+    {
+      "score": 0.895,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_train_importance_model",
+        "line": 330,
+        "tokens": 982
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "_train_credibility_model",
+        "line": 388,
+        "tokens": 982
+      }
+    },
+    {
+      "score": 0.893,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/routes/api_routes.py",
+        "func": "archive_digest",
+        "line": 1375,
+        "tokens": 627
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/routes/api_routes.py",
+        "func": "unarchive_digest",
+        "line": 1410,
+        "tokens": 633
+      }
+    },
+    {
+      "score": 0.892,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/update_imports.py",
+        "func": "update_tests_imports",
+        "line": 74,
+        "tokens": 452
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/update_imports.py",
+        "func": "update_utils_imports",
+        "line": 93,
+        "tokens": 452
+      }
+    },
+    {
+      "score": 0.889,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/services/subscription_service.py",
+        "func": "__init__",
+        "line": 19,
+        "tokens": 185
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "__init__",
+        "line": 27,
+        "tokens": 187
+      }
+    },
+    {
+      "score": 0.889,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/train_models.py",
+        "func": "setup_logging",
+        "line": 155,
+        "tokens": 143
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/analyze_data.py",
+        "func": "setup_logging",
+        "line": 20,
+        "tokens": 143
+      }
+    },
+    {
+      "score": 0.875,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/telegram_sender.py",
+        "func": "send_error_message",
+        "line": 135,
+        "tokens": 490
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/telegram_sender.py",
+        "func": "send_help_message",
+        "line": 155,
+        "tokens": 492
+      }
+    },
+    {
+      "score": 0.87,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/sports/thesportsdb_provider.py",
+        "func": "_calculate_importance",
+        "line": 206,
+        "tokens": 263
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/sports/football_data_provider.py",
+        "func": "_calculate_importance",
+        "line": 196,
+        "tokens": 263
+      }
+    },
+    {
+      "score": 0.87,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/post_selector.py",
+        "func": "reset_recently_published",
+        "line": 265,
+        "tokens": 87
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/telegram_bot/services/content_scheduler.py",
+        "func": "reset_recent_published",
+        "line": 299,
+        "tokens": 89
+      }
+    },
+    {
+      "score": 0.869,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_earnings_calendar",
+        "line": 93,
+        "tokens": 746
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_economic_calendar",
+        "line": 161,
+        "tokens": 746
+      }
+    },
+    {
+      "score": 0.869,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_ipo_calendar",
+        "line": 127,
+        "tokens": 746
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_economic_calendar",
+        "line": 161,
+        "tokens": 746
+      }
+    },
+    {
+      "score": 0.867,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/advanced_parser.py",
+        "func": "__aexit__",
+        "line": 234,
+        "tokens": 95
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/browser_parser.py",
+        "func": "__aexit__",
+        "line": 71,
+        "tokens": 95
+      }
+    },
+    {
+      "score": 0.867,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/browser_parser.py",
+        "func": "__aexit__",
+        "line": 71,
+        "tokens": 95
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/sources/validate_sources.py",
+        "func": "__aexit__",
+        "line": 125,
+        "tokens": 95
+      }
+    },
+    {
+      "score": 0.862,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/metrics.py",
+        "func": "wrapper",
+        "line": 628,
+        "tokens": 209
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/metrics.py",
+        "func": "wrapper",
+        "line": 647,
+        "tokens": 209
+      }
+    },
+    {
+      "score": 0.859,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_earnings_calendar",
+        "line": 93,
+        "tokens": 746
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/events/providers/markets/finnhub_provider.py",
+        "func": "_fetch_ipo_calendar",
+        "line": 127,
+        "tokens": 746
+      }
+    },
+    {
+      "score": 0.857,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/parsers/advanced_parser.py",
+        "func": "__aenter__",
+        "line": 228,
+        "tokens": 113
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/sources/validate_sources.py",
+        "func": "__aenter__",
+        "line": 119,
+        "tokens": 113
+      }
+    },
+    {
+      "score": 0.857,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/http_client.py",
+        "func": "httpx_client",
+        "line": 88,
+        "tokens": 299
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/http_client.py",
+        "func": "async_httpx_client",
+        "line": 103,
+        "tokens": 299
+      }
+    },
+    {
+      "score": 0.855,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/optimized_credibility.py",
+        "func": "evaluate_credibility_with_cache",
+        "line": 133,
+        "tokens": 271
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/optimized_importance.py",
+        "func": "evaluate_importance_with_cache",
+        "line": 155,
+        "tokens": 271
+      }
+    },
+    {
+      "score": 0.849,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/database/db_models.py",
+        "func": "soft_delete_digest",
+        "line": 1059,
+        "tokens": 860
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/database/db_models.py",
+        "func": "archive_digest",
+        "line": 1148,
+        "tokens": 878
+      }
+    },
+    {
+      "score": 0.84,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/events/load_sample_events.py",
+        "func": "main",
+        "line": 408,
+        "tokens": 136
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/events/load_15_events_per_subcategory.py",
+        "func": "main",
+        "line": 624,
+        "tokens": 128
+      }
+    },
+    {
+      "score": 0.838,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/analyze_data.py",
+        "func": "setup_logging",
+        "line": 20,
+        "tokens": 143
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "setup_logging",
+        "line": 745,
+        "tokens": 143
+      }
+    },
+    {
+      "score": 0.838,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/train_models.py",
+        "func": "setup_logging",
+        "line": 155,
+        "tokens": 143
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/tools/ai/build_dataset.py",
+        "func": "setup_logging",
+        "line": 745,
+        "tokens": 143
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "is_enabled",
+        "line": 316,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "is_enabled",
+        "line": 557,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "is_enabled",
+        "line": 141,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "is_enabled",
+        "line": 604,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "is_enabled",
+        "line": 141,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "is_enabled",
+        "line": 316,
+        "tokens": 77
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "is_enabled",
+        "line": 141,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "is_enabled",
+        "line": 557,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "is_enabled",
+        "line": 604,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "is_enabled",
+        "line": 316,
+        "tokens": 77
+      }
+    },
+    {
+      "score": 0.833,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/http_client.py",
+        "func": "get_sync",
+        "line": 217,
+        "tokens": 281
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/http_client.py",
+        "func": "post_sync",
+        "line": 243,
+        "tokens": 299
+      }
+    },
+    {
+      "score": 0.816,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/telegram_sender.py",
+        "func": "send_message",
+        "line": 196,
+        "tokens": 396
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/utils/network/telegram_sender.py",
+        "func": "send_digest",
+        "line": 217,
+        "tokens": 399
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_category_config",
+        "line": 617,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_tone_config",
+        "line": 624,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_category_config",
+        "line": 617,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_length_config",
+        "line": 631,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_category_config",
+        "line": 617,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_audience_config",
+        "line": 638,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_tone_config",
+        "line": 624,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_length_config",
+        "line": 631,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_tone_config",
+        "line": 624,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_audience_config",
+        "line": 638,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_length_config",
+        "line": 631,
+        "tokens": 96
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/digests/prompts_v2.py",
+        "func": "get_audience_config",
+        "line": 638,
+        "tokens": 96
+      }
+    },
+    {
+      "score": 0.812,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "build_daily_digest",
+        "line": 388,
+        "tokens": 120
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/services/unified_digest_service.py",
+        "func": "async_build_daily_digest",
+        "line": 398,
+        "tokens": 126
+      }
+    },
+    {
+      "score": 0.81,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/optimize_tests_utils.py",
+        "func": "move_tests_files",
+        "line": 138,
+        "tokens": 480
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/scripts/optimize_tests_utils.py",
+        "func": "move_utils_files",
+        "line": 158,
+        "tokens": 480
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "is_enabled",
+        "line": 316,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "is_enabled",
+        "line": 459,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/cache.py",
+        "func": "is_enabled",
+        "line": 316,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "is_enabled",
+        "line": 360,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "is_enabled",
+        "line": 141,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "is_enabled",
+        "line": 459,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/prefilter.py",
+        "func": "is_enabled",
+        "line": 141,
+        "tokens": 77
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "is_enabled",
+        "line": 360,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "is_enabled",
+        "line": 459,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "is_enabled",
+        "line": 557,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "is_enabled",
+        "line": 604,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/rejection_analyzer.py",
+        "func": "is_enabled",
+        "line": 459,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_collector.py",
+        "func": "is_enabled",
+        "line": 604,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "is_enabled",
+        "line": 360,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/self_tuning_trainer.py",
+        "func": "is_enabled",
+        "line": 557,
+        "tokens": 79
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/ai_modules/auto_rule_manager.py",
+        "func": "is_enabled",
+        "line": 360,
+        "tokens": 79
+      }
+    },
+    {
+      "score": 0.8,
+      "a": {
+        "file": "/Users/denisfedko/news_ai_bot/models/event.py",
+        "func": "_coerce_event_time",
+        "line": 42,
+        "tokens": 30
+      },
+      "b": {
+        "file": "/Users/denisfedko/news_ai_bot/models/news.py",
+        "func": "_coerce_published_at",
+        "line": 38,
+        "tokens": 30
+      }
+    }
+  ]
+}

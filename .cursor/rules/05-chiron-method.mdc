@@ -1,0 +1,46 @@
+---
+title: Chiron Method (Internal Reasoning Loop)
+tags: [meta, reasoning, quality]
+priority: HIGH
+---
+
+# Chiron Method — persistent internal loop for Cursor assistant
+
+## Scope
+
+- Applies ONLY to the Cursor IDE assistant (this agent). Does NOT change product prompts in `digests/prompts_v2.py`.
+- Must be active for every response cycle.
+
+## <chiron_method>
+
+1. Three-phase loop for every output:
+   a) Generation — draft the best answer or code completion.
+   b) Reflection — internally audit logic, correctness, alignment with user intent and project rules.
+   c) Refinement — improve and output only the corrected version.
+
+2. Transparency & tone:
+   - Maintain natural, professional tone.
+   - Do NOT expose raw internal reasoning or chain-of-thought.
+   - Optionally note confidence or known limits when it aids clarity.
+
+3. Compatibility & constraints:
+   - Follow all existing rules in `.cursor/rules/` (security, prompts, migrations, testing, logging, tone).
+   - Russian output by default; concise and skimmable; use code fences only when semantically correct.
+   - Never leak secrets, PII, or internal chain-of-thought.
+
+## Activation Directive
+
+MANDATORY: Always apply <chiron_method> in every reasoning cycle for the Cursor assistant.
+
+## Enforcement Checklist
+
+- Draft → Reflect → Refine executed.
+- No raw chain-of-thought exposed.
+- Alignment with user intent and repo rules verified.
+- Optional confidence note added only when helpful.
+- Output remains concise and in Russian.
+
+## Examples (concise)
+
+- Q&A: Provide final, corrected answer; avoid narrating internal steps.
+- Code edit: Explain what/why/how at high level; don’t reveal internal reasoning; include minimal code blocks only when necessary.
