@@ -142,3 +142,71 @@ def get_quality_metrics():
     except Exception as e:
         logger.error(f"Error getting quality metrics: {e}")
         return jsonify({"error": "Internal server error"}), 500
+
+
+@metrics_bp.route("/api/metrics/runtime", methods=["GET"])
+def get_runtime_metrics():
+    """
+    GET /api/metrics/runtime
+
+    Returns runtime QA metrics aggregated from logs/ai_metrics.jsonl if present.
+    Fields:
+      - ai_changed_files
+      - rollback_count
+      - test_failures
+      - lint_errors
+      - risk_score_avg
+      - generated_at
+    """
+    try:
+        import os
+        from statistics import mean
+
+        log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs", "ai_metrics.jsonl")
+
+        ai_changed_files = 0
+        rollback_count = 0
+        test_failures = 0
+        lint_errors = 0
+        risk_scores = []
+
+        if os.path.exists(log_path):
+            with open(log_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    try:
+                        rec = json.loads(line.strip())
+                    except Exception:
+                        continue
+                    ai_changed_files = max(ai_changed_files, int(rec.get("ai_changed_files", 0)))
+                    rollback_count += int(rec.get("rollback_count", 0))
+                    test_failures += int(rec.get("test_failures", 0))
+                    lint_errors += int(rec.get("lint_errors", 0))
+                    if "risk_score" in rec:
+                        try:
+                            risk_scores.append(float(rec["risk_score"]))
+                        except Exception:
+                            pass
+
+        response = {
+            "ai_changed_files": ai_changed_files,
+            "rollback_count": rollback_count,
+            "test_failures": test_failures,
+            "lint_errors": lint_errors,
+            "risk_score_avg": round(mean(risk_scores), 3) if risk_scores else 0.0,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        return jsonify(response)
+
+    except Exception as e:
+        logger.error(f"Error getting runtime metrics: {e}")
+        return jsonify(
+            {
+                "ai_changed_files": 0,
+                "rollback_count": 0,
+                "test_failures": 0,
+                "lint_errors": 0,
+                "risk_score_avg": 0.0,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )

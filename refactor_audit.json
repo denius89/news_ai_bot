@@ -1,0 +1,51 @@
+[
+    {
+        "file": "tools/utils/repo_map.py",
+        "type": "behavior_preserving",
+        "impact": [
+            "docs/CODEMAP.md",
+            "docs/ARCHITECTURE.md",
+            "docs/ROADMAP.md",
+            "architecture.json"
+        ],
+        "reason": "Add architecture export and docs generation",
+        "risk_score": 0.05
+    },
+    {
+        "file": "tools/dup_scan.py",
+        "type": "observability",
+        "impact": [
+            "reports/duplications.json"
+        ],
+        "reason": "Add duplication scanner (read-only)",
+        "risk_score": 0.03
+    },
+    {
+        "file": "tools/refactor_guard.py",
+        "type": "safety_guard",
+        "impact": [
+            "reports/public_api_snapshot.json",
+            "reports/public_api_violations.json"
+        ],
+        "reason": "Public API snapshot/check",
+        "risk_score": 0.07
+    },
+    {
+        "file": "routes/metrics_routes.py",
+        "type": "feature_small",
+        "impact": [
+            "/api/metrics/runtime"
+        ],
+        "reason": "Expose runtime QA metrics",
+        "risk_score": 0.08
+    },
+    {
+        "file": "scripts/run_sandbox_tests.sh",
+        "type": "tooling",
+        "impact": [
+            "local CI"
+        ],
+        "reason": "Isolated pytest runner",
+        "risk_score": 0.02
+    }
+]
