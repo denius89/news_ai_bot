@@ -135,9 +135,7 @@ def write_architecture_json(project_root: Path, deps: Dict[str, Set[str]]) -> No
         "layers": LAYER_DIRS + ["other"],
         "dependencies": {k: sorted(list(v)) for k, v in deps.items()},
     }
-    (project_root / "architecture.json").write_text(
-        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    (project_root / "architecture.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def write_docs(project_root: Path, tree_lines: List[str], deps: Dict[str, Set[str]]) -> None:
@@ -146,9 +144,7 @@ def write_docs(project_root: Path, tree_lines: List[str], deps: Dict[str, Set[st
     # 1) CODEMAP.md в корне (сохранить существующее поведение)
     out_root = project_root / "CODEMAP.md"
     out_root.write_text(
-        "# 📂 Project Structure\n\n"
-        f"_Generated on {ts}_\n\n"
-        "```\n" + "\n".join(tree_lines) + "\n```\n",
+        "# 📂 Project Structure\n\n" f"_Generated on {ts}_\n\n" "```\n" + "\n".join(tree_lines) + "\n```\n",
         encoding="utf-8",
     )
 
@@ -156,9 +152,7 @@ def write_docs(project_root: Path, tree_lines: List[str], deps: Dict[str, Set[st
     docs_dir = project_root / "docs"
     docs_dir.mkdir(parents=True, exist_ok=True)
     (docs_dir / "CODEMAP.md").write_text(
-        "# 📂 Project Structure\n\n"
-        f"_Generated on {ts}_\n\n"
-        "```\n" + "\n".join(tree_lines) + "\n```\n",
+        "# 📂 Project Structure\n\n" f"_Generated on {ts}_\n\n" "```\n" + "\n".join(tree_lines) + "\n```\n",
         encoding="utf-8",
     )
 

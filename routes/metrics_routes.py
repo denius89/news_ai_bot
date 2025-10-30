@@ -200,11 +200,13 @@ def get_runtime_metrics():
 
     except Exception as e:
         logger.error(f"Error getting runtime metrics: {e}")
-        return jsonify({
-            "ai_changed_files": 0,
-            "rollback_count": 0,
-            "test_failures": 0,
-            "lint_errors": 0,
-            "risk_score_avg": 0.0,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
-        })
+        return jsonify(
+            {
+                "ai_changed_files": 0,
+                "rollback_count": 0,
+                "test_failures": 0,
+                "lint_errors": 0,
+                "risk_score_avg": 0.0,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )

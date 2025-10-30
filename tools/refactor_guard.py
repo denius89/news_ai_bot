@@ -83,9 +83,7 @@ class ApiVisitor(ast.NodeVisitor):
         self.stack.append(node.name)
         if self._is_public_api(node):
             qual = ".".join(self.stack)
-            self.symbols.append(
-                ApiSymbol(module=self.module_path, qualname=qual, kind="class", args=[], defaults=0)
-            )
+            self.symbols.append(ApiSymbol(module=self.module_path, qualname=qual, kind="class", args=[], defaults=0))
         for stmt in node.body:
             if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Methods
