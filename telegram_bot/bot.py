@@ -3,9 +3,6 @@ from pathlib import Path
 import asyncio
 import logging
 
-# Добавляем корень проекта в PYTHONPATH ПЕРЕД импортами
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
