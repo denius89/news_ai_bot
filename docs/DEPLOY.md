@@ -27,7 +27,7 @@ Complete guide for local setup and deployment of PulseAI.
 
 1. **Clone Repository**
    ```bash
-   git clone https://github.com/denius89/news_ai_bot.git
+   git clone https://github.com/repository-owner/news_ai_bot.git
    cd news_ai_bot
    ```
 

@@ -23,7 +23,7 @@ async def open_dashboard(message: types.Message):
     logger.info("📱 Dashboard command received from user %s", message.from_user.id)
 
     # TODO: Move WebApp URL to config.py
-    webapp_url = "https://creativity-topic-boot-courage.trycloudflare.com/webapp"
+    webapp_url = "https://example.invalid/webapp"
 
     # Create keyboard with WebApp button
     keyboard = ReplyKeyboardMarkup(
