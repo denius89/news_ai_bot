@@ -10,7 +10,7 @@
 
 ### Вариант 1: Через Supabase Dashboard (Рекомендуется)
 
-1. Откройте [Supabase Dashboard](https://example.supabase.com)
+1. Откройте [Supabase Dashboard](https://app.supabase.com)
 2. Перейдите в ваш проект
 3. Откройте **SQL Editor**
 4. Выполните следующий SQL:
