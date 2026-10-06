@@ -50,7 +50,7 @@ COMMENT ON COLUMN events.subcategory IS 'Subcategory for hierarchical categoriza
 После миграции запустите тест:
 
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 python -c "
 from database.db_models import supabase
 try:
