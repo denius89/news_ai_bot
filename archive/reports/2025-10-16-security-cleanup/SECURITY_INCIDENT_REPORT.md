@@ -21,7 +21,7 @@
 
 ### ❌ Требуют немедленной ротации:
 
-2. **TELEGRAM_BOT_TOKEN** - `8062922612:AAHp8o_***masked***`
+2. **TELEGRAM_BOT_TOKEN** - `0:AAHp8o_***masked***`
 3. **GITHUB_TOKEN** - `ghp_***masked***`
 4. **SUPABASE_KEY** - полный ключ виден в истории
 5. **SUPABASE_URL** - `https://***masked***.supabase.co`

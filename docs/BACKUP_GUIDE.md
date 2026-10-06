@@ -195,7 +195,7 @@ pg_dump --version
 cat .env | grep SUPABASE
 
 # Если пусто, добавить в .env:
-SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_URL=https://example.supabase.co
 SUPABASE_KEY=your-anon-key
 ```
 
@@ -204,7 +204,7 @@ SUPABASE_KEY=your-anon-key
 **Решение:**
 ```bash
 # Проверить доступность Supabase
-ping db.supabase.co
+ping example.supabase.co
 
 # Проверить credentials
 echo $SUPABASE_URL
@@ -349,7 +349,7 @@ gunzip < backups/pulseai_20251027_143022.sql.gz | psql -d pulseai_test
 
 **Восстановление не работает?**
 1. Проверить формат backup: `file backups/pulseai_*.sql.gz`
-2. Проверить подключение: `psql -h db.supabase.co -U postgres -d pulseai`
+2. Проверить подключение: `psql -h example.supabase.co -U postgres -d pulseai`
 3. Попробовать старый backup
 
 ---
