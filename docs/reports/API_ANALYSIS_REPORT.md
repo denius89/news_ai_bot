@@ -342,5 +342,5 @@ WHERE (description IS NULL OR description = '')
 ---
 
 **Подготовлено:** PulseAI Engineering Team  
-**Контакт:** support@pulseai.local
+**Контакт:** contact@example.invalid
 

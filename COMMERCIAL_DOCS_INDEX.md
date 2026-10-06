@@ -1,3 +1,5 @@
+> **НЕАКТУАЛЬНО / DISCONTINUED — 2026-10-06.** Разработка PulseAI прекращена. Материалы сохранены как исторический архив; прежние заявления о готовности, планы и коммерческие прогнозы неактуальны. Поддержка и обновления не предоставляются.
+
 # 💼 Коммерческая документация PulseAI - Индекс
 
 **Дата создания:** 17 октября 2025  
@@ -195,10 +197,10 @@
 
 ## 📞 Контакты для вопросов
 
-**Denis Fedko** — Founder & CEO  
-- 📧 **Email:** denis@pulseai.app
-- 💼 **LinkedIn:** [denis-fedko](https://linkedin.com/in/denis-fedko)
-- 🐙 **GitHub:** [denius89](https://github.com/denius89)
+**Project maintainer** — Founder & CEO  
+- 📧 **Email:** contact@example.invalid
+- 💼 **LinkedIn:** [project-maintainer](https://example.invalid/profile)
+- 🐙 **GitHub:** [repository-owner](https://github.com/repository-owner)
 
 ---
 

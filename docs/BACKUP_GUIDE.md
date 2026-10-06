@@ -78,13 +78,13 @@ Size: 2.5M
 crontab -e
 
 # Add this line (adjust path):
-0 3 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
+0 3 * * * cd /home/user/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
 ```
 
 **С сохранением логов:**
 ```bash
 # Backup с логом
-0 3 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/backup_db.sh >> logs/backup_$(date +\%Y\%m\%d).log 2>&1
+0 3 * * * cd /home/user/news_ai_bot && ./scripts/backup_db.sh >> logs/backup_$(date +\%Y\%m\%d).log 2>&1
 ```
 
 ### Backup Метрики
@@ -136,19 +136,19 @@ crontab -e
 
 ```bash
 # Добавить в crontab
-0 3 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
+0 3 * * * cd /home/user/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
 ```
 
 #### Вариант 2: Backup каждые 6 часов
 
 ```bash
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
+0 */6 * * * cd /home/user/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
 ```
 
 #### Вариант 3: Backup раз в час (для критичных данных)
 
 ```bash
-0 * * * * cd /Users/denisfedko/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
+0 * * * * cd /home/user/news_ai_bot && ./scripts/backup_db.sh >> logs/backup.log 2>&1
 ```
 
 ### Monitoring Backup

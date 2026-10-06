@@ -37,7 +37,7 @@
       "size_mb": 2.5,
       "size_bytes": 2621440,
       "created_at": "2025-10-27T14:30:22",
-      "path": "/Users/denisfedko/news_ai_bot/backups/pulseai_20251027_143022.sql.gz"
+      "path": "/home/user/news_ai_bot/backups/pulseai_20251027_143022.sql.gz"
     }
   ],
   "count": 5,
@@ -90,7 +90,7 @@
     "created_at": "2025-10-27T14:30:22"
   },
   "total_backups": 5,
-  "backup_dir": "/Users/denisfedko/news_ai_bot/backups"
+  "backup_dir": "/home/user/news_ai_bot/backups"
 }
 ```
 

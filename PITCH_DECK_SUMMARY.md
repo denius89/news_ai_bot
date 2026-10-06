@@ -1,3 +1,5 @@
+> **НЕАКТУАЛЬНО / DISCONTINUED — 2026-10-06.** Разработка PulseAI прекращена. Материалы сохранены как исторический архив; прежние заявления о готовности, планы и коммерческие прогнозы неактуальны. Поддержка и обновления не предоставляются.
+
 # 🚀 PulseAI - Pitch Deck Summary
 
 **Investor Presentation**  
@@ -247,7 +249,7 @@ Google News → We provide AI analysis
 
 ## 👥 Team
 
-### Denis Fedko - Founder & CEO
+### Project maintainer - Founder & CEO
 - **Background:** Full-stack engineer, AI specialist
 - **Experience:** 10+ years in software development
 - **Skills:** Python, React, AI/ML, Product Management
@@ -347,13 +349,13 @@ Google News → We provide AI analysis
 
 ## 📞 Contact
 
-**Denis Fedko**  
+**Project maintainer**  
 Founder & CEO, PulseAI
 
-- 📧 **Email:** denis@pulseai.app
-- 💼 **LinkedIn:** [denis-fedko](https://linkedin.com/in/denis-fedko)
+- 📧 **Email:** contact@example.invalid
+- 💼 **LinkedIn:** [project-maintainer](https://example.invalid/profile)
 - 🤖 **Demo:** [@pulseai_bot](https://t.me/pulseai_bot)
-- 🐙 **GitHub:** [denius89/news_ai_bot](https://github.com/denius89/news_ai_bot)
+- 🐙 **GitHub:** [repository-owner/news_ai_bot](https://github.com/repository-owner/news_ai_bot)
 
 ---
 

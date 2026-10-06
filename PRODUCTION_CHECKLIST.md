@@ -1,3 +1,5 @@
+> **НЕАКТУАЛЬНО / DISCONTINUED — 2026-10-06.** Разработка PulseAI прекращена. Материалы сохранены как исторический архив; прежние заявления о готовности, планы и коммерческие прогнозы неактуальны. Поддержка и обновления не предоставляются.
+
 # 🚀 Production Readiness Checklist - PulseAI
 
 **Последнее обновление:** 22 октября 2025
@@ -317,7 +319,7 @@
 
 ## 📞 Support
 
-**Repository:** https://github.com/denius89/news_ai_bot
+**Repository:** https://github.com/repository-owner/news_ai_bot
 **Documentation:** docs/README.md
 **Issues:** GitHub Issues
 

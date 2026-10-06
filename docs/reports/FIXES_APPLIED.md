@@ -227,7 +227,7 @@
 ## 📞 КОНТАКТЫ
 
 При возникновении проблем обращайтесь:
-- Email: support@pulseai.local
+- Email: contact@example.invalid
 - Telegram: @pulseai_support
 
 ---

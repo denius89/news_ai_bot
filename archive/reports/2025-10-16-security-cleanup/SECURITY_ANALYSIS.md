@@ -1,7 +1,7 @@
 # 🔍 АНАЛИЗ: КАК ПРОИЗОШЛА УТЕЧКА
 
 **Дата анализа:** 16 октября 2025  
-**Репозиторий:** denius89/news_ai_bot
+**Репозиторий:** repository-owner/news_ai_bot
 
 ---
 
@@ -199,7 +199,7 @@ git stash push .env -m "backup env before changes"
 **Рабочий процесс:**
 ```bash
 # Новый разработчик клонирует репозиторий
-git clone https://github.com/denius89/news_ai_bot.git
+git clone https://github.com/repository-owner/news_ai_bot.git
 cd news_ai_bot
 
 # Создает свой .env из примера
@@ -243,7 +243,7 @@ git add -p
 ```bash
 brew install git-secrets
 
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 git secrets --install
 git secrets --add 'sk-proj-[a-zA-Z0-9_-]+'
 git secrets --add 'ghp_[a-zA-Z0-9]+'

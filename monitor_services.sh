@@ -101,7 +101,7 @@ restart_flask() {
     pkill -f "src/webapp.py" 2>/dev/null
     sleep 3
     
-    export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
+    export PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH"
     python3 src/webapp.py > logs/webapp.log 2>&1 &
     FLASK_PID=$!
     
@@ -126,7 +126,7 @@ restart_telegram_bot() {
     pkill -f "telegram_bot" 2>/dev/null
     sleep 3
     
-    export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
+    export PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH"
     python3 -m telegram_bot.bot > logs/bot.log 2>&1 &
     BOT_PID=$!
     

@@ -215,7 +215,7 @@ def train_models_safe(max_records=25000):
 
 set -e
 
-PROJECT_DIR="/Users/denisfedko/news_ai_bot"
+PROJECT_DIR="/home/user/news_ai_bot"
 LOG_DIR="$PROJECT_DIR/logs"
 
 cd "$PROJECT_DIR"
@@ -237,13 +237,13 @@ echo "$(date): Fetch and train completed" >> "$LOG_DIR/cron_fetch.log"
 
 ```cron
 # Fetch news every 2 hours
-0 */2 * * * /Users/denisfedko/news_ai_bot/scripts/auto_fetch_and_train.sh
+0 */2 * * * /home/user/news_ai_bot/scripts/auto_fetch_and_train.sh
 
 # Train ML models daily at 3 AM
-0 3 * * * /Users/denisfedko/news_ai_bot/scripts/train_models.sh
+0 3 * * * /home/user/news_ai_bot/scripts/train_models.sh
 
 # Cleanup old data weekly
-0 0 * * 0 /Users/denisfedko/news_ai_bot/scripts/cleanup_old_data.sh
+0 0 * * 0 /home/user/news_ai_bot/scripts/cleanup_old_data.sh
 ```
 
 ---

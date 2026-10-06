@@ -75,7 +75,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 ```bash
 python3 -c "
 import sys
-sys.path.append('/Users/denisfedko/news_ai_bot')
+sys.path.append('/home/user/news_ai_bot')
 from config.settings import APP_ENV, DEBUG
 print(f'APP_ENV: {APP_ENV}')
 print(f'DEBUG: {DEBUG}')
@@ -93,7 +93,7 @@ DEBUG: True
 ```bash
 python3 -c "
 import sys
-sys.path.append('/Users/denisfedko/news_ai_bot')
+sys.path.append('/home/user/news_ai_bot')
 from config.cloudflare import CLOUDFLARE_TUNNEL_URL
 print(f'CLOUDFLARE_TUNNEL_URL: {CLOUDFLARE_TUNNEL_URL}')
 print('✅ config/cloudflare.py загружает .env корректно')
@@ -101,7 +101,7 @@ print('✅ config/cloudflare.py загружает .env корректно')
 ```
 **Результат:** ✅ Успешно
 ```
-CLOUDFLARE_TUNNEL_URL: https://immunology-restructuring-march-same.trycloudflare.com
+CLOUDFLARE_TUNNEL_URL: https://example.invalid
 ✅ config/cloudflare.py загружает .env корректно
 ```
 

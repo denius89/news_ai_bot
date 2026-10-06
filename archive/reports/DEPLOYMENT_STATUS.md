@@ -12,7 +12,7 @@
 - **Статус:** ✅ Запущен
 - **PID:** 10552, 10535 (2 процесса - нормально)
 - **URL локальный:** http://localhost:8001/webapp
-- **URL внешний:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+- **URL внешний:** https://example.invalid/webapp
 - **Режим:** Debug ON, Threading ON
 - **Порт:** 8001
 
@@ -20,18 +20,18 @@
 - **Статус:** ✅ Запущен
 - **PID:** 31852
 - **Бот:** @PulseAIDigest_bot (ID: 8062922612)
-- **WebApp URL:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+- **WebApp URL:** https://example.invalid/webapp
 - **Статус:** Готов к работе
 
 ### 3. Cloudflare Tunnel
 - **Статус:** ✅ Запущен
 - **PID:** 4788
-- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com
+- **URL:** https://example.invalid
 - **Направление:** localhost:8001
 
 ### 4. Admin Panel
 - **Статус:** ✅ Полностью функционален
-- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/admin
+- **URL:** https://example.invalid/admin
 - **Функции:** Dashboard, Metrics, Logs, Config
 - **Аутентификация:** Telegram WebApp + Admin privileges
 
@@ -50,12 +50,12 @@
 ### ✅ Обновлены Cloudflare URL
 
 **Старые URL (не работают):**
-- ❌ `https://democrats-divorce-sheer-activities.trycloudflare.com`
-- ❌ `https://founded-shopper-miss-kruger.trycloudflare.com`
-- ❌ `https://scoring-side-receives-hudson.trycloudflare.com`
+- ❌ `https://example.invalid`
+- ❌ `https://example.invalid`
+- ❌ `https://example.invalid`
 
 **Актуальный URL:**
-- ✅ `https://founded-shopper-miss-kruger.trycloudflare.com`
+- ✅ `https://example.invalid`
 
 ---
 
@@ -67,10 +67,10 @@
 curl -s "http://localhost:8001/api/health"
 
 # WebApp Health
-curl -s -I "https://founded-shopper-miss-kruger.trycloudflare.com/webapp"
+curl -s -I "https://example.invalid/webapp"
 
 # Admin Panel Health
-curl -s -I "https://founded-shopper-miss-kruger.trycloudflare.com/admin"
+curl -s -I "https://example.invalid/admin"
 ```
 
 ### Логи
@@ -111,13 +111,13 @@ lsof -i :8001
 ### Перезапуск отдельных сервисов
 ```bash
 # Только Flask
-pkill -f "src/webapp.py" && cd /Users/denisfedko/news_ai_bot && python3 src/webapp.py > logs/webapp.log 2>&1 &
+pkill -f "src/webapp.py" && cd /home/user/news_ai_bot && python3 src/webapp.py > logs/webapp.log 2>&1 &
 
 # Только Bot
-pkill -f "telegram_bot/bot.py" && cd /Users/denisfedko/news_ai_bot && PYTHONPATH=/Users/denisfedko/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
+pkill -f "telegram_bot/bot.py" && cd /home/user/news_ai_bot && PYTHONPATH=/home/user/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
 
 # Только Cloudflare
-pkill -9 cloudflared && cd /Users/denisfedko/news_ai_bot && cloudflared tunnel --url http://localhost:8001 > logs/cloudflare.log 2>&1 &
+pkill -9 cloudflared && cd /home/user/news_ai_bot && cloudflared tunnel --url http://localhost:8001 > logs/cloudflare.log 2>&1 &
 ```
 
 ---
@@ -125,12 +125,12 @@ pkill -9 cloudflared && cd /Users/denisfedko/news_ai_bot && cloudflared tunnel -
 ## 🔐 Доступ и безопасность
 
 ### WebApp
-- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+- **URL:** https://example.invalid/webapp
 - **Аутентификация:** Telegram WebApp
 - **Доступ:** Все пользователи Telegram
 
 ### Admin Panel
-- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com/admin
+- **URL:** https://example.invalid/admin
 - **Аутентификация:** Telegram WebApp + Admin privileges
 - **DEV режим:** Доступ с localhost и Cloudflare tunnels
 
@@ -148,7 +148,7 @@ pkill -9 cloudflared && cd /Users/denisfedko/news_ai_bot && cloudflared tunnel -
 **Основной файл:** `config_files/environment/.env`
 
 **Ключевые переменные:**
-- `CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com`
+- `CLOUDFLARE_TUNNEL_URL=https://example.invalid`
 - `TELEGRAM_BOT_TOKEN=...`
 - `SUPABASE_URL=...`
 - `SUPABASE_KEY=...`

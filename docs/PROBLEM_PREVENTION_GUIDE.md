@@ -91,7 +91,7 @@ python3 scripts/health_check.py && ./start_services_safe.sh
 python telegram_bot/bot.py
 
 # ✅ Хорошо
-PYTHONPATH=/Users/denisfedko/news_ai_bot python -m telegram_bot.bot
+PYTHONPATH=/home/user/news_ai_bot python -m telegram_bot.bot
 ```
 
 ### 4. **Мониторьте сервисы**

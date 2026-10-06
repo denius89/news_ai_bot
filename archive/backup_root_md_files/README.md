@@ -1,6 +1,6 @@
 # PulseAI
 
-![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests – main](https://github.com/repository-owner/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 ![Code Quality](https://img.shields.io/badge/code%20quality-A%20-green)
 ![Architecture](https://img.shields.io/badge/architecture-unified-blue)
 ![Performance](https://img.shields.io/badge/performance-optimized-orange)
@@ -107,7 +107,7 @@ python tools/send_daily_digests.py
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/denius89/news_ai_bot.git
+git clone https://github.com/repository-owner/news_ai_bot.git
 cd news_ai_bot
 
 # Установка зависимостей
@@ -379,6 +379,6 @@ MVP в активной разработке. Фокус — минимальн�
 
 ## Contacts
 
-Автор: [@denius89](https://github.com/denius89)  
-Лицензия: [MIT](https://github.com/denius89/news_ai_bot/blob/main/LICENSE)# GitHub Actions test
+Автор: [@repository-owner](https://github.com/repository-owner)  
+Лицензия: [MIT](https://github.com/repository-owner/news_ai_bot/blob/main/LICENSE)# GitHub Actions test
 # Test comment

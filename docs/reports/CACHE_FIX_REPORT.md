@@ -21,7 +21,7 @@ Flask WebApp настроен на отдачу статической сбор�
 
 ### 1. **Пересборка React приложения**
 ```bash
-cd /Users/denisfedko/news_ai_bot/webapp
+cd /home/user/news_ai_bot/webapp
 npm run build
 ```
 
@@ -39,7 +39,7 @@ nohup python3 src/webapp.py > logs/flask.log 2>&1 & echo $! > .flask.pid
 
 ### 3. **Проверка новой сборки**
 ```bash
-curl "https://scoring-side-receives-hudson.trycloudflare.com/webapp" | grep -o "main-[a-zA-Z0-9]*\.js"
+curl "https://example.invalid/webapp" | grep -o "main-[a-zA-Z0-9]*\.js"
 # Результат: main-BMSLAMhF.js (новая сборка)
 ```
 
@@ -58,7 +58,7 @@ curl "https://scoring-side-receives-hudson.trycloudflare.com/webapp" | grep -o "
 |--------|--------|-----|
 | **Flask WebApp** | ✅ Работает | http://localhost:8001 |
 | **Telegram Bot** | ✅ Работает | - |
-| **Cloudflare Tunnel** | ✅ Работает | https://scoring-side-receives-hudson.trycloudflare.com |
+| **Cloudflare Tunnel** | ✅ Работает | https://example.invalid |
 | **React Dev Server** | ✅ Работает | http://localhost:3000 |
 
 ---

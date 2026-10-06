@@ -20,12 +20,12 @@ Config:    http://localhost:8001/admin/config
 
 ### Cloudflare Tunnel (публичный доступ):
 ```
-Base URL:  https://kitty-undo-gary-encoding.trycloudflare.com
+Base URL:  https://example.invalid
 
-Dashboard: https://kitty-undo-gary-encoding.trycloudflare.com/admin/dashboard
-Metrics:   https://kitty-undo-gary-encoding.trycloudflare.com/admin/metrics
-Logs:      https://kitty-undo-gary-encoding.trycloudflare.com/admin/logs
-Config:    https://kitty-undo-gary-encoding.trycloudflare.com/admin/config
+Dashboard: https://example.invalid/admin/dashboard
+Metrics:   https://example.invalid/admin/metrics
+Logs:      https://example.invalid/admin/logs
+Config:    https://example.invalid/admin/config
 ```
 
 ---
@@ -165,7 +165,7 @@ open http://localhost:8001/admin/dashboard
 ### Вариант 2: Cloudflare (публично)
 ```bash
 # Уже запущено!
-open https://kitty-undo-gary-encoding.trycloudflare.com/admin/dashboard
+open https://example.invalid/admin/dashboard
 ```
 
 ### Вариант 3: Полный рестарт

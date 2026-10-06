@@ -1,3 +1,5 @@
+> **НЕАКТУАЛЬНО / DISCONTINUED — 2026-10-06.** Разработка PulseAI прекращена. Материалы сохранены как исторический архив; прежние заявления о готовности, планы и коммерческие прогнозы неактуальны. Поддержка и обновления не предоставляются.
+
 # 🚀 PulseAI - Коммерческое описание продукта
 
 **Дата:** 17 октября 2025  
@@ -601,13 +603,13 @@
 ### Попробовать продукт:
 - 🤖 **Telegram Bot:** [@pulseai_bot](https://t.me/pulseai_bot) *(замените на реальный)*
 - 🌐 **WebApp:** [pulseai.app](https://pulseai.app) *(замените на реальный URL)*
-- 📚 **Документация:** [GitHub](https://github.com/denius89/news_ai_bot)
+- 📚 **Документация:** [GitHub](https://github.com/repository-owner/news_ai_bot)
 
 ### Контакты команды:
-- 👤 **Denis Fedko** — Founder & Lead Developer
-- 📧 **Email:** denis@pulseai.app *(замените на реальный)*
-- 💼 **LinkedIn:** [denis-fedko](https://linkedin.com/in/denis-fedko) *(замените на реальный)*
-- 🐙 **GitHub:** [denius89](https://github.com/denius89)
+- 👤 **Project maintainer** — Founder & Lead Developer
+- 📧 **Email:** contact@example.invalid *(замените на реальный)*
+- 💼 **LinkedIn:** [project-maintainer](https://example.invalid/profile) *(замените на реальный)*
+- 🐙 **GitHub:** [repository-owner](https://github.com/repository-owner)
 
 ### Для инвесторов и партнёров:
 - 📊 **Pitch Deck:** Доступен по запросу

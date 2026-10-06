@@ -16,7 +16,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 
 # Основной URL Cloudflare Tunnel
 CLOUDFLARE_TUNNEL_URL = os.getenv(
-    "CLOUDFLARE_TUNNEL_URL", "https://immunology-restructuring-march-same.trycloudflare.com"
+    "CLOUDFLARE_TUNNEL_URL", "https://example.invalid"
 )
 
 # Локальный URL для туннеля

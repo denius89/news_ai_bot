@@ -222,8 +222,8 @@
 ### Команды запуска
 ```bash
 # Backend
-cd /Users/denisfedko/news_ai_bot
-PYTHONPATH="/Users/denisfedko/news_ai_bot" python3 src/webapp.py
+cd /home/user/news_ai_bot
+PYTHONPATH="/home/user/news_ai_bot" python3 src/webapp.py
 
 # Frontend (уже собран)
 # Файлы в webapp/dist/ готовы к использованию

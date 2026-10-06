@@ -117,7 +117,7 @@
 brew install bfg
 
 # 2. Создайте резервную копию
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 git clone --mirror . ../news_ai_bot-backup.git
 
 # 3. Удалите файл из истории
@@ -135,7 +135,7 @@ git push origin --force --tags
 **Вариант B: git filter-branch (если нет BFG)**
 
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Удалите .env.backup из всей истории
 git filter-branch --force --index-filter \
@@ -195,7 +195,7 @@ chmod +x .git/hooks/pre-commit
 brew install git-secrets
 
 # Настройка в репозитории
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 git secrets --install
 git secrets --register-aws
 git secrets --add 'sk-proj-[a-zA-Z0-9_-]+'
@@ -289,7 +289,7 @@ git secrets --add '[0-9]{10}:AA[a-zA-Z0-9_-]+'  # Telegram bot tokens
 
 **Статус:** 🔴 ТРЕБУЕТСЯ НЕМЕДЛЕННОЕ ДЕЙСТВИЕ  
 **Приоритет:** КРИТИЧЕСКИЙ  
-**Ответственный:** Denys Fedko (denisfedko@gmail.com)
+**Ответственный:** Denys maintainer (contact@example.invalid)
 
 ---
 

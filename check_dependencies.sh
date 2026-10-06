@@ -5,10 +5,10 @@
 echo "🔍 Проверка зависимостей PulseAI..."
 
 # Устанавливаем PYTHONPATH
-export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
+export PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH"
 
 # Переходим в рабочую директорию
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Проверяем основные модули
 echo "📦 Проверка основных модулей..."

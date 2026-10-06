@@ -62,7 +62,7 @@ Cloudflare URL был хардкоден в **8 местах**:
 **`webapp/src/pages/EventsPage.tsx`:**
 ```typescript
 // Было:
-fetch('https://scoring-side-receives-hudson.trycloudflare.com/api/events/...')
+fetch('https://example.invalid/api/events/...')
 
 // Стало:
 fetch('/api/events/...') // Относительный путь
@@ -126,7 +126,7 @@ config/core/cloudflare.py
 
 1. **Обновить .env:**
    ```bash
-   CLOUDFLARE_TUNNEL_URL=https://new-url.trycloudflare.com
+   CLOUDFLARE_TUNNEL_URL=https://example.invalid
    ```
 
 2. **Перезапустить сервисы:**
@@ -188,12 +188,12 @@ config/core/cloudflare.py
 ### Рекомендации
 1. **Создать .env файл** в `config_files/environment/.env`:
    ```
-   CLOUDFLARE_TUNNEL_URL=https://your-url.trycloudflare.com
+   CLOUDFLARE_TUNNEL_URL=https://example.invalid
    ```
 
 2. **Для Vite (опционально)** создать `.env` в `webapp/`:
    ```
-   VITE_CLOUDFLARE_TUNNEL_URL=https://your-url.trycloudflare.com
+   VITE_CLOUDFLARE_TUNNEL_URL=https://example.invalid
    ```
 
 3. **Протестировать** смену URL:
