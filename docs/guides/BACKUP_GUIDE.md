@@ -72,7 +72,7 @@ op item create \
   --title="PulseAI Production" \
   --vault="Development" \
   "OPENAI_API_KEY[password]=sk-proj-..." \
-  "TELEGRAM_BOT_TOKEN[password]=8062922612:..." \
+  "TELEGRAM_BOT_TOKEN[password]=0:..." \
   "SUPABASE_KEY[password]=eyJhbGci..." \
   "SUPABASE_URL[text]=https://example.supabase.co"
 
@@ -114,7 +114,7 @@ bw create item '{
   },
   "fields": [
     {"name": "OPENAI_API_KEY", "value": "sk-proj-...", "type": 1},
-    {"name": "TELEGRAM_BOT_TOKEN", "value": "8062922612:...", "type": 1},
+    {"name": "TELEGRAM_BOT_TOKEN", "value": "0:...", "type": 1},
     {"name": "SUPABASE_KEY", "value": "eyJhbGci...", "type": 1},
     {"name": "SUPABASE_URL", "value": "https://...", "type": 0}
   ]

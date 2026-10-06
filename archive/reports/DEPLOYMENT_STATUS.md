@@ -19,7 +19,7 @@
 ### 2. Telegram Bot
 - **Статус:** ✅ Запущен
 - **PID:** 31852
-- **Бот:** @PulseAIDigest_bot (ID: 8062922612)
+- **Бот:** @PulseAIDigest_bot (ID: 0)
 - **WebApp URL:** https://example.invalid/webapp
 - **Статус:** Готов к работе
 

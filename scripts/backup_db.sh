@@ -53,7 +53,7 @@ if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
     echo -e "${RED}❌ Error: SUPABASE_URL and SUPABASE_KEY must be set in .env${NC}"
     echo ""
     echo "Please add to your .env file:"
-    echo "  SUPABASE_URL=https://your-project.supabase.co"
+    echo "  SUPABASE_URL=https://example.supabase.co"
     echo "  SUPABASE_KEY=your-anon-key"
     exit 1
 fi
