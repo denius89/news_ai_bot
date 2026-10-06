@@ -41,7 +41,7 @@ class LiquipediaProvider(BaseEventProvider):
     def __init__(self):
         """Initialize Liquipedia provider."""
         super().__init__("liquipedia", "sports")
-        self.user_agent = "PulseAI/1.0 (https://pulseai.com; contact@pulseai.com)"
+        self.user_agent = "PulseAI/1.0 (https://pulseai.com; contact@example.invalid)"
 
     async def fetch_events(self, start_date: datetime, end_date: datetime) -> List[Dict]:
         """

@@ -25,14 +25,14 @@ brew install bfg
 ### Шаг 2: Создание резервной копии
 
 ```bash
-cd /Users/denisfedko
+cd /home/user
 git clone --mirror news_ai_bot news_ai_bot-backup.git
 ```
 
 ### Шаг 3: Удаление файлов из истории
 
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Удалить .env.backup из всей истории
 bfg --delete-files .env.backup
@@ -69,7 +69,7 @@ git push origin --force --tags
 ### Шаг 1: Создание резервной копии
 
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 git branch backup-before-cleanup
 ```
 
@@ -119,13 +119,13 @@ git push origin --force --tags
 
 1. **Создайте резервную копию репозитория**
    ```bash
-   cd /Users/denisfedko
+   cd /home/user
    cp -r news_ai_bot news_ai_bot-backup-$(date +%Y%m%d)
    ```
 
 2. **Убедитесь, что все изменения закоммичены**
    ```bash
-   cd /Users/denisfedko/news_ai_bot
+   cd /home/user/news_ai_bot
    git status
    # Должно быть чисто
    ```
@@ -145,7 +145,7 @@ git push origin --force --tags
 ## 🔍 ПРОВЕРКА ПОСЛЕ ОЧИСТКИ
 
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # 1. Проверка локальной истории
 git log --all --full-history --source -- .env.backup
@@ -159,7 +159,7 @@ git log --all -S "sk-proj-" --oneline
 git count-objects -vH
 
 # 4. После push - проверка на GitHub
-# Перейдите: https://github.com/denius89/news_ai_bot/commits/main
+# Перейдите: https://github.com/repository-owner/news_ai_bot/commits/main
 # Коммит 93bfb62 должен измениться или исчезнуть
 ```
 
@@ -170,11 +170,11 @@ git count-objects -vH
 ### Восстановление из резервной копии:
 
 ```bash
-cd /Users/denisfedko
+cd /home/user
 rm -rf news_ai_bot
 cp -r news_ai_bot-backup-YYYYMMDD news_ai_bot
 cd news_ai_bot
-git remote set-url origin git@github.com:denius89/news_ai_bot.git
+git remote set-url origin contact@example.invalid:repository-owner/news_ai_bot.git
 ```
 
 ### Если force push не работает:
@@ -202,7 +202,7 @@ echo "🧹 Очистка Git истории от .env.backup"
 echo ""
 
 # Переход в директорию
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Резервная копия
 echo "📦 Создание резервной копии..."
@@ -274,5 +274,5 @@ chmod +x cleanup_git_history.sh
 ---
 
 **Создано:** 16 октября 2025  
-**Для репозитория:** denius89/news_ai_bot
+**Для репозитория:** repository-owner/news_ai_bot
 

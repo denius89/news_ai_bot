@@ -304,7 +304,7 @@ class TestEdgeCases:
 
     def test_special_characters_in_data(self):
         """Тест со специальными символами в данных."""
-        user_data = {"id": 12345, "first_name": "John & Jane", "username": "user@domain.com"}
+        user_data = {"id": 12345, "first_name": "John & Jane", "username": "contact@example.invalid"}
 
         init_data = f"user={json.dumps(user_data)}&auth_date={int(time.time())}&hash=test_hash"
         result = verify_telegram_webapp_data(init_data, "bot_token")

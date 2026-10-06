@@ -28,7 +28,7 @@
 pkill cloudflared
 
 # Запустить новый туннель
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 cloudflared tunnel --url http://localhost:8001 > logs/cloudflare.log 2>&1 &
 
 # Подождать 5 секунд для установки соединения
@@ -39,7 +39,7 @@ tail -30 logs/cloudflare.log | grep -E "(trycloudflare.com|Your quick Tunnel)"
 ```
 
 ### Результат:
-Запишите новый URL, например: `https://new-url-example.trycloudflare.com`
+Запишите новый URL, например: `https://example.invalid`
 
 ---
 
@@ -52,10 +52,10 @@ tail -30 logs/cloudflare.log | grep -E "(trycloudflare.com|Your quick Tunnel)"
 
 ```python
 # Найти и заменить:
-CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://OLD-URL.trycloudflare.com")
+CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://example.invalid")
 
 # На:
-CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://NEW-URL.trycloudflare.com")
+CLOUDFLARE_TUNNEL_URL = os.getenv("CLOUDFLARE_TUNNEL_URL", "https://example.invalid")
 ```
 
 **Команда для замены:**
@@ -102,7 +102,7 @@ grep CLOUDFLARE_TUNNEL_URL config_files/environment/.env
 
 **Ожидаемый результат:**
 ```
-CLOUDFLARE_TUNNEL_URL=https://NEW-URL.trycloudflare.com
+CLOUDFLARE_TUNNEL_URL=https://example.invalid
 ```
 
 ---
@@ -180,7 +180,7 @@ pkill -f "src/webapp.py"
 sleep 2
 
 # Запустить Flask с новыми настройками
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 python3 src/webapp.py > logs/webapp.log 2>&1 &
 
 # Подождать запуска
@@ -215,8 +215,8 @@ pkill -f "telegram_bot/bot.py"
 sleep 2
 
 # Запустить бота с новыми настройками
-cd /Users/denisfedko/news_ai_bot
-PYTHONPATH=/Users/denisfedko/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
+cd /home/user/news_ai_bot
+PYTHONPATH=/home/user/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
 
 # Подождать запуска
 sleep 5
@@ -248,7 +248,7 @@ python3 -c "from config.core.settings import WEBAPP_URL; print(f'✅ WEBAPP_URL:
 
 **Ожидаемый результат:**
 ```
-✅ WEBAPP_URL: https://NEW-URL.trycloudflare.com
+✅ WEBAPP_URL: https://example.invalid
 ```
 
 **Если видите старый URL:**
@@ -348,7 +348,7 @@ echo "https://$NEW_URL.trycloudflare.com/webapp"
 ps aux | grep "src/webapp.py" | grep -v grep
 
 # Если не запущен → запустить
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 python3 src/webapp.py > logs/webapp.log 2>&1 &
 
 # Проверить логи на ошибки
@@ -376,8 +376,8 @@ sed -i '' "s|$OLD_URL|$NEW_URL|g" config_files/environment/.env
 # 3. Перезапустить бота
 pkill -f "telegram_bot/bot.py"
 sleep 2
-cd /Users/denisfedko/news_ai_bot
-PYTHONPATH=/Users/denisfedko/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
+cd /home/user/news_ai_bot
+PYTHONPATH=/home/user/news_ai_bot:$PYTHONPATH python3 telegram_bot/bot.py > logs/bot.log 2>&1 &
 
 # 4. Проверить загруженный URL
 python3 -c "from config.core.settings import WEBAPP_URL; print(WEBAPP_URL)"
@@ -398,7 +398,7 @@ ERR Retrying connection in up to 1m4s
 # Полностью перезапустить туннель
 pkill cloudflared
 sleep 2
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 cloudflared tunnel --url http://localhost:8001 > logs/cloudflare.log 2>&1 &
 sleep 5
 
@@ -568,7 +568,7 @@ telegram_bot/handlers/dashboard.py → Открытие WebApp
 
 **Quick Tunnel (temporary):**
 - Генерируется автоматически при каждом запуске
-- Формат: `https://random-words.trycloudflare.com`
+- Формат: `https://example.invalid`
 - Не требует credentials файла
 - Используется командой: `cloudflared tunnel --url http://localhost:8001`
 - **Срок действия:** До остановки процесса

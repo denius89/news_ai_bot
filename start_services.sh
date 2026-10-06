@@ -109,7 +109,7 @@ else
 fi
 
 # Устанавливаем переменные окружения
-export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
+export PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH"
 log "INFO" "PYTHONPATH установлен: $PYTHONPATH"
 
 # Останавливаем старые процессы
@@ -163,7 +163,7 @@ echo ""
 # Получаем URL из конфига
 WEBAPP_URL=$(python3 -c "
 import sys
-sys.path.append('/Users/denisfedko/news_ai_bot')
+sys.path.append('/home/user/news_ai_bot')
 try:
     from config.core.cloudflare import get_webapp_url
     print(get_webapp_url())

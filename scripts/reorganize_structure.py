@@ -280,7 +280,7 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
         """Обновляет основной README.md в корне"""
         content = f"""# PulseAI
 
-![Tests – main](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests – main](https://github.com/repository-owner/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 ![Code Quality](https://img.shields.io/badge/code%20quality-A%20-green)
 ![Architecture](https://img.shields.io/badge/architecture-unified-blue)
 ![Performance](https://img.shields.io/badge/performance-optimized-orange)
@@ -301,7 +301,7 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/denius89/news_ai_bot.git
+git clone https://github.com/repository-owner/news_ai_bot.git
 cd news_ai_bot
 
 # Установить зависимости
@@ -366,8 +366,8 @@ Cloudflare Tunnel → Flask:8001 → React Static + API
 ## 📞 Поддержка
 
 - 📖 **Документация:** [docs/README.md](docs/README.md)
-- 🐛 **Баги:** [Issues](https://github.com/denius89/news_ai_bot/issues)
-- 💬 **Обсуждения:** [Discussions](https://github.com/denius89/news_ai_bot/discussions)
+- 🐛 **Баги:** [Issues](https://github.com/repository-owner/news_ai_bot/issues)
+- 💬 **Обсуждения:** [Discussions](https://github.com/repository-owner/news_ai_bot/discussions)
 
 ---
 

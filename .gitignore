@@ -70,3 +70,12 @@ __pycache__/
 logs/app.log
 logs/*.log
 logs/
+
+# Discontinued project: never commit credentials or personal runtime data
+.env
+.env.*
+!.env.example
+**/.env.backup*
+**/credentials*.json
+.runtime/
+cloudflare-tunnel.yaml

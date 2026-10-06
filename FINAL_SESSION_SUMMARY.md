@@ -16,7 +16,7 @@ TypeError: Failed to execute 'fetch' on 'Window': String contains non ISO-8859-1
 ```
 
 **Причина:**
-- Пользователи с кириллическими именами (например, "Денис") не могли загружать данные
+- Пользователи с кириллическими именами (например, "автор") не могли загружать данные
 - HTTP заголовок `X-Telegram-User-Data` содержал UTF-8 символы, что нарушает стандарт ISO-8859-1
 
 **Решение:**
@@ -41,7 +41,7 @@ TypeError: Failed to execute 'fetch' on 'Window': String contains non ISO-8859-1
 
 **Актуальный URL:**
 ```
-https://founded-shopper-miss-kruger.trycloudflare.com
+https://example.invalid
 ```
 
 ### 3. ✅ Полный аудит и документация Cloudflare URL
@@ -149,7 +149,7 @@ user_info = json.loads(user_data_json)
    - Добавить Lucide Icons во все компоненты
 
 2. **Тестовые данные:**
-   - Добавить подписки для пользователя 1879652637
+   - Добавить подписки для пользователя 0
    - Создать тестовые настройки уведомлений
 
 3. **Документация:**
@@ -168,10 +168,10 @@ ps aux | grep -E "(src/webapp.py|telegram_bot|cloudflared)" | grep -v grep
 curl -s "http://localhost:8001/api/health" | head -3
 
 # Проверить WebApp
-open https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+open https://example.invalid/webapp
 
 # Проверить Admin Panel
-open https://founded-shopper-miss-kruger.trycloudflare.com/admin
+open https://example.invalid/admin
 ```
 
 ---

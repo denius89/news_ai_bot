@@ -36,9 +36,9 @@ npm install
 
 # Configure environment (optional for dev)
 # Create .env file in webapp/ directory with:
-# VITE_CLOUDFLARE_TUNNEL_URL=https://your-subdomain.trycloudflare.com
+# VITE_CLOUDFLARE_TUNNEL_URL=https://example.invalid
 # или
-# CLOUDFLARE_TUNNEL_URL=https://your-subdomain.trycloudflare.com
+# CLOUDFLARE_TUNNEL_URL=https://example.invalid
 
 # Start development server
 npm run dev

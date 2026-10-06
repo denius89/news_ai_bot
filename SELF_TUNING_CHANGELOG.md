@@ -84,7 +84,7 @@ python tools/news/fetch_and_train.py --skip-train
 **Для cron:**
 ```bash
 # Каждые 6 часов
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 */6 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 ```
 
 ---
@@ -139,7 +139,7 @@ python tools/news/fetch_and_train.py --force-train
 crontab -e
 
 # Каждые 6 часов
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 */6 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 ```
 
 ---
@@ -263,7 +263,7 @@ cat models/local_predictor_meta.json
 
 # 3. Настроить автозапуск (опционально)
 crontab -e
-# 0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+# 0 */6 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 ```
 
 ---

@@ -20,7 +20,7 @@
 **Timeout:** 15 минут
 
 **Статус:** 
-![Tests](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests](https://github.com/repository-owner/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 
 ---
 
@@ -183,7 +183,7 @@ pytest tests/integration -v
 ### Badges в README:
 
 ```markdown
-![Tests](https://github.com/denius89/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests](https://github.com/repository-owner/news_ai_bot/actions/workflows/tests.yml/badge.svg?branch=main)
 ```
 
 ### Ручной запуск:

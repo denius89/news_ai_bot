@@ -63,16 +63,16 @@ python tools/news/fetch_balanced.py --per-subcategory 50 --use-local-predictor
 ### Вариант 1: Умный режим (рекомендуется)
 ```bash
 # Каждые 6 часов - парсинг + автообучение
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && python3 tools/news/fetch_and_train.py
+0 */6 * * * cd /home/user/news_ai_bot && python3 tools/news/fetch_and_train.py
 ```
 
 ### Вариант 2: Сбалансированная загрузка
 ```bash
 # Каждые 6 часов - по 50 новостей с предиктором
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && python3 tools/news/fetch_balanced.py --per-subcategory 50 --use-local-predictor
+0 */6 * * * cd /home/user/news_ai_bot && python3 tools/news/fetch_balanced.py --per-subcategory 50 --use-local-predictor
 
 # Раз в сутки - глубокая загрузка
-0 2 * * * cd /Users/denisfedko/news_ai_bot && python3 tools/news/fetch_balanced.py --per-subcategory 100 --use-local-predictor
+0 2 * * * cd /home/user/news_ai_bot && python3 tools/news/fetch_balanced.py --per-subcategory 100 --use-local-predictor
 ```
 
 ---

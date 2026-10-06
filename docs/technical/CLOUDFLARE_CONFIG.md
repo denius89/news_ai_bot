@@ -64,12 +64,12 @@ python3 scripts/update_cloudflare_config.py
 
 1. **Обновите переменную окружения:**
    ```bash
-   export CLOUDFLARE_TUNNEL_URL="https://new-url.trycloudflare.com"
+   export CLOUDFLARE_TUNNEL_URL="https://example.invalid"
    ```
 
 2. **Или обновите `.env` файл:**
    ```
-   CLOUDFLARE_TUNNEL_URL=https://new-url.trycloudflare.com
+   CLOUDFLARE_TUNNEL_URL=https://example.invalid
    ```
 
 3. **Запустите обновление:**

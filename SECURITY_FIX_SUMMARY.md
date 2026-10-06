@@ -101,7 +101,7 @@
 brew install bfg
 
 # 2. Очистить
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 bfg --delete-files .env.backup
 git reflog expire --expire=now --all
 git gc --prune=now --aggressive
@@ -112,7 +112,7 @@ git push origin --force --all
 
 #### Вариант B: git filter-branch (медленный)
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Готовый скрипт создан в:
 # GIT_HISTORY_CLEANUP_INSTRUCTIONS.md
@@ -233,12 +233,12 @@ Settings → Security → Audit log
 
 ```bash
 # 1. Откройте .env файл
-nano /Users/denisfedko/news_ai_bot/.env
+nano /home/user/news_ai_bot/.env
 
 # 2. Обновите каждый ключ по инструкциям выше
 
 # 3. Сохраните и перезапустите сервисы
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 ./stop_services.sh
 ./start_services.sh
 ```

@@ -78,13 +78,13 @@ def setup_pythonpath():
 
 ### Проверка здоровья проекта:
 ```
-✅ webapp_dist: /Users/denisfedko/news_ai_bot/webapp/dist
-✅ webapp_index: /Users/denisfedko/news_ai_bot/webapp/dist/index.html
-✅ logs: /Users/denisfedko/news_ai_bot/logs
-✅ config: /Users/denisfedko/news_ai_bot/config
-✅ ai_modules: /Users/denisfedko/news_ai_bot/ai_modules
-✅ utils: /Users/denisfedko/news_ai_bot/utils
-✅ telegram_bot: /Users/denisfedko/news_ai_bot/telegram_bot
+✅ webapp_dist: /home/user/news_ai_bot/webapp/dist
+✅ webapp_index: /home/user/news_ai_bot/webapp/dist/index.html
+✅ logs: /home/user/news_ai_bot/logs
+✅ config: /home/user/news_ai_bot/config
+✅ ai_modules: /home/user/news_ai_bot/ai_modules
+✅ utils: /home/user/news_ai_bot/utils
+✅ telegram_bot: /home/user/news_ai_bot/telegram_bot
 
 ✅ config.core.settings: Настройки проекта
 ✅ utils.ai.ai_client: AI клиент

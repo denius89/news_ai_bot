@@ -27,7 +27,7 @@ make start
 ### **1. Обновить URL в настройках:**
 ```python
 # config/settings.py
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://immunology-restructuring-march-same.trycloudflare.com")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://example.invalid")
 ```
 
 ### **2. Запустить Cloudflare Tunnel:**

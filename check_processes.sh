@@ -212,7 +212,7 @@ check_cloudflare() {
         # Получаем URL из конфига
         WEBAPP_URL=$(python3 -c "
 import sys
-sys.path.append('/Users/denisfedko/news_ai_bot')
+sys.path.append('/home/user/news_ai_bot')
 try:
     from config.core.cloudflare import CLOUDFLARE_TUNNEL_URL
     print(CLOUDFLARE_TUNNEL_URL)

@@ -1,7 +1,7 @@
 # 🔍 Полный аудит Cloudflare URL в проекте PulseAI
 
 **Дата проверки:** 2025-10-15 17:25  
-**Текущий рабочий URL:** `https://founded-shopper-miss-kruger.trycloudflare.com`
+**Текущий рабочий URL:** `https://example.invalid`
 
 ---
 
@@ -21,11 +21,11 @@
 
 **Файл:** `config/core/cloudflare.py`
 - **Статус:** ✅ Обновлён
-- **URL:** `https://founded-shopper-miss-kruger.trycloudflare.com`
+- **URL:** `https://example.invalid`
 - **Код:**
   ```python
   CLOUDFLARE_TUNNEL_URL = os.getenv(
-      "CLOUDFLARE_TUNNEL_URL", "https://founded-shopper-miss-kruger.trycloudflare.com"
+      "CLOUDFLARE_TUNNEL_URL", "https://example.invalid"
   )
   ```
 
@@ -33,7 +33,7 @@
 
 **Файлы:** `.env` и `config_files/environment/.env`
 - **Статус:** ✅ Обновлены
-- **Переменная:** `CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com`
+- **Переменная:** `CLOUDFLARE_TUNNEL_URL=https://example.invalid`
 
 ### 3. Frontend Authentication
 
@@ -78,27 +78,27 @@
 ### 1. Исторические отчёты (Низкий приоритет)
 
 #### `docs/reports/FINAL_TODO_REPORT.md`
-- **Старый URL:** `https://scoring-side-receives-hudson.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Обновить в секции с текущим статусом
 
 #### `docs/reports/CLOUDFLARE_URL_UNIFICATION_REPORT.md`
-- **Старый URL:** `https://scoring-side-receives-hudson.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Добавить примечание, что это исторический пример
 
 #### `docs/reports/CACHE_FIX_REPORT.md`
-- **Старый URL:** `https://scoring-side-receives-hudson.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Добавить примечание, что это исторический пример
 
 #### `docs/reports/FINAL_FIXES_REPORT.md`
-- **Старый URL:** `https://scoring-side-receives-hudson.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Добавить примечание, что это исторический пример
 
 #### `docs/reports/FINAL_REPORT.md`
-- **Старый URL:** `https://scoring-side-receives-hudson.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Добавить примечание, что это исторический пример
 
 #### `ADMIN_FINAL_REPORT.md`
-- **Старый URL:** `https://kitty-undo-gary-encoding.trycloudflare.com`
+- **Старый URL:** `https://example.invalid`
 - **Действие:** Обновить на актуальный или переместить в архив
 
 ---
@@ -112,7 +112,7 @@
 - **Текущее содержимое:**
   ```yaml
   tunnel: founded-shopper-miss-kruger
-  credentials-file: /Users/denisfedko/.cloudflared/founded-shopper-miss-kruger.json
+  credentials-file: /home/user/.cloudflared/founded-shopper-miss-kruger.json
   
   ingress:
     - hostname: founded-shopper-miss-kruger.trycloudflare.com
@@ -136,10 +136,10 @@
 - **Статус:** ⚠️ Содержит старый URL в примере
 - **Строка 492:**
   ```markdown
-  - **Значение по умолчанию:** `https://founded-shopper-miss-kruger.trycloudflare.com`
+  - **Значение по умолчанию:** `https://example.invalid`
   ```
 
-**Действие:** Обновить на `https://founded-shopper-miss-kruger.trycloudflare.com` или указать, что это пример.
+**Действие:** Обновить на `https://example.invalid` или указать, что это пример.
 
 ### 3. Script для обновления конфигурации
 
@@ -147,7 +147,7 @@
 - **Статус:** ⚠️ Содержит старые URL в hardcoded значениях
 - **Строки 46, 62:**
   ```python
-  old_url = "https://postcards-simple-investigators-negotiation.trycloudflare.com"
+  old_url = "https://example.invalid"
   ```
 
 **Действие:** Обновить на актуальный URL или сделать параметром.
@@ -160,7 +160,7 @@
 
 **Файл:** `archive/config_backup_20251008_103645/cloudflare.py`
 - **Статус:** ℹ️ Архивный файл
-- **URL:** `https://immunology-restructuring-march-same.trycloudflare.com`
+- **URL:** `https://example.invalid`
 - **Действие:** Не требуется (это backup)
 
 ### 2. Backup MD файлов
@@ -175,7 +175,7 @@
 ### 3. Архив отчётов
 
 **Файл:** `docs/reports/archive/2025-10/ENV_PATHS_FIX_REPORT.md`
-- **URL:** `https://immunology-restructuring-march-same.trycloudflare.com`
+- **URL:** `https://example.invalid`
 - **Действие:** Не требуется (это архив)
 
 ---
@@ -230,7 +230,7 @@
 ### Текущий рабочий URL
 
 ```
-https://founded-shopper-miss-kruger.trycloudflare.com
+https://example.invalid
 ```
 
 **Используется в:**
