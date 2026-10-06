@@ -21,7 +21,7 @@
 
 **Результат:**
 - ✅ Новый процесс: PID 63430
-- ✅ Новый URL: `https://founded-shopper-miss-kruger.trycloudflare.com`
+- ✅ Новый URL: `https://example.invalid`
 - ✅ Туннель работает стабильно
 
 ---
@@ -86,35 +86,35 @@
 ### Cloudflare Tunnel
 - **Статус:** ✅ Запущен и стабилен
 - **PID:** 63430
-- **URL:** https://founded-shopper-miss-kruger.trycloudflare.com
+- **URL:** https://example.invalid
 - **Команда:** `cloudflared tunnel --url http://localhost:8001`
 - **Лог:** `logs/cloudflare.log`
 
 ### Flask WebApp
 - **Статус:** ✅ Работает на порту 8001
 - **URL локальный:** http://localhost:8001
-- **URL внешний:** https://founded-shopper-miss-kruger.trycloudflare.com
+- **URL внешний:** https://example.invalid
 
 ### Telegram Bot
 - **Статус:** ✅ Перезапущен с новым URL
 - **PID:** 67492
-- **URL загружен:** https://founded-shopper-miss-kruger.trycloudflare.com
+- **URL загружен:** https://example.invalid
 - **Dashboard команда:** /dashboard (теперь открывает новый URL)
 
 ### Обновленные endpoints
 
 ```bash
 # WebApp
-https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+https://example.invalid/webapp
 
 # Admin Panel
-https://founded-shopper-miss-kruger.trycloudflare.com/admin
+https://example.invalid/admin
 
 # API Health
-https://founded-shopper-miss-kruger.trycloudflare.com/api/health
+https://example.invalid/api/health
 
 # API News
-https://founded-shopper-miss-kruger.trycloudflare.com/api/news/latest
+https://example.invalid/api/news/latest
 ```
 
 ---
@@ -131,13 +131,13 @@ ps aux | grep cloudflared | grep -v grep
 tail -f logs/cloudflare.log
 
 # Проверить health endpoint
-curl -s "https://founded-shopper-miss-kruger.trycloudflare.com/api/health" | jq
+curl -s "https://example.invalid/api/health" | jq
 
 # Проверить WebApp
-curl -I "https://founded-shopper-miss-kruger.trycloudflare.com/webapp"
+curl -I "https://example.invalid/webapp"
 
 # Проверить Admin Panel
-curl -I "https://founded-shopper-miss-kruger.trycloudflare.com/admin"
+curl -I "https://example.invalid/admin"
 ```
 
 ---
@@ -177,7 +177,7 @@ curl -I "https://founded-shopper-miss-kruger.trycloudflare.com/admin"
    - Бот остановлен и перезапущен
    - Загружен новый URL
    - Dashboard команда теперь использует новый URL
-   - Проверено: WEBAPP_URL = https://founded-shopper-miss-kruger.trycloudflare.com
+   - Проверено: WEBAPP_URL = https://example.invalid
 
 5. **✅ Проверена работоспособность**
    - API Health: успешно отвечает
@@ -210,7 +210,7 @@ curl -I "https://founded-shopper-miss-kruger.trycloudflare.com/admin"
 Если используется `.env` файл, убедитесь что он содержит:
 
 ```bash
-CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com
+CLOUDFLARE_TUNNEL_URL=https://example.invalid
 ```
 
 ### Кеширование
@@ -260,7 +260,7 @@ CLOUDFLARE_TUNNEL_URL=https://founded-shopper-miss-kruger.trycloudflare.com
 
 **✅ Обновление успешно завершено!**
 
-**Новый URL:** `https://founded-shopper-miss-kruger.trycloudflare.com`
+**Новый URL:** `https://example.invalid`
 
 **Последняя проверка:** 2025-10-16 12:10  
 **Статус:** ✅ ВСЕ РАБОТАЕТ

@@ -16,7 +16,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Устанавливаем рабочую директорию
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 
 # Создаём директорию для логов скриптов
 SCRIPT_LOG_DIR="logs/scripts"
@@ -84,7 +84,7 @@ if pgrep -f "python3 -m telegram_bot.bot" > /dev/null; then
 fi
 
 # Устанавливаем PYTHONPATH
-export PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH"
+export PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH"
 log "INFO" "PYTHONPATH установлен: $PYTHONPATH"
 
 # Проверяем, что все зависимости доступны
@@ -135,7 +135,7 @@ cleanup() {
 trap cleanup SIGTERM SIGINT
 
 log_success "🚀 Запуск Telegram Bot..."
-PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH" python3 -m telegram_bot.bot &
+PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH" python3 -m telegram_bot.bot &
 BOT_PID=$!
 
 # Сохраняем PID

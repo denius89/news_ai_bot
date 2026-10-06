@@ -46,7 +46,7 @@ const getImportanceStars = (importance: number) => {
 |--------|-----|--------|-----|
 | **Flask WebApp** | 67940, 68489 | ✅ Работает | http://localhost:8001 |
 | **Telegram Bot** | 56116, 56117 | ✅ Работает | - |
-| **Cloudflare Tunnel** | 31295, 31297 | ✅ Работает | https://scoring-side-receives-hudson.trycloudflare.com |
+| **Cloudflare Tunnel** | 31295, 31297 | ✅ Работает | https://example.invalid |
 | **React WebApp** | 69523 | ✅ Работает | http://localhost:3000 |
 
 ---
@@ -85,7 +85,7 @@ const getImportanceStars = (importance: number) => {
 
 ## 🌐 Доступ к приложению
 
-- **Основное приложение:** https://scoring-side-receives-hudson.trycloudflare.com/webapp
+- **Основное приложение:** https://example.invalid/webapp
 - **Локальный Flask:** http://localhost:8001/webapp
 - **Локальный React:** http://localhost:3000
 
@@ -95,10 +95,10 @@ const getImportanceStars = (importance: number) => {
 
 ### ✅ API тесты пройдены:
 ```bash
-curl "https://scoring-side-receives-hudson.trycloudflare.com/api/news/latest?limit=1"
+curl "https://example.invalid/api/news/latest?limit=1"
 # Возвращает: {"status": "success", "data": [...], "pagination": {...}}
 
-curl "https://scoring-side-receives-hudson.trycloudflare.com/api/events/upcoming?days=7"
+curl "https://example.invalid/api/events/upcoming?days=7"
 # Возвращает: {"success": true, "data": {"events": [...]}}
 ```
 

@@ -411,7 +411,7 @@ ORDER BY category, subcategory;
 **Шаги:**
 1. Запустить fetch events вручную:
    ```bash
-   cd /Users/denisfedko/news_ai_bot
+   cd /home/user/news_ai_bot
    python3 -m tools.events.fetch_events
    ```
 2. Проверить логи
@@ -596,7 +596,7 @@ GROUP BY category, subcategory;
 
 **Команда:**
 ```bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 python3 -m pytest tests/unit/events/ tests/unit/parsers/test_sources.py -v
 ```
 

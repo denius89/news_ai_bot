@@ -74,7 +74,7 @@ op item create \
   "OPENAI_API_KEY[password]=sk-proj-..." \
   "TELEGRAM_BOT_TOKEN[password]=8062922612:..." \
   "SUPABASE_KEY[password]=eyJhbGci..." \
-  "SUPABASE_URL[text]=https://nzgzolramikbxpdsnzdv.supabase.co"
+  "SUPABASE_URL[text]=https://example.supabase.co"
 
 # Получение ключа
 op item get "PulseAI Production" --field OPENAI_API_KEY
@@ -97,7 +97,7 @@ SUPABASE_KEY=op://Development/PulseAI Production/SUPABASE_KEY
 brew install bitwarden-cli
 
 # Логин
-bw login denisfedko@gmail.com
+bw login contact@example.invalid
 
 # Разблокировка (нужно при каждом запуске)
 export BW_SESSION=$(bw unlock --raw)
@@ -153,11 +153,11 @@ bw get item "PulseAI Production" | jq -r '.fields[] | "\(.name)=\(.value)"' > .e
 ./tools/backup_env.sh
 
 # Вывод:
-# ✅ Backup создан: /Users/denisfedko/.pulseai-secrets/news_ai_bot/.env.20251016_224530
+# ✅ Backup создан: /home/user/.pulseai-secrets/news_ai_bot/.env.20251016_224530
 # 
 # 📋 Последние backup'ы:
-# -rw------- 1 denisfedko staff 2065 Oct 16 22:45 .env.20251016_224530
-# -rw------- 1 denisfedko staff 2062 Oct 16 22:30 .env.20251016_223000
+# -rw------- 1 project-user staff 2065 Oct 16 22:45 .env.20251016_224530
+# -rw------- 1 project-user staff 2062 Oct 16 22:30 .env.20251016_223000
 
 # Восстановление
 cp ~/.pulseai-secrets/news_ai_bot/.env.20251016_224530 .env
@@ -175,7 +175,7 @@ diff .env ~/.pulseai-secrets/news_ai_bot/.env.20251016_224530
 
 ```bash
 # Alias для автоматического backup перед редактированием
-alias edit-env='cd /Users/denisfedko/news_ai_bot && ./tools/backup_env.sh && nano .env'
+alias edit-env='cd /home/user/news_ai_bot && ./tools/backup_env.sh && nano .env'
 
 # Использование
 edit-env  # Создаст backup и откроет редактор
@@ -238,11 +238,11 @@ edit-env  # Создаст backup и откроет редактор
 
 ```bash
 # 1. Добавьте алиас для быстрого backup
-echo 'alias backup-env="cd /Users/denisfedko/news_ai_bot && ./tools/backup_env.sh"' >> ~/.zshrc
+echo 'alias backup-env="cd /home/user/news_ai_bot && ./tools/backup_env.sh"' >> ~/.zshrc
 source ~/.zshrc
 
 # 2. Создайте первый backup
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 ./tools/backup_env.sh
 
 # 3. Используйте Git Stash для ежедневной работы

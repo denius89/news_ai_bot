@@ -64,7 +64,7 @@
 **Решение:**
 - Запущен Flask WebApp на порту 8001
 - Перезапущен Cloudflare Tunnel
-- Новый URL: `https://founded-shopper-miss-kruger.trycloudflare.com`
+- Новый URL: `https://example.invalid`
 
 **Результат:** WebApp доступен и работает корректно
 
@@ -115,7 +115,7 @@ DROP TABLE IF EXISTS events;
 |--------|--------|-----|------|-----|
 | Flask WebApp | ✅ Запущен | 84016 | 8001 | http://localhost:8001 |
 | Telegram Bot | ✅ Запущен | 56116 | - | - |
-| Cloudflare Tunnel | ✅ Запущен | - | - | https://founded-shopper-miss-kruger.trycloudflare.com |
+| Cloudflare Tunnel | ✅ Запущен | - | - | https://example.invalid |
 | React Dev Server | ✅ Запущен | 70976 | 3000 | http://localhost:3000 |
 
 ---
@@ -141,7 +141,7 @@ DROP TABLE IF EXISTS events;
 ## 🌐 Доступ к WebApp
 
 **Новый URL Cloudflare Tunnel:**  
-https://founded-shopper-miss-kruger.trycloudflare.com/webapp
+https://example.invalid/webapp
 
 **Локальный доступ:**  
 http://localhost:8001/webapp
@@ -152,7 +152,7 @@ http://localhost:8001/webapp
 
 1. **События с пустыми полями:** В БД остались старые события (загруженные до добавления fallback). Новые события будут иметь корректные значения.
 
-2. **Cloudflare URL изменился:** Старый URL `https://scoring-side-receives-hudson.trycloudflare.com` больше не работает. Используйте новый.
+2. **Cloudflare URL изменился:** Старый URL `https://example.invalid` больше не работает. Используйте новый.
 
 3. **Статистика "news_today: 0":** Это корректно, если сегодня новых новостей не было загружено.
 

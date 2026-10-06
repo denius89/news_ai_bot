@@ -13,7 +13,7 @@ HTTP заголовки должны соответствовать станда
 
 **Пример проблемного заголовка:**
 ```
-X-Telegram-User-Data: {"id":1879652637,"first_name":"Денис","username":"denisfedko"}
+X-Telegram-User-Data: {"id":0,"first_name":"автор","username":"project-user"}
                                                       ^^^^^^ - кириллица в UTF-8!
 ```
 
@@ -22,7 +22,7 @@ X-Telegram-User-Data: {"id":1879652637,"first_name":"Денис","username":"den
 ### Почему проявлялось не у всех пользователей?
 
 - ✅ **Пользователи с латинскими именами** (Alex, John) → заголовки содержат только ASCII → всё работает
-- ❌ **Пользователи с кириллическими именами** (Денис, Иван) → заголовки содержат UTF-8 → ошибка
+- ❌ **Пользователи с кириллическими именами** (автор, Иван) → заголовки содержат UTF-8 → ошибка
 
 ---
 
@@ -143,7 +143,7 @@ if user_data:
 ### 1. Пересобрать Frontend
 
 ```bash
-cd /Users/denisfedko/news_ai_bot/webapp
+cd /home/user/news_ai_bot/webapp
 npm run build
 ```
 
@@ -151,7 +151,7 @@ npm run build
 
 ```bash
 pkill -9 -f "src/webapp.py"
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 python3 src/webapp.py > logs/webapp.log 2>&1 &
 ```
 
@@ -159,7 +159,7 @@ python3 src/webapp.py > logs/webapp.log 2>&1 &
 
 ```bash
 pkill -9 cloudflared
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 cloudflared tunnel --url http://localhost:8001 > logs/cloudflare.log 2>&1 &
 
 # Получить новый URL:
@@ -168,7 +168,7 @@ sleep 5 && grep "https://" logs/cloudflare.log | grep "trycloudflare.com" | head
 
 **Новый URL:**
 ```
-https://founded-shopper-miss-kruger.trycloudflare.com
+https://example.invalid
 ```
 
 ---
@@ -185,8 +185,8 @@ https://founded-shopper-miss-kruger.trycloudflare.com
 
 ### Тест 1: Пользователь с кириллическим именем
 
-**User ID:** `1879652637`  
-**Имя:** "Денис"
+**User ID:** `0`  
+**Имя:** "автор"
 
 **Ожидаемый результат:**
 - ✅ Fetch запросы успешно отправляются

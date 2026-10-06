@@ -134,7 +134,7 @@ http://localhost:8001/admin/metrics
 
 Или через Cloudflare tunnel:
 ```
-https://your-tunnel-url.trycloudflare.com/admin/metrics
+https://example.invalid/admin/metrics
 ```
 
 ---

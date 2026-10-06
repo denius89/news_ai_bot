@@ -66,7 +66,7 @@ REACT_DIST_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "weba
 ```python
 # Добавлено в начало файла:
 import sys
-sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+sys.path.insert(0, '/home/user/news_ai_bot')
 ```
 
 #### `telegram_bot/bot.py`:
@@ -74,14 +74,14 @@ sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
 # Добавлено в начало файла:
 import sys
 import os
-sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+sys.path.insert(0, '/home/user/news_ai_bot')
 ```
 
 #### `telegram_bot/handlers/__init__.py`:
 ```python
 # Добавлено в начало файла:
 import sys
-sys.path.insert(0, '/Users/denisfedko/news_ai_bot')
+sys.path.insert(0, '/home/user/news_ai_bot')
 ```
 
 ### 2. **Правильная команда запуска**
@@ -93,7 +93,7 @@ python telegram_bot/bot.py
 
 #### ✅ Правильно:
 ```bash
-PYTHONPATH=/Users/denisfedko/news_ai_bot python -m telegram_bot.bot
+PYTHONPATH=/home/user/news_ai_bot python -m telegram_bot.bot
 ```
 
 ### 3. **Обновление скриптов запуска**
@@ -105,7 +105,7 @@ python3 -c "import utils.ai.ai_client; print('✅ utils.ai.ai_client OK')"
 python3 -c "import config.core.settings; print('✅ config.core.settings OK')"
 
 # Обновлена команда запуска:
-PYTHONPATH="/Users/denisfedko/news_ai_bot:$PYTHONPATH" python3 -m telegram_bot.bot &
+PYTHONPATH="/home/user/news_ai_bot:$PYTHONPATH" python3 -m telegram_bot.bot &
 ```
 
 #### `start_services.sh`:

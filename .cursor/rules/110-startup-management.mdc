@@ -112,7 +112,7 @@ curl -s http://localhost:8001/webapp | head -3
 tail -5 logs/app.log
 
 # Cloudflare
-curl -s https://your-url.trycloudflare.com/webapp | head -3
+curl -s https://example.invalid/webapp | head -3
 ```
 
 ## 🔧 Troubleshooting Commands

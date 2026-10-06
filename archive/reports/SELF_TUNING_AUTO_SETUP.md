@@ -61,16 +61,16 @@ crontab -e
 # Добавить одну из следующих строк:
 
 # Каждые 6 часов в 00:00, 06:00, 12:00, 18:00
-0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 */6 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 
 # Каждые 12 часов в 08:00 и 20:00
-0 8,20 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 8,20 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 
 # Раз в день в 03:00 ночи
-0 3 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 3 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 
 # Каждые 3 часа
-0 */3 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+0 */3 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 ```
 
 **Рекомендуемое расписание:** Каждые 6-12 часов
@@ -102,11 +102,11 @@ After=network.target
 
 [Service]
 Type=oneshot
-User=denisfedko
-WorkingDirectory=/Users/denisfedko/news_ai_bot
-ExecStart=/Users/denisfedko/news_ai_bot/scripts/auto_fetch_and_train.sh
-StandardOutput=append:/Users/denisfedko/news_ai_bot/logs/systemd_retrain.log
-StandardError=append:/Users/denisfedko/news_ai_bot/logs/systemd_retrain_error.log
+User=project-user
+WorkingDirectory=/home/user/news_ai_bot
+ExecStart=/home/user/news_ai_bot/scripts/auto_fetch_and_train.sh
+StandardOutput=append:/home/user/news_ai_bot/logs/systemd_retrain.log
+StandardError=append:/home/user/news_ai_bot/logs/systemd_retrain_error.log
 ```
 
 Создать файл `/etc/systemd/system/pulseai-retrain.timer`:
@@ -358,7 +358,7 @@ cat models/local_predictor_meta.json
 
 # 3. Настроить автозапуск каждые 6 часов
 crontab -e
-# Добавить: 0 */6 * * * cd /Users/denisfedko/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
+# Добавить: 0 */6 * * * cd /home/user/news_ai_bot && ./scripts/auto_fetch_and_train.sh >> logs/cron.log 2>&1
 
 # 4. Проверить, что cron работает
 crontab -l

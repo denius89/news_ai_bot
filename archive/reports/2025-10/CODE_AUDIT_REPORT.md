@@ -163,7 +163,7 @@ tools/news/load_fresh_news.py
 + load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 + SUPABASE_URL = os.getenv("SUPABASE_URL")
 
-- sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+- sys.path.insert(0, "/home/user/news_ai_bot")
 + sys.path.append(str(Path(__file__).parent.parent))
 
 - # HTTP/2 workaround (есть в service.py)
@@ -267,10 +267,10 @@ load_dotenv(Path(__file__).resolve().parent.parent / "config_files" / ".env")
 **Найдено абсолютных путей:**
 ```python
 # database/service.py:21
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+sys.path.insert(0, "/home/user/news_ai_bot")
 
 # telegram_bot/handlers/__init__.py:3  
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+sys.path.insert(0, "/home/user/news_ai_bot")
 
 # Еще в ~5 файлах
 ```
@@ -280,7 +280,7 @@ sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
 **Решение:**
 ```python
 # Вместо:
-sys.path.insert(0, "/Users/denisfedko/news_ai_bot")
+sys.path.insert(0, "/home/user/news_ai_bot")
 
 # Использовать:
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -523,7 +523,7 @@ def get_news():
   - `ai_modules/credibility.py`
   - `ai_modules/importance.py`
   - `ai_modules/teaser_generator.py`
-- **Было:** `sys.path.insert(0, "/Users/denisfedko/news_ai_bot")`
+- **Было:** `sys.path.insert(0, "/home/user/news_ai_bot")`
 - **Стало:** `sys.path.insert(0, str(Path(__file__).resolve().parent.parent))`
 - **Эффект:** Код стал портабельным
 

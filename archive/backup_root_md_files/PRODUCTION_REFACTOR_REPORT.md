@@ -58,7 +58,7 @@
 ```
 ┌─────────────────────────────────────────┐
 │           Cloudflare Tunnel            │
-│    (https://your-domain.trycloudflare.com) │
+│    (https://example.invalid) │
 └─────────────────┬───────────────────────┘
                   │
 ┌─────────────────▼───────────────────────┐
@@ -119,9 +119,9 @@ make bot      # Только Telegram Bot
 ## 🌐 **URL СТРУКТУРА**
 
 ### **Production:**
-- **React App:** `https://your-domain.trycloudflare.com/webapp`
-- **API:** `https://your-domain.trycloudflare.com/api/health`
-- **Dashboard:** `https://your-domain.trycloudflare.com/webapp`
+- **React App:** `https://example.invalid/webapp`
+- **API:** `https://example.invalid/api/health`
+- **Dashboard:** `https://example.invalid/webapp`
 
 ### **Local Development:**
 - **React App:** `http://localhost:8001/webapp`

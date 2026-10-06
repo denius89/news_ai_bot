@@ -171,7 +171,7 @@
 ### 1. Новости
 ```bash
 # Откройте браузер
-https://scoring-side-receives-hudson.trycloudflare.com/webapp
+https://example.invalid/webapp
 
 # Перейдите в раздел "Новости"
 # Проверьте:
@@ -320,6 +320,6 @@ EOF
 ---
 
 **Подготовлено:** PulseAI Senior Engineer  
-**Контакт:** support@pulseai.local  
+**Контакт:** contact@example.invalid  
 **Дата:** 13 октября 2025, 22:20 UTC
 

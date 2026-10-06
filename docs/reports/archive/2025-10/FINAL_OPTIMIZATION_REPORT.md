@@ -37,7 +37,7 @@
 - **12 файлов** в корне (только основные)
 - **Логическая структура:**
   ```
-  /Users/denisfedko/news_ai_bot/
+  /home/user/news_ai_bot/
   ├── 📄 README.md                    # Основная документация
   ├── 📄 LICENSE                      # Лицензия
   ├── 📄 pyproject.toml               # Конфигурация Python

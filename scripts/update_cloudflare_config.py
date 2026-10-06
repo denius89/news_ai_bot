@@ -43,7 +43,7 @@ def update_documentation():
             content = f.read()
 
         # Заменяем старые URL на новые
-        old_url = "https://postcards-simple-investigators-negotiation.trycloudflare.com"
+        old_url = "https://example.invalid"
         new_url = deployment_info["tunnel_url"]
 
         if old_url in content:
@@ -59,7 +59,7 @@ def update_documentation():
         with open(dev_guide_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        old_url = "https://postcards-simple-investigators-negotiation.trycloudflare.com"
+        old_url = "https://example.invalid"
         new_url = deployment_info["tunnel_url"]
 
         if old_url in content:

@@ -183,7 +183,7 @@ make start
 
 ### Production (Cloudflare):
 ```bash
-WEBAPP_URL=https://immunology-restructuring-march-same.trycloudflare.com
+WEBAPP_URL=https://example.invalid
 make start
 ```
 

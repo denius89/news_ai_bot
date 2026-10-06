@@ -336,7 +336,7 @@ def update_notification_settings():
 **Файл:** `scripts/send_morning_digests.sh`
 ```bash
 #!/bin/bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 source venv/bin/activate
 export $(cat .env | grep -v '^#' | xargs)
 
@@ -347,7 +347,7 @@ echo "$(date): Morning digests sent" >> logs/cron.log
 **Файл:** `scripts/send_evening_digests.sh`
 ```bash
 #!/bin/bash
-cd /Users/denisfedko/news_ai_bot
+cd /home/user/news_ai_bot
 source venv/bin/activate
 export $(cat .env | grep -v '^#' | xargs)
 
@@ -363,10 +363,10 @@ crontab -e
 
 # Add:
 # Morning digest at 9:00 AM (Europe/Warsaw)
-0 9 * * * /Users/denisfedko/news_ai_bot/scripts/send_morning_digests.sh
+0 9 * * * /home/user/news_ai_bot/scripts/send_morning_digests.sh
 
 # Evening digest at 6:00 PM (Europe/Warsaw)
-0 18 * * * /Users/denisfedko/news_ai_bot/scripts/send_evening_digests.sh
+0 18 * * * /home/user/news_ai_bot/scripts/send_evening_digests.sh
 ```
 
 **Или документировать без настройки:**
@@ -581,7 +581,7 @@ async def test_subscription_flow():
 
 ## 📞 КОНТАКТЫ И РЕСУРСЫ
 
-**Repository:** https://github.com/denius89/news_ai_bot  
+**Repository:** https://github.com/repository-owner/news_ai_bot  
 **Documentation:** docs/README.md  
 **Production Checklist:** PRODUCTION_CHECKLIST.md
 

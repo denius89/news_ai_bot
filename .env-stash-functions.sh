@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 # Git Stash функции для безопасной работы с .env
-# Добавьте в ~/.zshrc: source /Users/denisfedko/news_ai_bot/.env-stash-functions.sh
+# Добавьте в ~/.zshrc: source /home/user/news_ai_bot/.env-stash-functions.sh
 
 # Цвета
 GREEN='\033[0;32m'

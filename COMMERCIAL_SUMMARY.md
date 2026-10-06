@@ -1,3 +1,5 @@
+> **НЕАКТУАЛЬНО / DISCONTINUED — 2026-10-06.** Разработка PulseAI прекращена. Материалы сохранены как исторический архив; прежние заявления о готовности, планы и коммерческие прогнозы неактуальны. Поддержка и обновления не предоставляются.
+
 # 🚀 PulseAI - Краткая коммерческая справка
 
 **Дата:** 17 октября 2025  
@@ -127,8 +129,8 @@ Premium ($4.99), Enterprise ($49), API тарифы
 
 - 🤖 **Telegram Bot:** [@pulseai_bot](https://t.me/pulseai_bot)
 - 🌐 **Demo:** [Доступно по запросу]
-- 📧 **Email:** denis@pulseai.app
-- 🐙 **GitHub:** [github.com/denius89/news_ai_bot](https://github.com/denius89/news_ai_bot)
+- 📧 **Email:** contact@example.invalid
+- 🐙 **GitHub:** [github.com/repository-owner/news_ai_bot](https://github.com/repository-owner/news_ai_bot)
 
 ---
 

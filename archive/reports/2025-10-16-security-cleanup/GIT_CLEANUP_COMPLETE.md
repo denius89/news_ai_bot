@@ -114,7 +114,7 @@ git count-objects -vH
 
 ### На GitHub:
 - История может кэшироваться до 24 часов
-- Через несколько часов проверьте: https://github.com/denius89/news_ai_bot/commits/main
+- Через несколько часов проверьте: https://github.com/repository-owner/news_ai_bot/commits/main
 - Коммит `93bfb62` должен исчезнуть из истории
 
 ---
@@ -161,9 +161,9 @@ git push origin --force --tags --no-verify
 
 ## 📞 Контакты
 
-**Репозиторий:** https://github.com/denius89/news_ai_bot  
+**Репозиторий:** https://github.com/repository-owner/news_ai_bot  
 **Выполнено:** AI Assistant (Claude Sonnet 4.5)  
-**Пользователь:** Denys Fedko (denisfedko@gmail.com)
+**Пользователь:** Denys maintainer (contact@example.invalid)
 
 ---
 
