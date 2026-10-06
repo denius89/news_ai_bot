@@ -20,7 +20,7 @@ async def open_dashboard(message: types.Message):
     logger.info("📱 Dashboard command received from user %s", message.from_user.id)
 
     # TODO: Move WebApp URL to config.py
-    webapp_url = "https://reduction-newly-received-administrative.trycloudflare.com/webapp"
+    webapp_url = "https://example.invalid/webapp"
 
     # Create keyboard with WebApp button
     keyboard = ReplyKeyboardMarkup(
@@ -55,7 +55,7 @@ async def open_dashboard_callback(callback_query: types.CallbackQuery):
     logger.info("📱 Dashboard callback received from user %s", callback_query.from_user.id)
 
     # TODO: Move WebApp URL to config.py
-    webapp_url = "https://reduction-newly-received-administrative.trycloudflare.com/webapp"
+    webapp_url = "https://example.invalid/webapp"
 
     # Create keyboard with WebApp button
     keyboard = ReplyKeyboardMarkup(

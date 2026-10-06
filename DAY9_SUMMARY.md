@@ -31,7 +31,7 @@
 
 ### 5. ✅ Обновлен URL WebApp на новый Cloudflare tunnel
 - **Старый URL**: `http://localhost:8001/webapp`
-- **Новый URL**: `https://reduction-newly-received-administrative.trycloudflare.com/webapp`
+- **Новый URL**: `https://example.invalid/webapp`
 - **Файл**: `telegram_bot/handlers/dashboard.py`
 
 ## 🔧 Технические улучшения
