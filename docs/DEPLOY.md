@@ -10,7 +10,7 @@
 
 1. Клонировать репозиторий:
 ```bash
-git clone https://github.com/denius89/news_ai_bot.git
+git clone https://github.com/repository-owner/news_ai_bot.git
 cd news_ai_bot
 ```
 
@@ -88,7 +88,7 @@ python -m telegram_bot.bot
 
 ⚠️ Требуется наличие переменной окружения `TELEGRAM_BOT_TOKEN` в `.env`.
    ```bash
-   git clone https://github.com/denius89/news_ai_bot.git
+   git clone https://github.com/repository-owner/news_ai_bot.git
    cd news_ai_bot
    ```
 
